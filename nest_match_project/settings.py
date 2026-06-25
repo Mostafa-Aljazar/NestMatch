@@ -27,8 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-LOGIN_URL = '/auth/login/'
-
 
 # Application definition
 
@@ -65,7 +63,7 @@ ROOT_URLCONF = 'nest_match_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -111,6 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'accounts_app.User'
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
@@ -127,6 +126,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'

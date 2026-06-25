@@ -37,13 +37,6 @@
         .auth-input.has-icon-left  { padding-left: 2.5rem; }   /* 40px, matches pl-10 */
         .auth-input.has-icon-right { padding-right: 2.5rem; }
 
-        /* Error state: keep the red border even while focused, so it doesn't
-           flash back to purple the instant the user clicks into the field. */
-        .auth-input.border-red-500:focus {
-            border-color: #ef4444;
-            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
-        }
-
         input, select, textarea {
             background-color: #ffffff !important;
             color: #111827;
@@ -144,27 +137,17 @@
                     <p class="text-[14px] text-gray-500">Join NestMatch and find your perfect roommate</p>
                 </div>
 
-                <form action="{% url 'accounts_app:register_create' %}" method="POST" class="space-y-4" novalidate>
+                <form action="{% url 'accounts_app:register_create' %}" method="POST" class="space-y-4">
                     {% csrf_token %}
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="space-y-1.5">
                             <label class="text-[13px] font-semibold text-[#374151]">First Name</label>
-                            <input type="text" name="first_name" placeholder="Mohamed"
-                                   value="{{ form_data.first_name|default:'' }}"
-                                   class="auth-input {% if errors.first_name %}border-red-500 has-error{% endif %}">
-                            {% if errors.first_name %}
-                                <p id="error-first_name" class="field-error text-[12px] text-red-600 font-medium mt-1">{{ errors.first_name }}</p>
-                            {% endif %}
+                            <input type="text" name="first_name" placeholder="Mohamed" class="auth-input">
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-[13px] font-semibold text-[#374151]">Last Name</label>
-                            <input type="text" name="last_name" placeholder="Ali"
-                                   value="{{ form_data.last_name|default:'' }}"
-                                   class="auth-input {% if errors.last_name %}border-red-500 has-error{% endif %}">
-                            {% if errors.last_name %}
-                                <p id="error-last_name" class="field-error text-[12px] text-red-600 font-medium mt-1">{{ errors.last_name }}</p>
-                            {% endif %}
+                            <input type="text" name="last_name" placeholder="Ali" class="auth-input">
                         </div>
                     </div>
 
@@ -172,14 +155,8 @@
                         <label class="text-[13px] font-semibold text-[#374151]">Username</label>
                         <div class="relative">
                             <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 font-bold text-[15px]">@</span>
-                            <input type="text" name="username" placeholder="mohamedali"
-                                   value="{{ form_data.username|default:'' }}"
-                                   class="auth-input has-icon-left {% if errors.username %}border-red-500 has-error{% endif %}"
-                                   autocomplete="username">
+                            <input type="text" name="username" placeholder="mohamedali" class="auth-input has-icon-left" autocomplete="username">
                         </div>
-                        {% if errors.username %}
-                            <p id="error-username" class="field-error text-[12px] text-red-600 font-medium mt-1">{{ errors.username }}</p>
-                        {% endif %}
                     </div>
 
                     <div class="space-y-1.5">
@@ -191,14 +168,8 @@
                                     <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                                 </svg>
                             </span>
-                            <input type="email" name="email" placeholder="you@example.com"
-                                   value="{{ form_data.email|default:'' }}"
-                                   class="auth-input has-icon-left {% if errors.email %}border-red-500 has-error{% endif %}"
-                                   autocomplete="email">
+                            <input type="email" name="email" placeholder="you@example.com" class="auth-input has-icon-left" autocomplete="email">
                         </div>
-                        {% if errors.email %}
-                            <p id="error-email" class="field-error text-[12px] text-red-600 font-medium mt-1">{{ errors.email }}</p>
-                        {% endif %}
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -210,13 +181,8 @@
                                         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
                                     </svg>
                                 </span>
-                                <input id="password" type="password" name="password" placeholder="••••••••"
-                                       class="auth-input has-icon-left {% if errors.password %}border-red-500 has-error{% endif %}"
-                                       autocomplete="new-password">
+                                <input id="password" type="password" name="password" placeholder="••••••••" class="auth-input has-icon-left" autocomplete="new-password">
                             </div>
-                            {% if errors.password %}
-                                <p  id="error-password" class="field-error text-[12px] text-red-600 font-medium mt-1">{{ errors.password }}</p>
-                            {% endif %}
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-[13px] font-semibold text-[#374151]">Confirm Password</label>
@@ -226,30 +192,24 @@
                                         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
                                     </svg>
                                 </span>
-                                <!-- Same key "password" covers a mismatch, so this field gets the
-                                     red border too, but we don't repeat the message twice. -->
-                                <input id="confirm_pw" type="password" name="confirm_pw" placeholder="••••••••"
-                                       class="auth-input has-icon-left {% if errors.password %}border-red-500 has-error{% endif %}"
-                                       autocomplete="new-password">
+                                <input id="confirm_pw" type="password" name="confirm_pw" placeholder="••••••••" class="auth-input has-icon-left" autocomplete="new-password">
                             </div>
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-[13px] font-semibold text-[#374151]">Gender</label>
-                        <div id="gender-group" class="grid grid-cols-2 gap-3 {% if errors.gender %}ring-2 ring-red-400 rounded-lg p-1{% endif %}">
-                            <label onclick="toggleGender(this)"
-                                   class="gender-card flex items-center justify-start space-x-2.5 rounded-lg py-2.5 px-4 cursor-pointer select-none font-semibold text-sm transition {% if form_data.gender == 'F' %}border border-gray-200 bg-white text-[#374151] hover:bg-gray-50{% else %}border-2 border-[#7C3AED] bg-[#F5F3FF] text-[#7C3AED]{% endif %}">
-                                <input type="radio" name="gender" value="M" {% if form_data.gender != 'F' %}checked{% endif %} class="hidden">
+                        <div class="grid grid-cols-2 gap-3">
+                            <label onclick="toggleGender(this)" class="gender-card flex items-center justify-start space-x-2.5 border-2 border-[#7C3AED] bg-[#F5F3FF] text-[#7C3AED] rounded-lg py-2.5 px-4 cursor-pointer select-none font-semibold text-sm transition">
+                                <input type="radio" name="gender" value="M" checked class="hidden">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                                     <circle cx="12" cy="7" r="4"/>
                                 </svg>
                                 <span>Male</span>
                             </label>
-                            <label onclick="toggleGender(this)"
-                                   class="gender-card flex items-center justify-start space-x-2.5 rounded-lg py-2.5 px-4 cursor-pointer select-none font-semibold text-sm transition {% if form_data.gender == 'F' %}border-2 border-[#7C3AED] bg-[#F5F3FF] text-[#7C3AED]{% else %}border border-gray-200 bg-white text-[#374151] hover:bg-gray-50{% endif %}">
-                                <input type="radio" name="gender" value="F" {% if form_data.gender == 'F' %}checked{% endif %} class="hidden">
+                            <label onclick="toggleGender(this)" class="gender-card flex items-center justify-start space-x-2.5 border border-gray-200 bg-white text-[#374151] rounded-lg py-2.5 px-4 cursor-pointer select-none font-semibold text-sm hover:bg-gray-50 transition">
+                                <input type="radio" name="gender" value="F" class="hidden">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M20 21v-2a4 4 0 0 0-3-3.87"/>
                                     <path d="M4 21v-2a4 4 0 0 1 3-3.87"/>
@@ -258,34 +218,21 @@
                                 <span>Female</span>
                             </label>
                         </div>
-                        {% if errors.gender %}
-                            <p id="gender-error-msg" class="field-error text-[12px] text-red-600 font-medium mt-1">{{ errors.gender }}</p>
-                        {% endif %}
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="space-y-1.5">
                             <label class="text-[13px] font-semibold text-[#374151]">Nationality</label>
-                            <select name="country"
-                                    class="auth-input appearance-none {% if errors.country %}border-red-500 has-error{% endif %}"
-                                    style="background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b7280%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem;">
-                                <option value="" disabled {% if not form_data.country %}selected{% endif %}>Select country</option>
+                            <select name="country" class="auth-input appearance-none" style="background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b7280%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1rem;">
+                                <option value="" disabled selected>Select country</option>
                                 {% for code, name in countries %}
-                                    <option value="{{ code }}" {% if form_data.country == code %}selected{% endif %}>{{ name }}</option>
+                                    <option value="{{ code }}">{{ name }}</option>
                                 {% endfor %}
                             </select>
-                            {% if errors.country %}
-                                <p id="error-country" class="field-error text-[12px] text-red-600 font-medium mt-1">{{ errors.country }}</p>
-                            {% endif %}
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-[13px] font-semibold text-[#374151]">Date of Birth</label>
-                            <input type="date" name="date_of_birth"
-                                   value="{{ form_data.date_of_birth|default:'' }}"
-                                   class="auth-input {% if errors.date_of_birth %}border-red-500 has-error{% endif %}">
-                            {% if errors.date_of_birth %}
-                                <p id="error-date_of_birth" class="field-error text-[12px] text-red-600 font-medium mt-1">{{ errors.date_of_birth }}</p>
-                            {% endif %}
+                            <input type="date" name="date_of_birth" class="auth-input">
                         </div>
                     </div>
 
@@ -336,31 +283,7 @@
             selectedLabel.classList.remove('border', 'border-gray-200', 'bg-white', 'text-[#374151]');
             selectedLabel.classList.add('border-2', 'border-[#7C3AED]', 'bg-[#F5F3FF]', 'text-[#7C3AED]');
             selectedLabel.querySelector('input').checked = true;
-
-            // Gender doesn't fire a normal "input" event (it's a styled radio),
-            // so we clear its error state manually as soon as a choice is made.
-            const genderGroup = document.getElementById('gender-group');
-            if (genderGroup) genderGroup.classList.remove('ring-2', 'ring-red-400');
-            const genderError = document.getElementById('gender-error-msg');
-            if (genderError) genderError.remove();
         }
-
-        // ===== Clear server-side field errors as soon as the user edits the field =====
-        // Every input/select that currently shows an error has the "has-error" class.
-        // The moment the user types into it (or picks a new option/date), we:
-        //   1. drop the red border
-        //   2. remove the error message right under it
-        // This only clears the *visual* error; the field is still re-validated for
-        // real the next time the form is submitted to the server.
-        document.querySelectorAll('input, select').forEach(field => {
-            const clearError = () => {
-                field.classList.remove('has-error', 'border-red-500');
-                const errorMsg = document.getElementById('error-' + field.name);
-                if (errorMsg) errorMsg.remove();
-            };
-            field.addEventListener('input', clearError);
-            field.addEventListener('change', clearError);
-        });
     </script>
 </body>
 </html>
