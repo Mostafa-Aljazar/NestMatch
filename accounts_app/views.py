@@ -48,7 +48,7 @@ def register_create_view(request):
             login(request, user)
             
             messages.success(request, "Registration successful! Welcome to NestMatch.")
-            return redirect('accounts_app:index')
+            return redirect('core_app:index')
 
         except Exception as e:
             messages.error(request, "An unexpected error occurred. Please try again.")
@@ -87,7 +87,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f"Welcome back, {user.first_name}!")
-                return redirect('accounts_app:index')
+                return redirect('core_app:index')
 
         messages.error(request, "Authentication failed. Invalid credentials.")
         return render(request, 'login.html')
