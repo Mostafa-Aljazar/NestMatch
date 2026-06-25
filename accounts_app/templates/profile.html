@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile | NestMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#f5f3ff',
+                100: '#ede9fe',
+                500: '#7c3aed',
+                600: '#6d28d9',
+                700: '#5b21b6',
+                900: '#4c1d95',
+              },
+            },
+            boxShadow: {
+              soft: '0 16px 45px rgba(124, 58, 237, 0.16)',
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+      .tab-btn.active {
+        color: #7c3aed;
+        border-bottom-color: #7c3aed;
+      }
+      .option-card.selected {
+        border-color: #7c3aed;
+        background-color: #f5f3ff;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gray-50 text-slate-800">
+    <nav class="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <a href="#" class="flex items-center gap-2 text-brand-600">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12 12 3l9 9" />
+            <path d="M9 21V9h6v12" />
+          </svg>
+          <span class="text-lg font-extrabold tracking-[-0.02em]">NestMatch</span>
+        </a>
+
+        <div class="hidden items-center gap-6 md:flex">
+          <a href="#" class="text-sm font-medium text-slate-500 hover:text-brand-600">Home</a>
+          <a href="#" class="text-sm font-medium text-slate-500 hover:text-brand-600">Listings</a>
+          <a href="#" class="text-sm font-medium text-slate-500 hover:text-brand-600">Post a Room</a>
+          <a href="#" class="text-sm font-medium text-slate-500 hover:text-brand-600">About</a>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button class="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-violet-400 text-sm font-black text-white">A</div>
+            Ahmed
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <section class="mt-20 bg-gradient-to-br from-brand-900 via-brand-600 to-violet-500 px-4 py-16 text-white sm:px-6 lg:px-8">
+      <div class="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+        <div class="flex items-center gap-5">
+          <div class="relative">
+            <div class="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/30 bg-gradient-to-br from-violet-300 to-brand-500 text-3xl font-black text-white shadow-soft">
+              A
+            </div>
+            <button class="absolute bottom-1 right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white text-sm shadow-lg">
+              ✏️
+            </button>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.25em] text-violet-100">Room Poster · Member since Jan 2024</p>
+            <h1 class="mt-2 text-3xl font-black tracking-[-0.03em]">Ahmed Mohamed</h1>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <span class="rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-semibold text-white">✅ Verified Account</span>
+              <span class="rounded-full border border-emerald-300/35 bg-emerald-400/20 px-3 py-1 text-xs font-semibold text-emerald-200">⚡ 95% Response Rate</span>
+              <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-violet-50">🏠 2 Active Listings</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-b border-slate-200 bg-white">
+      <div class="mx-auto flex max-w-6xl flex-wrap px-4 sm:px-6 lg:px-8">
+        <button class="tab-btn active border-b-2 border-transparent px-5 py-4 text-sm font-semibold text-brand-600" data-tab="info">Personal Info</button>
+        <button class="tab-btn border-b-2 border-transparent px-5 py-4 text-sm font-semibold text-slate-500" data-tab="lifestyle">Lifestyle Profile</button>
+        <button class="tab-btn border-b-2 border-transparent px-5 py-4 text-sm font-semibold text-slate-500" data-tab="security">Security</button>
+        <button class="tab-btn border-b-2 border-transparent px-5 py-4 text-sm font-semibold text-slate-500" data-tab="notifications">Notifications</button>
+      </div>
+    </section>
+
+    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+      <div id="tab-info" class="space-y-6">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-900">Personal Information</h2>
+          <div class="mt-6 grid gap-5 md:grid-cols-2">
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-700">First Name</label>
+              <input type="text" value="Ahmed" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100" />
+            </div>
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-700">Last Name</label>
+              <input type="text" value="Mohamed" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="mb-2 block text-sm font-semibold text-slate-700">Username</label>
+              <input type="text" value="@ahmedmohamed" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="mb-2 block text-sm font-semibold text-slate-700">Email <span class="text-slate-400 font-normal">(read-only)</span></label>
+              <input type="email" value="ahmed@example.com" readonly class="w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500 outline-none" />
+            </div>
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-700">Phone Number</label>
+              <input type="tel" value="+20 100 123 4567" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100" />
+            </div>
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-700">Gender</label>
+              <select class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100">
+                <option selected>Male</option>
+                <option>Female</option>
+              </select>
+            </div>
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-700">Nationality</label>
+              <select class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100">
+                <option selected>Egyptian</option>
+                <option>Palestinian</option>
+                <option>Saudi Arabian</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-700">Date of Birth</label>
+              <input type="date" value="1999-03-15" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="mb-2 block text-sm font-semibold text-slate-700">Bio</label>
+              <textarea class="min-h-28 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100">Engineering student at Ain Shams University. Looking for responsible and respectful roommates. I'm clean, organized, and prefer a quiet environment for studying.</textarea>
+            </div>
+          </div>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button class="rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Save Changes</button>
+            <button class="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-600">Discard</button>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-rose-200 bg-rose-50 p-6 shadow-sm">
+          <h3 class="text-base font-bold text-rose-600">Danger Zone</h3>
+          <p class="mt-2 text-sm text-slate-600">Permanently delete your NestMatch account and all associated data. This action cannot be undone.</p>
+          <button class="mt-4 rounded-xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600">Delete Account</button>
+        </div>
+      </div>
+
+      <div id="tab-lifestyle" class="hidden space-y-6">
+        <div class="rounded-2xl border border-violet-200 bg-violet-50 p-4 shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🤖</span>
+            <div>
+              <p class="text-sm font-bold text-brand-600">AI Compatibility Profile</p>
+              <p class="text-sm text-slate-600">Keep your answers updated to improve roommate recommendations.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-bold text-slate-900">😴 Sleep & Schedule</h3>
+          <div class="mt-4 space-y-4">
+            <div>
+              <p class="mb-3 text-sm font-semibold text-slate-700">When do you usually sleep?</p>
+              <div class="flex flex-wrap gap-3">
+                <button class="option-card rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">Before 10PM</button>
+                <button class="option-card selected rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">10PM–12AM</button>
+                <button class="option-card rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">After 12AM</button>
+              </div>
+            </div>
+            <div>
+              <p class="mb-3 text-sm font-semibold text-slate-700">When do you wake up?</p>
+              <div class="flex flex-wrap gap-3">
+                <button class="option-card rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">Before 7AM</button>
+                <button class="option-card selected rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">7AM–9AM</button>
+                <button class="option-card rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">After 9AM</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-bold text-slate-900">🔊 Noise & Social</h3>
+          <div class="mt-4">
+            <p class="mb-3 text-sm font-semibold text-slate-700">How social are you at home?</p>
+            <div class="flex flex-wrap gap-3">
+              <button class="option-card selected rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">Introvert</button>
+              <button class="option-card rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">Balanced</button>
+              <button class="option-card rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">Extrovert</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-bold text-slate-900">🧹 Cleanliness & Habits</h3>
+          <div class="mt-4 space-y-4">
+            <div>
+              <p class="mb-3 text-sm font-semibold text-slate-700">Cleanliness level?</p>
+              <div class="flex flex-wrap gap-3">
+                <button class="option-card selected rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">Very Clean</button>
+                <button class="option-card rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">Clean</button>
+                <button class="option-card rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">Relaxed</button>
+              </div>
+            </div>
+            <div>
+              <p class="mb-3 text-sm font-semibold text-slate-700">Do you smoke?</p>
+              <div class="flex flex-wrap gap-3">
+                <button class="option-card rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">Yes</button>
+                <button class="option-card selected rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">No</button>
+                <button class="option-card rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">Outside Only</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="w-full rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Save Lifestyle Profile</button>
+      </div>
+
+      <div id="tab-security" class="hidden space-y-6">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-900">🔒 Change Password</h2>
+          <div class="mt-5 space-y-4">
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-700">Current Password</label>
+              <input type="password" placeholder="••••••••" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100" />
+            </div>
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-700">New Password</label>
+              <input type="password" placeholder="••••••••" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100" />
+            </div>
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-700">Confirm New Password</label>
+              <input type="password" placeholder="••••••••" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100" />
+            </div>
+          </div>
+          <button class="mt-6 rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Update Password</button>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-bold text-slate-900">🔗 Connected Accounts</h3>
+          <div class="mt-4 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <div class="flex items-center gap-3">
+              <svg class="h-5 w-5" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+                <path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" />
+                <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
+              </svg>
+              <div>
+                <p class="text-sm font-semibold text-slate-800">Google</p>
+                <p class="text-sm text-slate-500">ahmed@gmail.com</p>
+              </div>
+            </div>
+            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">Connected</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-notifications" class="hidden">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-900">🔔 Notification Preferences</h2>
+          <div class="mt-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <p class="text-sm font-semibold text-slate-800">New Applicants</p>
+                <p class="text-sm text-slate-500">When someone applies to your listing</p>
+              </div>
+              <label class="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" class="peer sr-only" checked />
+                <div class="h-6 w-11 rounded-full bg-slate-300 peer-checked:bg-brand-600"></div>
+                <div class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition peer-checked:translate-x-5"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <p class="text-sm font-semibold text-slate-800">Application Status</p>
+                <p class="text-sm text-slate-500">Accepted or rejected updates</p>
+              </div>
+              <label class="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" class="peer sr-only" checked />
+                <div class="h-6 w-11 rounded-full bg-slate-300 peer-checked:bg-brand-600"></div>
+                <div class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition peer-checked:translate-x-5"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <p class="text-sm font-semibold text-slate-800">New Matching Rooms</p>
+                <p class="text-sm text-slate-500">Rooms that match your lifestyle above 85%</p>
+              </div>
+              <label class="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" class="peer sr-only" checked />
+                <div class="h-6 w-11 rounded-full bg-slate-300 peer-checked:bg-brand-600"></div>
+                <div class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition peer-checked:translate-x-5"></div>
+              </label>
+            </div>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <p class="text-sm font-semibold text-slate-800">WhatsApp Notifications</p>
+                <p class="text-sm text-slate-500">Receive alerts via WhatsApp</p>
+              </div>
+              <label class="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" class="peer sr-only" />
+                <div class="h-6 w-11 rounded-full bg-slate-300 peer-checked:bg-brand-600"></div>
+                <div class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition peer-checked:translate-x-5"></div>
+              </label>
+            </div>
+          </div>
+          <button class="mt-6 rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Save Preferences</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-slate-900 px-4 py-10 text-slate-300 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-6xl">
+        <div class="grid gap-8 md:grid-cols-3">
+          <div>
+            <div class="flex items-center gap-2 text-brand-400">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12 12 3l9 9" />
+                <path d="M9 21V9h6v12" />
+              </svg>
+              <span class="text-base font-extrabold">NestMatch</span>
+            </div>
+            <p class="mt-3 max-w-xs text-sm text-slate-400">AI-powered roommate matching for better living.</p>
+          </div>
+          <div>
+            <h4 class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Platform</h4>
+            <div class="mt-3 space-y-2 text-sm">
+              <a href="#" class="block text-slate-400 hover:text-white">Home</a>
+              <a href="#" class="block text-slate-400 hover:text-white">Listings</a>
+              <a href="#" class="block text-slate-400 hover:text-white">Post a Room</a>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Support</h4>
+            <div class="mt-3 space-y-2 text-sm">
+              <a href="#" class="block text-slate-400 hover:text-white">Contact</a>
+              <a href="#" class="block text-slate-400 hover:text-white">FAQ</a>
+              <a href="#" class="block text-slate-400 hover:text-white">Privacy Policy</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      const tabPanels = {
+        info: document.getElementById('tab-info'),
+        lifestyle: document.getElementById('tab-lifestyle'),
+        security: document.getElementById('tab-security'),
+        notifications: document.getElementById('tab-notifications'),
+      };
+
+      tabButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          tabButtons.forEach((btn) => btn.classList.remove('active'));
+          button.classList.add('active');
+
+          Object.entries(tabPanels).forEach(([key, panel]) => {
+            panel.classList.toggle('hidden', key !== button.dataset.tab);
+          });
+        });
+      });
+
+      document.querySelectorAll('.option-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          const group = card.parentElement;
+          group.querySelectorAll('.option-card').forEach((item) => item.classList.remove('selected'));
+          card.classList.add('selected');
+        });
+      });
+    </script>
+  </body>
+</html>
