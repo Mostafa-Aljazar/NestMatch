@@ -146,7 +146,7 @@ Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 
 AXSOS Academy — Graduation Final Project, 2026
 
-- **Mostafa Aljazar** — Team Lead · [@mostafaibrahim20032020](https://github.com/mostafaibrahim20032020)
+- **Mostafa Aljazar** — Team Lead · [@Mostafa-Aljazar](https://github.com/Mostafa-Aljazar)
 - **Amira Jarghon** — [@AmiraAliJa1282001](https://github.com/AmiraAliJa1282001)
 - **Noor Shurrab** — [@NoorShurrab](https://github.com/NoorShurrab)
 - **Sara Ayyash** — [@Sara-ayyash1](https://github.com/Sara-ayyash1)
