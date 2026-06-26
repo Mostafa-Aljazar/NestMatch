@@ -1,0 +1,99 @@
+{% comment %}
+  Navbar partial — include with:
+    {% include "core_app/partials/navbar.html" with active_page="home" %}
+
+  active_page values: "home" | "listings" | "post_room" | "about"
+{% endcomment %}
+
+<!-- NAVBAR -->
+<nav id="nm-nav" class="fixed top-0 left-0 right-0 z-50 h-16 bg-white border-b border-gray-200 flex items-center px-5 transition-shadow duration-300">
+
+  <!-- Logo -->
+  <a href="/" class="flex items-center gap-2 shrink-0 no-underline">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <path d="M3 12L12 3L21 12V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V12Z" fill="#7C3AED"/>
+    </svg>
+    <span class="text-[19px] font-extrabold text-violet-600 tracking-tight">NestMatch</span>
+  </a>
+
+  <!-- Desktop nav links -->
+  <div class="hidden md:flex items-center gap-7 mx-auto">
+    <a href="/"
+       class="text-sm font-medium {% if active_page == 'home' %}text-violet-600 border-b-2 border-violet-600 pb-0.5 font-semibold{% else %}text-gray-500 hover:text-gray-800{% endif %}">
+      Home
+    </a>
+    <a href="/rooms/"
+       class="text-sm font-medium {% if active_page == 'listings' %}text-violet-600 border-b-2 border-violet-600 pb-0.5 font-semibold{% else %}text-gray-500 hover:text-gray-800{% endif %}">
+      Listings
+    </a>
+    <a href="/rooms/new/"
+       class="text-sm font-medium {% if active_page == 'post_room' %}text-violet-600 border-b-2 border-violet-600 pb-0.5 font-semibold{% else %}text-gray-500 hover:text-gray-800{% endif %}">
+      Post a Room
+    </a>
+    <a href="/about/"
+       class="text-sm font-medium {% if active_page == 'about' %}text-violet-600 border-b-2 border-violet-600 pb-0.5 font-semibold{% else %}text-gray-500 hover:text-gray-800{% endif %}">
+      About
+    </a>
+  </div>
+
+  <!-- Desktop auth buttons -->
+  <div class="hidden md:flex items-center gap-3 shrink-0">
+    {% if user.is_authenticated %}
+      <a href="/dashboard/" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 hover:text-violet-600 transition-colors">
+        <span class="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-xs font-extrabold">
+          {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+        </span>
+        {{ user.first_name }}
+      </a>
+      <a href="/auth/logout/" class="px-5 py-2 text-sm font-semibold text-gray-500 border border-gray-200 rounded-lg hover:border-red-300 hover:text-red-500 transition-colors">Logout</a>
+    {% else %}
+      <a href="/auth/" class="px-5 py-2 text-sm font-semibold text-violet-600 border border-violet-600 rounded-lg hover:bg-violet-50 transition-colors">Login</a>
+      <a href="/auth/" class="px-5 py-2 text-sm font-semibold text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors">Register</a>
+    {% endif %}
+  </div>
+
+  <!-- Mobile hamburger -->
+  <button class="md:hidden flex flex-col gap-1.5 ml-auto bg-transparent border-none p-1.5 cursor-pointer" id="nm-hbg" onclick="nmToggleMenu()" aria-label="Menu">
+    <span class="block w-5 h-0.5 bg-gray-700 rounded transition-all duration-250"></span>
+    <span class="block w-5 h-0.5 bg-gray-700 rounded transition-all duration-250"></span>
+    <span class="block w-5 h-0.5 bg-gray-700 rounded transition-all duration-250"></span>
+  </button>
+
+</nav>
+
+<!-- Mobile menu -->
+<div id="nm-mm" class="hidden fixed top-16 left-0 right-0 bg-white border-b border-gray-200 z-40 flex-col shadow-lg">
+  <a href="/" class="text-[15px] font-semibold {% if active_page == 'home' %}text-violet-600{% else %}text-gray-700{% endif %} px-6 py-3.5 border-b border-gray-100 block">🏠 Home</a>
+  <a href="/rooms/" class="text-[15px] font-semibold {% if active_page == 'listings' %}text-violet-600{% else %}text-gray-700{% endif %} px-6 py-3.5 border-b border-gray-100 block">🏘️ Listings</a>
+  <a href="/rooms/new/" class="text-[15px] font-semibold {% if active_page == 'post_room' %}text-violet-600{% else %}text-gray-700{% endif %} px-6 py-3.5 border-b border-gray-100 block">➕ Post a Room</a>
+  <a href="/about/" class="text-[15px] font-semibold {% if active_page == 'about' %}text-violet-600{% else %}text-gray-700{% endif %} px-6 py-3.5 border-b border-gray-100 block">ℹ️ About</a>
+  <div class="px-6 py-4 flex gap-3">
+    {% if user.is_authenticated %}
+      <a href="/dashboard/" class="flex-1 text-center py-2.5 border border-violet-600 rounded-lg text-violet-600 text-sm font-semibold">Dashboard</a>
+      <a href="/auth/logout/" class="flex-1 text-center py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-500 text-sm font-semibold">Logout</a>
+    {% else %}
+      <a href="/auth/" class="flex-1 text-center py-2.5 border border-violet-600 rounded-lg text-violet-600 text-sm font-semibold">Login</a>
+      <a href="/auth/" class="flex-1 text-center py-2.5 bg-violet-600 rounded-lg text-white text-sm font-semibold">Register</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Navbar scroll shadow -->
+<script>
+(function() {
+  var nav = document.getElementById('nm-nav');
+  if (nav) {
+    window.addEventListener('scroll', function() {
+      nav.style.boxShadow = window.scrollY > 10 ? '0 4px 20px rgba(0,0,0,.1)' : 'none';
+    }, { passive: true });
+  }
+})();
+
+function nmToggleMenu() {
+  var mm  = document.getElementById('nm-mm');
+  var hbg = document.getElementById('nm-hbg');
+  if (mm)  mm.classList.toggle('hidden');
+  if (mm)  mm.style.display = mm.classList.contains('hidden') ? '' : 'flex';
+  if (hbg) hbg.classList.toggle('nm-open');
+}
+</script>

@@ -1,0 +1,501 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listings — NestMatch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ["'Plus Jakarta Sans'", 'sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+* { box-sizing: border-box }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: #F9FAFB; color: #111827 }
+a { text-decoration: none }
+
+.nm-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px }
+@media (max-width: 1280px) { .nm-cards-grid { grid-template-columns: repeat(2, 1fr) } }
+@media (max-width: 640px)  { .nm-cards-grid { grid-template-columns: 1fr } }
+
+input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px; border-radius: 99px;
+  background: #E5E7EB; outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #7C3AED; cursor: pointer;
+  box-shadow: 0 1px 4px rgba(124,58,237,.35);
+  border: 2px solid #fff;
+}
+
+.nm-pill {
+  padding: 5px 12px; font-size: 12px; font-weight: 600;
+  border-radius: 99px; border: 1.5px solid #E5E7EB;
+  background: #fff; cursor: pointer; font-family: inherit;
+  color: #6B7280; transition: all .15s ease;
+}
+.nm-pill:hover { border-color: #C4B5FD; color: #7C3AED }
+.nm-pill.sel { border-color: #7C3AED; background: #EDE9FE; color: #7C3AED }
+
+.nm-input {
+  width: 100%; padding: 9px 14px; font-size: 14px;
+  border: 1.5px solid #E5E7EB; border-radius: 10px;
+  font-family: inherit; color: #111827; outline: none; background: #fff;
+}
+.nm-input:focus { border-color: #7C3AED; box-shadow: 0 0 0 3px rgba(124,58,237,.1) }
+
+.nm-page-body { max-width:1440px;margin:0 auto;display:grid;grid-template-columns:248px 1fr;gap:28px;padding:28px 28px 60px;align-items:start }
+
+/* Mobile drawer */
+.nm-drawer-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400 }
+.nm-drawer-overlay.open { display:block }
+.nm-drawer { position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;z-index:401;overflow:visible;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1) }
+.nm-drawer.open { transform:translateY(0) }
+
+@media (max-width: 1000px) {
+  #nm-sidebar { display: none !important }
+  .nm-page-body { grid-template-columns: 1fr; padding: 20px 16px 60px }
+}
+</style>
+</head>
+<body>
+
+{% include "core_app/partials/navbar.html" with active_page="listings" %}
+
+<!-- SEARCH BAR -->
+<div style="position:sticky;top:64px;z-index:50;background:#fff;border-bottom:1px solid #E5E7EB;margin-top:64px">
+  <div style="max-width:1440px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div style="position:relative;flex:1;min-width:200px">
+      <!-- search icon left -->
+      <svg style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#9CA3AF;pointer-events:none;z-index:1" width="15" height="15" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+      </svg>
+            <!-- input -->
+            <input type="text" id="nm-search" placeholder="Search by city, area, or university..."
+             style="width:100%;padding:9px 56px 9px 38px;font-size:14px;border:1.5px solid #E5E7EB;border-radius:10px;font-family:inherit;outline:none;background:#fff;transition:border-color .15s"
+             onfocus="this.style.borderColor='#7C3AED'" onblur="this.style.borderColor='#E5E7EB'"
+             oninput="nmToggleClear(this.value)"
+             onkeydown="if(event.key==='Enter') nmSearch()">
+            <!-- clear × button (appears when input has value) -->
+            <button id="nm-clear-btn" onclick="nmClearSearch()" title="Clear"
+              style="display:none;position:absolute;right:48px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:999px;background:#F3F4F6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6B7280;font-size:14px;line-height:1;padding:0">
+        ✕
+            </button>
+            <!-- compact search icon button inside input -->
+            <button onclick="nmSearch()" title="Search"
+              style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:9px;background:#7C3AED;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+            </button>
+    </div>
+    <select id="nm-sort" onchange="nmApplyFilters()" class="nm-input" style="width:auto;cursor:pointer">
+      <option value="match">Best Match</option>
+      <option value="price_asc">Lowest Price</option>
+      <option value="newest" selected>Newest First</option>
+    </select>
+    <button id="nm-filter-btn" onclick="nmOpenFilters()" style="display:none;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid #7C3AED;border-radius:10px;background:#fff;color:#7C3AED;cursor:pointer;font-family:inherit">
+      ⚙️ Filters
+    </button>
+  </div>
+</div>
+
+<!-- MOBILE DRAWER OVERLAY -->
+<div class="nm-drawer-overlay" id="nm-overlay" onclick="nmCloseFilters()"></div>
+
+<!-- MOBILE FILTER DRAWER -->
+<div class="nm-drawer" id="nm-drawer">
+  <!-- Drag handle -->
+  <div style="display:flex;justify-content:center;padding:10px 0 0">
+    <div style="width:36px;height:4px;background:#E5E7EB;border-radius:99px"></div>
+  </div>
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 12px;border-bottom:1px solid #F3F4F6">
+    <span style="font-size:15px;font-weight:700;color:#111827">Filters</span>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button onclick="nmResetFilters()" style="font-size:12px;font-weight:600;color:#7C3AED;background:none;border:none;cursor:pointer;font-family:inherit">Reset all</button>
+      <button onclick="nmCloseFilters()" style="width:26px;height:26px;border-radius:50%;background:#F3F4F6;border:none;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+    </div>
+  </div>
+
+  <!-- Filter grid: 2 columns -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0">
+
+    <!-- Price Range (full width) -->
+    <div style="grid-column:1/-1;padding:12px 16px;border-bottom:1px solid #F3F4F6">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF">
+          💰 Price / month
+        </span>
+        <span id="nm-price-lbl-d" style="font-size:11px;font-weight:700;color:#7C3AED">Up to $2000</span>
+      </div>
+      <input type="range" id="nm-price-d" min="50" max="2000" value="2000"
+             oninput="document.getElementById('nm-price-lbl-d').textContent='Up to $'+this.value">
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:#C4B5FD"><span>$50</span><span>$2000</span></div>
+    </div>
+
+    <!-- Room Type -->
+    <div style="padding:12px 16px;border-bottom:1px solid #F3F4F6;border-right:1px solid #F3F4F6">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:8px">🏠 Room Type</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="private_room" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">Private Room</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="full_apartment" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">Full Apartment</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="shared_bed" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">Shared Room</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="roommate_wanted" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">Roommate Wanted</label>
+      </div>
+    </div>
+
+    <!-- Smoking + Pets + Gender stacked in right column -->
+    <div style="display:flex;flex-direction:column;border-bottom:1px solid #F3F4F6">
+      <!-- Smoking -->
+      <div style="padding:12px 16px;border-bottom:1px solid #F3F4F6">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:7px">🚭 Smoking</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <button class="nm-pill sel" data-group="smoking-d" data-val="" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Any</button>
+          <button class="nm-pill" data-group="smoking-d" data-val="no_smoking" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">No smoking</button>
+          <button class="nm-pill" data-group="smoking-d" data-val="smoking_ok" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Allowed</button>
+        </div>
+      </div>
+      <!-- Pets -->
+      <div style="padding:12px 16px;border-bottom:1px solid #F3F4F6">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:7px">🐾 Pets</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <button class="nm-pill sel" data-group="pets-d" data-val="" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Any</button>
+          <button class="nm-pill" data-group="pets-d" data-val="pets_allowed" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Accepted</button>
+          <button class="nm-pill" data-group="pets-d" data-val="no_pets" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Not accepted</button>
+        </div>
+      </div>
+      <!-- Gender -->
+      <div style="padding:12px 16px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:7px">👤 Gender</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <button class="nm-pill sel" data-group="gender-d" data-val="" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Any</button>
+          <button class="nm-pill" data-group="gender-d" data-val="males_only" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Males only</button>
+          <button class="nm-pill" data-group="gender-d" data-val="females_only" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Females only</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Apply -->
+  <div style="padding:12px 16px 24px">
+    <button onclick="nmApplyFilters(true)" style="width:100%;padding:12px;background:#7C3AED;color:#fff;font-size:14px;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-family:inherit">
+      Show Results
+    </button>
+  </div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="nm-page-body">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside id="nm-sidebar">
+    <div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;overflow:hidden">
+
+      <!-- Header row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #F3F4F6">
+        <span style="font-size:14px;font-weight:700;color:#111827">Filters</span>
+        <button onclick="nmResetFilters()" style="font-size:12px;font-weight:600;color:#7C3AED;background:none;border:none;cursor:pointer;font-family:inherit;padding:0">Reset all</button>
+      </div>
+
+      <!-- Price Range -->
+      <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF">💰 Price / month</span>
+          <span id="nm-price-lbl" style="font-size:12px;font-weight:700;color:#7C3AED">Up to $2000</span>
+        </div>
+        <input type="range" id="nm-price" min="50" max="2000" value="2000"
+               oninput="document.getElementById('nm-price-lbl').textContent='Up to $'+this.value">
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:#9CA3AF">
+          <span>$50</span><span>$2000</span>
+        </div>
+      </div>
+
+      <!-- Room Type -->
+      <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:12px">🏠 Room Type</div>
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#374151">
+            <input type="checkbox" value="private_room" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">
+            Private Room
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#374151">
+            <input type="checkbox" value="full_apartment" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">
+            Full Apartment
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#374151">
+            <input type="checkbox" value="shared_bed" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">
+            Shared Room
+          </label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#374151">
+            <input type="checkbox" value="roommate_wanted" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">
+            Roommate Wanted
+          </label>
+        </div>
+      </div>
+
+      {% if user.is_authenticated %}
+      <!-- Min Compatibility -->
+      <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF">🤖 Min Match</span>
+          <span id="nm-compat-lbl" style="font-size:12px;font-weight:700;color:#7C3AED">Any</span>
+        </div>
+        <input type="range" id="nm-compat" min="0" max="100" value="0"
+               oninput="document.getElementById('nm-compat-lbl').textContent=this.value>0?this.value+'%+':'Any'">
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:#9CA3AF">
+          <span>Any</span><span>100%</span>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Smoking -->
+      <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:10px">🚭 Smoking</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="nm-pill sel" data-group="smoking" data-val="" onclick="nmToggleTag(this)">Any</button>
+          <button class="nm-pill" data-group="smoking" data-val="no_smoking" onclick="nmToggleTag(this)">No smoking</button>
+          <button class="nm-pill" data-group="smoking" data-val="smoking_ok" onclick="nmToggleTag(this)">Allowed</button>
+        </div>
+      </div>
+
+      <!-- Pets -->
+      <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:10px">🐾 Pets</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="nm-pill sel" data-group="pets" data-val="" onclick="nmToggleTag(this)">Any</button>
+          <button class="nm-pill" data-group="pets" data-val="pets_allowed" onclick="nmToggleTag(this)">Accepted</button>
+          <button class="nm-pill" data-group="pets" data-val="no_pets" onclick="nmToggleTag(this)">Not accepted</button>
+        </div>
+      </div>
+
+      <!-- Gender -->
+      <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:10px">👤 Gender preference</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <button class="nm-pill sel" data-group="gender" data-val="" onclick="nmToggleTag(this)">Any</button>
+          <button class="nm-pill" data-group="gender" data-val="males_only" onclick="nmToggleTag(this)">Males only</button>
+          <button class="nm-pill" data-group="gender" data-val="females_only" onclick="nmToggleTag(this)">Females only</button>
+        </div>
+      </div>
+
+      <!-- Apply -->
+      <div style="padding:16px 20px">
+        <button onclick="nmApplyFilters()" style="width:100%;padding:11px;background:#7C3AED;color:#fff;font-size:13px;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='#6D28D9'" onmouseout="this.style.background='#7C3AED'">
+          Apply Filters
+        </button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <main>
+
+    <!-- Results header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div>
+        <span style="font-size:15px;font-weight:700;color:#111827">{{ listings.paginator.count }} room{{ listings.paginator.count|pluralize }} found</span>
+        {% if search_query %}
+        <span style="font-size:14px;color:#6B7280;margin-left:8px">for "{{ search_query }}"</span>
+        {% endif %}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span style="background:#EDE9FE;color:#7C3AED;font-size:12px;font-weight:600;padding:5px 12px;border-radius:99px">🤖 AI Sorted</span>
+        {% if search_query %}
+        <span style="background:#F0FDF4;color:#059669;font-size:12px;font-weight:600;padding:5px 12px;border-radius:99px;display:flex;align-items:center;gap:6px">
+          {{ search_query }}
+          <a href="{% url 'listings_app:listings' %}" style="color:#059669;font-weight:700">✕</a>
+        </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="nm-cards-grid">
+      {% for listing in listings %}
+        {% include "listings_app/partials/listing_card.html" with listing=listing %}
+      {% empty %}
+        <div style="grid-column:1/-1;text-align:center;padding:80px 20px">
+          <div style="font-size:48px;margin-bottom:16px">🏠</div>
+          <div style="font-size:18px;font-weight:700;color:#111827;margin-bottom:8px">No listings found</div>
+          <div style="font-size:14px;color:#6B7280;margin-bottom:24px">Try adjusting your search or filters</div>
+          <a href="{% url 'listings_app:listings' %}" style="padding:10px 24px;background:#7C3AED;color:#fff;border-radius:8px;font-size:14px;font-weight:600">Clear filters</a>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if listings.has_other_pages %}
+    <div style="display:flex;justify-content:center;align-items:center;gap:6px;margin-top:40px">
+      {% if listings.has_previous %}
+      <a href="?page={{ listings.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+         style="width:36px;height:36px;border-radius:8px;border:1.5px solid #E5E7EB;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#6B7280">←</a>
+      {% else %}
+      <span style="width:36px;height:36px;border-radius:8px;border:1.5px solid #E5E7EB;background:#F9FAFB;display:flex;align-items:center;justify-content:center;font-size:13px;color:#D1D5DB">←</span>
+      {% endif %}
+      {% for num in listings.paginator.page_range %}
+        {% if listings.number == num %}
+        <span style="width:36px;height:36px;border-radius:8px;border:1.5px solid #7C3AED;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff">{{ num }}</span>
+        {% elif num > listings.number|add:"-3" and num < listings.number|add:"3" %}
+        <a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}"
+           style="width:36px;height:36px;border-radius:8px;border:1.5px solid #E5E7EB;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#374151">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if listings.has_next %}
+      <a href="?page={{ listings.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+         style="width:36px;height:36px;border-radius:8px;border:1.5px solid #E5E7EB;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#6B7280">→</a>
+      {% else %}
+      <span style="width:36px;height:36px;border-radius:8px;border:1.5px solid #E5E7EB;background:#F9FAFB;display:flex;align-items:center;justify-content:center;font-size:13px;color:#D1D5DB">→</span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </main>
+</div>
+
+<script>
+(function () {
+  const nav = document.getElementById('nm-nav');
+  if (nav) window.addEventListener('scroll', () => {
+    nav.style.boxShadow = scrollY > 10 ? '0 4px 20px rgba(0,0,0,.1)' : 'none';
+  }, { passive: true });
+
+  // drawer open / close
+  window.nmOpenFilters = () => {
+    document.getElementById('nm-drawer')?.classList.add('open');
+    document.getElementById('nm-overlay')?.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+  window.nmCloseFilters = () => {
+    document.getElementById('nm-drawer')?.classList.remove('open');
+    document.getElementById('nm-overlay')?.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  window.nmToggleTag = (el) => {
+    document.querySelectorAll(`.nm-pill[data-group="${el.dataset.group}"]`).forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+  };
+
+  window.nmResetFilters = () => {
+    window.location.href = window.location.pathname;
+  };
+
+  window.nmApplyFilters = (fromDrawer) => {
+    const p = new URLSearchParams();
+    const q = document.getElementById('nm-search')?.value.trim();
+    if (q) p.set('q', q);
+    // price: prefer drawer on mobile
+    const priceEl = fromDrawer ? document.getElementById('nm-price-d') : document.getElementById('nm-price');
+    if (priceEl?.value < 2000) p.set('price_max', priceEl.value);
+    const compat = document.getElementById('nm-compat')?.value;
+    if (compat > 0) p.set('compat_min', compat);
+    const sort = document.getElementById('nm-sort')?.value;
+    if (sort && sort !== 'newest') p.set('sort', sort);
+    // types: prefer drawer on mobile
+    const typeClass = fromDrawer ? '.nm-type-chk-d:checked' : '.nm-type-chk:checked';
+    const types = [...document.querySelectorAll(typeClass)].map(c => c.value);
+    if (types.length && types.length < 4) p.set('types', types.join(','));
+    // pills: drawer groups are suffixed with -d
+    const suffix = fromDrawer ? '-d' : '';
+    ['smoking','pets','gender'].forEach(g => {
+      const sel = document.querySelector(`.nm-pill[data-group="${g}${suffix}"].sel`);
+      if (sel?.dataset.val) p.set(g, sel.dataset.val);
+    });
+    window.location.href = '?' + p.toString();
+  };
+
+  window.nmSearch = () => {
+    const v = document.getElementById('nm-search')?.value.trim() || '';
+    const p = new URLSearchParams(window.location.search);
+    v ? p.set('q', v) : p.delete('q');
+    p.delete('page');
+    window.location.href = '?' + p.toString();
+  };
+
+  window.nmClearSearch = () => {
+    const input = document.getElementById('nm-search');
+    if (input) input.value = '';
+    document.getElementById('nm-clear-btn').style.display = 'none';
+    const p = new URLSearchParams(window.location.search);
+    p.delete('q');
+    p.delete('page');
+    window.location.href = '?' + p.toString();
+  };
+
+  window.nmToggleClear = (val) => {
+    const btn = document.getElementById('nm-clear-btn');
+    if (btn) btn.style.display = val ? 'flex' : 'none';
+  };
+
+  const checkResp = () => {
+    const btn = document.getElementById('nm-filter-btn');
+    if (btn) btn.style.display = innerWidth <= 1000 ? 'flex' : 'none';
+  };
+  checkResp();
+  window.addEventListener('resize', checkResp);
+
+  // ── Restore filter state from URL params on page load ────────────────────
+  (function restoreFilters() {
+    const p = new URLSearchParams(window.location.search);
+
+    // Search
+    const q = p.get('q');
+    if (q) {
+      const s = document.getElementById('nm-search'); if (s) s.value = q;
+      const btn = document.getElementById('nm-clear-btn'); if (btn) btn.style.display = 'flex';
+    }
+
+    // Sort
+    const sort = p.get('sort') || 'newest';
+    const sortEl = document.getElementById('nm-sort'); if (sortEl) sortEl.value = sort;
+
+    // Price
+    const price = p.get('price_max');
+    if (price) {
+      ['nm-price','nm-price-d'].forEach(id => { const el = document.getElementById(id); if (el) el.value = price; });
+      const lbl = 'Up to $' + price;
+      ['nm-price-lbl','nm-price-lbl-d'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = lbl; });
+    }
+
+    // Compat
+    const compat = p.get('compat_min');
+    if (compat) {
+      const el = document.getElementById('nm-compat'); if (el) el.value = compat;
+      const lbl = document.getElementById('nm-compat-lbl'); if (lbl) lbl.textContent = compat + '%+';
+    }
+
+    // Room types — uncheck all first, then check only the active ones
+    const types = p.get('types');
+    if (types) {
+      const active = new Set(types.split(','));
+      document.querySelectorAll('.nm-type-chk,.nm-type-chk-d').forEach(cb => {
+        cb.checked = active.has(cb.value);
+      });
+    }
+
+    // Pill groups (smoking, pets, gender) — both sidebar and drawer
+    [['smoking','smoking-d'], ['pets','pets-d'], ['gender','gender-d']].forEach(([param, drawerGroup]) => {
+      const val = p.get(param) || '';
+      [param, drawerGroup].forEach(group => {
+        document.querySelectorAll(`.nm-pill[data-group="${group}"]`).forEach(btn => {
+          btn.classList.toggle('sel', btn.dataset.val === val);
+        });
+      });
+    });
+  })();
+})();
+</script>
+</body>
+</html>
