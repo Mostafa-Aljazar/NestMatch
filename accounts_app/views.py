@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 from .models import User, LifestyleProfile
 
 
@@ -168,13 +169,10 @@ def profile_update_personal_info(request):
     errors = User.objects.update_profile_validator(user, request.POST, request.FILES)
 
     if errors:
-        for key, val in errors.items():
-            messages.error(request, val)
-        return redirect('accounts_app:profile')
+        return JsonResponse({'success': False, 'errors': errors})
 
     User.objects.update_profile(user, request.POST, request.FILES)
-    messages.success(request, "Your personal information has been updated.")
-    return redirect('accounts_app:profile')
+    return JsonResponse({'success': True, 'message': 'Your personal information has been updated.'})
 
 
 @login_required
@@ -188,13 +186,10 @@ def profile_update_lifestyle(request):
     errors = LifestyleProfile.objects.lifestyle_validator(request.POST)
 
     if errors:
-        for key, val in errors.items():
-            messages.error(request, val)
-        return redirect('accounts_app:profile')
+        return JsonResponse({'success': False, 'errors': errors})
 
     LifestyleProfile.objects.save_for_user(request.user, request.POST)
-    messages.success(request, "Your lifestyle profile has been updated.")
-    return redirect('accounts_app:profile')
+    return JsonResponse({'success': True, 'message': 'Your lifestyle profile has been updated.'})
 
 
 @login_required
@@ -215,21 +210,17 @@ def change_password_view(request):
     confirm_password = request.POST.get('confirm_password', '')
 
     if not user.check_password(current_password):
-        messages.error(request, "Current password is incorrect.")
-        return redirect('accounts_app:profile')
+        return JsonResponse({'success': False, 'errors': {'current_password': 'Current password is incorrect.'}})
 
     if len(new_password) < 8:
-        messages.error(request, "New password must be at least 8 characters!")
-        return redirect('accounts_app:profile')
+        return JsonResponse({'success': False, 'errors': {'new_password': 'New password must be at least 8 characters!'}})
 
     if new_password != confirm_password:
-        messages.error(request, "New passwords do not match!")
-        return redirect('accounts_app:profile')
+        return JsonResponse({'success': False, 'errors': {'confirm_password': 'New passwords do not match!'}})
 
     user.set_password(new_password)
     user.save()
     # Keeps the current session valid after the password hash changes
     update_session_auth_hash(request, user)
 
-    messages.success(request, "Your password has been updated.")
-    return redirect('accounts_app:profile')
+    return JsonResponse({'success': True, 'message': 'Your password has been updated.'})

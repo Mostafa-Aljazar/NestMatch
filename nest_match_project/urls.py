@@ -29,4 +29,7 @@ urlpatterns = [
     path('applications/', include('applications_app.urls')),
     path('agreements/', include('agreements_app.urls')),
     path('dashboard/', include('dashboard_app.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
