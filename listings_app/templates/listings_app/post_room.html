@@ -691,6 +691,45 @@ window._parStep = 1;
 
 function parStep(s) {
   if (s < 1 || s > 4) return;
+
+  // Leaving step 2 → forward: auto-geocode if no pin was dropped
+  if (window._parStep === 2 && s === 3) {
+    var latEl = document.getElementById('nm-lat');
+    var lngEl = document.getElementById('nm-lng');
+    if (latEl && lngEl && !latEl.value) {
+      var city     = (document.getElementById('nm-field-city')    || {}).value || '';
+      var district = (document.getElementById('nm-field-district')|| {}).value || '';
+      var country  = (document.getElementById('nm-field-country') || {}).value || '';
+      var q = [district, city, country].filter(Boolean).join(', ');
+      if (q) {
+        fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=1&addressdetails=1&accept-language=en', {
+          headers: { 'Accept-Language': 'en' }
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(results){
+          if (results && results.length) {
+            var r = results[0];
+            latEl.value = parseFloat(r.lat).toFixed(6);
+            lngEl.value = parseFloat(r.lon).toFixed(6);
+            // Also show the green info bar with approximate coords
+            var info = document.getElementById('nm-map-info');
+            var coords = document.getElementById('nm-map-coords');
+            var addr = document.getElementById('nm-map-address');
+            if (info) info.classList.remove('hidden');
+            if (addr) addr.textContent = r.display_name;
+            if (coords) coords.textContent = '(' + parseFloat(r.lat).toFixed(5) + ', ' + parseFloat(r.lon).toFixed(5) + ') — approximate';
+            // Drop an approximate pin on the map if open
+            if (_map) {
+              parSetPin(parseFloat(r.lat), parseFloat(r.lon), r.display_name);
+              _map.setView([parseFloat(r.lat), parseFloat(r.lon)], 13);
+            }
+          }
+        })
+        .catch(function(){});
+      }
+    }
+  }
+
   window._parStep = s;
   for (var i = 1; i <= 4; i++) {
     var el = document.getElementById('par-s' + i);
@@ -1064,7 +1103,11 @@ function parSetPin(lat, lng, label, icon) {
 }
 
 function parReverseGeocode(lat, lng) {
-  fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lng+'&format=json&addressdetails=1')
+  fetch(
+    'https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng +
+    '&format=json&addressdetails=1&zoom=18&accept-language=en',
+    { headers: { 'Accept-Language': 'en' } }
+  )
     .then(function(r){ return r.json(); })
     .then(function(d){
       if (!d || !d.address) return;
@@ -1077,13 +1120,8 @@ function parReverseGeocode(lat, lng) {
       setField('nm-field-city',     a.city || a.town || a.village || a.municipality);
       setField('nm-field-district', a.suburb || a.neighbourhood || a.quarter || a.district);
       setField('nm-field-street',   a.road || a.pedestrian || a.footway);
-      var parts = [];
-      if (a.house_number) parts.push(a.house_number);
-      if (a.road)         parts.push(a.road);
-      if (a.suburb || a.neighbourhood) parts.push(a.suburb || a.neighbourhood);
-      if (a.city || a.town || a.village) parts.push(a.city || a.town || a.village);
-      if (a.country)      parts.push(a.country);
-      setField('nm-field-address', parts.join(', '));
+      // Save the full Nominatim display_name as the address — includes house number, postcode, everything
+      setField('nm-field-address', d.display_name);
       var addrEl = document.getElementById('nm-map-address');
       if (addrEl) addrEl.textContent = d.display_name;
       var coords = document.getElementById('nm-map-coords');
@@ -1096,7 +1134,9 @@ function parMapSearch() {
   if (!q) return;
   var btn = document.querySelector('#nm-map-search + button');
   if (btn) { btn.textContent = '...'; btn.disabled = true; }
-  fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q)+'&format=json&limit=1')
+  fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q)+'&format=json&limit=1&addressdetails=1&accept-language=en', {
+    headers: { 'Accept-Language': 'en' }
+  })
     .then(function(r){ return r.json(); })
     .then(function(results){
       if (btn) { btn.textContent = 'Search'; btn.disabled = false; }
