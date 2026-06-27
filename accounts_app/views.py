@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate,logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
@@ -37,23 +37,19 @@ def register_create_view(request):
         errors = User.objects.register_validator(request.POST)
 
         if errors:
-            # Loop through all found errors and pass them to Django messages framework
-            for key, val in errors.items():
-                messages.error(request, val)
             return render(request, 'register.html', {
                 'countries': User.COUNTRY_CHOICES,
                 'genders': User.GENDER_CHOICES,
-                'form_data': request.POST  # Retain input values on error
+                'form_data': request.POST,
+                'errors': errors,          
             })
 
         try:
             # Create the user using the structured postData method in your manager
             user = User.objects.create_user(request.POST)
-
             # Automatically establish a login session for the newly created user
             login(request, user)
-
-            messages.success(request, "Registration successful! Welcome to NestMatch.")
+            #messages.success(request, "Registration successful! Welcome to NestMatch.")
             return redirect('accounts_app:profile')
 
         except Exception:
@@ -75,9 +71,8 @@ def login_view(request):
         errors = User.objects.login_validator(request.POST)
 
         if errors:
-            for key, val in errors.items():
-                messages.error(request, val)
-            return render(request, 'login.html')
+            error_msg = list(errors.values())[0]
+            return render(request, 'login.html', {'error': error_msg})
 
         # Extract identifier (which checks both email/username inside the manager)
         identifier = request.POST.get('email', '').strip()
@@ -95,11 +90,10 @@ def login_view(request):
             user = authenticate(request, username=user_obj.username, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, f"Welcome back, {user.first_name}!")
+                #messages.success(request, f"Welcome back, {user.first_name}!")
                 return redirect('accounts_app:profile')
 
-        messages.error(request, "Authentication failed. Invalid credentials.")
-        return render(request, 'login.html')
+        return render(request, 'login.html', {'errors': {'email': 'Invalid email/username or password.'}})
 
     return render(request, 'login.html')
 
@@ -224,3 +218,39 @@ def change_password_view(request):
     update_session_auth_hash(request, user)
 
     return JsonResponse({'success': True, 'message': 'Your password has been updated.'})
+
+
+@login_required
+@require_POST
+def delete_account_view(request):
+    """
+    Permanently deletes the logged-in user's account.
+    Triggered by the "Confirm" button in the delete-account popup/modal
+    (no password re-entry — confirmation is just the Confirm click itself).
+
+    request.user.delete() cascades to LifestyleProfile via on_delete=CASCADE,
+    so the lifestyle row is removed automatically — no orphaned data.
+    """
+    user = request.user
+    user.delete()
+
+    # The DB row is gone, but the session still thinks it's logged in
+    # until we clear it explicitly.
+    logout(request)
+
+    return JsonResponse({'success': True, 'redirect_url': '/auth/register/'})
+
+@login_required
+@require_POST
+def logout_view(request):
+    """
+    Logs the current user out and redirects to the login page.
+
+    Implemented as POST-only (not a plain GET link), since a GET-triggered
+    logout is a classic CSRF-able side effect: a malicious page could embed
+    <img src="/logout/"> and log a victim out without their consent.
+    Requiring POST + CSRF token (sent automatically by the logout <form>
+    in the navbar) closes that gap.
+    """
+    logout(request)
+    return redirect('accounts_app:login')

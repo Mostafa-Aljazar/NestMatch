@@ -18,7 +18,7 @@ urlpatterns = [
     path('profile/update/personal-info/', views.profile_update_personal_info, name='profile_update_personal_info'),
     path('profile/update/lifestyle/', views.profile_update_lifestyle, name='profile_update_lifestyle'),
     path('profile/update/password/', views.change_password_view, name='change_password'),
-
+    path('delete-account/', views.delete_account_view, name='delete_account'),
     # path(
     #     'password-reset/',
     #     auth_views.PasswordResetView.as_view(
@@ -51,6 +51,6 @@ urlpatterns = [
     #     ),
     #     name='password_reset_complete',
     # ),
-    # path('logout/', views.logout_view, name='logout'),
+    path('logout/', views.logout_view, name='logout'),
 
 ]

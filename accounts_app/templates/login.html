@@ -164,15 +164,6 @@
 
           <form action="{% url 'accounts_app:login' %}" method="POST" class="mt-8 space-y-5">
             {% csrf_token %}
-            {% if messages %}
-              <div class="space-y-2">
-                {% for message in messages %}
-                  <div class="rounded-lg border px-3 py-2 text-sm {% if message.tags == 'error' %}border-red-200 bg-red-50 text-red-700{% else %}border-emerald-200 bg-emerald-50 text-emerald-700{% endif %}">
-                    {{ message }}
-                  </div>
-                {% endfor %}
-              </div>
-            {% endif %}
 
             <div>
               <label class="mb-2 block text-sm font-semibold text-slate-700" for="email">Email or Username</label>
@@ -190,7 +181,7 @@
             <div>
               <div class="mb-2 flex items-center justify-between">
                 <label class="text-sm font-semibold text-slate-700" for="password">Password</label>
-                <a href="{% url 'accounts_app:password_reset' %}" class="text-sm font-semibold text-brand-600 hover:text-brand-700">Forgot Password?</a>
+                
               </div>
               <div class="relative">
                 <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
@@ -200,6 +191,9 @@
                 </span>
                 <input id="password" type="password" name="password" placeholder="••••••••" class="auth-input has-icon-left" autocomplete="current-password" />
               </div>
+              {% if error %}
+                <p class="text-sm font-medium text-red-600 mt-2">{{ error }}</p>
+              {% endif %}
             </div>
 
             <button type="submit" class="w-full rounded-lg bg-[#7C3AED] px-4 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#5B21B6]">
@@ -230,5 +224,14 @@
         </div>
       </main>
     </div>
+    <script>
+      document.querySelectorAll('input').forEach(function(field) {
+        field.addEventListener('input', function() {
+          // امسح الخطأ المرتبط بهاد الحقل لما المستخدم يبدأ يكتب
+          var errorEl = document.getElementById('error-' + field.name);
+          if (errorEl) errorEl.remove();
+        });
+      });
+    </script>
   </body>
 </html>

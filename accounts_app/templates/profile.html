@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Account Settings | NestMatch</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    {% load static %}
     <script>
       tailwind.config = {
         theme: {
@@ -34,10 +35,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <style>
       body {
         font-family: 'Inter', sans-serif;
@@ -107,7 +105,7 @@
     {% endif %}
 
     <!-- Page header -->
-    <header class="mt-[65px] border-b border-slate-200 bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
+    <section class="mt-[65px] border-b border-slate-200 bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-6xl">
         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-600">Account settings</p>
         <h1 class="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900">{{ user_obj.full_name }}</h1>
@@ -125,7 +123,7 @@
           {% endif %}
         </div>
       </div>
-    </header>
+    </section>
 
     <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <div class="flex flex-col gap-8 lg:flex-row lg:items-start">
@@ -133,14 +131,13 @@
         <aside class="w-full flex-shrink-0 lg:w-72 lg:sticky lg:top-24">
           <div class="rounded-2xl border border-slate-200 bg-white p-6">
             <div class="flex items-center gap-4">
-              <div id="profile-avatar-wrapper">
+              <div id="profile-avatar-wrapper" class="relative">
                 {% if user_obj.profile_pic %}
-                  <img id="profile-avatar-image" src="{{ user_obj.profile_pic.url }}" alt="{{ user_obj.full_name }}" class="h-16 w-16 rounded-full object-cover border border-brand-200" />
-                {% else %}
-                  <div id="profile-avatar-placeholder" class="flex h-16 w-16 items-center justify-center rounded-full border border-brand-200 bg-brand-100 font-display text-xl font-bold text-brand-700">
-                    {{ user_obj.first_name|first|upper }}
-                  </div>
+                  <img id="profile-avatar-image" src="{{ user_obj.profile_pic.url }}" alt="{{ user_obj.full_name }}" class="h-16 w-16 rounded-full border border-brand-200 object-cover" />
                 {% endif %}
+                <div id="profile-avatar-placeholder" class="{% if user_obj.profile_pic %}hidden{% else %}flex{% endif %} h-16 w-16 items-center justify-center rounded-full border border-brand-200 bg-gradient-to-br from-brand-600 via-brand-500 to-indigo-500 font-display text-lg font-bold text-white shadow-sm">
+                  {{ user_obj.first_name|first|upper }}{% if user_obj.last_name %}{{ user_obj.last_name|first|upper }}{% endif %}
+                </div>
               </div>
               <div>
                 <p id="sidebar-user-name" class="font-display text-sm font-bold text-slate-900">{{ user_obj.full_name }}</p>
@@ -159,10 +156,10 @@
             <div>
               <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
                 <span>Profile strength</span>
-                <span class="text-brand-600">{{ profile_strength }}%</span>
+                <span id="profile-strength-value" class="text-brand-600">{{ profile_strength }}%</span>
               </div>
               <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-                <div class="h-full rounded-full bg-brand-600" style="width: {{ profile_strength }}%"></div>
+                <div id="profile-strength-bar" class="h-full rounded-full bg-brand-600" style="width: {{ profile_strength }}%"></div>
               </div>
               <p class="mt-2 text-xs text-slate-500">Complete your lifestyle profile to unlock stronger matches.</p>
             </div>
@@ -287,15 +284,19 @@
                   <button type="reset" class="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">Discard</button>
                 </div>
               </div>
+              
             </form>
 
             <div class="rounded-2xl border border-rose-200 bg-white p-6 sm:p-8">
               <p class="text-xs font-semibold uppercase tracking-wide text-rose-600">Danger zone</p>
               <h3 class="mt-1 font-display text-base font-bold text-slate-900">Delete account</h3>
               <p class="mt-2 text-sm text-slate-500">Permanently deletes your NestMatch account and all associated data. This action cannot be undone.</p>
-              <button type="button" class="mt-4 rounded-lg border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-50">Delete account</button>
+                <button type="button" onclick="openDeleteModal()" class="mt-4 rounded-lg border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-50">
+                  Delete account
+                </button>
             </div>
           </div>
+          
 
           <!-- ============================================================ -->
           <!-- TAB 2: Lifestyle profile — separate form/CSRF/endpoint.     -->
@@ -535,6 +536,37 @@
       </div>
     </main>
 
+    <!-- Delete Account Modal -->
+    <div id="delete-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div class="mx-4 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-rose-100">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+          </svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Delete account</h3>
+        <p class="mt-2 text-sm text-slate-500">Are you sure you want to delete your account? All your data will be permanently removed. This action cannot be undone.</p>
+        <div class="mt-6 flex gap-3">
+          <button type="button" onclick="closeDeleteModal()" class="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+            Cancel
+          </button>
+          <!-- id="delete-account-form" added so profile.js can find and AJAX-submit this -->
+          <form id="delete-account-form" action="{% url 'accounts_app:delete_account' %}" method="POST" class="flex-1">
+            {% csrf_token %}
+            <button type="submit" class="w-full rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-700">
+              Yes, delete
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <span id="strength-has-phone"     data-value="{{ user_obj.phone_number|yesno:'true,false' }}" class="hidden"></span>
+    <span id="strength-has-bio"       data-value="{{ user_obj.bio|yesno:'true,false' }}"          class="hidden"></span>
+    <span id="strength-has-photo"     data-value="{{ user_obj.profile_pic|yesno:'true,false' }}"  class="hidden"></span>
+    <span id="strength-has-lifestyle" data-value="{{ lifestyle_profile|yesno:'true,false' }}"     class="hidden"></span>
+   
+
     <footer class="border-t border-slate-200 bg-slate-900 px-4 py-10 text-slate-300 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-6xl">
         <div class="grid gap-8 md:grid-cols-3">
@@ -567,184 +599,8 @@
         </div>
       </div>
     </footer>
+    
 
-    <script>
-      // --- Tab navigation (unchanged logic, just re-confirmed working) ---
-      const tabButtons = document.querySelectorAll('.tab-nav-btn');
-      const tabPanels = {
-        info: document.getElementById('tab-info'),
-        lifestyle: document.getElementById('tab-lifestyle'),
-        security: document.getElementById('tab-security'),
-      };
-
-      tabButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-          tabButtons.forEach((btn) => btn.classList.remove('active'));
-          button.classList.add('active');
-
-          Object.entries(tabPanels).forEach(([key, panel]) => {
-            panel.classList.toggle('hidden', key !== button.dataset.tab);
-          });
-        });
-      });
-
-      // --- Option-card selection logic ---
-      // Each option-card group has a data-target attribute that matches the
-      // id of a hidden input (e.g. data-target="sleep_time" -> #input-sleep_time).
-      // Clicking a card both toggles the visual "selected" state AND writes
-      // the button's data-value into that hidden input, so the real value
-      // actually reaches the server when the form is submitted.
-      document.querySelectorAll('[data-target]').forEach((group) => {
-        const targetField = group.dataset.target;
-        const hiddenInput = document.getElementById(`input-${targetField}`);
-
-        group.querySelectorAll('.option-card').forEach((card) => {
-          card.addEventListener('click', () => {
-            group.querySelectorAll('.option-card').forEach((item) => item.classList.remove('selected'));
-            card.classList.add('selected');
-            if (hiddenInput) {
-              hiddenInput.value = card.dataset.value;
-            }
-          });
-        });
-      });
-
-      function clearFormFeedback(form) {
-        form.querySelectorAll('.field-error').forEach((element) => {
-          element.textContent = '';
-        });
-        form.querySelectorAll('input, select, textarea').forEach((element) => {
-          element.classList.remove('border-rose-300');
-        });
-        const messageBox = form.querySelector('[id$="-form-message"]');
-        if (messageBox) {
-          messageBox.textContent = '';
-          messageBox.className = 'hidden';
-        }
-      }
-
-      const profilePicInput = document.getElementById('profile_pic_input');
-      const profileAvatarImage = document.getElementById('profile-avatar-image');
-      const profileAvatarPlaceholder = document.getElementById('profile-avatar-placeholder');
-      const sidebarUserName = document.getElementById('sidebar-user-name');
-
-      if (profilePicInput) {
-        profilePicInput.addEventListener('change', (event) => {
-          const file = event.target.files && event.target.files[0];
-          if (!file) {
-            return;
-          }
-
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            if (profileAvatarImage) {
-              profileAvatarImage.src = e.target.result;
-            } else if (profileAvatarPlaceholder) {
-              profileAvatarPlaceholder.remove();
-              const img = document.createElement('img');
-              img.id = 'profile-avatar-image';
-              img.src = e.target.result;
-              img.alt = 'Profile preview';
-              img.className = 'h-16 w-16 rounded-full object-cover border border-brand-200';
-              document.getElementById('profile-avatar-wrapper').appendChild(img);
-            }
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      function refreshSidebarName(form) {
-        const firstNameInput = form.querySelector('[name="first_name"]');
-        const lastNameInput = form.querySelector('[name="last_name"]');
-        if (sidebarUserName && firstNameInput && lastNameInput) {
-          const fullName = `${firstNameInput.value.trim()} ${lastNameInput.value.trim()}`.trim();
-          sidebarUserName.textContent = fullName || sidebarUserName.textContent;
-        }
-      }
-
-      function showFormFeedback(form, message, isError = false) {
-        const messageBox = form.querySelector('[id$="-form-message"]');
-        if (messageBox) {
-          if (isError) {
-            messageBox.textContent = '';
-            messageBox.classList.add('hidden');
-            return;
-          }
-
-          messageBox.innerHTML = `
-            <div class="fixed right-4 top-4 z-[60] flex max-w-sm items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700 shadow-soft">
-              <div class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100">
-                <span class="text-sm font-bold text-emerald-700">✓</span>
-              </div>
-              <div class="flex-1">
-                <p class="text-sm font-semibold">Success</p>
-                <p class="mt-1 text-sm">${message}</p>
-              </div>
-              <button type="button" class="ml-2 text-sm font-semibold text-emerald-700" onclick="this.parentElement.remove()">✕</button>
-            </div>`;
-          messageBox.classList.remove('hidden');
-          setTimeout(() => {
-            if (messageBox.firstElementChild) {
-              messageBox.firstElementChild.remove();
-            }
-            messageBox.classList.add('hidden');
-          }, 5000);
-        }
-      }
-
-      function showFieldErrors(form, errors) {
-        Object.entries(errors || {}).forEach(([field, message]) => {
-          const fieldMessage = form.querySelector(`.field-error[data-field="${field}"]`);
-          if (fieldMessage) {
-            fieldMessage.textContent = message;
-          }
-          const fieldInput = form.querySelector(`[name="${field}"]`);
-          if (fieldInput) {
-            fieldInput.classList.add('border-rose-300');
-          }
-        });
-      }
-
-      async function submitAjaxForm(form) {
-        form.addEventListener('submit', async (event) => {
-          event.preventDefault();
-          clearFormFeedback(form);
-
-          const formData = new FormData(form);
-          const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]')?.value || '';
-
-          try {
-            const response = await fetch(form.action, {
-              method: 'POST',
-              headers: { 'X-CSRFToken': csrfToken },
-              body: formData,
-            });
-
-            const data = await response.json();
-            if (data.success) {
-              if (form.id === 'personal-info-form') {
-                refreshSidebarName(form);
-              }
-              showFormFeedback(form, data.message || 'Saved successfully.', false);
-              form.querySelectorAll('input[type="password"]').forEach((input) => {
-                input.value = '';
-              });
-            } else {
-              showFormFeedback(form, Object.values(data.errors || {})[0] || 'Please fix the highlighted fields.', true);
-              showFieldErrors(form, data.errors || {});
-            }
-          } catch (error) {
-            showFormFeedback(form, 'Something went wrong. Please try again.', true);
-          }
-        });
-      }
-
-      ['personal-info-form', 'lifestyle-form', 'security-form'].forEach((formId) => {
-        const form = document.getElementById(formId);
-        if (form) {
-          submitAjaxForm(form);
-        }
-      });
-    </script>
+    <script src="{% static 'js/profile.js' %}"></script>
   </body>
 </html>
