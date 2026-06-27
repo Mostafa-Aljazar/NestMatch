@@ -257,10 +257,34 @@ class User(AbstractBaseUser, PermissionsMixin):
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
-    # Property method to calculate the current age dynamically
     @property
     def age(self):
-        return User.objects._calculate_age(self.date_of_birth)
+        today = date.today()
+        dob = self.date_of_birth
+        return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
+    @property
+    def birthday_this_year(self):
+        today = date.today()
+        dob = self.date_of_birth
+        try:
+            return dob.replace(year=today.year)
+        except ValueError:
+            # Feb 29 on a non-leap year → use Mar 1
+            return date(today.year, 3, 1)
+
+    @property
+    def days_until_birthday(self):
+        today = date.today()
+        birthday = self.birthday_this_year
+        if birthday < today:
+            birthday = birthday.replace(year=today.year + 1)
+        return (birthday - today).days
+
+    @property
+    def is_birthday_today(self):
+        today = date.today()
+        return (self.date_of_birth.month, self.date_of_birth.day) == (today.month, today.day)
 
 
 class LifestyleProfileManager(models.Manager):

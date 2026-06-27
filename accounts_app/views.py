@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
@@ -224,3 +224,8 @@ def change_password_view(request):
     update_session_auth_hash(request, user)
 
     return JsonResponse({'success': True, 'message': 'Your password has been updated.'})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('accounts_app:login')

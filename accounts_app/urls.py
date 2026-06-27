@@ -51,6 +51,5 @@ urlpatterns = [
     #     ),
     #     name='password_reset_complete',
     # ),
-    # path('logout/', views.logout_view, name='logout'),
-
+    path('logout/', views.logout_view, name='logout'),
 ]
