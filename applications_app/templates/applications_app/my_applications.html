@@ -1,0 +1,576 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Applications — NestMatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { jakarta: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            violet: { 50:'#F5F3FF', 100:'#EDE9FE', 200:'#DDD6FE', 600:'#7C3AED', 700:'#6D28D9' },
+          },
+          keyframes: {
+            fadeUp:    { from:{ opacity:'0', transform:'translateY(10px)' }, to:{ opacity:'1', transform:'translateY(0)' } },
+            toastIn:   { from:{ opacity:'0', transform:'translateX(24px)' }, to:{ opacity:'1', transform:'translateX(0)' } },
+            toastOut:  { to:  { opacity:'0', transform:'translateX(24px)' } },
+          },
+          animation: {
+            fadeUp:   'fadeUp .4s ease both',
+            toastIn:  'toastIn .3s ease both',
+            toastOut: 'toastOut .3s ease forwards',
+          },
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="font-jakarta bg-gray-50 text-gray-900 overflow-x-hidden">
+
+{% include "core_app/partials/navbar.html" %}
+
+<!-- ═══ PAGE CONTENT ═══ -->
+<div class="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+
+  <!-- ── Page Header ── -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">My Applications</h1>
+      <p class="text-sm text-gray-500 mt-1">Track all rooms you've applied to</p>
+    </div>
+    <a href="{% url 'listings_app:listings' %}"
+       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-violet-600 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors sm:w-auto w-full">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Browse Rooms
+    </a>
+  </div>
+
+  <!-- ── Demo Banner ── -->
+  {% if is_demo %}
+  <div class="flex flex-wrap items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm font-semibold text-amber-800 mb-6">
+    👀 Preview mode with demo data.
+    <a href="/auth/login/" class="text-violet-600 font-bold underline">Sign in</a> to see your real applications.
+  </div>
+  {% endif %}
+
+  <!-- ── Stats ── -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+      <div class="text-2xl font-extrabold text-violet-600">{{ total }}</div>
+      <div class="text-xs text-gray-500 font-medium mt-1">Total</div>
+    </div>
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+      <div class="text-2xl font-extrabold text-amber-500">{{ pending }}</div>
+      <div class="text-xs text-gray-500 font-medium mt-1">Pending</div>
+    </div>
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+      <div class="text-2xl font-extrabold text-emerald-500">{{ accepted }}</div>
+      <div class="text-xs text-gray-500 font-medium mt-1">Accepted</div>
+    </div>
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+      <div class="text-2xl font-extrabold text-red-500">{{ rejected }}</div>
+      <div class="text-xs text-gray-500 font-medium mt-1">Rejected</div>
+    </div>
+  </div>
+
+  <!-- ── Filter Tabs ── -->
+  <div id="nm-tabs" class="flex gap-2 mb-5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden">
+    <button onclick="nmAppTab(this,'all')"
+      class="nm-tab shrink-0 px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all duration-200 cursor-pointer bg-violet-600 text-white border-violet-600">
+      All ({{ total }})
+    </button>
+    <button onclick="nmAppTab(this,'pending')"
+      class="nm-tab shrink-0 px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all duration-200 cursor-pointer text-gray-500 bg-transparent hover:border-violet-200 hover:text-violet-600">
+      🟡 Pending ({{ pending }})
+    </button>
+    <button onclick="nmAppTab(this,'accepted')"
+      class="nm-tab shrink-0 px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all duration-200 cursor-pointer text-gray-500 bg-transparent hover:border-violet-200 hover:text-violet-600">
+      🟢 Accepted ({{ accepted }})
+    </button>
+    <button onclick="nmAppTab(this,'rejected')"
+      class="nm-tab shrink-0 px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all duration-200 cursor-pointer text-gray-500 bg-transparent hover:border-violet-200 hover:text-violet-600">
+      🔴 Rejected ({{ rejected }})
+    </button>
+  </div>
+
+  <!-- ── Application Cards ── -->
+  <div id="nm-app-list" class="flex flex-col gap-4">
+
+    {% if not applications %}
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm px-6 py-20 text-center animate-fadeUp">
+      <div class="text-5xl mb-4">📭</div>
+      <div class="text-lg font-extrabold text-gray-900 mb-2">No applications yet</div>
+      <p class="text-sm text-gray-500 max-w-xs mx-auto mb-6">Browse rooms and apply to find your perfect match.</p>
+      <a href="{% url 'listings_app:listings' %}"
+         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 transition-colors">
+        Browse Rooms
+      </a>
+    </div>
+    {% else %}
+
+    {% for app in applications %}
+    {% if is_demo %}
+    {% with s=app.status l=app.listing d=app.applied_at_fmt c=app.compatibility %}
+
+    {# ══ DEMO ACCEPTED ══ #}
+    {% if s == 'accepted' %}
+    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-emerald-200 animate-fadeUp" data-status="accepted">
+
+      <!-- accepted banner -->
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2 bg-gradient-to-r from-emerald-600 to-emerald-400 px-5 py-4">
+        <span class="text-xl shrink-0">🎉</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-bold text-white">Congratulations! You've been accepted.</div>
+          <div class="text-xs text-emerald-100 mt-0.5">Download your rental agreement below</div>
+        </div>
+        <button onclick="nmDownloadAgreement(this,'{{ l.title }}')"
+          class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-white hover:bg-emerald-50 transition-colors border-0 cursor-pointer font-jakarta">
+          📄 Download Agreement
+        </button>
+      </div>
+
+      <!-- card body -->
+      <div class="flex flex-col sm:flex-row gap-3 p-4">
+
+        <!-- image -->
+        <div class="w-full sm:w-[90px] h-44 sm:h-[72px] rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-violet-200 to-violet-300">
+          {% if l.image_url %}<img src="{{ l.image_url }}" alt="{{ l.title }}" class="w-full h-full object-cover"/>{% endif %}
+        </div>
+
+        <!-- content -->
+        <div class="flex-1 min-w-0">
+
+          <!-- title row -->
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <div>
+              <div class="text-sm font-bold text-gray-900 leading-snug" data-card-title>{{ l.title }}</div>
+              <div class="text-xs text-gray-500 mt-1">📍 {{ l.district }}, {{ l.city }} · ${{ l.price }}/mo</div>
+            </div>
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 shrink-0 self-start">🟢 Accepted</span>
+          </div>
+
+          <!-- match + date -->
+          <div class="flex flex-wrap items-center gap-2 mt-2.5">
+            {% if c %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-violet-50 text-violet-600">🤖 {{ c }}% Match</span>
+            {% endif %}
+            <span class="text-xs text-gray-400">📅 {{ d }}</span>
+          </div>
+
+          <!-- poster row -->
+          <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ l.poster_initials }}</div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-gray-900">{{ l.poster_name }}</div>
+              <div class="text-xs text-gray-500">Room Poster · <span class="text-emerald-600 font-semibold">✓ Verified</span></div>
+            </div>
+            <span class="ml-auto text-[11px] font-semibold text-gray-400 shrink-0">{{ l.listing_type }}</span>
+          </div>
+
+          <!-- message -->
+          <div class="mt-3 px-3 py-2.5 bg-gray-50 border-l-[3px] border-violet-200 rounded-r-lg text-xs text-gray-600 italic leading-relaxed">
+            "{{ app.message }}"
+          </div>
+
+          <!-- actions -->
+          <div class="flex flex-col sm:flex-row gap-2 mt-3">
+            <a href="/rooms/{{ l.pk }}/"
+               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              View Room
+            </a>
+            {% if l.poster_phone %}
+            <a href="https://wa.me/{{ l.poster_phone }}" target="_blank"
+               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp {{ l.poster_name|truncatewords:1 }}
+            </a>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    {# ══ DEMO PENDING ══ #}
+    {% elif s == 'pending' %}
+    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200 animate-fadeUp" data-status="pending">
+      <div class="flex flex-col sm:flex-row gap-3 p-4">
+
+        <div class="w-full sm:w-[90px] h-44 sm:h-[72px] rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-emerald-100 to-emerald-200">
+          {% if l.image_url %}<img src="{{ l.image_url }}" alt="{{ l.title }}" class="w-full h-full object-cover"/>{% endif %}
+        </div>
+
+        <div class="flex-1 min-w-0">
+
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <div>
+              <div class="text-sm font-bold text-gray-900 leading-snug" data-card-title>{{ l.title }}</div>
+              <div class="text-xs text-gray-500 mt-1">📍 {{ l.district }}, {{ l.city }} · ${{ l.price }}/mo</div>
+            </div>
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 shrink-0 self-start">🟡 Pending</span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 mt-2.5">
+            {% if c %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-violet-50 text-violet-600">🤖 {{ c }}% Match</span>
+            {% endif %}
+            <span class="text-xs text-gray-400">📅 {{ d }}</span>
+          </div>
+
+          <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ l.poster_initials }}</div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-gray-900">{{ l.poster_name }}</div>
+              <div class="text-xs text-gray-500">Room Poster · {{ l.listing_type }}</div>
+            </div>
+          </div>
+
+          <div class="mt-3 px-3 py-2.5 bg-gray-50 border-l-[3px] border-violet-200 rounded-r-lg text-xs text-gray-600 italic leading-relaxed">
+            "{{ app.message }}"
+          </div>
+
+          <div class="flex items-start gap-2 mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 leading-relaxed">
+            <span class="shrink-0 mt-0.5">⏳</span>
+            <span>Waiting for <strong>{{ l.poster_name|truncatewords:1 }}</strong> to review your application. Usually 1–3 days.</span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2 mt-3">
+            <a href="/rooms/{{ l.pk }}/"
+               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              View Room
+            </a>
+            <button onclick="nmWithdrawDemo(this,'{{ l.title }}')"
+              class="inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors cursor-pointer font-jakarta">
+              Withdraw
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    {# ══ DEMO REJECTED ══ #}
+    {% elif s == 'rejected' %}
+    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200 opacity-70 animate-fadeUp" data-status="rejected">
+      <div class="flex flex-col sm:flex-row gap-3 p-4">
+
+        <div class="w-full sm:w-[90px] h-44 sm:h-[72px] rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-red-100 to-red-200">
+          {% if l.image_url %}<img src="{{ l.image_url }}" alt="{{ l.title }}" class="w-full h-full object-cover"/>{% endif %}
+        </div>
+
+        <div class="flex-1 min-w-0">
+
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <div>
+              <div class="text-sm font-bold text-gray-900 leading-snug" data-card-title>{{ l.title }}</div>
+              <div class="text-xs text-gray-500 mt-1">📍 {{ l.district }}, {{ l.city }} · ${{ l.price }}/mo</div>
+            </div>
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-600 shrink-0 self-start">🔴 Rejected</span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 mt-2.5">
+            {% if c %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-gray-100 text-gray-400">🤖 {{ c }}% Match</span>
+            {% endif %}
+            <span class="text-xs text-gray-400">📅 {{ d }}</span>
+          </div>
+
+          <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-gray-400 to-gray-500">{{ l.poster_initials }}</div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-gray-400">{{ l.poster_name }}</div>
+              <div class="text-xs text-gray-400">Room Poster</div>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2 mt-3">
+            <a href="{% url 'listings_app:listings' %}"
+               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors">
+              Find Similar Rooms →
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% else %}
+    {# ── Real DB objects ── #}
+
+    {# ══ DB ACCEPTED ══ #}
+    {% if app.status == 'accepted' %}
+    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-emerald-200 animate-fadeUp" data-status="accepted">
+
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2 bg-gradient-to-r from-emerald-600 to-emerald-400 px-5 py-4">
+        <span class="text-xl shrink-0">🎉</span>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-bold text-white">Congratulations! You've been accepted.</div>
+          <div class="text-xs text-emerald-100 mt-0.5">Download your rental agreement below</div>
+        </div>
+        <button onclick="nmDownloadAgreement(this,'{{ app.listing.title }}')"
+          class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-white hover:bg-emerald-50 transition-colors border-0 cursor-pointer font-jakarta">
+          📄 Download Agreement
+        </button>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 p-4">
+        <div class="w-full sm:w-[90px] h-44 sm:h-[72px] rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-violet-200 to-violet-300">
+          {% with img=app.listing.images.first %}{% if img %}<img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover"/>{% endif %}{% endwith %}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <div>
+              <div class="text-sm font-bold text-gray-900 leading-snug" data-card-title>{{ app.listing.title }}</div>
+              <div class="text-xs text-gray-500 mt-1">📍 {{ app.listing.district }}, {{ app.listing.city }} · ${{ app.listing.price }}/mo</div>
+            </div>
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 shrink-0 self-start">🟢 Accepted</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 mt-2.5">
+            {% if app.compatibility %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-violet-50 text-violet-600">🤖 {{ app.compatibility }}% Match</span>
+            {% endif %}
+            <span class="text-xs text-gray-400">📅 {{ app.applied_at|date:"M j, Y" }}</span>
+          </div>
+          <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-gray-900">{{ app.listing.poster.get_full_name }}</div>
+              <div class="text-xs text-gray-500">Room Poster · <span class="text-emerald-600 font-semibold">✓ Verified</span></div>
+            </div>
+          </div>
+          {% if app.message %}
+          <div class="mt-3 px-3 py-2.5 bg-gray-50 border-l-[3px] border-violet-200 rounded-r-lg text-xs text-gray-600 italic leading-relaxed">"{{ app.message }}"</div>
+          {% endif %}
+          <div class="flex flex-col sm:flex-row gap-2 mt-3">
+            <a href="{% url 'listings_app:room_detail' app.listing.pk %}"
+               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
+              View Room
+            </a>
+            <a href="https://wa.me/" target="_blank"
+               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+              💬 WhatsApp {{ app.listing.poster.first_name }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ══ DB PENDING ══ #}
+    {% elif app.status == 'pending' %}
+    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200 animate-fadeUp" data-status="pending">
+      <div class="flex flex-col sm:flex-row gap-3 p-4">
+        <div class="w-full sm:w-[90px] h-44 sm:h-[72px] rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-emerald-100 to-emerald-200">
+          {% with img=app.listing.images.first %}{% if img %}<img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover"/>{% endif %}{% endwith %}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <div>
+              <div class="text-sm font-bold text-gray-900 leading-snug" data-card-title>{{ app.listing.title }}</div>
+              <div class="text-xs text-gray-500 mt-1">📍 {{ app.listing.district }}, {{ app.listing.city }} · ${{ app.listing.price }}/mo</div>
+            </div>
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 shrink-0 self-start">🟡 Pending</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 mt-2.5">
+            {% if app.compatibility %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-violet-50 text-violet-600">🤖 {{ app.compatibility }}% Match</span>
+            {% endif %}
+            <span class="text-xs text-gray-400">📅 {{ app.applied_at|date:"M j, Y" }}</span>
+          </div>
+          <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-gray-900">{{ app.listing.poster.get_full_name }}</div>
+              <div class="text-xs text-gray-500">Room Poster</div>
+            </div>
+          </div>
+          {% if app.message %}
+          <div class="mt-3 px-3 py-2.5 bg-gray-50 border-l-[3px] border-violet-200 rounded-r-lg text-xs text-gray-600 italic leading-relaxed">"{{ app.message }}"</div>
+          {% endif %}
+          <div class="flex items-start gap-2 mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 leading-relaxed">
+            <span class="shrink-0 mt-0.5">⏳</span>
+            <span>Waiting for <strong>{{ app.listing.poster.first_name }}</strong> to review — usually 1–3 days.</span>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2 mt-3">
+            <a href="{% url 'listings_app:room_detail' app.listing.pk %}"
+               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
+              View Room
+            </a>
+            <button data-withdraw-pk="{{ app.pk }}" onclick="nmWithdraw(+this.dataset.withdrawPk,this)"
+              class="inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors cursor-pointer font-jakarta">
+              Withdraw
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ══ DB REJECTED ══ #}
+    {% elif app.status == 'rejected' %}
+    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200 opacity-70 animate-fadeUp" data-status="rejected">
+      <div class="flex flex-col sm:flex-row gap-3 p-4">
+        <div class="w-full sm:w-[90px] h-44 sm:h-[72px] rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-red-100 to-red-200">
+          {% with img=app.listing.images.first %}{% if img %}<img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover"/>{% endif %}{% endwith %}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <div>
+              <div class="text-sm font-bold text-gray-900 leading-snug" data-card-title>{{ app.listing.title }}</div>
+              <div class="text-xs text-gray-500 mt-1">📍 {{ app.listing.district }}, {{ app.listing.city }} · ${{ app.listing.price }}/mo</div>
+            </div>
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-600 shrink-0 self-start">🔴 Rejected</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 mt-2.5">
+            {% if app.compatibility %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-gray-100 text-gray-400">🤖 {{ app.compatibility }}% Match</span>
+            {% endif %}
+            <span class="text-xs text-gray-400">📅 {{ app.applied_at|date:"M j, Y" }}</span>
+          </div>
+          <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-gray-400 to-gray-500">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-gray-400">{{ app.listing.poster.get_full_name }}</div>
+              <div class="text-xs text-gray-400">Room Poster</div>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2 mt-3">
+            <a href="{% url 'listings_app:listings' %}"
+               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-violet-600 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors">
+              Find Similar Rooms →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+
+    {% endif %}
+  </div>
+
+  <!-- ── Timeline ── -->
+  {% if applications %}
+  <div class="mt-10">
+    <div class="text-sm font-bold text-gray-900 mb-3">Application Timeline</div>
+    <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+      <div class="flex flex-col">
+        {% for app in applications %}
+        <div class="relative flex gap-4 {% if not forloop.last %}pb-5{% endif %}">
+          {% if not forloop.last %}
+          <div class="absolute left-[4px] top-4 bottom-0 w-0.5 bg-gray-100"></div>
+          {% endif %}
+          {% if is_demo %}
+          {% with s=app.status l=app.listing d=app.applied_at_fmt %}
+          <div class="w-2.5 h-2.5 rounded-full mt-1 shrink-0 {% if s == 'accepted' %}bg-emerald-400{% elif s == 'pending' %}bg-amber-400{% else %}bg-red-400{% endif %}"></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs font-bold text-gray-900">{{ l.title }}</div>
+            <div class="text-xs text-gray-500 mt-0.5">
+              {{ d }} ·
+              <span class="font-semibold {% if s == 'accepted' %}text-emerald-600{% elif s == 'pending' %}text-amber-600{% else %}text-rose-600{% endif %}">
+                {% if s == 'accepted' %}Accepted{% elif s == 'pending' %}Under Review{% else %}Rejected{% endif %}
+              </span>
+            </div>
+          </div>
+          {% endwith %}
+          {% else %}
+          <div class="w-2.5 h-2.5 rounded-full mt-1 shrink-0 {% if app.status == 'accepted' %}bg-emerald-400{% elif app.status == 'pending' %}bg-amber-400{% else %}bg-red-400{% endif %}"></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs font-bold text-gray-900">{{ app.listing.title }}</div>
+            <div class="text-xs text-gray-500 mt-0.5">
+              {{ app.applied_at|date:"M j, Y" }} ·
+              <span class="font-semibold {% if app.status == 'accepted' %}text-emerald-600{% elif app.status == 'pending' %}text-amber-600{% else %}text-rose-600{% endif %}">
+                {{ app.get_status_display }}
+              </span>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── Tips Section ── -->
+  <div class="mt-5 bg-violet-50 border border-violet-200 rounded-2xl p-5">
+    <div class="text-sm font-bold text-violet-600 mb-3">💡 Tips to Improve Your Chances</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+      <div class="flex items-start gap-2 text-xs text-gray-700">
+        <span class="text-violet-600 font-bold shrink-0">✓</span>
+        Complete your lifestyle profile for a better match score
+      </div>
+      <div class="flex items-start gap-2 text-xs text-gray-700">
+        <span class="text-violet-600 font-bold shrink-0">✓</span>
+        Write a personal message when applying to stand out
+      </div>
+      <div class="flex items-start gap-2 text-xs text-gray-700">
+        <span class="text-violet-600 font-bold shrink-0">✓</span>
+        Apply to rooms with 80%+ AI compatibility score
+      </div>
+      <div class="flex items-start gap-2 text-xs text-gray-700">
+        <span class="text-violet-600 font-bold shrink-0">✓</span>
+        Respond quickly when a poster reaches out to you
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% include "core_app/partials/footer.html" %}
+
+<!-- ── Toast container ── -->
+<div id="nm-toast-wrap" class="fixed top-20 right-4 left-4 z-[9999] flex flex-col items-end gap-2.5 pointer-events-none sm:left-auto sm:right-6"></div>
+
+<!-- ── Withdraw modal ── -->
+<div id="nm-withdraw-modal" class="fixed inset-0 z-[8000] hidden items-center justify-center p-6">
+  <div id="nm-withdraw-backdrop" onclick="nmCloseWithdraw()" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+  <div id="nm-withdraw-box" class="relative bg-white rounded-2xl p-7 w-full max-w-sm shadow-2xl z-10">
+    <div class="text-2xl mb-2.5">⚠️</div>
+    <div class="text-lg font-extrabold text-gray-900 mb-1.5">Withdraw Application?</div>
+    <div id="nm-withdraw-title" class="text-xs text-gray-500 mb-4 leading-relaxed"></div>
+    <p class="text-xs text-gray-600 mb-6 leading-relaxed">Once withdrawn, the poster will no longer see your application. You can re-apply later.</p>
+    <div class="flex gap-2.5">
+      <button onclick="nmCloseWithdraw()"
+        class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer font-jakarta">
+        Cancel
+      </button>
+      <button id="nm-withdraw-confirm"
+        class="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors cursor-pointer border-0 font-jakarta">
+        Yes, Withdraw
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Toast colours — only 4 rules that can't be done with Tailwind's dynamic bg */
+  .nm-toast-success{background:#059669;color:#fff}
+  .nm-toast-error  {background:#E11D48;color:#fff}
+  .nm-toast-info   {background:#7C3AED;color:#fff}
+  .nm-toast-warning{background:#D97706;color:#fff}
+  @keyframes nmToastIn {from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes nmToastOut{from{opacity:1}to{opacity:0;transform:translateX(20px)}}
+  /* Tab active state managed by JS */
+  .nm-tab-active{background:#7C3AED!important;color:#fff!important;border-color:#7C3AED!important}
+  /* Modal open state */
+  #nm-withdraw-modal.open{display:flex}
+  /* Toast base */
+  .nm-toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;font-family:"Plus Jakarta Sans",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:240px;max-width:340px;width:auto;animation:nmToastIn .3s ease}
+  @media(max-width:480px){.nm-toast{min-width:0;width:100%}}
+</style>
+
+{% if not is_demo %}<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">{% endif %}
+<script src="{% static 'applications_app/js/my_applications.js' %}"></script>
+</body>
+</html>

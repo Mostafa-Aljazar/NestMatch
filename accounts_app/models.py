@@ -257,10 +257,34 @@ class User(AbstractBaseUser, PermissionsMixin):
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
-    # Property method to calculate the current age dynamically
     @property
     def age(self):
-        return User.objects._calculate_age(self.date_of_birth)
+        today = date.today()
+        dob = self.date_of_birth
+        return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
+    @property
+    def birthday_this_year(self):
+        today = date.today()
+        dob = self.date_of_birth
+        try:
+            return dob.replace(year=today.year)
+        except ValueError:
+            # Feb 29 on a non-leap year → use Mar 1
+            return date(today.year, 3, 1)
+
+    @property
+    def days_until_birthday(self):
+        today = date.today()
+        birthday = self.birthday_this_year
+        if birthday < today:
+            birthday = birthday.replace(year=today.year + 1)
+        return (birthday - today).days
+
+    @property
+    def is_birthday_today(self):
+        today = date.today()
+        return (self.date_of_birth.month, self.date_of_birth.day) == (today.month, today.day)
 
 
 class LifestyleProfileManager(models.Manager):
@@ -440,3 +464,43 @@ class LifestyleProfile(models.Model):
 
     def __str__(self):
         return f'Lifestyle profile of {self.user.username}'
+
+
+class Testimonial(models.Model):
+    ROOM_SEEKER = 'seeker'
+    ROOM_POSTER = 'poster'
+    ROLE_CHOICES = [
+        (ROOM_SEEKER, 'Room Seeker'),
+        (ROOM_POSTER, 'Room Poster'),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='testimonials',
+    )
+    reviewer_name = models.CharField(max_length=150)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    location = models.CharField(max_length=120, blank=True)
+    quote = models.TextField()
+    rating = models.PositiveSmallIntegerField(default=5)
+    approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        app_label = 'core_app'
+        db_table = 'core_app_testimonial'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.reviewer_name} — {self.get_role_display()}'
+
+    @property
+    def reviewer_initials(self):
+        parts = self.reviewer_name.strip().split()
+        if len(parts) == 0:
+            return ''
+        if len(parts) == 1:
+            return parts[0][:2].upper()
+        return ''.join(part[0].upper() for part in parts[:2])

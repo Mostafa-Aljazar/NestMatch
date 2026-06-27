@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import login, authenticate,logout
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-from .models import User, LifestyleProfile
+from .models import User, LifestyleProfile, Testimonial
 
 
 def index(request):
@@ -50,7 +50,7 @@ def register_create_view(request):
             # Automatically establish a login session for the newly created user
             login(request, user)
             #messages.success(request, "Registration successful! Welcome to NestMatch.")
-            return redirect('accounts_app:profile')
+            return redirect('listings_app:listings')
 
         except Exception:
             messages.error(request, "An unexpected error occurred. Please try again.")
@@ -91,7 +91,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 #messages.success(request, f"Welcome back, {user.first_name}!")
-                return redirect('accounts_app:profile')
+                return redirect('listings_app:listings')
 
         return render(request, 'login.html', {'errors': {'email': 'Invalid email/username or password.'}})
 
@@ -143,6 +143,8 @@ def profile_view(request):
         'religion_choices': LifestyleProfile.RELIGION_CHOICES,
         'field_choices': LifestyleProfile.FIELD_CHOICES,
         'smoking_choices': LifestyleProfile.SMOKING_CHOICES,
+        'user_reviews': Testimonial.objects.filter(user=user).order_by('-created_at'),
+        'review_section_heading': 'Write a review',
     }
     return render(request, 'profile.html', context)
 
@@ -184,6 +186,53 @@ def profile_update_lifestyle(request):
 
     LifestyleProfile.objects.save_for_user(request.user, request.POST)
     return JsonResponse({'success': True, 'message': 'Your lifestyle profile has been updated.'})
+
+
+@login_required
+@require_POST
+def submit_review(request):
+    """Handle new testimonial submission from the profile page."""
+    review_text = request.POST.get('review_text', '').strip()
+    reviewer_name = request.POST.get('reviewer_name', '').strip()
+    role = request.POST.get('role')
+    location = request.POST.get('location', '').strip()
+
+    errors = {}
+    if not reviewer_name:
+        errors['reviewer_name'] = 'Your name is required.'
+
+    if not review_text or len(review_text) < 20:
+        errors['review_text'] = 'Please write a review with at least 20 characters.'
+
+    if role not in dict(Testimonial.ROLE_CHOICES):
+        errors['role'] = 'Please select your role.'
+
+    if errors:
+        for error_message in errors.values():
+            messages.error(request, error_message)
+        return redirect('accounts_app:profile')
+
+    testimonial = Testimonial.objects.create(
+        user=request.user,
+        reviewer_name=reviewer_name,
+        role=role,
+        location=location,
+        quote=review_text,
+        approved=False,
+    )
+
+    messages.success(request, 'Your review has been submitted for approval.')
+    return redirect('accounts_app:profile')
+
+
+@login_required
+@require_POST
+def delete_review(request, review_id):
+    """Allow the logged-in user to delete one of their submitted reviews."""
+    review = get_object_or_404(Testimonial, pk=review_id, user=request.user)
+    review.delete()
+    messages.success(request, 'Your review has been removed.')
+    return redirect('accounts_app:profile')
 
 
 @login_required
@@ -240,17 +289,6 @@ def delete_account_view(request):
 
     return JsonResponse({'success': True, 'redirect_url': '/auth/register/'})
 
-@login_required
-@require_POST
 def logout_view(request):
-    """
-    Logs the current user out and redirects to the login page.
-
-    Implemented as POST-only (not a plain GET link), since a GET-triggered
-    logout is a classic CSRF-able side effect: a malicious page could embed
-    <img src="/logout/"> and log a victim out without their consent.
-    Requiring POST + CSRF token (sent automatically by the logout <form>
-    in the navbar) closes that gap.
-    """
     logout(request)
     return redirect('accounts_app:login')

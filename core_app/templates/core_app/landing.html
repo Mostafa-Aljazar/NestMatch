@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NestMatch — Find Your Perfect Roommate & Room</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    * { font-family: 'Inter', sans-serif; }
+    .hero-gradient { background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 50%, #5B21B6 100%); }
+    .card-float { animation: float 3s ease-in-out infinite; }
+    .card-float-delay { animation: float 3s ease-in-out infinite 1.5s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    .stat-number { background: linear-gradient(135deg, #7C3AED, #A78BFA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  </style>
+</head>
+<body class="bg-white">
+
+  {% include "core_app/partials/navbar.html" with active_page="home" %}
+
+  <!-- Hero section -->
+  <section class="relative flex items-center pt-32 lg:pt-16 min-h-[700px] overflow-hidden hero-gradient">
+    <div class="absolute inset-0" style="background-image: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px); background-size: 28px 28px;"></div>
+
+    <div class="z-10 relative mx-auto px-10 sm:px-6 w-full max-w-[1200px]">
+      <div class="items-center gap-12 grid grid-cols-1 lg:grid-cols-2">
+
+        <!-- Left: Text -->
+        <div class="lg:text-left text-center">
+          <div class="inline-flex items-center gap-2 bg-white/15 mb-6 px-3 py-1.5 border border-white/25 rounded-full font-semibold text-white text-xs">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="white"/></svg>
+            AI-Powered Matching
+          </div>
+          <h1 class="mb-5 font-black text-white text-3xl sm:text-4xl lg:text-5xl leading-tight">
+            Find Your Perfect<br/>Roommate & Room
+          </h1>
+          <p class="mx-auto lg:mx-0 mb-8 max-w-[420px] text-purple-200 text-sm sm:text-base leading-relaxed">
+            NestMatch uses AI to match you with compatible roommates based on your lifestyle — sleep habits, cleanliness, noise level, and more.
+          </p>
+          <div class="flex flex-wrap justify-center lg:justify-start gap-4 mb-8">
+            <a href="/auth/" class="bg-white hover:bg-purple-50 shadow-lg px-6 py-3 rounded-xl font-bold text-violet-700 text-sm transition-all">Get Started</a>
+            <a href="/rooms/" class="bg-transparent hover:bg-white/10 px-6 py-3 border-2 border-white rounded-xl font-bold text-white text-sm transition-all">Browse Rooms</a>
+          </div>
+          <div class="flex flex-wrap justify-center lg:justify-start items-center gap-5">
+            <span class="font-medium text-purple-200 text-xs">✓ Free to use</span>
+            <span class="font-medium text-purple-200 text-xs">✓ AI Compatibility</span>
+            <span class="font-medium text-purple-200 text-xs">✓ Instant WhatsApp</span>
+          </div>
+        </div>
+
+        <!-- Right: Floating Cards-->
+        <div class="relative mt-8 lg:mt-0 w-full h-[420px]">
+
+          <div class="top-6 left-0 z-20 card-float absolute bg-white shadow-2xl p-4 rounded-2xl w-40">
+            <div class="mb-1 font-semibold text-[10px] text-gray-400">AI Match Score</div>
+            <div class="font-black text-violet-600 text-3xl">87%</div>
+            <div class="font-bold text-[10px] text-amber-500">✦ Excellent Match</div>
+          </div>
+
+          <div class="top-16 right-0 left-20 z-10 card-float-delay absolute bg-white shadow-2xl rounded-2xl overflow-hidden" style="max-width:260px;">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=180&fit=crop" alt="Room" class="w-full h-36 object-cover" />
+              <span class="top-2 left-2 absolute flex items-center gap-1 bg-white/90 px-2 py-0.5 rounded-full font-bold text-[10px] text-gray-700">🛏 Private Room</span>
+              <span class="top-2 right-2 absolute bg-green-500 px-2 py-0.5 rounded-full font-bold text-[10px] text-white">Available</span>
+            </div>
+            <div class="p-3">
+              <div class="font-bold text-gray-800 text-sm">Cozy Room Near University</div>
+              <div class="mb-2 text-gray-400 text-xs">📍 Cairo, Nasr City</div>
+              <div class="mb-2 font-black text-violet-600 text-base">$250<span class="font-normal text-gray-400 text-xs">/month</span></div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="font-bold text-[10px] text-violet-600">🔗 87% Compatible</span>
+                <span class="font-semibold text-[10px] text-green-500">Excellent</span>
+              </div>
+              <div class="bg-gray-100 mb-2 rounded-full h-1.5">
+                <div class="bg-violet-500 rounded-full h-1.5" style="width:87%"></div>
+              </div>
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-1.5">
+                  <div class="flex justify-center items-center bg-violet-100 rounded-full w-6 h-6 font-black text-[10px] text-violet-700">A</div>
+                  <span class="text-gray-500 text-xs">Ahmed M.</span>
+                </div>
+                <span class="text-[10px] text-gray-400">👥 3/5 spots</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="top-8 right-0 z-20 card-float absolute flex items-center gap-2 bg-white shadow-xl px-3 py-2 rounded-xl">
+            <div class="flex justify-center items-center bg-violet-100 rounded-full w-7 h-7 text-base">🏠</div>
+            <div>
+              <div class="font-bold text-gray-700 text-xs">New Listing!</div>
+              <div class="text-[10px] text-gray-400">$280 · Heliopolis</div>
+            </div>
+          </div>
+
+          <div class="right-0 bottom-10 z-20 card-float-delay absolute flex items-center gap-2 bg-white shadow-xl px-3 py-2 rounded-xl">
+            <div class="flex justify-center items-center bg-green-500 rounded-full w-7 h-7 font-black text-white text-xs">M</div>
+            <div>
+              <div class="font-bold text-gray-700 text-xs">Mohamed A.</div>
+              <div class="font-semibold text-[10px] text-green-500">94% Compatible 💜</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="py-14 border-gray-100 border-b">
+    <div class="mx-auto px-10 sm:px-6 max-w-[1200px]">
+      <div class="gap-8 grid grid-cols-2 sm:grid-cols-4 text-center">
+        <div>
+          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">2,400+</div>
+          <div class="font-medium text-gray-500 text-sm">Active Listings</div>
+        </div>
+        <div>
+          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">8,500+</div>
+          <div class="font-medium text-gray-500 text-sm">Happy Users</div>
+        </div>
+        <div>
+          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">12+</div>
+          <div class="font-medium text-gray-500 text-sm">Cities</div>
+        </div>
+        <div>
+          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">94%</div>
+          <div class="font-medium text-gray-500 text-sm">Match Accuracy</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="bg-gray-50 py-20">
+    <div class="mx-auto px-10 sm:px-6 max-w-[1200px]">
+      <div class="mb-14 text-center">
+        <div class="inline-block bg-violet-100 mb-5 px-4 py-1.5 rounded-full font-bold text-violet-600 text-xs uppercase tracking-wider">How it Works</div>
+        <h2 class="mb-4 font-black text-gray-900 text-3xl sm:text-4xl">Find your match in 3 simple steps</h2>
+        <p class="mx-auto max-w-xs text-gray-500 text-sm leading-relaxed">From sign-up to move-in, NestMatch makes the process seamless</p>
+      </div>
+
+      <!-- Desktop: 3 cards in a row | Tablet: 2 cards | Mobile: 1 card -->
+      <div class="gap-4 md:gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+
+        <div class="relative bg-white shadow-sm p-8 border border-gray-100 rounded-2xl text-center">
+          <div class="-top-4 -right-4 absolute flex justify-center items-center bg-violet-600 shadow-lg rounded-full w-8 h-8 font-black text-white text-sm">1</div>
+          <div class="flex justify-center items-center bg-violet-100 mx-auto mb-6 rounded-2xl w-16 h-16"><span class="text-3xl">📝</span></div>
+          <h3 class="mb-3 font-bold text-gray-900 text-base">Create Your Profile</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Sign up and fill out your lifestyle questionnaire — sleep time, cleanliness, noise level, smoking habits and more</p>
+        </div>
+
+        <div class="relative bg-white shadow-sm p-8 border border-gray-100 rounded-2xl text-center">
+          <div class="-top-4 -right-4 absolute flex justify-center items-center bg-violet-600 shadow-lg rounded-full w-8 h-8 font-black text-white text-sm">2</div>
+          <div class="flex justify-center items-center bg-violet-100 mx-auto mb-6 rounded-2xl w-16 h-16"><span class="text-3xl">🔍</span></div>
+          <h3 class="mb-3 font-bold text-gray-900 text-base">Browse & Match</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Search rooms with live filters. See AI compatibility scores instantly for every listing you browse</p>
+        </div>
+
+        <div class="relative md:col-span-2 lg:col-span-1 bg-white shadow-sm md:mx-auto p-8 border border-gray-100 rounded-2xl md:max-w-[420px] text-center">
+          <div class="-top-4 -right-4 absolute flex justify-center items-center bg-violet-600 shadow-lg rounded-full w-8 h-8 font-black text-white text-sm">3</div>
+          <div class="flex justify-center items-center bg-violet-100 mx-auto mb-6 rounded-2xl w-16 h-16"><span class="text-3xl">🤝</span></div>
+          <h3 class="mb-3 font-bold text-gray-900 text-base">Connect & Move In</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Apply to rooms, chat via WhatsApp, and generate your rental agreement with AI in seconds</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- LATEST LISTINGS -->
+  <section class="py-20">
+    <div class="mx-auto px-10 sm:px-6 max-w-[1200px]">
+
+      <div class="flex flex-wrap justify-between items-end gap-3 mb-10">
+        <div>
+          <div class="inline-block bg-violet-50 mb-3 px-3 py-1 border border-violet-100 rounded-full font-bold text-violet-600 text-xs uppercase tracking-wider">Featured Today</div>
+          <h2 class="font-black text-gray-900 text-2xl sm:text-3xl">Latest Listings</h2>
+          <p class="mt-1 text-gray-500 text-sm">Fresh rooms added today — matched to your lifestyle</p>
+        </div>
+        <a href="/rooms/" class="font-semibold text-violet-600 hover:text-violet-700 text-sm">View All →</a>
+      </div>
+
+      <div class="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+
+        {% for listing in latest_listings %}
+        {% with first_image=listing.images.first initials=listing.poster.first_name|slice:":1" %}
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 overflow-hidden{% if forloop.last and forloop.counter == 3 %} md:col-span-2 md:max-w-[420px] md:mx-auto lg:col-span-1{% endif %}">
+          <div class="relative">
+            {% if first_image %}
+              <img src="{{ first_image.image.url }}" alt="{{ listing.title }}" class="w-full h-44 object-cover" />
+            {% else %}
+              <div class="flex justify-center items-center bg-gradient-to-br from-violet-100 to-purple-200 w-full h-44">
+                <span class="text-4xl">🏠</span>
+              </div>
+            {% endif %}
+            <span class="top-3 left-3 absolute bg-white/90 px-2 py-1 rounded-full font-bold text-[10px] text-gray-700">{{ listing.get_listing_type_display }}</span>
+            <span class="top-3 right-3 absolute bg-green-500 px-2 py-1 rounded-full font-bold text-[10px] text-white">Available</span>
+          </div>
+          <div class="p-4">
+            <h3 class="mb-1 font-bold text-gray-900 text-sm truncate">{{ listing.title }}</h3>
+            <p class="flex items-center gap-1 mb-3 text-gray-400 text-xs">
+              <svg width="11" height="11" fill="none" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke="#9CA3AF" stroke-width="2"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke="#9CA3AF" stroke-width="2"/></svg>
+              {{ listing.city }}{% if listing.district %}, {{ listing.district }}{% endif %}
+            </p>
+            <span class="font-black text-violet-600 text-lg">${{ listing.price|floatformat:0 }}<span class="font-normal text-gray-400 text-xs">/mo</span></span>
+            <div class="my-3">
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-[11px] text-gray-400">Login to see match score</span>
+              </div>
+              <div class="bg-gray-100 rounded-full h-1.5"><div class="bg-gray-300 rounded-full w-full h-1.5"></div></div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-gray-100 border-t">
+              <div class="flex items-center gap-2">
+                <div class="flex justify-center items-center bg-violet-100 rounded-full w-6 h-6 font-black text-[10px] text-violet-700">{{ listing.poster.first_name|slice:":1" }}{{ listing.poster.last_name|slice:":1" }}</div>
+                <span class="text-gray-500 text-xs">{{ listing.poster.first_name }} {{ listing.poster.last_name|slice:":1" }}.</span>
+              </div>
+              <div class="flex flex-wrap justify-end gap-1.5 text-[10px] text-gray-400">
+                {% if listing.no_smoking %}<span class="bg-gray-100 px-2 py-0.5 rounded-full">No Smoking</span>{% endif %}
+                {% if listing.pets_allowed %}<span class="bg-gray-100 px-2 py-0.5 rounded-full">Pets OK</span>{% elif listing.no_pets %}<span class="bg-gray-100 px-2 py-0.5 rounded-full">No Pets</span>{% endif %}
+                {% if listing.wifi_included %}<span class="bg-gray-100 px-2 py-0.5 rounded-full">WiFi</span>{% endif %}
+              </div>
+            </div>
+            <a href="/rooms/{{ listing.pk }}/" class="block bg-violet-600 hover:bg-violet-700 mt-3 py-2.5 rounded-xl w-full font-bold text-white text-xs text-center transition-colors">View Details →</a>
+          </div>
+        </div>
+        {% endwith %}
+        {% empty %}
+        <div class="col-span-3 py-16 text-gray-400 text-center">
+          <span class="block mb-3 text-4xl">🏠</span>
+          <p class="font-semibold">No listings yet. Check back soon!</p>
+        </div>
+        {% endfor %}
+
+      </div>
+
+      <div class="mt-10 text-center">
+        <a href="/rooms/" class="inline-flex items-center gap-2 hover:bg-violet-50 px-8 py-3 border-2 border-violet-600 rounded-xl font-bold text-violet-600 text-sm transition-colors">
+          View All Listings →
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="bg-gray-50 py-20">
+    <div class="mx-auto px-10 sm:px-6 max-w-[1200px]">
+
+      <div class="mb-14 text-center">
+        <div class="inline-block bg-violet-50 mb-4 px-3 py-1 border border-violet-100 rounded-full font-bold text-violet-600 text-xs uppercase tracking-wider">Reviews</div>
+        <h2 class="mb-3 font-black text-gray-900 text-2xl sm:text-3xl">What Our Users Say</h2>
+        <p class="text-gray-500 text-sm">Thousands of happy matches across 12+ cities</p>
+      </div>
+
+      <div class="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {% if reviews %}
+          {% for review in reviews %}
+            <div class="bg-white shadow-sm p-6 border border-gray-100 rounded-2xl">
+              <div class="flex gap-0.5 mb-4">
+                {% for i in "12345" %}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="{% if forloop.counter <= review.rating %}#FBBF24{% else %}none{% endif %}" stroke="{% if forloop.counter <= review.rating %}none{% else %}currentColor{% endif %}">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                {% endfor %}
+              </div>
+              <p class="mb-5 text-gray-600 text-sm leading-relaxed">"{{ review.quote }}"</p>
+              <div class="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-4">
+                <div class="flex items-center gap-2.5">
+                  <div class="flex justify-center items-center bg-violet-100 rounded-full w-8 h-8 font-black text-violet-700 text-xs">{{ review.reviewer_initials }}</div>
+                  <div>
+                    <div class="font-bold text-gray-800 text-sm">{{ review.reviewer_name }}</div>
+                    <div class="text-gray-400 text-xs">{% if review.location %}{{ review.location }}{% else %}Unknown location{% endif %}</div>
+                  </div>
+                </div>
+                <span class="bg-violet-50 px-2 py-1 rounded-full font-bold text-[10px] text-violet-600">{{ review.get_role_display }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-span-3 py-16 text-gray-400 text-center">
+            <span class="block mb-3 text-4xl">🏠</span>
+            <p class="font-semibold">No user reviews are available yet. Check back soon!</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- cta section -->
+  <section class="py-16 sm:py-20 hero-gradient">
+    <div class="mx-auto px-4 sm:px-6 lg:px-10 max-w-[1200px] text-center">
+      <div class="inline-block bg-white/10 mb-6 px-3 py-1 border border-white/20 rounded-full font-bold text-purple-200 text-xs uppercase tracking-wider">Get Started Today</div>
+      <h2 class="mb-4 font-black text-white text-3xl sm:text-4xl">Ready to Find Your Perfect Nest?</h2>
+      <p class="mx-auto mb-8 sm:mb-10 max-w-md text-purple-200 text-base">Join 8,500+ users already finding their perfect roommate match with AI</p>
+      <div class="flex flex-row flex-wrap justify-center items-center gap-3 sm:gap-4">
+        <a href="/rooms/new/" class="bg-white hover:bg-purple-50 shadow-lg px-6 sm:px-8 py-3 rounded-xl w-full sm:w-auto min-w-[160px] font-bold text-violet-700 text-sm text-center transition-all">Post a Room</a>
+        <a href="/rooms/" class="hover:bg-white/10 px-6 sm:px-8 py-3 border-2 border-white/50 rounded-xl w-full sm:w-auto min-w-[160px] font-bold text-white text-sm text-center transition-all">Find a Room</a>
+      </div>
+    </div>
+  </section>
+
+  {% include "core_app/partials/footer.html" %}
+
+</body>
+</html>

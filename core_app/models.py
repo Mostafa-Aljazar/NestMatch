@@ -1,3 +1,1 @@
-from django.db import models
-
-# Create your models here.
+from accounts_app.models import Testimonial
