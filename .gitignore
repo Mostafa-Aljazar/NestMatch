@@ -48,3 +48,6 @@ coverage.xml
 # Migrations (optional — keep if you want to track them)
 # */migrations/*.py
 # !*/migrations/__init__.py
+
+# Local management commands (not for deployment)
+listings_app/management/

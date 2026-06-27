@@ -2,98 +2,321 @@
   Navbar partial — include with:
     {% include "core_app/partials/navbar.html" with active_page="home" %}
 
-  active_page values: "home" | "listings" | "post_room" | "about"
+  active_page values: "home" | "listings" | "post_room" | "about" | "profile" | "dashboard"
 {% endcomment %}
 
-<!-- NAVBAR -->
-<nav id="nm-nav" class="fixed top-0 left-0 right-0 z-50 h-16 bg-white border-b border-gray-200 flex items-center px-5 transition-shadow duration-300">
+<nav id="nm-nav" class="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 flex items-center px-5 transition-all duration-300" style="z-index:9998">
 
   <!-- Logo -->
-  <a href="/" class="flex items-center gap-2 shrink-0 no-underline">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-      <path d="M3 12L12 3L21 12V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V12Z" fill="#7C3AED"/>
-    </svg>
-    <span class="text-[19px] font-extrabold text-violet-600 tracking-tight">NestMatch</span>
+  <a href="/" class="flex items-center gap-2 shrink-0 no-underline mr-8">
+    <div class="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center shadow-sm">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M3 12L12 3L21 12V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V12Z" fill="white"/>
+      </svg>
+    </div>
+    <span class="text-[18px] font-extrabold tracking-tight leading-none" style="font-family:'Plus Jakarta Sans',sans-serif">
+      <span class="text-gray-900">Nest</span><span class="text-violet-600">Match</span>
+    </span>
   </a>
 
-  <!-- Desktop nav links -->
-  <div class="hidden md:flex items-center gap-7 mx-auto">
-    <a href="/"
-       class="text-sm font-medium {% if active_page == 'home' %}text-violet-600 border-b-2 border-violet-600 pb-0.5 font-semibold{% else %}text-gray-500 hover:text-gray-800{% endif %}">
+  <!-- Desktop nav links (centered) -->
+  <div class="hidden md:flex items-center gap-1 flex-1">
+    <a href="/" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
+      {% if active_page == 'home' %}text-violet-600 bg-violet-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-gray-50{% endif %}">
       Home
     </a>
-    <a href="/rooms/"
-       class="text-sm font-medium {% if active_page == 'listings' %}text-violet-600 border-b-2 border-violet-600 pb-0.5 font-semibold{% else %}text-gray-500 hover:text-gray-800{% endif %}">
+    <a href="/rooms/" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
+      {% if active_page == 'listings' %}text-violet-600 bg-violet-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-gray-50{% endif %}">
       Listings
     </a>
-    <a href="/rooms/new/"
-       class="text-sm font-medium {% if active_page == 'post_room' %}text-violet-600 border-b-2 border-violet-600 pb-0.5 font-semibold{% else %}text-gray-500 hover:text-gray-800{% endif %}">
-      Post a Room
-    </a>
-    <a href="/about/"
-       class="text-sm font-medium {% if active_page == 'about' %}text-violet-600 border-b-2 border-violet-600 pb-0.5 font-semibold{% else %}text-gray-500 hover:text-gray-800{% endif %}">
+    <a href="/about/" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
+      {% if active_page == 'about' %}text-violet-600 bg-violet-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-gray-50{% endif %}">
       About
     </a>
   </div>
 
-  <!-- Desktop auth buttons -->
-  <div class="hidden md:flex items-center gap-3 shrink-0">
+  <!-- Desktop right side -->
+  <div class="hidden md:flex items-center gap-2 shrink-0">
     {% if user.is_authenticated %}
-      <a href="/dashboard/" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 hover:text-violet-600 transition-colors">
-        <span class="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center text-violet-700 text-xs font-extrabold">
-          {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-        </span>
-        {{ user.first_name }}
+
+      <!-- Post a Room CTA -->
+      <a href="/rooms/new/"
+         class="px-4 py-2 text-sm font-semibold text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 transition-colors">
+        + Post Room
       </a>
-      <a href="/auth/logout/" class="px-5 py-2 text-sm font-semibold text-gray-500 border border-gray-200 rounded-lg hover:border-red-300 hover:text-red-500 transition-colors">Logout</a>
+
+      <!-- Avatar dropdown trigger -->
+      <div class="relative" id="nm-user-menu">
+        <button onclick="nmToggleUserMenu()"
+                class="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:border-violet-300 hover:bg-violet-50 transition-all text-sm font-medium text-gray-700">
+          <span class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
+            {% if user.profile_pic %}
+              <img src="{{ user.profile_pic.url }}" class="w-7 h-7 rounded-full object-cover" alt="">
+            {% else %}
+              {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+            {% endif %}
+          </span>
+          <span class="max-w-[90px] truncate">{{ user.first_name }}</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 shrink-0">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+
+        <!-- Dropdown -->
+        <div id="nm-user-dropdown"
+             class="hidden absolute right-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl py-1.5"
+             style="z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.12)">
+
+          <!-- User info header -->
+          <div class="px-4 py-3 border-b border-gray-100">
+            <p class="text-[13px] font-semibold text-gray-900 truncate">{{ user.full_name }}</p>
+            <p class="text-[11px] text-gray-400 truncate mt-0.5">{{ user.email }}</p>
+          </div>
+
+          <div class="py-1">
+            <a href="/auth/profile/" class="flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors
+              {% if active_page == 'profile' %}bg-violet-50 text-violet-600{% endif %}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+              My Profile
+            </a>
+            <a href="/dashboard/" class="flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors
+              {% if active_page == 'dashboard' %}bg-violet-50 text-violet-600{% endif %}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+              Dashboard
+            </a>
+            <a href="/dashboard/applications/" class="flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/>
+              </svg>
+              My Applications
+            </a>
+          </div>
+
+          <div class="border-t border-gray-100 py-1">
+            <a href="/auth/logout/" class="flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-red-500 hover:bg-red-50 transition-colors">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Sign Out
+            </a>
+          </div>
+        </div>
+      </div>
+
     {% else %}
-      <a href="/auth/" class="px-5 py-2 text-sm font-semibold text-violet-600 border border-violet-600 rounded-lg hover:bg-violet-50 transition-colors">Login</a>
-      <a href="/auth/" class="px-5 py-2 text-sm font-semibold text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors">Register</a>
+      <a href="/auth/login/" class="px-4 py-2 text-sm font-semibold text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 transition-colors">
+        Login
+      </a>
+      <a href="/auth/register/" class="px-4 py-2 text-sm font-semibold text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors shadow-sm">
+        Register
+      </a>
     {% endif %}
   </div>
 
   <!-- Mobile hamburger -->
-  <button class="md:hidden flex flex-col gap-1.5 ml-auto bg-transparent border-none p-1.5 cursor-pointer" id="nm-hbg" onclick="nmToggleMenu()" aria-label="Menu">
-    <span class="block w-5 h-0.5 bg-gray-700 rounded transition-all duration-250"></span>
-    <span class="block w-5 h-0.5 bg-gray-700 rounded transition-all duration-250"></span>
-    <span class="block w-5 h-0.5 bg-gray-700 rounded transition-all duration-250"></span>
+  <button class="md:hidden flex flex-col justify-center gap-[5px] ml-auto bg-transparent border-none w-9 h-9 cursor-pointer rounded-lg hover:bg-gray-100 transition-colors items-center"
+          id="nm-hbg" onclick="nmToggleMenu()" aria-label="Menu">
+    <span id="nm-b1" class="block w-[20px] h-[2px] bg-gray-700 rounded-full transition-all duration-300 origin-center"></span>
+    <span id="nm-b2" class="block w-[20px] h-[2px] bg-gray-700 rounded-full transition-all duration-300"></span>
+    <span id="nm-b3" class="block w-[20px] h-[2px] bg-gray-700 rounded-full transition-all duration-300 origin-center"></span>
   </button>
 
 </nav>
 
-<!-- Mobile menu -->
-<div id="nm-mm" class="hidden fixed top-16 left-0 right-0 bg-white border-b border-gray-200 z-40 flex-col shadow-lg">
-  <a href="/" class="text-[15px] font-semibold {% if active_page == 'home' %}text-violet-600{% else %}text-gray-700{% endif %} px-6 py-3.5 border-b border-gray-100 block">🏠 Home</a>
-  <a href="/rooms/" class="text-[15px] font-semibold {% if active_page == 'listings' %}text-violet-600{% else %}text-gray-700{% endif %} px-6 py-3.5 border-b border-gray-100 block">🏘️ Listings</a>
-  <a href="/rooms/new/" class="text-[15px] font-semibold {% if active_page == 'post_room' %}text-violet-600{% else %}text-gray-700{% endif %} px-6 py-3.5 border-b border-gray-100 block">➕ Post a Room</a>
-  <a href="/about/" class="text-[15px] font-semibold {% if active_page == 'about' %}text-violet-600{% else %}text-gray-700{% endif %} px-6 py-3.5 border-b border-gray-100 block">ℹ️ About</a>
-  <div class="px-6 py-4 flex gap-3">
-    {% if user.is_authenticated %}
-      <a href="/dashboard/" class="flex-1 text-center py-2.5 border border-violet-600 rounded-lg text-violet-600 text-sm font-semibold">Dashboard</a>
-      <a href="/auth/logout/" class="flex-1 text-center py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-500 text-sm font-semibold">Logout</a>
-    {% else %}
-      <a href="/auth/" class="flex-1 text-center py-2.5 border border-violet-600 rounded-lg text-violet-600 text-sm font-semibold">Login</a>
-      <a href="/auth/" class="flex-1 text-center py-2.5 bg-violet-600 rounded-lg text-white text-sm font-semibold">Register</a>
-    {% endif %}
+<!-- Mobile backdrop -->
+<div id="nm-backdrop" onclick="nmCloseMenu()"
+     class="md:hidden fixed inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 opacity-0 pointer-events-none"
+     style="z-index:9996"></div>
+
+<!-- Mobile drawer (slides in from right) -->
+<div id="nm-mm"
+     class="md:hidden fixed top-0 right-0 bottom-0 w-[300px] bg-white flex flex-col transition-transform duration-300 translate-x-full"
+     style="z-index:9997;box-shadow:-8px 0 40px rgba(0,0,0,0.12)">
+
+  <!-- Drawer header -->
+  <div class="flex items-center justify-between px-5 h-16 border-b border-gray-100 shrink-0">
+    <div class="flex items-center gap-2">
+      <div class="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M3 12L12 3L21 12V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V12Z" fill="white"/>
+        </svg>
+      </div>
+      <span class="text-[16px] font-extrabold tracking-tight" style="font-family:'Plus Jakarta Sans',sans-serif">
+        <span class="text-gray-900">Nest</span><span class="text-violet-600">Match</span>
+      </span>
+    </div>
+    <button onclick="nmCloseMenu()" class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors border-none cursor-pointer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
   </div>
+
+  <!-- User card (logged in) or guest banner -->
+  {% if user.is_authenticated %}
+  <div class="mx-4 mt-4 mb-1 rounded-2xl p-4 shrink-0" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #ddd6fe">
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center text-white font-extrabold text-sm shrink-0">
+        {% if user.profile_pic %}
+          <img src="{{ user.profile_pic.url }}" class="w-11 h-11 rounded-full object-cover" alt="">
+        {% else %}
+          {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+        {% endif %}
+      </div>
+      <div class="min-w-0">
+        <p class="text-[14px] font-bold text-gray-900 truncate">{{ user.full_name }}</p>
+        <p class="text-[11px] text-violet-500 font-medium truncate">{{ user.email }}</p>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="mx-4 mt-4 mb-1 rounded-2xl p-4 shrink-0" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #ddd6fe">
+    <p class="text-[13px] font-semibold text-violet-700 mb-3">Join NestMatch today</p>
+    <div class="flex gap-2">
+      <a href="/auth/login/" class="flex-1 text-center py-2 rounded-xl text-[13px] font-semibold text-violet-600 bg-white border border-violet-200">Login</a>
+      <a href="/auth/register/" class="flex-1 text-center py-2 rounded-xl text-[13px] font-semibold text-white bg-violet-600">Register</a>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Nav links -->
+  <nav class="flex-1 overflow-y-auto px-3 py-2">
+    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3 mb-1 mt-2">Navigation</p>
+
+    <a href="/" class="flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-colors mb-0.5
+      {% if active_page == 'home' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {% if active_page == 'home' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V12Z"/></svg>
+      </span>
+      Home
+    </a>
+
+    <a href="/rooms/" class="flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-colors mb-0.5
+      {% if active_page == 'listings' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {% if active_page == 'listings' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </span>
+      Listings
+    </a>
+
+    <a href="/about/" class="flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-colors mb-0.5
+      {% if active_page == 'about' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {% if active_page == 'about' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      </span>
+      About
+    </a>
+
+    {% if user.is_authenticated %}
+    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3 mb-1 mt-4">Account</p>
+
+    <a href="/rooms/new/" class="flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-colors mb-0.5
+      {% if active_page == 'post_room' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {% if active_page == 'post_room' %}bg-violet-100{% else %}bg-violet-100{% endif %}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      </span>
+      Post a Room
+    </a>
+
+    <a href="/auth/profile/" class="flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-colors mb-0.5
+      {% if active_page == 'profile' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {% if active_page == 'profile' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </span>
+      My Profile
+    </a>
+
+    <a href="/dashboard/" class="flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-colors mb-0.5
+      {% if active_page == 'dashboard' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {% if active_page == 'dashboard' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </span>
+      Dashboard
+    </a>
+
+    <a href="/dashboard/applications/" class="flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold text-gray-700 hover:bg-gray-50 transition-colors mb-0.5">
+      <span class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+      </span>
+      My Applications
+    </a>
+    {% endif %}
+  </nav>
+
+  <!-- Bottom sign out -->
+  {% if user.is_authenticated %}
+  <div class="px-4 pb-6 pt-2 shrink-0 border-t border-gray-100">
+    <a href="/auth/logout/" class="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-[14px] font-semibold text-red-500 bg-red-50 hover:bg-red-100 transition-colors">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Sign Out
+    </a>
+  </div>
+  {% endif %}
+
 </div>
 
-<!-- Navbar scroll shadow -->
+<style>
+  #nm-user-dropdown a { display: flex; }
+</style>
+
 <script>
-(function() {
+(function () {
   var nav = document.getElementById('nm-nav');
   if (nav) {
-    window.addEventListener('scroll', function() {
-      nav.style.boxShadow = window.scrollY > 10 ? '0 4px 20px rgba(0,0,0,.1)' : 'none';
+    window.addEventListener('scroll', function () {
+      nav.style.boxShadow = window.scrollY > 10 ? '0 4px 20px rgba(0,0,0,.08)' : 'none';
     }, { passive: true });
   }
 })();
 
-function nmToggleMenu() {
+function nmOpenMenu() {
   var mm  = document.getElementById('nm-mm');
-  var hbg = document.getElementById('nm-hbg');
-  if (mm)  mm.classList.toggle('hidden');
-  if (mm)  mm.style.display = mm.classList.contains('hidden') ? '' : 'flex';
-  if (hbg) hbg.classList.toggle('nm-open');
+  var bd  = document.getElementById('nm-backdrop');
+  var b1  = document.getElementById('nm-b1');
+  var b2  = document.getElementById('nm-b2');
+  var b3  = document.getElementById('nm-b3');
+  if (mm) mm.classList.remove('translate-x-full');
+  if (bd) { bd.classList.remove('opacity-0','pointer-events-none'); bd.classList.add('opacity-100'); }
+  if (b1) b1.style.transform = 'rotate(45deg) translate(5px,5px)';
+  if (b2) b2.style.opacity   = '0';
+  if (b3) b3.style.transform = 'rotate(-45deg) translate(5px,-5px)';
+  document.body.style.overflow = 'hidden';
 }
+
+function nmCloseMenu() {
+  var mm  = document.getElementById('nm-mm');
+  var bd  = document.getElementById('nm-backdrop');
+  var b1  = document.getElementById('nm-b1');
+  var b2  = document.getElementById('nm-b2');
+  var b3  = document.getElementById('nm-b3');
+  if (mm) mm.classList.add('translate-x-full');
+  if (bd) { bd.classList.add('opacity-0','pointer-events-none'); bd.classList.remove('opacity-100'); }
+  if (b1) b1.style.transform = '';
+  if (b2) b2.style.opacity   = '';
+  if (b3) b3.style.transform = '';
+  document.body.style.overflow = '';
+}
+
+function nmToggleMenu() {
+  var mm = document.getElementById('nm-mm');
+  if (!mm) return;
+  mm.classList.contains('translate-x-full') ? nmOpenMenu() : nmCloseMenu();
+}
+
+function nmToggleUserMenu() {
+  var dd = document.getElementById('nm-user-dropdown');
+  if (dd) dd.classList.toggle('hidden');
+}
+
+document.addEventListener('click', function (e) {
+  var menu = document.getElementById('nm-user-menu');
+  var dd   = document.getElementById('nm-user-dropdown');
+  if (dd && menu && !menu.contains(e.target)) dd.classList.add('hidden');
+});
 </script>
