@@ -464,3 +464,43 @@ class LifestyleProfile(models.Model):
 
     def __str__(self):
         return f'Lifestyle profile of {self.user.username}'
+
+
+class Testimonial(models.Model):
+    ROOM_SEEKER = 'seeker'
+    ROOM_POSTER = 'poster'
+    ROLE_CHOICES = [
+        (ROOM_SEEKER, 'Room Seeker'),
+        (ROOM_POSTER, 'Room Poster'),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='testimonials',
+    )
+    reviewer_name = models.CharField(max_length=150)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    location = models.CharField(max_length=120, blank=True)
+    quote = models.TextField()
+    rating = models.PositiveSmallIntegerField(default=5)
+    approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        app_label = 'core_app'
+        db_table = 'core_app_testimonial'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.reviewer_name} — {self.get_role_display()}'
+
+    @property
+    def reviewer_initials(self):
+        parts = self.reviewer_name.strip().split()
+        if len(parts) == 0:
+            return ''
+        if len(parts) == 1:
+            return parts[0][:2].upper()
+        return ''.join(part[0].upper() for part in parts[:2])

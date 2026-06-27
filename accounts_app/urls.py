@@ -17,6 +17,8 @@ urlpatterns = [
     # form never touches/overwrites the personal info data, and vice versa.
     path('profile/update/personal-info/', views.profile_update_personal_info, name='profile_update_personal_info'),
     path('profile/update/lifestyle/', views.profile_update_lifestyle, name='profile_update_lifestyle'),
+    path('profile/review/submit/', views.submit_review, name='submit_review'),
+    path('profile/review/<int:review_id>/delete/', views.delete_review, name='delete_review'),
     path('profile/update/password/', views.change_password_view, name='change_password'),
 
     # path(
