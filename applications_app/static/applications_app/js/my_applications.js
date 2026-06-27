@@ -1,0 +1,165 @@
+/* ─────────────────────────────────────────
+   CSRF cookie helper (Django standard)
+───────────────────────────────────────── */
+function getCookie(name) {
+  var value = '; ' + document.cookie;
+  var parts = value.split('; ' + name + '=');
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return '';
+}
+
+/* ─────────────────────────────────────────
+   Toast
+───────────────────────────────────────── */
+function nmToast(msg, type, duration) {
+  type     = type     || 'success';
+  duration = duration || 3500;
+
+  var wrap = document.getElementById('nm-toast-wrap');
+  var t    = document.createElement('div');
+  t.className = 'nm-toast nm-toast-' + type;
+
+  var icons = { success: '✅', error: '❌', info: '💜', warning: '⚠️' };
+  t.innerHTML =
+    '<span style="font-size:15px;flex-shrink:0">' + (icons[type] || '') + '</span>' +
+    '<span style="flex:1">' + msg + '</span>';
+
+  wrap.appendChild(t);
+  setTimeout(function () {
+    t.style.animation = 'nmToastOut .3s ease forwards';
+    setTimeout(function () { t.remove(); }, 300);
+  }, duration);
+}
+
+/* ─────────────────────────────────────────
+   Filter tabs
+───────────────────────────────────────── */
+window.nmAppTab = function (btn, filter) {
+  document.querySelectorAll('#nm-tabs .nm-tab').forEach(function (b) {
+    b.classList.remove('bg-violet-600', 'text-white', 'border-violet-600');
+    b.classList.add('text-gray-500', 'bg-transparent');
+  });
+  btn.classList.remove('text-gray-500', 'bg-transparent');
+  btn.classList.add('bg-violet-600', 'text-white', 'border-violet-600');
+
+  document.querySelectorAll('#nm-app-list [data-status]').forEach(function (card) {
+    card.style.display =
+      (filter === 'all' || card.dataset.status === filter) ? '' : 'none';
+  });
+};
+
+/* ─────────────────────────────────────────
+   Card removal animation
+───────────────────────────────────────── */
+function nmRemoveCard(card) {
+  if (!card) return;
+  card.style.transition   = 'opacity .3s ease, transform .3s ease';
+  card.style.opacity      = '0';
+  card.style.transform    = 'translateX(28px)';
+  setTimeout(function () {
+    card.style.transition = 'max-height .3s ease, margin .3s ease, padding .3s ease';
+    card.style.overflow   = 'hidden';
+    card.style.maxHeight  = '0';
+    card.style.margin     = '0';
+    card.style.padding    = '0';
+    setTimeout(function () { card.remove(); }, 320);
+  }, 280);
+}
+
+/* ─────────────────────────────────────────
+   Withdraw modal — open / close
+───────────────────────────────────────── */
+function nmOpenWithdrawModal(title, onConfirm) {
+  document.getElementById('nm-withdraw-title').textContent =
+    title ? '“' + title + '”' : '';
+
+  var modal   = document.getElementById('nm-withdraw-modal');
+  var confirm = document.getElementById('nm-withdraw-confirm');
+
+  /* reset button state */
+  confirm.textContent = 'Yes, Withdraw';
+  confirm.disabled    = false;
+
+  /* assign the specific confirm action for this call */
+  confirm.onclick = function () { onConfirm(confirm); };
+
+  modal.classList.add('open');
+  setTimeout(function () { confirm.focus(); }, 60);
+}
+
+function nmCloseWithdraw() {
+  document.getElementById('nm-withdraw-modal').classList.remove('open');
+  var confirm      = document.getElementById('nm-withdraw-confirm');
+  confirm.onclick  = null;
+  confirm.textContent = 'Yes, Withdraw';
+  confirm.disabled    = false;
+}
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') nmCloseWithdraw();
+});
+
+/* ─────────────────────────────────────────
+   Withdraw — demo mode  (no network)
+───────────────────────────────────────── */
+function nmWithdrawDemo(btn, title) {
+  var card = btn.closest('[data-status]');
+
+  nmOpenWithdrawModal(title, function (confirmBtn) {
+    nmCloseWithdraw();
+    nmRemoveCard(card);
+    nmToast('Application withdrawn.', 'info');
+  });
+}
+
+/* ─────────────────────────────────────────
+   Withdraw — real DB users
+───────────────────────────────────────── */
+function nmWithdraw(pk, btn) {
+  var card    = btn.closest('[data-status]');
+  var titleEl = card.querySelector('[data-card-title]');
+  var title   = titleEl ? titleEl.textContent.trim() : '';
+
+  nmOpenWithdrawModal(title, function (confirmBtn) {
+    confirmBtn.textContent = '⏳ Withdrawing…';
+    confirmBtn.disabled    = true;
+
+    var csrf = getCookie('csrftoken');
+
+    fetch('/applications/withdraw/' + pk + '/', {
+      method:  'POST',
+      headers: { 'X-CSRFToken': csrf || '' }
+    })
+      .then(function (r) {
+        nmCloseWithdraw();
+        if (r.ok) {
+          nmRemoveCard(card);
+          nmToast('Application withdrawn successfully.', 'info');
+        } else {
+          r.text().then(function (body) {
+            console.error('Withdraw failed:', r.status, body);
+          });
+          nmToast('Could not withdraw — please try again.', 'error');
+        }
+      })
+      .catch(function (err) {
+        console.error('Withdraw network error:', err);
+        nmCloseWithdraw();
+        nmToast('Network error — check your connection.', 'error');
+      });
+  });
+}
+
+/* ─────────────────────────────────────────
+   Download Agreement (simulated)
+───────────────────────────────────────── */
+function nmDownloadAgreement(btn, title) {
+  var orig  = btn.innerHTML;
+  btn.innerHTML = '⏳ Generating…';
+  btn.disabled  = true;
+  setTimeout(function () {
+    btn.innerHTML = orig;
+    btn.disabled  = false;
+    nmToast('Agreement for “' + title + '” downloaded!', 'success');
+  }, 1800);
+}
