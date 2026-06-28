@@ -25,7 +25,19 @@ tabButtons.forEach((button) => {
     // Activate the clicked button and show the corresponding panel
     button.classList.add('active');
     const target = button.dataset.tab;
-    if (tabPanels[target]) tabPanels[target].classList.remove('hidden');
+    const panel = tabPanels[target];
+    if (panel) {
+      panel.classList.remove('hidden');
+      // Re-trigger the fade-in animation every time a panel becomes visible
+      // (CSS animations don't replay just by removing `hidden`).
+      panel.classList.remove('tab-panel');
+      void panel.offsetWidth; // force reflow
+      panel.classList.add('tab-panel');
+    }
+
+    // On mobile the nav is a horizontally scrollable strip — keep the
+    // active button in view instead of leaving it clipped off-screen.
+    button.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   });
 });
 
@@ -66,6 +78,9 @@ const profileAvatarPlaceholder = document.getElementById('profile-avatar-placeho
 const sidebarUserName          = document.getElementById('sidebar-user-name');
 const profileStrengthValue     = document.getElementById('profile-strength-value');
 const profileStrengthBar       = document.getElementById('profile-strength-bar');
+// New header mirror of the same strength bar/value (purely visual, same data)
+const profileStrengthValueHeader = document.getElementById('profile-strength-value-header');
+const profileStrengthBarHeader   = document.getElementById('profile-strength-bar-header');
 
 
 // ===========================================================================
@@ -86,9 +101,46 @@ function recalcStrength() {
   const pct = Math.round((filled / 4) * 100);
   if (profileStrengthValue) profileStrengthValue.textContent = `${pct}%`;
   if (profileStrengthBar) profileStrengthBar.style.width = `${pct}%`;
+  if (profileStrengthValueHeader) profileStrengthValueHeader.textContent = `${pct}%`;
+  if (profileStrengthBarHeader) profileStrengthBarHeader.style.width = `${pct}%`;
+
+  // Checklist: each <li class="strength-check" data-key="hasX"> gets a filled
+  // check icon + emerald text once that piece of strengthState is true.
+  document.querySelectorAll('.strength-check').forEach((item) => {
+    const key = item.dataset.key;
+    const done = !!strengthState[key];
+    const icon = item.querySelector('.check-icon');
+
+    item.classList.toggle('text-slate-500', !done);
+    item.classList.toggle('text-slate', done);
+
+    if (icon) {
+      icon.classList.toggle('border-slate-300', !done);
+      icon.classList.toggle('bg-white', !done);
+      icon.classList.toggle('border-emerald-500', done);
+      icon.classList.toggle('bg-emerald-500', done);
+      icon.classList.toggle('text-white', done);
+      icon.textContent = done ? '✓' : '';
+    }
+  });
 }
 
 recalcStrength();
+
+// Make the very first render fill in from 0% instead of just appearing at
+// its final width — the CSS transition on .strength-bar-fill only plays on
+// a *change*, so we force one extra paint at 0% first, then let it animate
+// up to the real value on the next frame.
+[profileStrengthBar, profileStrengthBarHeader].forEach((bar) => {
+  if (!bar) return;
+  const target = bar.style.width;
+  bar.style.width = '0%';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      bar.style.width = target;
+    });
+  });
+});
 
 
 // ===========================================================================
@@ -368,4 +420,4 @@ if (deleteAccountForm) {
       // عرض رسالة خطأ
     }
   });
-}  
+}
