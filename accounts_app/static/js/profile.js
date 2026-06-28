@@ -199,7 +199,7 @@ function showFormFeedback(form, message, isError = false) {
   const title = isError ? 'Something went wrong' : 'Success';
 
   messageBox.innerHTML = `
-    <div class="fixed right-4 top-4 z-[60] flex max-w-sm items-start gap-3 rounded-2xl border ${colorClasses} px-4 py-3 shadow-soft">
+    <div class="fixed right-4 top-20 z-[60] flex max-w-sm items-start gap-3 rounded-2xl border ${colorClasses} px-4 py-3 shadow-soft">
       <div class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${iconBg}">
         <span class="text-sm font-bold ${iconColor}">${icon}</span>
       </div>

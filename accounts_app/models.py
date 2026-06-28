@@ -225,9 +225,23 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Note: 'password' field is automatically provided by AbstractBaseUser, no manual field needed
 
     # Custom profile and demographic fields
-    date_of_birth = models.DateField()
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    country = models.CharField(max_length=100, choices=COUNTRY_CHOICES)
+       # Made nullable so a brand-new Google sign-up can be saved to the DB
+    # immediately (Google never provides date of birth, gender, or
+    # nationality), and the user fills these in afterward on the
+    # lifestyle quiz / profile completion step.
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+    country = models.CharField(max_length=100, choices=COUNTRY_CHOICES, blank=True, null=True)
+
+    # Tracks how the account was created. Used to:
+    # - decide whether to show "Change password" vs "Add password" on the
+    #   Security tab (Google users don't have a usable password by default)
+    # - know whether profile completion (DOB/gender/country) is still pending
+    AUTH_PROVIDER_CHOICES = [
+        ('email', 'Email/Password'),
+        ('google', 'Google'),
+    ]
+    auth_provider = models.CharField(max_length=10, choices=AUTH_PROVIDER_CHOICES, default='email')
     bio = models.TextField(blank=True, null=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
@@ -258,12 +272,23 @@ class User(AbstractBaseUser, PermissionsMixin):
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
+    # Property method to calculate the current age dynamically.
+    # Returns None instead of crashing if date_of_birth hasn't been set yet
+    # (e.g. a brand-new Google sign-up that hasn't completed the lifestyle
+    # quiz / profile completion step).
     @property
     def age(self):
-        today = date.today()
-        dob = self.date_of_birth
-        return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        if not self.date_of_birth:
+            return None
+        return User.objects._calculate_age(self.date_of_birth)
 
+    # True once the user has filled in the fields Google never provides.
+    # Used to decide whether to redirect a freshly-logged-in user to the
+    # "complete your profile" / lifestyle quiz step.
+    @property
+    def is_profile_complete(self):
+        return bool(self.date_of_birth and self.gender and self.country)
+    
     @property
     def birthday_this_year(self):
         today = date.today()

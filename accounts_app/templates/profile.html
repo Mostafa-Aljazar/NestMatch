@@ -65,19 +65,6 @@
   <body class="min-h-screen">
     {% include "core_app/partials/navbar.html" with active_page="profile" %}
 
-    <!-- Django messages framework output (validation errors / success notices) -->
-    {% if messages %}
-      <div class="top-20 right-4 z-[10001] fixed space-y-2 px-4 sm:px-0 w-full max-w-sm">
-        {% for message in messages %}
-          <div class="rounded-lg border px-4 py-3 text-sm font-medium shadow-soft
-            {% if message.tags == 'error' %}border-rose-200 bg-rose-50 text-rose-700
-            {% else %}border-emerald-200 bg-emerald-50 text-emerald-700{% endif %}">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-
     <!-- Page header -->
     <header class="bg-slate-50 mt-[65px] px-4 sm:px-6 lg:px-8 py-10 border-slate-200 border-b">
       <div class="mx-auto max-w-6xl">
@@ -97,7 +84,7 @@
           {% endif %}
         </div>
       </div>
-    </section>
+    </header>
 
     <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <div class="flex flex-col gap-8 lg:flex-row lg:items-start">
@@ -626,39 +613,7 @@
     <span id="strength-has-photo"     data-value="{{ user_obj.profile_pic|yesno:'true,false' }}"  class="hidden"></span>
     <span id="strength-has-lifestyle" data-value="{{ lifestyle_profile|yesno:'true,false' }}"     class="hidden"></span>
    
-      <footer class="bg-slate-900 px-4 sm:px-6 lg:px-8 py-10 border-slate-200 border-t text-slate-300">
-      <div class="mx-auto max-w-6xl">
-        <div class="gap-8 grid md:grid-cols-3">
-          <div>
-            <div class="flex items-center gap-2">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12 12 3l9 9" />
-                <path d="M9 21V9h6v12" />
-              </svg>
-              <span class="font-display font-extrabold text-white text-base">NestMatch</span>
-            </div>
-            <p class="mt-3 max-w-xs text-slate-400 text-sm">AI-powered roommate matching for better living.</p>
-          </div>
-          <div>
-            <h4 class="font-semibold text-slate-400 text-xs uppercase tracking-[0.2em]">Platform</h4>
-            <div class="space-y-2 mt-3 text-sm">
-              <a href="#" class="block text-slate-400 hover:text-white">Home</a>
-              <a href="#" class="block text-slate-400 hover:text-white">Listings</a>
-              <a href="#" class="block text-slate-400 hover:text-white">Post a Room</a>
-            </div>
-          </div>
-          <div>
-            <h4 class="font-semibold text-slate-400 text-xs uppercase tracking-[0.2em]">Support</h4>
-            <div class="space-y-2 mt-3 text-sm">
-              <a href="#" class="block text-slate-400 hover:text-white">Contact</a>
-              <a href="#" class="block text-slate-400 hover:text-white">FAQ</a>
-              <a href="#" class="block text-slate-400 hover:text-white">Privacy Policy</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
-
+    {% include "core_app/partials/footer.html" %}
     <script src="{% static 'js/profile.js' %}"></script>
   </body>
 </html>

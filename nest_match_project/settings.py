@@ -41,6 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',  # required by allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
     # NestMatch apps
     'core_app',
@@ -51,6 +56,8 @@ INSTALLED_APPS = [
     'agreements_app',
     'dashboard_app',
 ]
+# Required by django-allauth (django.contrib.sites)
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -60,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'nest_match_project.urls'
@@ -80,6 +88,38 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'nest_match_project.wsgi.application'
+
+# --- django-allauth configuration ---
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+# عدّل المسار هون ليطابق صفحة lifestyle quiz الحقيقية عندك إذا حابب
+LOGIN_REDIRECT_URL = '/auth/profile/'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '937751602718-a7qbnufspqdhgpq4roj1efn9vlpljm2q.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+    }
+}
+
+SOCIALACCOUNT_LOGIN_ON_GET = False
+SOCIALACCOUNT_ADAPTER = 'accounts_app.adapters.NestMatchSocialAccountAdapter'
 
 
 # Database

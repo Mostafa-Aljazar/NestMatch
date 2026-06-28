@@ -26,6 +26,7 @@ urlpatterns = [
 
     path('', include('core_app.urls')),
     path('auth/', include('accounts_app.urls')),
+    path('auth/', include('allauth.urls')),
     path('rooms/', include('listings_app.urls')),
     path('compatibility/', include('compatibility_app.urls')),
     path('applications/', include('applications_app.urls')),
