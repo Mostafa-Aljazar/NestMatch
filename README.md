@@ -108,8 +108,7 @@ NestMatchProject/
 | 7   | `/dashboard/`              | Poster dashboard — listings, applicants, agreements |
 | 8   | `/dashboard/applications/` | Seeker — track all applications by status           |
 | 9   | `/profile/`                | Profile — personal info, lifestyle, security        |
-| 10  | `/about/`                  | About NestMatch and the AI                          |
-| 11  | `/admin-panel/`            | Custom admin panel                                  |
+| 10  | `/admin-panel/`            | Custom admin panel                                  |
 
 ---
 
