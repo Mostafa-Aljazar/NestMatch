@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Code | NestMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#f5f3ff',
+                100: '#ede9fe',
+                500: '#7c3aed',
+                600: '#6d28d9',
+                700: '#5b21b6',
+                900: '#4c1d95',
+              },
+            },
+            boxShadow: {
+              soft: '0 16px 45px rgba(124, 58, 237, 0.16)',
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+      /* Individual OTP digit input boxes */
+      .otp-input {
+        width: 3.5rem;
+        height: 3.5rem;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.75rem;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        background: #ffffff;
+        color: #111827;
+      }
+      .otp-input:focus {
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+      }
+      .otp-input.filled {
+        border-color: #7c3aed;
+        background-color: #f5f3ff;
+      }
+      input { background-color: #ffffff !important; }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gray-50 text-slate-800">
+    <div class="min-h-screen lg:grid lg:grid-cols-[1.05fr_0.95fr]">
+
+      <!-- Left side -->
+      <aside class="relative hidden overflow-hidden bg-gradient-to-br from-brand-900 via-brand-600 to-violet-500 px-10 py-16 text-white lg:flex lg:flex-col lg:justify-center">
+        <div class="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,255,255,0.14)_1.5px,_transparent_1.5px)] bg-[length:32px_32px]" aria-hidden="true"></div>
+        <div class="absolute -right-16 -top-16 h-80 w-80 rounded-full bg-white/10" aria-hidden="true"></div>
+        <div class="absolute -bottom-24 -left-12 h-64 w-64 rounded-full bg-white/5" aria-hidden="true"></div>
+        <div class="relative z-10">
+          <a href="#" class="mb-12 flex items-center gap-3 text-white no-underline">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span class="text-2xl font-extrabold tracking-[-0.02em]">NestMatch</span>
+          </a>
+          <h1 class="max-w-md text-4xl font-black leading-tight tracking-[-0.03em]">Check Your Email</h1>
+          <p class="mt-4 max-w-lg text-base leading-7 text-violet-100">
+            We sent a 4-digit verification code to your email. Enter it within 2 minutes.
+          </p>
+          <div class="mt-10 rounded-2xl border border-white/20 bg-white/10 p-5">
+            <div class="flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-400/90">
+                <svg class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-white">Code sent!</p>
+                <p class="text-xs text-violet-100">Check your inbox and spam folder</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right side — OTP form -->
+      <main class="flex min-h-screen items-center justify-center bg-white px-5 py-10 sm:px-8 lg:px-10">
+        <div class="w-full max-w-[420px]">
+
+          <!-- Mobile logo -->
+          <a href="#" class="mb-8 flex items-center gap-2 text-brand-600 lg:hidden">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span class="text-lg font-extrabold tracking-[-0.02em] text-brand-600">NestMatch</span>
+          </a>
+
+          <!-- Icon -->
+          <div class="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-100">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+
+          <h2 class="text-3xl font-black tracking-[-0.03em] text-slate-900">Enter Your Code</h2>
+          <p class="mt-2 text-sm text-slate-500">We sent a 4-digit code to your email. It expires in 2 minutes.</p>
+
+          <!-- Countdown timer -->
+          <div class="mt-5 flex items-center gap-2">
+            <div id="timer-wrapper" class="flex items-center gap-2">
+              <div class="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2.5" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="9"/>
+                  <polyline points="12 7 12 12 15 15"/>
+                </svg>
+              </div>
+              <span class="text-sm font-semibold text-slate-700">
+                Code expires in <span id="countdown" class="text-brand-600">2:00</span>
+              </span>
+            </div>
+            <!-- Shown only after timer expires -->
+            <span id="expired-msg" class="hidden text-sm font-semibold text-red-600">Code expired</span>
+          </div>
+
+          <form action="{% url 'accounts_app:verify_otp' %}" method="POST" class="mt-8 space-y-6" id="otp-form">
+            {% csrf_token %}
+
+            <!-- 4 individual digit boxes -->
+            <div>
+              <label class="mb-3 block text-sm font-semibold text-slate-700">Verification code</label>
+              <div class="flex gap-3" id="otp-boxes">
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
+                       class="otp-input" autocomplete="off" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
+                       class="otp-input" autocomplete="off" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
+                       class="otp-input" autocomplete="off" />
+                <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
+                       class="otp-input" autocomplete="off" />
+              </div>
+              <!-- Hidden input that holds the combined 4-digit code for form submission -->
+              <input type="hidden" name="code" id="code-hidden" />
+
+              {% if error %}
+                <p class="mt-3 text-sm font-medium text-red-600">{{ error }}</p>
+              {% endif %}
+            </div>
+
+            <button type="submit" id="submit-btn"
+                    class="w-full rounded-lg bg-[#7C3AED] px-4 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#5B21B6] disabled:opacity-50 disabled:cursor-not-allowed">
+              Verify Code
+            </button>
+          </form>
+
+          <!-- Resend section -->
+          <div class="mt-6 text-center">
+            <p class="text-sm text-slate-500">Didn't receive the code?</p>
+
+            <!-- Shown while timer is running -->
+            <p id="resend-waiting" class="mt-1 text-sm text-slate-400">
+              You can resend after the timer expires
+            </p>
+
+            <!-- Shown after timer expires -->
+            <form id="resend-form" action="{% url 'accounts_app:resend_otp' %}" method="POST" class="hidden mt-1">
+              {% csrf_token %}
+              <button type="submit" class="text-sm font-semibold text-[#7C3AED] hover:text-[#5B21B6]">
+                Resend code
+              </button>
+            </form>
+          </div>
+
+          <p class="mt-6 text-center text-sm text-slate-500">
+            Wrong email?
+            <a href="{% url 'accounts_app:forgot_password' %}" class="ml-1 font-semibold text-[#7C3AED] hover:text-[#5B21B6]">Go back</a>
+          </p>
+
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // =====================================================================
+      // OTP INPUT BOXES — Auto-advance and backspace handling
+      // When the user types a digit, focus moves to the next box.
+      // When they press backspace on an empty box, focus moves back.
+      // All 4 digits are combined into the hidden input before submission.
+      // =====================================================================
+      const boxes = document.querySelectorAll('.otp-input');
+      const hiddenInput = document.getElementById('code-hidden');
+
+      boxes.forEach((box, index) => {
+        box.addEventListener('input', () => {
+          // Only allow digits
+          box.value = box.value.replace(/[^0-9]/g, '');
+
+          if (box.value) {
+            box.classList.add('filled');
+            // Move to next box if available
+            if (index < boxes.length - 1) boxes[index + 1].focus();
+          } else {
+            box.classList.remove('filled');
+          }
+
+          // Combine all digits into the hidden input
+          hiddenInput.value = Array.from(boxes).map(b => b.value).join('');
+        });
+
+        box.addEventListener('keydown', (e) => {
+          // On backspace, clear current box and move to previous
+          if (e.key === 'Backspace' && !box.value && index > 0) {
+            boxes[index - 1].focus();
+            boxes[index - 1].value = '';
+            boxes[index - 1].classList.remove('filled');
+          }
+        });
+
+        // Allow pasting a 4-digit code directly
+        box.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 4);
+          pasted.split('').forEach((digit, i) => {
+            if (boxes[i]) {
+              boxes[i].value = digit;
+              boxes[i].classList.add('filled');
+            }
+          });
+          hiddenInput.value = pasted;
+          // Focus the last filled box
+          if (boxes[pasted.length - 1]) boxes[pasted.length - 1].focus();
+        });
+      });
+
+      // Auto-focus first box on load
+      boxes[0].focus();
+
+
+      // =====================================================================
+      // COUNTDOWN TIMER — 2 minutes (120 seconds)
+      // When it hits 0: hides the timer, shows "expired", shows Resend button,
+      // and disables the submit button so the user can't submit an expired code.
+      // =====================================================================
+      const countdownEl  = document.getElementById('countdown');
+      const timerWrapper = document.getElementById('timer-wrapper');
+      const expiredMsg   = document.getElementById('expired-msg');
+      const resendWaiting = document.getElementById('resend-waiting');
+      const resendForm   = document.getElementById('resend-form');
+      const submitBtn    = document.getElementById('submit-btn');
+
+      let totalSeconds = 120; // 2 minutes
+
+      const timer = setInterval(() => {
+        totalSeconds--;
+
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        // Format as M:SS
+        countdownEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        // Change color to red in the last 30 seconds
+        if (totalSeconds <= 30) {
+          countdownEl.classList.remove('text-brand-600');
+          countdownEl.classList.add('text-red-500');
+        }
+
+        if (totalSeconds <= 0) {
+          clearInterval(timer);
+
+          // Hide timer, show expired message
+          timerWrapper.classList.add('hidden');
+          expiredMsg.classList.remove('hidden');
+
+          // Show resend button, hide waiting message
+          resendWaiting.classList.add('hidden');
+          resendForm.classList.remove('hidden');
+
+          // Disable submit — the code is expired
+          submitBtn.disabled = true;
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>
