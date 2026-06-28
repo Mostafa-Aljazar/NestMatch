@@ -35,7 +35,10 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       body {
         font-family: 'Inter', sans-serif;
@@ -76,15 +79,15 @@
     {% endif %}
 
     <!-- Page header -->
-    <section class="mt-[65px] border-b border-slate-200 bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
+    <header class="bg-slate-50 mt-[65px] px-4 sm:px-6 lg:px-8 py-10 border-slate-200 border-b">
       <div class="mx-auto max-w-6xl">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-600">Account settings</p>
-        <h1 class="mt-2 font-display text-3xl font-bold tracking-tight text-slate-900">{{ user_obj.full_name }}</h1>
-        <p class="mt-1 text-sm text-slate-500">Member since {{ user_obj.created_at|date:"F Y" }}</p>
+        <p class="font-semibold text-brand-600 text-xs uppercase tracking-[0.18em]">Account settings</p>
+        <h1 class="mt-2 font-display font-bold text-slate-900 text-3xl tracking-tight">{{ user_obj.full_name }}</h1>
+        <p class="mt-1 text-slate-500 text-sm">Member since {{ user_obj.created_at|date:"F Y" }}</p>
 
-        <div class="mt-5 flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-2 mt-5">
           {% if user_obj.is_active %}
-          <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700">
+          <span class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 border border-slate-200 rounded-full font-medium text-slate-700 text-xs">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z" />
               <path d="M9 12l2 2 4-4" />
@@ -507,8 +510,7 @@
       </div>
     </main>
 
-
-        <!-- Review submission section -->
+    <!-- Review submission section -->
     <section class="bg-gray-50 py-16">
       <div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div class="gap-6 grid lg:grid-cols-[1.2fr_0.8fr]">
@@ -579,7 +581,7 @@
                       </div>
                       <p class="mt-3 text-gray-600 text-sm leading-6">{{ review.quote|truncatechars:140 }}</p>
                       <div class="flex flex-wrap items-center gap-2 mt-3 text-gray-500 text-xs">
-                        {% if review.location %}<span> {{ review.location }}</span>{% endif %}
+                        {% if review.location %}<span>📍 {{ review.location }}</span>{% endif %}
                         <span>· {{ review.created_at|date:'M j, Y' }}</span>
                       </div>
                     </div>
