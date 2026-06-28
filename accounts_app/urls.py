@@ -20,7 +20,7 @@ urlpatterns = [
     path('profile/review/submit/', views.submit_review, name='submit_review'),
     path('profile/review/<int:review_id>/delete/', views.delete_review, name='delete_review'),
     path('profile/update/password/', views.change_password_view, name='change_password'),
-
+    path('delete-account/', views.delete_account_view, name='delete_account'),
     # path(
     #     'password-reset/',
     #     auth_views.PasswordResetView.as_view(
