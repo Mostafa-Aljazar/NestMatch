@@ -21,37 +21,9 @@ urlpatterns = [
     path('profile/review/<int:review_id>/delete/', views.delete_review, name='delete_review'),
     path('profile/update/password/', views.change_password_view, name='change_password'),
     path('delete-account/', views.delete_account_view, name='delete_account'),
-    # path(
-    #     'password-reset/',
-    #     auth_views.PasswordResetView.as_view(
-    #         template_name='password_reset.html',
-    #         email_template_name='password_reset_email.html',
-    #         subject_template_name='password_reset_subject.txt',
-    #         success_url=reverse_lazy('accounts_app:password_reset_done'),
-    #     ),
-    #     name='password_reset',
-    # ),
-    # path(
-    #     'password-reset/done/',
-    #     auth_views.PasswordResetDoneView.as_view(
-    #         template_name='password_reset_done.html',
-    #     ),
-    #     name='password_reset_done',
-    # ),
-    # path(
-    #     'password-reset/<uidb64>/<token>/',
-    #     auth_views.PasswordResetConfirmView.as_view(
-    #         template_name='password_reset_confirm.html',
-    #         success_url=reverse_lazy('accounts_app:password_reset_complete'),
-    #     ),
-    #     name='password_reset_confirm',
-    # ),
-    # path(
-    #     'password-reset/complete/',
-    #     auth_views.PasswordResetCompleteView.as_view(
-    #         template_name='password_reset_complete.html',
-    #     ),
-    #     name='password_reset_complete',
-    # ),
+    path('forgot-password/', views.forgot_password_view, name='forgot_password'),
+    path('verify-otp/', views.verify_otp_view, name='verify_otp'),
+    path('resend-otp/', views.resend_otp_view, name='resend_otp'),
+    path('reset-password/', views.reset_password_view, name='reset_password'),
     path('logout/', views.logout_view, name='logout'),
 ]

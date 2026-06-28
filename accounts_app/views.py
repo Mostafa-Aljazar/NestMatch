@@ -4,7 +4,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-from .models import User, LifestyleProfile, Testimonial
+from .models import User, LifestyleProfile, Testimonial ,OTPCode
+from django.core.mail import EmailMultiAlternatives
 
 
 def index(request):
@@ -292,3 +293,193 @@ def delete_account_view(request):
 def logout_view(request):
     logout(request)
     return redirect('accounts_app:login')
+
+
+def _send_otp_email(user, otp):
+    """
+    Sends a styled HTML email containing the OTP code to the user.
+    Falls back to plain text for email clients that don't support HTML.
+    """
+    subject      = 'Your NestMatch Password Reset Code'
+    text_content = f'Your verification code is: {otp.code}\n\nThis code expires in 2 minutes.'
+    html_content = f'''
+    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e5e7eb;">
+
+      <!-- Header -->
+      <div style="background: linear-gradient(135deg, #4c1d95, #6d28d9, #7c3aed); padding: 32px 24px; text-align: center;">
+        <h1 style="color: #ffffff; font-size: 22px; font-weight: 800; margin: 0;"> NestMatch</h1>
+        <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 8px 0 0;">Password Reset Code</p>
+      </div>
+
+      <!-- Body -->
+      <div style="padding: 32px 24px;">
+        <p style="color: #1e293b; font-size: 15px; margin: 0 0 24px;">Hi there! Here's your verification code:</p>
+
+        <!-- OTP Code -->
+        <div style="background: #f5f3ff; border: 2px solid #7c3aed; border-radius: 12px; padding: 24px; text-align: center; margin: 0 0 24px;">
+          <p style="color: #6d28d9; font-size: 42px; font-weight: 800; letter-spacing: 12px; margin: 0;">{otp.code}</p>
+        </div>
+
+        <p style="color: #64748b; font-size: 13px; margin: 0 0 8px;"> This code expires in <strong>2 minutes</strong>.</p>
+        <p style="color: #64748b; font-size: 13px; margin: 0;">If you didn't request this, you can safely ignore this email.</p>
+      </div>
+
+      <!-- Footer -->
+      <div style="background: #f8fafc; border-top: 1px solid #e5e7eb; padding: 16px 24px; text-align: center;">
+        <p style="color: #94a3b8; font-size: 12px; margin: 0;">© 2026 NestMatch. All rights reserved.</p>
+      </div>
+
+    </div>
+    '''
+
+    msg = EmailMultiAlternatives(subject, text_content, None, [user.email])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+
+
+def forgot_password_view(request):
+    """
+    Displays the forgot password form.
+    On POST: looks up the user by email, generates an OTP,
+    sends it via email, and redirects to the verify page.
+    """
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+
+        # Check if a user with this email exists
+        user = User.objects.filter(email__iexact=email).first()
+
+        if not user:
+            return render(request, 'forgot_password.html', {
+                'error': 'No account found with this email address.'
+            })
+
+        # Generate a fresh 4-digit OTP and save it to the DB
+        otp = OTPCode.generate_for_user(user)
+
+        # Send the styled OTP email
+        _send_otp_email(user, otp)
+
+        # Store the user's email in session so verify/reset views know who we're resetting for
+        request.session['reset_email'] = user.email
+
+        return redirect('accounts_app:verify_otp')
+
+    return render(request, 'forgot_password.html')
+
+
+def verify_otp_view(request):
+    """
+    Displays the OTP verification form with a 2-minute countdown.
+    On POST: checks the code against the DB — must be unused and not expired.
+    On success: sets a session flag and redirects to reset password page.
+    """
+    # If no email in session, the user didn't go through forgot_password first
+    if not request.session.get('reset_email'):
+        return redirect('accounts_app:forgot_password')
+
+    if request.method == 'POST':
+        code  = request.POST.get('code', '').strip()
+        email = request.session.get('reset_email')
+
+        user = User.objects.filter(email__iexact=email).first()
+
+        if not user:
+            return redirect('accounts_app:forgot_password')
+
+        # Find the latest unused OTP for this user
+        otp = OTPCode.objects.filter(user=user, is_used=False).first()
+
+        if not otp:
+            return render(request, 'verify_otp.html', {
+                'error': 'No active code found. Please request a new one.'
+            })
+
+        if otp.is_expired:
+            return render(request, 'verify_otp.html', {
+                'error': 'Your code has expired. Please request a new one.'
+            })
+
+        if otp.code != code:
+            return render(request, 'verify_otp.html', {
+                'error': 'Incorrect code. Please try again.'
+            })
+
+        # Mark the OTP as used so it can't be reused
+        otp.is_used = True
+        otp.save()
+
+        # Set a session flag allowing access to the reset password page
+        request.session['otp_verified'] = True
+
+        return redirect('accounts_app:reset_password')
+
+    return render(request, 'verify_otp.html')
+
+
+def resend_otp_view(request):
+    """
+    Generates a new OTP and resends it to the user's email.
+    Only accessible via POST to prevent accidental resends.
+    Redirects back to the verify page after sending.
+    """
+    email = request.session.get('reset_email')
+
+    if not email:
+        return redirect('accounts_app:forgot_password')
+
+    user = User.objects.filter(email__iexact=email).first()
+
+    if not user:
+        return redirect('accounts_app:forgot_password')
+
+    # Generate a new OTP (this also invalidates the previous one)
+    otp = OTPCode.generate_for_user(user)
+
+    # Send the styled OTP email
+    _send_otp_email(user, otp)
+
+    return redirect('accounts_app:verify_otp')
+
+
+def reset_password_view(request):
+    """
+    Displays the new password form.
+    Only accessible if the user has verified their OTP (session flag).
+    On POST: validates and saves the new password, clears session flags.
+    """
+    # Block direct access without OTP verification
+    if not request.session.get('otp_verified'):
+        return redirect('accounts_app:forgot_password')
+
+    if request.method == 'POST':
+        new_password     = request.POST.get('new_password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+
+        if len(new_password) < 8:
+            return render(request, 'reset_password.html', {
+                'error': 'Password must be at least 8 characters.'
+            })
+
+        if new_password != confirm_password:
+            return render(request, 'reset_password.html', {
+                'error': 'Passwords do not match.'
+            })
+
+        email = request.session.get('reset_email')
+        user  = User.objects.filter(email__iexact=email).first()
+
+        if not user:
+            return redirect('accounts_app:forgot_password')
+
+        # Save the new password
+        user.set_password(new_password)
+        user.save()
+
+        # Clear all reset-related session data
+        del request.session['reset_email']
+        del request.session['otp_verified']
+
+        return redirect('accounts_app:login')
+
+    return render(request, 'reset_password.html')
