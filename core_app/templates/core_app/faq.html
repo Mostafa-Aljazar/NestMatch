@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FAQ — NestMatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+    .faq-answer.open { max-height: 500px; }
+    .faq-icon { transition: transform 0.3s ease; }
+    .faq-item.open .faq-icon { transform: rotate(180deg); }
+    .faq-item.open { border-color: #7C3AED; }
+    .faq-item.open .faq-question { color: #7C3AED; }
+    #cat-sidebar::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-white">
+
+  {% include "core_app/partials/navbar.html" %}
+
+  <!-- HERO -->
+  <section class="relative pt-24 pb-20 overflow-hidden" style="background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 50%, #9F67FA 100%);">
+    <!-- Dots -->
+    <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(circle,rgba(255,255,255,.1) 1.5px,transparent 1.5px);background-size:32px 32px"></div>
+    <!-- Blobs -->
+    <div class="absolute -top-20 -right-20 w-96 h-96 rounded-full pointer-events-none" style="background:rgba(255,255,255,.06)"></div>
+    <div class="absolute -bottom-10 -left-10 w-64 h-64 rounded-full pointer-events-none" style="background:rgba(255,255,255,.04)"></div>
+
+    <div class="max-w-[900px] mx-auto px-6 text-center relative z-10">
+      <div class="inline-flex items-center gap-2 bg-white/15 border border-white/25 text-white text-xs font-bold px-4 py-2 rounded-full mb-6 uppercase tracking-wider">
+          Help Center
+      </div>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-5">
+        Frequently Asked Questions
+      </h1>
+      <p class="text-white/80 text-lg mb-10 max-w-[520px] mx-auto leading-relaxed">
+        Find answers to the most common questions about NestMatch your AI-powered roommate matching platform.
+      </p>
+
+      <!-- Stats row -->
+      <div class="flex items-center justify-center gap-8 mb-10 flex-wrap">
+        <div class="text-center">
+          <div class="text-2xl font-extrabold text-white">10+</div>
+          <div class="text-white/60 text-xs font-medium mt-0.5">Questions</div>
+        </div>
+        <div class="w-px h-8 bg-white/20"></div>
+        <div class="text-center">
+          <div class="text-2xl font-extrabold text-white">5</div>
+          <div class="text-white/60 text-xs font-medium mt-0.5">Categories</div>
+        </div>
+        <div class="w-px h-8 bg-white/20"></div>
+        <div class="text-center">
+          <div class="text-2xl font-extrabold text-white">24/7</div>
+          <div class="text-white/60 text-xs font-medium mt-0.5">Support</div>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="relative max-w-[600px] mx-auto">
+        <svg class="absolute left-5 top-1/2 -translate-y-1/2" width="18" height="18" fill="none" viewBox="0 0 24 24">
+          <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <input id="faq-search" type="text" placeholder="Search for a question..."
+          class="w-full pl-12 pr-5 py-4 rounded-2xl border-0 text-sm text-gray-700 shadow-xl focus:outline-none focus:ring-2 focus:ring-violet-300 transition bg-white"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ BODY -->
+  <section class="py-16 px-6">
+    <div class="max-w-[1100px] mx-auto">
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+      <!-- LEFT: Categories sidebar -->
+<div class="lg:col-span-1">
+  <div class="lg:top-20">
+    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Browse by Topic</h3>
+
+    <!-- Mobile: horizontal scroll / Desktop: vertical -->
+    <div class="flex flex-row gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-x-visible lg:pb-0"
+        id="cat-sidebar"
+        style="-ms-overflow-style:none; scrollbar-width:none;">
+
+      <button onclick="filterFaq('all')" data-cat="all"
+        class="cat-btn text-left px-4 py-3 rounded-xl text-sm font-semibold bg-violet-600 text-white transition flex items-center justify-between gap-3 shrink-0 lg:w-full">
+        <span class="flex items-center gap-2 whitespace-nowrap"><svg xmlns="http://www.w3.org/2000/svg" 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          class="w-5 h-5">
+          <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+          </svg> All</span>
+        <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full">10</span>
+      </button>
+
+      <button onclick="filterFaq('general')" data-cat="general"
+        class="cat-btn text-left px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition flex items-center justify-between gap-3 shrink-0 lg:w-full">
+        <span class="whitespace-nowrap">General</span>
+        <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">2</span>
+      </button>
+
+      <button onclick="filterFaq('compatibility')" data-cat="compatibility"
+        class="cat-btn text-left px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition flex items-center justify-between gap-3 shrink-0 lg:w-full">
+        <span class="whitespace-nowrap">Compatibility</span>
+        <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">2</span>
+      </button>
+
+      <button onclick="filterFaq('listings')" data-cat="listings"
+        class="cat-btn text-left px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition flex items-center justify-between gap-3 shrink-0 lg:w-full">
+        <span class="whitespace-nowrap">Listings</span>
+        <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">3</span>
+      </button>
+
+      <button onclick="filterFaq('applications')" data-cat="applications"
+        class="cat-btn text-left px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition flex items-center justify-between gap-3 shrink-0 lg:w-full">
+        <span class="whitespace-nowrap">Applications</span>
+        <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">2</span>
+      </button>
+
+      <button onclick="filterFaq('account')" data-cat="account"
+        class="cat-btn text-left px-4 py-3 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-100 transition flex items-center justify-between gap-3 shrink-0 lg:w-full">
+        <span class="whitespace-nowrap">Account</span>
+        <span class="bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full">1</span>
+      </button>
+
+    </div>
+  </div>
+</div>
+
+        <!-- RIGHT: FAQ List -->
+        <div class="lg:col-span-2">
+
+          <!-- Result count -->
+          <div class="flex items-center justify-between mb-5">
+            <p id="result-count" class="text-sm text-gray-500 font-medium">Showing <span class="font-bold text-gray-800">10</span> questions</p>
+          </div>
+
+          <div id="faq-list" class="flex flex-col gap-3">
+
+            <!-- Q1 -->
+            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="compatibility">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
+                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How does the AI compatibility score work?</span>
+                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                  NestMatch uses Google Gemini AI to compare your lifestyle profile with the room poster's. It analyzes sleep schedule, noise tolerance, cleanliness, smoking habits, pet preferences, and social behavior returning a compatibility percentage with strengths and differences highlighted.
+                </div>
+              </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="general">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
+                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">Is NestMatch free to use?</span>
+                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                  Yes! NestMatch is completely free. You can browse listings, view compatibility scores, apply to rooms, and post listings at no cost. We believe finding the right roommate should be accessible to everyone.
+                </div>
+              </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="listings">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
+                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How do I post a room listing?</span>
+                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                  After completing your lifestyle questionnaire, click "Post a Room" in the navbar. Fill in the title, price, location, available date, and upload photos. Use the AI button to auto-generate a professional description using Google Gemini.
+                </div>
+              </div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="applications">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
+                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">Can I apply to multiple rooms at the same time?</span>
+                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                  Yes! You can apply to as many rooms as you like. Each application is tracked in your "My Applications" dashboard where you can monitor the status — Pending, Accepted, or Rejected.
+                </div>
+              </div>
+            </div>
+
+            <!-- Q5 -->
+            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="applications">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
+                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How is the rental agreement generated by AI?</span>
+                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                  Once accepted, both parties can generate a rental agreement. NestMatch sends room details and both profiles to Google Gemini, which returns a structured ready-to-use agreement you can view and download as PDF.
+                </div>
+              </div>
+            </div>
+
+            <!-- Q6 -->
+            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="listings">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
+                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How do I contact a room poster?</span>
+                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                  On the Room Detail page, click the green "Chat on WhatsApp" button. This opens a direct WhatsApp conversation with the poster using their registered phone number.
+                </div>
+              </div>
+            </div>
+
+            <!-- Q7 -->
+            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="compatibility">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
+                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">Can I edit my lifestyle questionnaire later?</span>
+                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                  Yes! Update your lifestyle preferences anytime from your Profile page. Changes immediately affect new compatibility scores for future applications and room views.
+                </div>
+              </div>
+            </div>
+
+            <!-- Q8 -->
+            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="listings">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
+                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">What listing types are supported?</span>
+                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                  Three types: <strong class="text-gray-700">Private Room</strong> (single room in shared apartment), <strong class="text-gray-700">Full Apartment</strong> (entire unit for a group), and <strong class="text-gray-700">Roommate Wanted</strong> (you live there and need a roommate).
+                </div>
+              </div>
+            </div>
+
+            <!-- Q9 -->
+            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="general">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
+                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">Is my personal data safe on NestMatch?</span>
+                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                  Absolutely. All passwords are hashed with bcrypt, sessions use JWT tokens, and all data is transmitted over HTTPS. We never sell your data to third parties.
+                </div>
+              </div>
+            </div>
+
+            <!-- Q10 -->
+            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="account">
+              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
+                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How do I delete my account?</span>
+                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="faq-answer">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                  Go to your Profile page, scroll to the bottom, and click "Delete Account". Confirm the action to permanently remove your profile, listings, and applications. This cannot be undone.
+                </div>
+              </div>
+            </div>
+
+            <!-- No results -->
+            <div id="no-results" class="hidden text-center py-20 text-gray-400">
+              <p class="font-bold text-gray-600 text-lg">No questions found</p>
+              <p class="text-sm mt-2">Try a different keyword or browse by category</p>
+            </div>
+
+          </div>
+
+          <!-- PAGINATION -->
+          <div id="pagination" class="flex items-center justify-between mt-10 pt-6 border-t border-gray-100">
+            <button id="prev-btn" onclick="changePage(-1)"
+              class="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-500 hover:border-violet-400 hover:text-violet-600 transition disabled:opacity-30 disabled:cursor-not-allowed">
+              ← Previous
+            </button>
+            <div id="page-numbers" class="flex items-center gap-2"></div>
+            <button id="next-btn" onclick="changePage(1)"
+              class="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-500 hover:border-violet-400 hover:text-violet-600 transition">
+              Next →
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section class="py-12 px-6">
+    <div class="max-w-[1100px] mx-auto">
+      <div class="rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden" style="background:linear-gradient(135deg,#5B21B6,#7C3AED 50%,#9F67FA)">
+        <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(circle,rgba(255,255,255,.08) 1.5px,transparent 1.5px);background-size:28px 28px"></div>
+        <div class="relative z-10">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">Still have questions?</h2>
+          <p class="text-white/75 text-base mb-8 max-w-[440px] mx-auto leading-relaxed">
+            Can't find the answer you're looking for? Our support team is here to help you find your perfect nest.
+          </p>
+          <a href="/contact/" class="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-violet-700 font-bold text-sm rounded-xl hover:bg-violet-50 transition shadow-lg hover:scale-[1.03]">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"/></svg>
+            Contact Support
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% include "core_app/partials/footer.html" %}
+
+  <script>
+  var ITEMS_PER_PAGE = 5;
+  var currentPage = 1;
+  var currentCat = 'all';
+
+  function getVisibleItems() {
+    return Array.from(document.querySelectorAll('.faq-item')).filter(function(item) {
+      return item.style.display !== 'none' && !item.classList.contains('search-hidden');
+    });
+  }
+
+
+  function renderPage(page) {
+    currentPage = page;
+    var items = Array.from(document.querySelectorAll('.faq-item'));
+    
+    // filter by cat AND search
+    var filtered = items.filter(function(item) {
+      var catOk = currentCat === 'all' || item.dataset.cat === currentCat;
+      var searchOk = !item.classList.contains('search-hidden');
+      return catOk && searchOk;
+    });
+    
+    // hide all first
+    items.forEach(function(i){ i.style.display='none'; });
+    
+    // show current page
+    var start = (page - 1) * ITEMS_PER_PAGE;
+    var end   = start + ITEMS_PER_PAGE;
+    filtered.slice(start, end).forEach(function(i){ i.style.display=''; });
+
+    // update count
+    document.getElementById('result-count').innerHTML =
+      'Showing <span class="font-bold text-gray-800">' + filtered.length + '</span> questions';
+
+    // pagination
+    var totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+    document.getElementById('prev-btn').disabled = page <= 1;
+    document.getElementById('next-btn').disabled = page >= totalPages;
+
+    var pn = document.getElementById('page-numbers');
+    pn.innerHTML = '';
+    for (var p = 1; p <= totalPages; p++) {
+      var btn = document.createElement('button');
+      btn.textContent = p;
+      btn.className = 'w-9 h-9 rounded-lg text-sm font-bold transition ' +
+        (p === page ? 'bg-violet-600 text-white' : 'text-gray-500 hover:bg-gray-100 border border-gray-200');
+      btn.onclick = (function(pp){ return function(){ renderPage(pp); }; })(p);
+      pn.appendChild(btn);
+    }
+
+    document.getElementById('pagination').style.display = totalPages <= 1 ? 'none' : 'flex';
+    document.getElementById('no-results').classList.toggle('hidden', filtered.length > 0);
+  }
+
+  function changePage(dir) {
+    var items = Array.from(document.querySelectorAll('.faq-item')).filter(function(item) {
+      return currentCat === 'all' || item.dataset.cat === currentCat;
+    });
+    var totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
+    var newPage = currentPage + dir;
+    if (newPage >= 1 && newPage <= totalPages) renderPage(newPage);
+  }
+
+  function filterFaq(cat) {
+    currentCat = cat;
+    // update sidebar buttons
+    document.querySelectorAll('.cat-btn').forEach(function(btn) {
+      var active = btn.dataset.cat === cat;
+      btn.className = 'cat-btn text-left px-4 py-3 rounded-xl text-sm font-semibold transition flex items-center justify-between ' +
+        (active ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100');
+      var badge = btn.querySelector('span:last-child');
+      if (badge) {
+        badge.className = active
+          ? 'bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full'
+          : 'bg-gray-100 text-gray-500 text-xs font-bold px-2 py-0.5 rounded-full';
+      }
+    });
+    renderPage(1);
+  }
+
+  // Toggle accordion
+  function toggleFaq(btn) {
+    var item = btn.closest('.faq-item');
+    var answer = item.querySelector('.faq-answer');
+    var isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(function(el) {
+      el.classList.remove('open');
+      el.querySelector('.faq-answer').classList.remove('open');
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      answer.classList.add('open');
+    }
+  }
+
+  // Live search
+  document.getElementById('faq-search').addEventListener('input', function() {
+    var q = this.value.toLowerCase().trim();
+    currentCat = 'all';
+    document.querySelectorAll('.cat-btn').forEach(function(btn) {
+      var active = btn.dataset.cat === 'all';
+      btn.className = 'cat-btn text-left px-4 py-3 rounded-xl text-sm font-semibold transition flex items-center justify-between ' +
+        (active ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100');
+    });
+      document.querySelectorAll('.faq-item').forEach(function(item) {
+      var text = item.querySelector('.faq-question').textContent.toLowerCase();
+      var body = item.querySelector('.faq-answer').textContent.toLowerCase();
+      var match = !q || text.includes(q) || body.includes(q);
+      item.classList.toggle('search-hidden', !match);
+    });
+    renderPage(1);
+  });
+
+  // Init
+  renderPage(1);
+  </script>
+
+</body>
+</html>
