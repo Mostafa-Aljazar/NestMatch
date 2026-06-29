@@ -12,6 +12,5 @@ def index(request):
         'reviews': reviews,
     })
 
-
-#def index(request):
-#   return HttpResponse("<h1>core_app ✅</h1><p>Landing Page — OK</p>")
+def faq(request):
+    return render(request, 'core_app/faq.html')
