@@ -51,3 +51,5 @@ coverage.xml
 
 # Local management commands (not for deployment)
 listings_app/management/
+
+.env

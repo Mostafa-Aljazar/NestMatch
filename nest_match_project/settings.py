@@ -9,18 +9,23 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Loads variables from the .env file into os.environ.
+# Must happen BEFORE any os.environ.get(...) calls below.
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@ak0l*z&hpw18%+82j5p&)00dr8w^6g9+#z_y+vh@lc*r%vu30'
+SECRET_KEY =os.environ.get('DJANGO_SECRET_KEY')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -98,14 +103,14 @@ AUTHENTICATION_BACKENDS = [
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
-# عدّل المسار هون ليطابق صفحة lifestyle quiz الحقيقية عندك إذا حابب
-LOGIN_REDIRECT_URL = '/auth/profile/'
+
+LOGIN_REDIRECT_URL = '/'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': '937751602718-a7qbnufspqdhgpq4roj1efn9vlpljm2q.apps.googleusercontent.com',
-            'secret': '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',
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET'),
             'key': ''
         },
         'SCOPE': [
@@ -184,6 +189,6 @@ EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST          = 'smtp.gmail.com'
 EMAIL_PORT          = 587
 EMAIL_USE_TLS       = True
-EMAIL_HOST_USER    = 'sara420561730@gmail.com'
-EMAIL_HOST_PASSWORD = 'knstmxxldwyxirmh'
-DEFAULT_FROM_EMAIL = 'NestMatch <sara420561730@gmail.com>'
+EMAIL_HOST_USER    = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = f'NestMatch <{os.environ.get("EMAIL_HOST_USER")}>' 
