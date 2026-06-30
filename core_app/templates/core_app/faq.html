@@ -76,12 +76,12 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
       <!-- Left: Categories sidebar -->
-<div class="lg:col-span-1">
+<div class="hidden lg:block col-span-1">
   <div class="lg:top-20">
-    <h3 class="hidden lg:text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Browse by Topic</h3>
+    <h3 class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Browse by Topic</h3>
 
     <!-- Mobile: hidden / Desktop: vertical -->
-<div class="hidden md:flex flex-col gap-1 w-full" id="cat-sidebar" style="-ms-overflow-style:none; scrollbar-width:none;">
+<div class="flex flex-col gap-1 w-full" id="cat-sidebar" style="-ms-overflow-style:none; scrollbar-width:none;">
 
   <button onclick="filterFaq('all')" data-cat="all"
     class="cat-btn flex w-full items-center justify-between gap-2.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-left transition-all border-l-[3px] border-violet-600 bg-violet-100 text-violet-600">
@@ -95,7 +95,7 @@
   </button>
 
   <button onclick="filterFaq('general')" data-cat="general"
-    class="cat-btn flex w-full items-center justify-between gap-2.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-left transition-all border-l-[3px] border-transparent text-gray-500 hover:bg-gray-50">
+    class="cat-btn flex w-full items-center justify-between gap-2.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-left transition-all border-l-[3px] border-transparent text-gray-500">
     <span class="flex items-center gap-2 whitespace-nowrap">
       <svg class="w-[18px] h-[18px] flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="9" />
@@ -107,7 +107,7 @@
   </button>
 
   <button onclick="filterFaq('compatibility')" data-cat="compatibility"
-    class="cat-btn flex w-full items-center justify-between gap-2.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-left transition-all border-l-[3px] border-transparent text-gray-500 hover:bg-gray-50">
+    class="cat-btn flex w-full items-center justify-between gap-2.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-left transition-all border-l-[3px] border-transparent text-gray-500">
     <span class="flex items-center gap-2 whitespace-nowrap">
       <svg class="w-[18px] h-[18px] flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 12l2 2 4-4" />
@@ -331,7 +331,7 @@
         <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(circle,rgba(255,255,255,.08) 1.5px,transparent 1.5px);background-size:28px 28px"></div>
         <div class="relative z-10">
           <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">Still have questions?</h2>
-          <p class="text-white/75 text-base mb-8 max-w-[440px] mx-auto leading-relaxed">
+          <p class="text-white/75 text-base mb-8  mx-auto leading-relaxed">
             Can't find the answer you're looking for? Our support team is here to help you find your perfect nest.
           </p>
           <a href="/contact/" class="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-violet-700 font-bold text-sm rounded-xl hover:bg-violet-50 transition shadow-lg hover:scale-[1.03]">
