@@ -49,24 +49,27 @@
         position: relative;
         transition: background-color 0.15s ease, color 0.15s ease;
       }
-      .tab-nav-btn::before {
-        content: '';
-        position: absolute;
-        left: -1px;
-        top: 50%;
-        height: 0;
-        width: 3px;
-        border-radius: 999px;
-        background-color: #6d28d9;
-        transform: translateY(-50%);
-        transition: height 0.18s ease;
+      /* Desktop: left accent bar */
+      @media (min-width: 1024px) {
+        .tab-nav-btn::before {
+          content: '';
+          position: absolute;
+          left: -1px;
+          top: 50%;
+          height: 0;
+          width: 3px;
+          border-radius: 999px;
+          background-color: #6d28d9;
+          transform: translateY(-50%);
+          transition: height 0.18s ease;
+        }
+        .tab-nav-btn.active::before {
+          height: 60%;
+        }
       }
       .tab-nav-btn.active {
         background-color: #ede9fe;
         color: #5b21b6;
-      }
-      .tab-nav-btn.active::before {
-        height: 60%;
       }
       .tab-nav-btn.active svg {
         color: #6d28d9;
@@ -76,7 +79,7 @@
       }
       @keyframes tabFadeIn {
         from { opacity: 0; transform: translateY(4px); }
-        to { opacity: 1; transform: translateY(0); }
+        to   { opacity: 1; transform: translateY(0); }
       }
       .option-card {
         transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
@@ -116,7 +119,6 @@
       .strength-check svg {
         transition: stroke 0.15s ease, background-color 0.15s ease;
       }
-      /* ---- Premium animated header ---- */
       .header-blob {
         animation: blobDrift 14s ease-in-out infinite;
       }
@@ -167,6 +169,14 @@
       .strength-bar-fill {
         transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1);
       }
+      /* Photo upload hover ring */
+      #tab-photo-btn {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      #tab-photo-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 4px rgba(109, 40, 217, 0.2);
+      }
       @media (prefers-reduced-motion: reduce) {
         .tab-panel, .option-card, .tab-nav-btn::before,
         .header-blob, .header-title-gradient, .header-fade-up, .verified-pulse-ring, .strength-bar-fill {
@@ -182,194 +192,141 @@
   <body class="min-h-screen">
     {% include "core_app/partials/navbar.html" with active_page="profile" %}
 
-    <!-- Page header -->
-    <!-- ============================================================ -->
+    <!-- ================================================================== -->
+    <!-- Page header                                                         -->
+    <!-- ================================================================== -->
     <header class="relative mt-[65px] overflow-hidden bg-gradient-to-br from-brand-900 via-brand-600 to-violet-500">
 
-  <!-- Decorative dot pattern -->
-  <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,_rgba(255,255,255,0.12)_1.5px,_transparent_1.5px)] bg-[length:28px_28px]"></div>
-  <!-- Decorative blobs -->
-  <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/5"></div>
-  <div class="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-white/5"></div>
+      <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,_rgba(255,255,255,0.12)_1.5px,_transparent_1.5px)] bg-[length:28px_28px]"></div>
+      <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/5"></div>
+      <div class="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-white/5"></div>
 
-  <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col gap-6 py-8 sm:flex-row sm:items-center sm:justify-between">
+      <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col gap-6 py-8 sm:flex-row sm:items-center sm:justify-between">
 
-      <!-- Left: Avatar + Info -->
-      <div class="flex items-center gap-5">
-
-        <!-- Avatar -->
-        <div class="relative flex-shrink-0">
-          {% if user_obj.profile_pic %}
-            <img src="{{ user_obj.profile_pic.url }}"
-                 alt="{{ user_obj.full_name }}"
-                 class="h-16 w-16 rounded-full border-2 border-white/30 object-cover sm:h-20 sm:w-20" />
-          {% else %}
-            <div class="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/30 bg-white/20 font-display text-xl font-bold text-white sm:h-20 sm:w-20 sm:text-2xl">
-              {{ user_obj.first_name|first|upper }}{% if user_obj.last_name %}{{ user_obj.last_name|first|upper }}{% endif %}
-            </div>
-          {% endif %}
-          <!-- Online dot -->
-          <span class="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-400 sm:h-4 sm:w-4"></span>
-        </div>
-
-        <!-- Text -->
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.15em] text-white/60">Account settings</p>
-          <h1 class="mt-1 font-display text-2xl font-bold text-white sm:text-3xl">
-            {{ user_obj.full_name }}
-          </h1>
-          <p class="mt-1 text-sm text-white/60">
-            Member since {{ user_obj.created_at|date:"F Y" }}
-          </p>
-
-          <!-- Badges -->
-          <div class="mt-3 flex flex-wrap items-center gap-2">
-            {% if user_obj.is_active %}
-            <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-200">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z"/>
-                <path d="M9 12l2 2 4-4"/>
-              </svg>
-              Verified
-            </span>
-            {% endif %}
-
-            <span class="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-              {{ user_obj.get_gender_display }}
-            </span>
-
-            <span class="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="8.5"/>
-                <path d="M3.5 12h17M12 3.5c2.2 2.3 3.3 5.4 3.3 8.5s-1.1 6.2-3.3 8.5"/>
-              </svg>
-              {{ user_obj.get_country_display }}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right: Profile strength card -->
-      <div class="w-full rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm sm:w-56 lg:w-64">
-        <div class="flex items-center justify-between">
-          <p class="text-xs font-semibold uppercase tracking-wide text-white/90">Profile strength</p>
-          <span id="profile-strength-value-header" class="text-lg font-bold text-white">{{ profile_strength }}%</span>
-        </div>
-
-        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/20">
-          <div id="profile-strength-bar-header"
-               class="strength-bar-fill h-full rounded-full bg-white"
-               style="width: {{ profile_strength }}%">
-          </div>
-        </div>
-
-        <!-- Checklist -->
-        <ul class="mt-4 space-y-2.5">
-          <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasPhoto">
-            <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
-            Profile photo
-          </li>
-          <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasBio">
-            <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
-            Bio
-          </li>
-          <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasPhone">
-            <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
-            Phone number
-          </li>
-          <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasLifestyle">
-            <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
-            Lifestyle profile
-          </li>
-        </ul>
-      </div>
-
-    </div>
-
-    <!-- Bottom divider -->
-    <div class="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-  </div>
-</header>
-
-    <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <div class="flex flex-col gap-8 lg:flex-row lg:items-start">
-        <!-- Sidebar — intentionally NOT sticky: with the right column being a
-             different height per tab, position:sticky made the card jump/float
-             oddly while scrolling. It now just scrolls normally with the page. -->
-        <aside class="w-full flex-shrink-0 lg:w-72 lg:self-start">
-          <div class="rounded-2xl border border-slate-200 bg-white p-6">
-            <div class="flex items-center gap-4">
-              <div id="profile-avatar-wrapper" class="relative">
-                {% if user_obj.profile_pic %}
-                  <img id="profile-avatar-image" src="{{ user_obj.profile_pic.url }}" alt="{{ user_obj.full_name }}" class="h-16 w-16 rounded-full border border-brand-200 object-cover" />
-                {% endif %}
-                <div id="profile-avatar-placeholder" class="{% if user_obj.profile_pic %}hidden{% else %}flex{% endif %} h-16 w-16 items-center justify-center rounded-full border border-brand-200 bg-gradient-to-br from-brand-600 via-brand-500 to-indigo-500 font-display text-lg font-bold text-white shadow-sm">
+          <!-- Left: Avatar + Info -->
+          <div class="flex items-center gap-5">
+            <div class="relative flex-shrink-0">
+              {% if user_obj.profile_pic %}
+                <img id="header-avatar-image"
+                     src="{{ user_obj.profile_pic.url }}"
+                     alt="{{ user_obj.full_name }}"
+                     class="h-16 w-16 rounded-full border-2 border-white/30 object-cover sm:h-20 sm:w-20" />
+                <div id="header-avatar-placeholder"
+                     class="hidden h-16 w-16 items-center justify-center rounded-full border-2 border-white/30 bg-white/20 font-display text-xl font-bold text-white sm:h-20 sm:w-20 sm:text-2xl">
                   {{ user_obj.first_name|first|upper }}{% if user_obj.last_name %}{{ user_obj.last_name|first|upper }}{% endif %}
                 </div>
-              </div>
-              <div>
-                <p id="sidebar-user-name" class="font-display text-sm font-bold text-slate-900">{{ user_obj.full_name }}</p>
-                <!-- Triggers the hidden file input inside the Personal Info form below -->
-                <button type="button" onclick="document.getElementById('profile_pic_input').click()" class="mt-1 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 17.5L3 21l3.5-1L17.8 8.7a1.5 1.5 0 000-2.1l-1.4-1.4a1.5 1.5 0 00-2.1 0L4 17.5z" />
-                  </svg>
-                  Change photo
-                </button>
-              </div>
+              {% else %}
+                <img id="header-avatar-image"
+                     src=""
+                     alt="{{ user_obj.full_name }}"
+                     class="hidden h-16 w-16 rounded-full border-2 border-white/30 object-cover sm:h-20 sm:w-20" />
+                <div id="header-avatar-placeholder"
+                     class="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/30 bg-white/20 font-display text-xl font-bold text-white sm:h-20 sm:w-20 sm:text-2xl">
+                  {{ user_obj.first_name|first|upper }}{% if user_obj.last_name %}{{ user_obj.last_name|first|upper }}{% endif %}
+                </div>
+              {% endif %}
+              <span class="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-400 sm:h-4 sm:w-4"></span>
             </div>
-
-            <div class="my-5 h-px bg-slate-200"></div>
 
             <div>
-              <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
-                <span>Profile strength</span>
-                <span id="profile-strength-value" class="text-brand-600">{{ profile_strength }}%</span>
+              <p class="text-xs font-semibold uppercase tracking-[0.15em] text-white/60">Account settings</p>
+              <h1 class="mt-1 font-display text-2xl font-bold text-white sm:text-3xl">
+                {{ user_obj.full_name }}
+              </h1>
+              <p class="mt-1 text-sm text-white/60">
+                Member since {{ user_obj.created_at|date:"F Y" }}
+              </p>
+              <div class="mt-3 flex flex-wrap items-center gap-2">
+                {% if user_obj.is_active %}
+                <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-200">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                  </svg>
+                  Verified
+                </span>
+                {% endif %}
+                {% if user_obj.gender %}
+                <span class="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  {{ user_obj.get_gender_display }}
+                </span>
+                {% endif %}
+                {% if user_obj.country %}
+                <span class="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.2 2.3 3.3 5.4 3.3 8.5s-1.1 6.2-3.3 8.5"/></svg>
+                  {{ user_obj.get_country_display }}
+                </span>
+                {% endif %}
               </div>
-              <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-                <div id="profile-strength-bar" class="strength-bar-fill h-full rounded-full bg-brand-600" style="width: {{ profile_strength }}%"></div>
-              </div>
-
-              <!-- Checklist breaks down WHY the percentage is what it is, instead of
-                   just showing a bar. profile.js toggles each item's check state
-                   from the same strengthState object it already tracks. -->
-              <ul class="mt-3.5 space-y-1.5">
-                <li class="strength-check flex items-center gap-2 text-xs text-slate-500" data-key="hasPhoto">
-                  <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-[10px] leading-none"></span>
-                  Profile photo
-                </li>
-                <li class="strength-check flex items-center gap-2 text-xs text-slate-500" data-key="hasBio">
-                  <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-[10px] leading-none"></span>
-                  Bio
-                </li>
-                <li class="strength-check flex items-center gap-2 text-xs text-slate-500" data-key="hasPhone">
-                  <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-[10px] leading-none"></span>
-                  Phone number
-                </li>
-                <li class="strength-check flex items-center gap-2 text-xs text-slate-500" data-key="hasLifestyle">
-                  <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-[10px] leading-none"></span>
-                  Lifestyle profile
-                </li>
-              </ul>
             </div>
+          </div>
 
-            <div class="my-5 h-px bg-slate-200"></div>
+          <!-- Right: Profile strength card -->
+          <div class="w-full rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm sm:w-56 lg:w-64">
+            <div class="flex items-center justify-between">
+              <p class="text-xs font-semibold uppercase tracking-wide text-white/90">Profile strength</p>
+              <span id="profile-strength-value-header" class="text-lg font-bold text-white">{{ profile_strength }}%</span>
+            </div>
+            <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/20">
+              <div id="profile-strength-bar-header"
+                   class="strength-bar-fill h-full rounded-full bg-white"
+                   style="width: {{ profile_strength }}%">
+              </div>
+            </div>
+            <ul class="mt-4 space-y-2.5">
+              <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasPhoto">
+                <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
+                Profile photo
+              </li>
+              <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasBio">
+                <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
+                Bio
+              </li>
+              <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasPhone">
+                <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
+                Phone number
+              </li>
+              <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasLifestyle">
+                <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
+                Lifestyle profile
+              </li>
+            </ul>
+          </div>
 
-            <nav class="flex gap-1 overflow-x-auto pb-1 -mx-1 px-1 sm:gap-1.5 lg:flex-col lg:space-y-1 lg:overflow-visible lg:pb-0 lg:mx-0 lg:px-0">
-              <button class="tab-nav-btn active flex w-full flex-shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-100 lg:flex-shrink" data-tab="info">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        </div>
+        <div class="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <div class="flex flex-col gap-8 ">
+
+        <!-- ============================================================ -->
+        <!-- Aside -->
+        <!-- ============================================================ -->
+        <aside class="w-full flex-shrink-0 ">
+          <div class="rounded-2xl border border-slate-200 bg-white p-3 lg:p-4">
+
+            <nav class="grid grid-cols-2 gap-1 lg:flex  lg:gap-0 lg:space-y-1">
+
+              <button class="tab-nav-btn active
+                            flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100
+                            max-lg:flex-col max-lg:justify-center max-lg:gap-1.5 max-lg:py-3 max-lg:text-center max-lg:text-xs
+                            lg:gap-2.5 lg:text-left lg:whitespace-nowrap" data-tab="info">
+                <svg class="flex-shrink-0" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="8" r="3.2" />
                   <path d="M5.5 19c1-3.2 3.6-5 6.5-5s5.5 1.8 6.5 5" />
                 </svg>
-                Personal info
+                <span>Personal info</span>
               </button>
-              <button class="tab-nav-btn flex w-full flex-shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-100 lg:flex-shrink" data-tab="lifestyle">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+
+              <button class="tab-nav-btn
+                            flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100
+                            max-lg:flex-col max-lg:justify-center max-lg:gap-1.5 max-lg:py-3 max-lg:text-center max-lg:text-xs
+                            lg:gap-2.5 lg:text-left lg:whitespace-nowrap" data-tab="lifestyle">
+                <svg class="flex-shrink-0" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="5" y1="6" x2="5" y2="18" />
                   <line x1="12" y1="4" x2="12" y2="18" />
                   <line x1="19" y1="9" x2="19" y2="18" />
@@ -377,35 +334,70 @@
                   <circle cx="12" cy="13" r="1.5" fill="currentColor" stroke="none" />
                   <circle cx="19" cy="6" r="1.5" fill="currentColor" stroke="none" />
                 </svg>
-                Lifestyle profile
+                <span>Lifestyle profile</span>
               </button>
-              <button class="tab-nav-btn flex w-full flex-shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-100 lg:flex-shrink" data-tab="security">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+
+              <button class="tab-nav-btn
+                            flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100
+                            max-lg:flex-col max-lg:justify-center max-lg:gap-1.5 max-lg:py-3 max-lg:text-center max-lg:text-xs
+                            lg:gap-2.5 lg:text-left lg:whitespace-nowrap" data-tab="security">
+                <svg class="flex-shrink-0" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="5" y="11" width="14" height="9" rx="2" />
                   <path d="M8 11V8a4 4 0 018 0v3" />
                 </svg>
-                Security
+                <span>Security</span>
               </button>
+
+              <button class="tab-nav-btn
+                            flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100
+                            max-lg:flex-col max-lg:justify-center max-lg:gap-1.5 max-lg:py-3 max-lg:text-center max-lg:text-xs
+                            lg:gap-2.5 lg:text-left lg:whitespace-nowrap" data-tab="reviews">
+                <svg class="flex-shrink-0" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span>Reviews</span>
+              </button>
+
             </nav>
           </div>
         </aside>
-
-        <!-- Content -->
+        <!-- ============================================================ -->
+        <!-- Content                                                       -->
+        <!-- ============================================================ -->
         <div class="flex-1 min-w-0">
 
-          <!-- ============================================================ -->
-          <!-- TAB 1: Personal info — its own form, its own CSRF token,    -->
-          <!-- its own POST endpoint (profile_update_personal_info).      -->
-          <!-- ============================================================ -->
+          <!-- TAB 1: Personal info -->
           <div id="tab-info" class="tab-panel space-y-6">
             <form id="personal-info-form" action="{% url 'accounts_app:profile_update_personal_info' %}" method="POST" enctype="multipart/form-data">
               {% csrf_token %}
-              <!-- Hidden file input used by the "Change photo" button in the sidebar -->
+              <!-- Hidden file input (triggered by the + button in the photo field) -->
               <input type="file" id="profile_pic_input" name="profile_pic" accept="image/png, image/jpeg, image/webp, image/gif" class="hidden" />
 
               <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
                 <h2 class="font-display text-lg font-bold text-slate-900">Personal information</h2>
                 <p class="mt-1 text-sm text-slate-500">This information is visible to people you match with.</p>
+
+                <!-- -------------------------------------------------- -->
+                <!-- Profile photo field                                  -->
+                <!-- -------------------------------------------------- -->
+                <div class="mt-6 pb-6 border-b border-slate-100">
+                  <label class="mb-3 block text-xs font-semibold uppercase tracking-wide text-slate-500">Profile photo</label>
+                  <div class="flex items-center gap-5">
+
+                    <!-- Text + secondary change link -->
+                    <div>
+                      <button type="button"
+                              onclick="document.getElementById('profile_pic_input').click()"
+                              class="mt-2.5 inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700 hover:bg-brand-100 transition-colors">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M4 17.5L3 21l3.5-1L17.8 8.7a1.5 1.5 0 000-2.1l-1.4-1.4a1.5 1.5 0 00-2.1 0L4 17.5z" />
+                        </svg>
+                        Change photo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- -------------------------------------------------- -->
 
                 <h3 class="mt-6 text-xs font-semibold uppercase tracking-wide text-slate-400">Basic info</h3>
                 <div class="mt-3 grid gap-5 md:grid-cols-2">
@@ -472,8 +464,6 @@
                   </div>
                   <div>
                     <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nationality</label>
-                    <!-- Looped from User.COUNTRY_CHOICES instead of being hardcoded,
-                         so all 8 options are available, not just 4 -->
                     <div class="field-icon-wrap">
                       <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" /><path d="M3.5 12h17M12 3.5c2.2 2.3 3.3 5.4 3.3 8.5s-1.1 6.2-3.3 8.5c-2.2-2.3-3.3-5.4-3.3-8.5S9.8 5.8 12 3.5z" /></svg>
                       <select name="country" class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
@@ -498,7 +488,7 @@
                     <div class="field-icon-wrap">
                       <svg class="field-icon" style="top: 0.95rem; transform: none;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17.5L3 21l3.5-1L17.8 8.7a1.5 1.5 0 000-2.1l-1.4-1.4a1.5 1.5 0 00-2.1 0L4 17.5z" /></svg>
                       <textarea name="bio" maxlength="1000"
-                        class="field-icon-input min-h-28 w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">{{ user_obj.bio|default:'' }}</textarea>
+                           class="field-icon-input min-h-28 w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">{{ user_obj.bio|default:'' }}</textarea>
                     </div>
                     <p class="field-error mt-1 text-xs text-rose-600" data-field="bio"></p>
                   </div>
@@ -510,25 +500,20 @@
                   <button type="reset" class="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">Discard</button>
                 </div>
               </div>
-              
             </form>
 
             <div class="rounded-2xl border border-rose-200 bg-white p-6 sm:p-8">
               <p class="text-xs font-semibold uppercase tracking-wide text-rose-600">Danger zone</p>
               <h3 class="mt-1 font-display text-base font-bold text-slate-900">Delete account</h3>
               <p class="mt-2 text-sm text-slate-500">Permanently deletes your NestMatch account and all associated data. This action cannot be undone.</p>
-                <button type="button" onclick="openDeleteModal()" class="mt-4 rounded-lg border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-50">
-                  Delete account
-                </button>
+              <button type="button" onclick="openDeleteModal()" class="mt-4 rounded-lg border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-50">
+                Delete account
+              </button>
             </div>
           </div>
-          
 
           <!-- ============================================================ -->
-          <!-- TAB 2: Lifestyle profile — separate form/CSRF/endpoint.     -->
-          <!-- Each option-card group has a hidden input that JS keeps    -->
-          <!-- in sync, so the actual value POSTed matches the selection. -->
-          <!-- Pre-selects the "selected" class from lifestyle_profile.   -->
+          <!-- TAB 2: Lifestyle profile                                      -->
           <!-- ============================================================ -->
           <div id="tab-lifestyle" class="tab-panel hidden space-y-6">
             <div class="flex items-start gap-3 bg-brand-50 p-4 border border-brand-200 rounded-xl">
@@ -545,22 +530,17 @@
 
             <form id="lifestyle-form" action="{% url 'accounts_app:profile_update_lifestyle' %}" method="POST">
               {% csrf_token %}
-
-              <!-- Hidden inputs: these carry the REAL values submitted to the server.
-                   The visible buttons below only toggle the .selected class and update
-                   these inputs via JS — the server never reads button text, only these. -->
-              <input type="hidden" name="sleep_time" id="input-sleep_time" value="{{ lifestyle_profile.sleep_time|default:'' }}" />
-              <input type="hidden" name="wake_time" id="input-wake_time" value="{{ lifestyle_profile.wake_time|default:'' }}" />
-              <input type="hidden" name="noise_level" id="input-noise_level" value="{{ lifestyle_profile.noise_level|default:'' }}" />
-              <input type="hidden" name="social_type" id="input-social_type" value="{{ lifestyle_profile.social_type|default:'' }}" />
-              <input type="hidden" name="cleanliness" id="input-cleanliness" value="{{ lifestyle_profile.cleanliness|default:'' }}" />
-              <input type="hidden" name="smoking" id="input-smoking" value="{{ lifestyle_profile.smoking|default:'no' }}" />
+              <input type="hidden" name="sleep_time"          id="input-sleep_time"          value="{{ lifestyle_profile.sleep_time|default:'' }}" />
+              <input type="hidden" name="wake_time"           id="input-wake_time"           value="{{ lifestyle_profile.wake_time|default:'' }}" />
+              <input type="hidden" name="noise_level"         id="input-noise_level"         value="{{ lifestyle_profile.noise_level|default:'' }}" />
+              <input type="hidden" name="social_type"         id="input-social_type"         value="{{ lifestyle_profile.social_type|default:'' }}" />
+              <input type="hidden" name="cleanliness"         id="input-cleanliness"         value="{{ lifestyle_profile.cleanliness|default:'' }}" />
+              <input type="hidden" name="smoking"             id="input-smoking"             value="{{ lifestyle_profile.smoking|default:'no' }}" />
               <input type="hidden" name="preferred_roommates" id="input-preferred_roommates" value="{{ lifestyle_profile.preferred_roommates|default:'' }}" />
-              <input type="hidden" name="religion" id="input-religion" value="{{ lifestyle_profile.religion|default:'' }}" />
-              <input type="hidden" name="field" id="input-field" value="{{ lifestyle_profile.field|default:'' }}" />
-              <!-- cooking/pets are true booleans; "true"/"false" strings read by save_for_user -->
-              <input type="hidden" name="cooking" id="input-cooking" value="{% if lifestyle_profile.cooking %}true{% else %}false{% endif %}" />
-              <input type="hidden" name="pets" id="input-pets" value="{% if lifestyle_profile.pets %}true{% else %}false{% endif %}" />
+              <input type="hidden" name="religion"            id="input-religion"            value="{{ lifestyle_profile.religion|default:'' }}" />
+              <input type="hidden" name="field"               id="input-field"               value="{{ lifestyle_profile.field|default:'' }}" />
+              <input type="hidden" name="cooking"             id="input-cooking"             value="{% if lifestyle_profile.cooking %}true{% else %}false{% endif %}" />
+              <input type="hidden" name="pets"                id="input-pets"                value="{% if lifestyle_profile.pets %}true{% else %}false{% endif %}" />
 
               <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
                 <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
@@ -624,7 +604,6 @@
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Preferred number of roommates?</p>
-                    <!-- NEW: previously missing from the UI despite existing in the DB schema -->
                     <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="preferred_roommates">
                       {% for value, label in preferred_roommates_choices %}
                         <button type="button" data-value="{{ value }}"
@@ -666,17 +645,15 @@
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Do you cook regularly?</p>
-                    <!-- NEW: was in the SQL schema (cooking TINYINT) but had no control in the UI -->
                     <div class="bool-toggle grid max-w-xs grid-cols-2 gap-2.5" data-target="cooking" data-bool="true">
-                      <button type="button" data-value="true" class="option-card {% if lifestyle_profile.cooking %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
+                      <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.cooking %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
                       <button type="button" data-value="false" class="option-card {% if lifestyle_profile and not lifestyle_profile.cooking %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
                     </div>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Do you have pets?</p>
-                    <!-- NEW: was in the SQL schema (pets TINYINT) but had no control in the UI -->
                     <div class="bool-toggle grid max-w-xs grid-cols-2 gap-2.5" data-target="pets" data-bool="true">
-                      <button type="button" data-value="true" class="option-card {% if lifestyle_profile.pets %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
+                      <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.pets %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
                       <button type="button" data-value="false" class="option-card {% if lifestyle_profile and not lifestyle_profile.pets %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
                     </div>
                   </div>
@@ -693,7 +670,6 @@
                 <div class="mt-5 space-y-5">
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Religion <span class="font-normal text-slate-400">(optional)</span></p>
-                    <!-- NEW: existed in the SQL schema (religion ENUM) but had no control in the UI -->
                     <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="religion">
                       {% for value, label in religion_choices %}
                         <button type="button" data-value="{{ value }}"
@@ -703,7 +679,6 @@
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Field of study / work <span class="font-normal text-slate-400">(optional)</span></p>
-                    <!-- NEW: existed in the SQL schema (field ENUM) but had no control in the UI -->
                     <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="field">
                       {% for value, label in field_choices %}
                         <button type="button" data-value="{{ value }}"
@@ -720,144 +695,187 @@
           </div>
 
           <!-- ============================================================ -->
-          <!-- TAB 3: Security — its own form/CSRF/endpoint               -->
+          <!-- TAB 3: Security                                               -->
           <!-- ============================================================ -->
-          <div id="tab-security" class="tab-panel hidden space-y-6">
-            <form id="security-form" action="{% url 'accounts_app:change_password' %}" method="POST">
-              {% csrf_token %}
-              <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-                <h2 class="flex items-center gap-2 font-display text-lg font-bold text-slate-900">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="5" y="11" width="14" height="9" rx="2" />
-                    <path d="M8 11V8a4 4 0 018 0v3" />
-                  </svg>
-                  Change password
-                </h2>
-                <div class="mt-5 space-y-4">
-                  <div>
-                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Current password</label>
-                    <div class="field-icon-wrap">
-                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></svg>
-                      <input type="password" name="current_password" required placeholder="••••••••"
-                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
-                    </div>
-                    <p class="field-error mt-1 text-xs text-rose-600" data-field="current_password"></p>
+            <div id="tab-security" class="tab-panel hidden space-y-6">
+              <form id="security-form" action="{% url 'accounts_app:change_password' %}" method="POST">
+                {% csrf_token %}
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+
+                  {% if user_obj.auth_provider == 'google' %}
+                  <!-- Google user: no current password, just set a new one -->
+                  <div class="mb-5 flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+                    <svg class="mt-0.5 shrink-0 text-blue-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <p class="text-sm text-blue-700">You signed in with Google. Set a password below to also enable email/password login.</p>
                   </div>
-                  <div>
-                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">New password</label>
-                    <div class="field-icon-wrap">
-                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></svg>
-                      <input type="password" name="new_password" required minlength="8" placeholder="••••••••"
-                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                  <h2 class="flex items-center gap-2 font-display text-lg font-bold text-slate-900">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                    Add a password
+                  </h2>
+                  <div class="mt-5 space-y-4">
+                    <div>
+                      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">New password</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                        <input type="password" name="new_password" required minlength="8" placeholder="••••••••"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                      </div>
+                      <p class="field-error mt-1 text-xs text-rose-600" data-field="new_password"></p>
                     </div>
-                    <p class="field-error mt-1 text-xs text-rose-600" data-field="new_password"></p>
+                    <div>
+                      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Confirm password</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                        <input type="password" name="confirm_password" required minlength="8" placeholder="••••••••"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                      </div>
+                      <p class="field-error mt-1 text-xs text-rose-600" data-field="confirm_password"></p>
+                    </div>
                   </div>
-                  <div>
-                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Confirm new password</label>
-                    <div class="field-icon-wrap">
-                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></svg>
-                      <input type="password" name="confirm_password" required minlength="8" placeholder="••••••••"
-                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                  <div id="security-form-message" class="mt-4 hidden"></div>
+                  <button type="submit" class="mt-6 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">Set password</button>
+
+                  {% else %}
+                  <!-- Normal user: must verify current password -->
+                  <h2 class="flex items-center gap-2 font-display text-lg font-bold text-slate-900">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                    Change password
+                  </h2>
+                  <div class="mt-5 space-y-4">
+                    <div>
+                      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Current password</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                        <input type="password" name="current_password" required placeholder="••••••••"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                      </div>
+                      <p class="field-error mt-1 text-xs text-rose-600" data-field="current_password"></p>
                     </div>
-                    <p class="field-error mt-1 text-xs text-rose-600" data-field="confirm_password"></p>
+                    <div>
+                      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">New password</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                        <input type="password" name="new_password" required minlength="8" placeholder="••••••••"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                      </div>
+                      <p class="field-error mt-1 text-xs text-rose-600" data-field="new_password"></p>
+                    </div>
+                    <div>
+                      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Confirm new password</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                        <input type="password" name="confirm_password" required minlength="8" placeholder="••••••••"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                      </div>
+                      <p class="field-error mt-1 text-xs text-rose-600" data-field="confirm_password"></p>
+                    </div>
+                  </div>
+                  <div id="security-form-message" class="mt-4 hidden"></div>
+                  <button type="submit" class="mt-6 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">Update password</button>
+                  {% endif %}
+
+                </div>
+              </form>
+            </div>
+          <!-- ============================================================ -->
+          <!-- TAB 4: Reviews                                                -->
+          <!-- ============================================================ -->
+            <div id="tab-reviews" class="tab-panel hidden">
+              <div class="gap-6 grid lg:grid-cols-[1.2fr_0.8fr]">
+
+                <!-- Form -->
+                <div class="bg-white shadow-sm p-8 border border-slate-100 rounded-2xl">
+                  <h3 class="mb-5 font-display font-bold text-slate-900 text-xl">{{ review_section_heading }}</h3>
+                  <form id="review-form" action="{% url 'accounts_app:submit_review' %}" method="POST" class="space-y-5">
+                    {% csrf_token %}
+                    <div>
+                      <label for="reviewer_name" class="block mb-2 font-semibold text-slate-600 text-sm">Your name</label>
+                      <input id="reviewer_name" name="reviewer_name" type="text" required placeholder="e.g. Sara Ahmed"
+                        class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm" />
+                      <p class="mt-2 text-rose-600 text-xs field-error" data-field="reviewer_name"></p>
+                    </div>
+
+                    <div class="gap-5 grid sm:grid-cols-2">
+                      <div>
+                        <label for="role" class="block mb-2 font-semibold text-slate-600 text-sm">I am a</label>
+                        <select id="role" name="role" required
+                          class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm">
+                          <option value="">Select role</option>
+                          <option value="seeker">Room Seeker</option>
+                          <option value="poster">Room Poster</option>
+                        </select>
+                        <p class="mt-2 text-rose-600 text-xs field-error" data-field="role"></p>
+                      </div>
+                      <div>
+                        <label for="location" class="block mb-2 font-semibold text-slate-600 text-sm">Location</label>
+                        <input id="location" name="location" type="text" placeholder="e.g. Cairo, Heliopolis"
+                          class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label for="review_text" class="block mb-2 font-semibold text-slate-600 text-sm">Your review</label>
+                      <textarea id="review_text" name="review_text" rows="6" required placeholder="Tell us about your experience with NestMatch"
+                        class="bg-slate-50 focus:bg-white px-4 py-4 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm leading-6"></textarea>
+                      <p class="mt-2 text-rose-600 text-xs field-error" data-field="review_text"></p>
+                    </div>
+
+                    <button type="submit" class="bg-brand-600 hover:bg-brand-700 shadow-lg shadow-brand-200/30 px-4 py-3 rounded-lg w-full font-semibold text-white text-sm transition">
+                      Submit review
+                    </button>
+                  </form>
+                </div>
+
+                <!-- My submitted reviews -->
+                <div class="space-y-6">
+                  <div class="bg-white shadow-sm p-8 border border-slate-100 rounded-2xl">
+                    <h3 class="mb-4 font-display font-bold text-slate-900 text-lg">My submitted reviews</h3>
+                    {% if user_reviews %}
+                      <div class="space-y-4">
+                        {% for review in user_reviews %}
+                          <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl">
+                            <div class="flex justify-between items-center gap-3">
+                              <div>
+                                <p class="font-semibold text-slate-900">{{ review.reviewer_name }}</p>
+                                <p class="text-slate-500 text-xs">{{ review.get_role_display }}</p>
+                              </div>
+                              <div class="flex items-center gap-2">
+                                <span class="rounded-full px-3 py-1 text-[11px] font-semibold {{ review.approved|yesno:'bg-emerald-100 text-emerald-700,bg-yellow-50 text-yellow-700' }}">
+                                  {{ review.approved|yesno:'Approved,Pending approval' }}
+                                </span>
+                                <form action="{% url 'accounts_app:delete_review' review.id %}" method="POST">
+                                  {% csrf_token %}
+                                  <button type="submit" class="inline-flex items-center gap-1 bg-white hover:bg-rose-50 px-3 py-1 border border-rose-200 rounded-full font-semibold text-[11px] text-rose-700">
+                                    <span aria-hidden="true"></span> Delete
+                                  </button>
+                                </form>
+                              </div>
+                            </div>
+                            <p class="mt-3 text-slate-600 text-sm leading-6">{{ review.quote|truncatechars:140 }}</p>
+                            <div class="flex flex-wrap items-center gap-2 mt-3 text-slate-500 text-xs">
+                              {% if review.location %}<span>{{ review.location }}</span>{% endif %}
+                              <span>· {{ review.created_at|date:'M j, Y' }}</span>
+                            </div>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <p class="text-slate-500 text-sm">You haven't submitted any reviews yet. Use the form to send your feedback.</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div id="security-form-message" class="mt-4 hidden"></div>
-                <button type="submit" class="mt-6 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">Update password</button>
+
               </div>
-            </form>
-          </div>
+            </div>
+
         </div>
       </div>
     </main>
 
-    <!-- Review submission section -->
-    <section class="bg-slate-50 py-16">
-      <div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-        <div class="gap-6 grid lg:grid-cols-[1.2fr_0.8fr]">
-          <div class="bg-white shadow-sm p-8 border border-slate-100 rounded-2xl">
-            <h3 class="mb-5 font-display font-bold text-slate-900 text-xl">{{ review_section_heading }}</h3>
-            <form id="review-form" action="{% url 'accounts_app:submit_review' %}" method="POST" class="space-y-5">
-              {% csrf_token %}
-              <div>
-                <label for="reviewer_name" class="block mb-2 font-semibold text-slate-600 text-sm">Your name</label>
-                <input id="reviewer_name" name="reviewer_name" type="text" required placeholder="e.g. Sara Ahmed"
-                  class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm" />
-                <p class="mt-2 text-rose-600 text-xs field-error" data-field="reviewer_name"></p>
-              </div>
 
-              <div class="gap-5 grid sm:grid-cols-2">
-                <div>
-                  <label for="role" class="block mb-2 font-semibold text-slate-600 text-sm">I am a</label>
-                  <select id="role" name="role" required
-                    class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm">
-                    <option value="">Select role</option>
-                    <option value="seeker">Room Seeker</option>
-                    <option value="poster">Room Poster</option>
-                  </select>
-                  <p class="mt-2 text-rose-600 text-xs field-error" data-field="role"></p>
-                </div>
-                <div>
-                  <label for="location" class="block mb-2 font-semibold text-slate-600 text-sm">Location</label>
-                  <input id="location" name="location" type="text" placeholder="e.g. Cairo, Heliopolis"
-                    class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm" />
-                </div>
-              </div>
-
-              <div>
-                <label for="review_text" class="block mb-2 font-semibold text-slate-600 text-sm">Your review</label>
-                <textarea id="review_text" name="review_text" rows="6" required placeholder="Tell us about your experience with NestMatch"
-                  class="bg-slate-50 focus:bg-white px-4 py-4 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm leading-6"></textarea>
-                <p class="mt-2 text-rose-600 text-xs field-error" data-field="review_text"></p>
-              </div>
-
-              <button type="submit" class="bg-brand-600 hover:bg-brand-700 shadow-lg shadow-brand-200/30 px-4 py-3 rounded-lg w-full font-semibold text-white text-sm transition">Submit review</button>
-            </form>
-          </div>
-
-          <div class="space-y-6">
-            <div class="bg-white shadow-sm p-8 border border-slate-100 rounded-2xl">
-              <h3 class="mb-4 font-display font-bold text-slate-900 text-lg">My submitted reviews</h3>
-              {% if user_reviews %}
-                <div class="space-y-4">
-                  {% for review in user_reviews %}
-                    <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl">
-                      <div class="flex justify-between items-center gap-3">
-                        <div>
-                          <p class="font-semibold text-slate-900">{{ review.reviewer_name }}</p>
-                          <p class="text-slate-500 text-xs">{{ review.get_role_display }}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                          <span class="rounded-full px-3 py-1 text-[11px] font-semibold {{ review.approved|yesno:'bg-emerald-100 text-emerald-700,bg-yellow-50 text-yellow-700' }}">
-                            {{ review.approved|yesno:'Approved,Pending approval' }}
-                          </span>
-                          <form action="{% url 'accounts_app:delete_review' review.id %}" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" class="inline-flex items-center gap-1 bg-white hover:bg-rose-50 px-3 py-1 border border-rose-200 rounded-full font-semibold text-[11px] text-rose-700">
-                              <span aria-hidden="true">🗑️</span>
-                              Delete
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                      <p class="mt-3 text-slate-600 text-sm leading-6">{{ review.quote|truncatechars:140 }}</p>
-                      <div class="flex flex-wrap items-center gap-2 mt-3 text-slate-500 text-xs">
-                        {% if review.location %}<span>📍 {{ review.location }}</span>{% endif %}
-                        <span>· {{ review.created_at|date:'M j, Y' }}</span>
-                      </div>
-                    </div>
-                  {% endfor %}
-                </div>
-              {% else %}
-                <p class="text-slate-500 text-sm">You haven’t submitted any reviews yet. Use the form to send your feedback.</p>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Delete Account Modal -->
+    <!-- ================================================================== -->
+    <!-- Delete Account Modal                                                -->
+    <!-- ================================================================== -->
     <div id="delete-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm">
       <div class="mx-4 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-rose-100">
@@ -871,7 +889,6 @@
           <button type="button" onclick="closeDeleteModal()" class="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
             Cancel
           </button>
-          <!-- id="delete-account-form" added so profile.js can find and AJAX-submit this -->
           <form id="delete-account-form" action="{% url 'accounts_app:delete_account' %}" method="POST" class="flex-1">
             {% csrf_token %}
             <button type="submit" class="w-full rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-700">
@@ -882,11 +899,12 @@
       </div>
     </div>
 
+    <!-- Hidden strength data spans -->
     <span id="strength-has-phone"     data-value="{{ user_obj.phone_number|yesno:'true,false' }}" class="hidden"></span>
     <span id="strength-has-bio"       data-value="{{ user_obj.bio|yesno:'true,false' }}"          class="hidden"></span>
     <span id="strength-has-photo"     data-value="{{ user_obj.profile_pic|yesno:'true,false' }}"  class="hidden"></span>
     <span id="strength-has-lifestyle" data-value="{{ lifestyle_profile|yesno:'true,false' }}"     class="hidden"></span>
-   
+
     {% include "core_app/partials/footer.html" %}
     <script src="{% static 'js/profile.js' %}"></script>
   </body>

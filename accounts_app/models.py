@@ -532,8 +532,6 @@ class Testimonial(models.Model):
         return ''.join(part[0].upper() for part in parts[:2])
 
 
-
-
 class OTPCode(models.Model):
     """
     Stores a one-time password (OTP) for password reset.

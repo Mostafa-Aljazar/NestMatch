@@ -169,7 +169,10 @@ def profile_update_personal_info(request):
         return JsonResponse({'success': False, 'errors': errors})
 
     User.objects.update_profile(user, request.POST, request.FILES)
-    return JsonResponse({'success': True, 'message': 'Your personal information has been updated.'})
+    user.refresh_from_db()
+    pic_url = user.profile_pic.url if user.profile_pic else None
+    return JsonResponse({'success': True, 'message': 'Your personal information has been updated.','profile_pic_url': pic_url, })
+
 
 
 @login_required
@@ -192,28 +195,24 @@ def profile_update_lifestyle(request):
 @login_required
 @require_POST
 def submit_review(request):
-    """Handle new testimonial submission from the profile page."""
-    review_text = request.POST.get('review_text', '').strip()
+    """Handle new testimonial submission — returns JSON for AJAX calls."""
+    review_text   = request.POST.get('review_text', '').strip()
     reviewer_name = request.POST.get('reviewer_name', '').strip()
-    role = request.POST.get('role')
-    location = request.POST.get('location', '').strip()
+    role          = request.POST.get('role', '').strip()
+    location      = request.POST.get('location', '').strip()
 
     errors = {}
     if not reviewer_name:
         errors['reviewer_name'] = 'Your name is required.'
-
     if not review_text or len(review_text) < 20:
         errors['review_text'] = 'Please write a review with at least 20 characters.'
-
     if role not in dict(Testimonial.ROLE_CHOICES):
         errors['role'] = 'Please select your role.'
 
     if errors:
-        for error_message in errors.values():
-            messages.error(request, error_message)
-        return redirect('accounts_app:profile')
+        return JsonResponse({'success': False, 'errors': errors})
 
-    testimonial = Testimonial.objects.create(
+    Testimonial.objects.create(
         user=request.user,
         reviewer_name=reviewer_name,
         role=role,
@@ -222,18 +221,16 @@ def submit_review(request):
         approved=False,
     )
 
-    messages.success(request, 'Your review has been submitted for approval.')
-    return redirect('accounts_app:profile')
+    return JsonResponse({'success': True, 'message': 'Your review has been submitted for approval.'})
 
 
 @login_required
 @require_POST
 def delete_review(request, review_id):
-    """Allow the logged-in user to delete one of their submitted reviews."""
+    """Allow the logged-in user to delete one of their submitted reviews — returns JSON."""
     review = get_object_or_404(Testimonial, pk=review_id, user=request.user)
     review.delete()
-    messages.success(request, 'Your review has been removed.')
-    return redirect('accounts_app:profile')
+    return JsonResponse({'success': True, 'message': 'Review removed.'})
 
 
 @login_required
@@ -249,26 +246,29 @@ def change_password_view(request):
     from django.contrib.auth import update_session_auth_hash
 
     user = request.user
-    current_password = request.POST.get('current_password', '')
-    new_password = request.POST.get('new_password', '')
+    new_password     = request.POST.get('new_password', '')
     confirm_password = request.POST.get('confirm_password', '')
 
-    if not user.check_password(current_password):
-        return JsonResponse({'success': False, 'errors': {'current_password': 'Current password is incorrect.'}})
+    # Google users have no current password — skip the check
+    if user.auth_provider != 'google':
+        current_password = request.POST.get('current_password', '')
+        if not user.check_password(current_password):
+            return JsonResponse({'success': False, 'errors': {'current_password': 'Current password is incorrect.'}})
 
     if len(new_password) < 8:
-        return JsonResponse({'success': False, 'errors': {'new_password': 'New password must be at least 8 characters!'}})
+        return JsonResponse({'success': False, 'errors': {'new_password': 'Password must be at least 8 characters!'}})
 
     if new_password != confirm_password:
-        return JsonResponse({'success': False, 'errors': {'confirm_password': 'New passwords do not match!'}})
+        return JsonResponse({'success': False, 'errors': {'confirm_password': 'Passwords do not match!'}})
 
     user.set_password(new_password)
+    if user.auth_provider == 'google':
+        user.auth_provider = 'email'  # يصير يقدر يدخل بالطريقتين
     user.save()
-    # Keeps the current session valid after the password hash changes
     update_session_auth_hash(request, user)
 
-    return JsonResponse({'success': True, 'message': 'Your password has been updated.'})
-
+    msg = 'Password set successfully. You can now log in with email & password.' if user.auth_provider == 'google' else 'Your password has been updated.'
+    return JsonResponse({'success': True, 'message': msg})
 
 @login_required
 @require_POST
