@@ -125,6 +125,7 @@ a{text-decoration:none;cursor:pointer}
         <span style="font-size:16px">🚫</span> Banned Users
         <span style="margin-left:auto;background:rgba(239,68,68,.25);color:#FCA5A5;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ banned_users }}</span>
       </div>
+      <div class="adm-nl" id="anl-site-content" onclick="admTab('site-content')"><span style="font-size:16px">🖋️</span> Site Content</div>
       <div style="height:1px;background:rgba(255,255,255,.08);margin:12px 0"></div>
       <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.2px;text-transform:uppercase;padding:0 4px;margin-bottom:6px">SYSTEM</div>
       <div class="adm-nl" id="anl-settings" onclick="admTab('settings')"><span style="font-size:16px">⚙️</span> Settings</div>
@@ -460,6 +461,165 @@ a{text-decoration:none;cursor:pointer}
         </div>
       </div>
 
+      <!-- ═══ SITE CONTENT (Landing Page Editor) ═══ -->
+      <div id="av-site-content" style="display:none;animation:fadeIn .35s ease both">
+        <div style="margin-bottom:20px">
+          <h2 style="font-size:20px;font-weight:800;color:#111827">Landing Page Content</h2>
+          <p style="font-size:13px;color:#6B7280;margin-top:2px">Edit the text shown on the public homepage. Changes go live immediately.</p>
+        </div>
+
+        <form method="post" action="{% url 'dashboard_app:update_site_content' %}">
+          {% csrf_token %}
+
+          <!-- Hero -->
+          <div class="adm-card">
+            <div class="adm-section-title">Hero Section</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Badge Text</label>
+                <input type="text" name="hero_badge_text" value="{{ site_content.hero_badge_text }}" class="adm-input" style="width:100%">
+              </div>
+              <div></div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title — Line 1</label>
+                <input type="text" name="hero_title_line1" value="{{ site_content.hero_title_line1 }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title — Line 2</label>
+                <input type="text" name="hero_title_line2" value="{{ site_content.hero_title_line2 }}" class="adm-input" style="width:100%">
+              </div>
+              <div style="grid-column:1 / -1">
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label>
+                <textarea name="hero_subtitle" rows="2" class="adm-input" style="width:100%;resize:vertical">{{ site_content.hero_subtitle }}</textarea>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button Text</label>
+                <input type="text" name="hero_cta_primary_text" value="{{ site_content.hero_cta_primary_text }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button URL</label>
+                <input type="text" name="hero_cta_primary_url" value="{{ site_content.hero_cta_primary_url }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button Text</label>
+                <input type="text" name="hero_cta_secondary_text" value="{{ site_content.hero_cta_secondary_text }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button URL</label>
+                <input type="text" name="hero_cta_secondary_url" value="{{ site_content.hero_cta_secondary_url }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 1</label>
+                <input type="text" name="hero_feature_tag_1" value="{{ site_content.hero_feature_tag_1 }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 2</label>
+                <input type="text" name="hero_feature_tag_2" value="{{ site_content.hero_feature_tag_2 }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 3</label>
+                <input type="text" name="hero_feature_tag_3" value="{{ site_content.hero_feature_tag_3 }}" class="adm-input" style="width:100%">
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="adm-card">
+            <div class="adm-section-title">Stats Bar</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+              {% for n in "1234" %}
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <label style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase">Stat {{ n }}</label>
+                <input type="text" name="stat_{{ n }}_value" value="{% if n == '1' %}{{ site_content.stat_1_value }}{% elif n == '2' %}{{ site_content.stat_2_value }}{% elif n == '3' %}{{ site_content.stat_3_value }}{% else %}{{ site_content.stat_4_value }}{% endif %}" class="adm-input" placeholder="Value (e.g. 2,400+)">
+                <input type="text" name="stat_{{ n }}_label" value="{% if n == '1' %}{{ site_content.stat_1_label }}{% elif n == '2' %}{{ site_content.stat_2_label }}{% elif n == '3' %}{{ site_content.stat_3_label }}{% else %}{{ site_content.stat_4_label }}{% endif %}" class="adm-input" placeholder="Label">
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- How it works -->
+          <div class="adm-card">
+            <div class="adm-section-title">How It Works Section</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Eyebrow</label>
+                <input type="text" name="how_it_works_eyebrow" value="{{ site_content.how_it_works_eyebrow }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title</label>
+                <input type="text" name="how_it_works_title" value="{{ site_content.how_it_works_title }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label>
+                <input type="text" name="how_it_works_subtitle" value="{{ site_content.how_it_works_subtitle }}" class="adm-input" style="width:100%">
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+              <div style="background:#F9FAFB;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase">Step 1</div>
+                <input type="text" name="step_1_icon" value="{{ site_content.step_1_icon }}" class="adm-input" placeholder="Icon (emoji)">
+                <input type="text" name="step_1_title" value="{{ site_content.step_1_title }}" class="adm-input" placeholder="Title">
+                <textarea name="step_1_text" rows="3" class="adm-input" style="resize:vertical">{{ site_content.step_1_text }}</textarea>
+              </div>
+              <div style="background:#F9FAFB;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase">Step 2</div>
+                <input type="text" name="step_2_icon" value="{{ site_content.step_2_icon }}" class="adm-input" placeholder="Icon (emoji)">
+                <input type="text" name="step_2_title" value="{{ site_content.step_2_title }}" class="adm-input" placeholder="Title">
+                <textarea name="step_2_text" rows="3" class="adm-input" style="resize:vertical">{{ site_content.step_2_text }}</textarea>
+              </div>
+              <div style="background:#F9FAFB;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase">Step 3</div>
+                <input type="text" name="step_3_icon" value="{{ site_content.step_3_icon }}" class="adm-input" placeholder="Icon (emoji)">
+                <input type="text" name="step_3_title" value="{{ site_content.step_3_title }}" class="adm-input" placeholder="Title">
+                <textarea name="step_3_text" rows="3" class="adm-input" style="resize:vertical">{{ site_content.step_3_text }}</textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom CTA -->
+          <div class="adm-card">
+            <div class="adm-section-title">Bottom CTA Section</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Eyebrow</label>
+                <input type="text" name="cta_eyebrow" value="{{ site_content.cta_eyebrow }}" class="adm-input" style="width:100%">
+              </div>
+              <div></div>
+              <div style="grid-column:1 / -1">
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title</label>
+                <input type="text" name="cta_title" value="{{ site_content.cta_title }}" class="adm-input" style="width:100%">
+              </div>
+              <div style="grid-column:1 / -1">
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label>
+                <input type="text" name="cta_subtitle" value="{{ site_content.cta_subtitle }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button Text</label>
+                <input type="text" name="cta_primary_text" value="{{ site_content.cta_primary_text }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button URL</label>
+                <input type="text" name="cta_primary_url" value="{{ site_content.cta_primary_url }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button Text</label>
+                <input type="text" name="cta_secondary_text" value="{{ site_content.cta_secondary_text }}" class="adm-input" style="width:100%">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button URL</label>
+                <input type="text" name="cta_secondary_url" value="{{ site_content.cta_secondary_url }}" class="adm-input" style="width:100%">
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px">
+            <button type="submit" style="padding:11px 28px;font-size:13px;font-weight:700;color:#fff;background:#7C3AED;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Save Changes</button>
+            <a href="/" target="_blank" style="font-size:12px;font-weight:600;color:#7C3AED">Preview Live Site →</a>
+          </div>
+        </form>
+      </div>
+
       <!-- ═══ SETTINGS ═══ -->
       <div id="av-settings" style="display:none;animation:fadeIn .35s ease both">
         <div style="margin-bottom:20px"><h2 style="font-size:20px;font-weight:800;color:#111827">Platform Settings</h2></div>
@@ -539,8 +699,8 @@ function drawChart() {
 drawChart();
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
-const tabs   = ['overview','users','listings','banned','settings'];
-const labels = { overview:'📊 Overview', users:'👥 Users', listings:'🏠 Listings', banned:'🚫 Banned Users', settings:'⚙️ Settings' };
+const tabs   = ['overview','users','listings','banned','site-content','settings'];
+const labels = { overview:'📊 Overview', users:'👥 Users', listings:'🏠 Listings', banned:'🚫 Banned Users', 'site-content':'🖋️ Site Content', settings:'⚙️ Settings' };
 
 window.admTab = (tab) => {
   tabs.forEach(t => {
