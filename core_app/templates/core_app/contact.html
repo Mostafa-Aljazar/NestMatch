@@ -139,7 +139,7 @@
                 <div class="mb-6 px-5 py-4 rounded-xl text-sm font-semibold flex items-center gap-3
                   {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-700
                   {% else %}bg-red-50 border border-red-200 text-red-700{% endif %}">
-                  {% if message.tags == 'success' %}✅{% else %}❌{% endif %}
+                  {% if message.tags == 'success' %}{% else %}{% endif %}
                   {{ message }}
                 </div>
               {% endfor %}
@@ -152,19 +152,21 @@
                 <!-- Name -->
                 <div>
                   <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Full Name <span class="text-red-400">*</span></label>
-                  <input type="text" name="name" id="name" placeholder="Your full name"
-                    class="input-field"
+                  <input type="text" name="name" id="name" placeholder="Your full name" class="input-field"
                     value="{{ form_data.name|default:'' }}"/>
-                  <p class="text-xs text-red-500 mt-1 hidden" id="name-error">Please enter your name</p>
+                  {% if errors.name %}
+                      <p class="text-xs text-red-500 mt-1">{{ errors.name }}</p>
+                    {% endif %}
                 </div>
 
                 <!-- Email -->
                 <div>
                   <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Email Address <span class="text-red-400">*</span></label>
-                  <input type="email" name="email" id="email" placeholder="your@email.com"
-                    class="input-field"
+                  <input type="email" name="email" id="email" placeholder="your@email.com" class="input-field"
                     value="{{ form_data.email|default:'' }}"/>
-                  <p class="text-xs text-red-500 mt-1 hidden" id="email-error">Please enter a valid email</p>
+                    {% if errors.email %}
+                      <p class="text-xs text-red-500 mt-1">{{ errors.email }}</p>
+                    {% endif %}
                 </div>
               </div>
 
@@ -174,8 +176,10 @@
                 <textarea name="message" id="message" rows="6" placeholder="Write your message here..."
                   class="input-field resize-none">{{ form_data.message|default:'' }}</textarea>
                 <div class="flex justify-between mt-1.5">
-                  <p class="text-xs text-red-500 hidden" id="message-error">Message must be at least 10 characters</p>
-                  <p class="text-xs text-gray-400 ml-auto"><span id="char-count">0</span> characters</p>
+                {% if errors.message %}
+                  <p class="text-xs text-red-500 mt-1">{{ errors.message }}</p>
+                {% endif %}                 
+                <p class="text-xs text-gray-400 ml-auto"><span id="char-count">0</span> characters</p>
                 </div>
               </div>
 
@@ -214,45 +218,6 @@
   // Form submit with loading state
   document.getElementById('contact-form').addEventListener('submit', function(e) {
     var valid = true;
-
-    // Name validation
-    var name = document.getElementById('name');
-    var nameErr = document.getElementById('name-error');
-    if (!name.value.trim()) {
-      nameErr.classList.remove('hidden');
-      name.style.borderColor = '#EF4444';
-      valid = false;
-    } else {
-      nameErr.classList.add('hidden');
-      name.style.borderColor = '';
-    }
-
-    // Email validation
-    var email = document.getElementById('email');
-    var emailErr = document.getElementById('email-error');
-    var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRe.test(email.value.trim())) {
-      emailErr.classList.remove('hidden');
-      email.style.borderColor = '#EF4444';
-      valid = false;
-    } else {
-      emailErr.classList.add('hidden');
-      email.style.borderColor = '';
-    }
-
-    // Message validation
-    var msg = document.getElementById('message');
-    var msgErr = document.getElementById('message-error');
-    if (msg.value.trim().length < 10) {
-      msgErr.classList.remove('hidden');
-      msg.style.borderColor = '#EF4444';
-      valid = false;
-    } else {
-      msgErr.classList.add('hidden');
-      msg.style.borderColor = '';
-    }
-
-    if (!valid) { e.preventDefault(); return; }
 
     // Loading state
     document.getElementById('btn-text').textContent = 'Sending...';
