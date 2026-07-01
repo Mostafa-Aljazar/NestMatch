@@ -33,26 +33,26 @@
         <div class="lg:text-left text-center">
           <div class="inline-flex items-center gap-2 bg-white/15 mb-6 px-3 py-1.5 border border-white/25 rounded-full font-semibold text-white text-xs">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="white"/></svg>
-            AI-Powered Matching
+            {{ content.hero_badge_text }}
           </div>
           <h1 class="mb-5 font-black text-white text-3xl sm:text-4xl lg:text-5xl leading-tight">
-            Find Your Perfect<br/>Roommate & Room
+            {{ content.hero_title_line1 }}<br/>{{ content.hero_title_line2 }}
           </h1>
           <p class="mx-auto lg:mx-0 mb-8 max-w-[420px] text-purple-200 text-sm sm:text-base leading-relaxed">
-            NestMatch uses AI to match you with compatible roommates based on your lifestyle — sleep habits, cleanliness, noise level, and more.
+            {{ content.hero_subtitle }}
           </p>
           <div class="flex flex-wrap justify-center lg:justify-start gap-4 mb-8">
-            <a href="/auth/" class="bg-white hover:bg-purple-50 shadow-lg px-6 py-3 rounded-xl font-bold text-violet-700 text-sm transition-all">Get Started</a>
-            <a href="/rooms/" class="bg-transparent hover:bg-white/10 px-6 py-3 border-2 border-white rounded-xl font-bold text-white text-sm transition-all">Browse Rooms</a>
+            <a href="{{ content.hero_cta_primary_url }}" class="bg-white hover:bg-purple-50 shadow-lg px-6 py-3 rounded-xl font-bold text-violet-700 text-sm transition-all">{{ content.hero_cta_primary_text }}</a>
+            <a href="{{ content.hero_cta_secondary_url }}" class="bg-transparent hover:bg-white/10 px-6 py-3 border-2 border-white rounded-xl font-bold text-white text-sm transition-all">{{ content.hero_cta_secondary_text }}</a>
           </div>
           <div class="flex flex-wrap justify-center lg:justify-start items-center gap-5">
-            <span class="font-medium text-purple-200 text-xs">✓ Free to use</span>
-            <span class="font-medium text-purple-200 text-xs">✓ AI Compatibility</span>
-            <span class="font-medium text-purple-200 text-xs">✓ Instant WhatsApp</span>
+            <span class="font-medium text-purple-200 text-xs">✓ {{ content.hero_feature_tag_1 }}</span>
+            <span class="font-medium text-purple-200 text-xs">✓ {{ content.hero_feature_tag_2 }}</span>
+            <span class="font-medium text-purple-200 text-xs">✓ {{ content.hero_feature_tag_3 }}</span>
           </div>
         </div>
 
-        <!-- Right: Floating Cards-->
+        <!-- Right: Floating Cards (kept static — illustrative, not editable content) -->
         <div class="relative mt-8 lg:mt-0 w-full h-[420px]">
 
           <div class="top-6 left-0 z-20 card-float absolute bg-white shadow-2xl p-4 rounded-2xl w-40">
@@ -114,20 +114,20 @@
     <div class="mx-auto px-10 sm:px-6 max-w-[1200px]">
       <div class="gap-8 grid grid-cols-2 sm:grid-cols-4 text-center">
         <div>
-          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">2,400+</div>
-          <div class="font-medium text-gray-500 text-sm">Active Listings</div>
+          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">{{ content.stat_1_value }}</div>
+          <div class="font-medium text-gray-500 text-sm">{{ content.stat_1_label }}</div>
         </div>
         <div>
-          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">8,500+</div>
-          <div class="font-medium text-gray-500 text-sm">Happy Users</div>
+          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">{{ content.stat_2_value }}</div>
+          <div class="font-medium text-gray-500 text-sm">{{ content.stat_2_label }}</div>
         </div>
         <div>
-          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">12+</div>
-          <div class="font-medium text-gray-500 text-sm">Cities</div>
+          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">{{ content.stat_3_value }}</div>
+          <div class="font-medium text-gray-500 text-sm">{{ content.stat_3_label }}</div>
         </div>
         <div>
-          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">94%</div>
-          <div class="font-medium text-gray-500 text-sm">Match Accuracy</div>
+          <div class="mb-1 font-black text-3xl sm:text-4xl stat-number">{{ content.stat_4_value }}</div>
+          <div class="font-medium text-gray-500 text-sm">{{ content.stat_4_label }}</div>
         </div>
       </div>
     </div>
@@ -137,33 +137,32 @@
   <section class="bg-gray-50 py-20">
     <div class="mx-auto px-10 sm:px-6 max-w-[1200px]">
       <div class="mb-14 text-center">
-        <div class="inline-block bg-violet-100 mb-5 px-4 py-1.5 rounded-full font-bold text-violet-600 text-xs uppercase tracking-wider">How it Works</div>
-        <h2 class="mb-4 font-black text-gray-900 text-3xl sm:text-4xl">Find your match in 3 simple steps</h2>
-        <p class="mx-auto max-w-xs text-gray-500 text-sm leading-relaxed">From sign-up to move-in, NestMatch makes the process seamless</p>
+        <div class="inline-block bg-violet-100 mb-5 px-4 py-1.5 rounded-full font-bold text-violet-600 text-xs uppercase tracking-wider">{{ content.how_it_works_eyebrow }}</div>
+        <h2 class="mb-4 font-black text-gray-900 text-3xl sm:text-4xl">{{ content.how_it_works_title }}</h2>
+        <p class="mx-auto max-w-xs text-gray-500 text-sm leading-relaxed">{{ content.how_it_works_subtitle }}</p>
       </div>
 
-      <!-- Desktop: 3 cards in a row | Tablet: 2 cards | Mobile: 1 card -->
       <div class="gap-4 md:gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 
         <div class="relative bg-white shadow-sm p-8 border border-gray-100 rounded-2xl text-center">
           <div class="-top-4 -right-4 absolute flex justify-center items-center bg-violet-600 shadow-lg rounded-full w-8 h-8 font-black text-white text-sm">1</div>
-          <div class="flex justify-center items-center bg-violet-100 mx-auto mb-6 rounded-2xl w-16 h-16"><span class="text-3xl">📝</span></div>
-          <h3 class="mb-3 font-bold text-gray-900 text-base">Create Your Profile</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">Sign up and fill out your lifestyle questionnaire — sleep time, cleanliness, noise level, smoking habits and more</p>
+          <div class="flex justify-center items-center bg-violet-100 mx-auto mb-6 rounded-2xl w-16 h-16"><span class="text-3xl">{{ content.step_1_icon }}</span></div>
+          <h3 class="mb-3 font-bold text-gray-900 text-base">{{ content.step_1_title }}</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">{{ content.step_1_text }}</p>
         </div>
 
         <div class="relative bg-white shadow-sm p-8 border border-gray-100 rounded-2xl text-center">
           <div class="-top-4 -right-4 absolute flex justify-center items-center bg-violet-600 shadow-lg rounded-full w-8 h-8 font-black text-white text-sm">2</div>
-          <div class="flex justify-center items-center bg-violet-100 mx-auto mb-6 rounded-2xl w-16 h-16"><span class="text-3xl">🔍</span></div>
-          <h3 class="mb-3 font-bold text-gray-900 text-base">Browse & Match</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">Search rooms with live filters. See AI compatibility scores instantly for every listing you browse</p>
+          <div class="flex justify-center items-center bg-violet-100 mx-auto mb-6 rounded-2xl w-16 h-16"><span class="text-3xl">{{ content.step_2_icon }}</span></div>
+          <h3 class="mb-3 font-bold text-gray-900 text-base">{{ content.step_2_title }}</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">{{ content.step_2_text }}</p>
         </div>
 
         <div class="relative md:col-span-2 lg:col-span-1 bg-white shadow-sm md:mx-auto p-8 border border-gray-100 rounded-2xl md:max-w-[420px] text-center">
           <div class="-top-4 -right-4 absolute flex justify-center items-center bg-violet-600 shadow-lg rounded-full w-8 h-8 font-black text-white text-sm">3</div>
-          <div class="flex justify-center items-center bg-violet-100 mx-auto mb-6 rounded-2xl w-16 h-16"><span class="text-3xl">🤝</span></div>
-          <h3 class="mb-3 font-bold text-gray-900 text-base">Connect & Move In</h3>
-          <p class="text-gray-500 text-sm leading-relaxed">Apply to rooms, chat via WhatsApp, and generate your rental agreement with AI in seconds</p>
+          <div class="flex justify-center items-center bg-violet-100 mx-auto mb-6 rounded-2xl w-16 h-16"><span class="text-3xl">{{ content.step_3_icon }}</span></div>
+          <h3 class="mb-3 font-bold text-gray-900 text-base">{{ content.step_3_title }}</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">{{ content.step_3_text }}</p>
         </div>
 
       </div>
@@ -292,12 +291,12 @@
   <!-- cta section -->
   <section class="py-16 sm:py-20 hero-gradient">
     <div class="mx-auto px-4 sm:px-6 lg:px-10 max-w-[1200px] text-center">
-      <div class="inline-block bg-white/10 mb-6 px-3 py-1 border border-white/20 rounded-full font-bold text-purple-200 text-xs uppercase tracking-wider">Get Started Today</div>
-      <h2 class="mb-4 font-black text-white text-3xl sm:text-4xl">Ready to Find Your Perfect Nest?</h2>
-      <p class="mx-auto mb-8 sm:mb-10 max-w-md text-purple-200 text-base">Join 8,500+ users already finding their perfect roommate match with AI</p>
+      <div class="inline-block bg-white/10 mb-6 px-3 py-1 border border-white/20 rounded-full font-bold text-purple-200 text-xs uppercase tracking-wider">{{ content.cta_eyebrow }}</div>
+      <h2 class="mb-4 font-black text-white text-3xl sm:text-4xl">{{ content.cta_title }}</h2>
+      <p class="mx-auto mb-8 sm:mb-10 max-w-md text-purple-200 text-base">{{ content.cta_subtitle }}</p>
       <div class="flex flex-row flex-wrap justify-center items-center gap-3 sm:gap-4">
-        <a href="/rooms/new/" class="bg-white hover:bg-purple-50 shadow-lg px-6 sm:px-8 py-3 rounded-xl w-full sm:w-auto min-w-[160px] font-bold text-violet-700 text-sm text-center transition-all">Post a Room</a>
-        <a href="/rooms/" class="hover:bg-white/10 px-6 sm:px-8 py-3 border-2 border-white/50 rounded-xl w-full sm:w-auto min-w-[160px] font-bold text-white text-sm text-center transition-all">Find a Room</a>
+        <a href="{{ content.cta_primary_url }}" class="bg-white hover:bg-purple-50 shadow-lg px-6 sm:px-8 py-3 rounded-xl w-full sm:w-auto min-w-[160px] font-bold text-violet-700 text-sm text-center transition-all">{{ content.cta_primary_text }}</a>
+        <a href="{{ content.cta_secondary_url }}" class="hover:bg-white/10 px-6 sm:px-8 py-3 border-2 border-white/50 rounded-xl w-full sm:w-auto min-w-[160px] font-bold text-white text-sm text-center transition-all">{{ content.cta_secondary_text }}</a>
       </div>
     </div>
   </section>
