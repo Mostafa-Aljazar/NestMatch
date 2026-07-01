@@ -3,7 +3,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from datetime import date
 import re
 from PIL import Image, UnidentifiedImageError
-
+import random
+from django.utils import timezone
 
 class UserManager(BaseUserManager):
     # Regex patterns for validating username and email formats
@@ -224,9 +225,23 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Note: 'password' field is automatically provided by AbstractBaseUser, no manual field needed
 
     # Custom profile and demographic fields
-    date_of_birth = models.DateField()
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    country = models.CharField(max_length=100, choices=COUNTRY_CHOICES)
+       # Made nullable so a brand-new Google sign-up can be saved to the DB
+    # immediately (Google never provides date of birth, gender, or
+    # nationality), and the user fills these in afterward on the
+    # lifestyle quiz / profile completion step.
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+    country = models.CharField(max_length=100, choices=COUNTRY_CHOICES, blank=True, null=True)
+
+    # Tracks how the account was created. Used to:
+    # - decide whether to show "Change password" vs "Add password" on the
+    #   Security tab (Google users don't have a usable password by default)
+    # - know whether profile completion (DOB/gender/country) is still pending
+    AUTH_PROVIDER_CHOICES = [
+        ('email', 'Email/Password'),
+        ('google', 'Google'),
+    ]
+    auth_provider = models.CharField(max_length=10, choices=AUTH_PROVIDER_CHOICES, default='email')
     bio = models.TextField(blank=True, null=True)
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
@@ -257,12 +272,23 @@ class User(AbstractBaseUser, PermissionsMixin):
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
+    # Property method to calculate the current age dynamically.
+    # Returns None instead of crashing if date_of_birth hasn't been set yet
+    # (e.g. a brand-new Google sign-up that hasn't completed the lifestyle
+    # quiz / profile completion step).
     @property
     def age(self):
-        today = date.today()
-        dob = self.date_of_birth
-        return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        if not self.date_of_birth:
+            return None
+        return User.objects._calculate_age(self.date_of_birth)
 
+    # True once the user has filled in the fields Google never provides.
+    # Used to decide whether to redirect a freshly-logged-in user to the
+    # "complete your profile" / lifestyle quiz step.
+    @property
+    def is_profile_complete(self):
+        return bool(self.date_of_birth and self.gender and self.country)
+    
     @property
     def birthday_this_year(self):
         today = date.today()
@@ -504,3 +530,40 @@ class Testimonial(models.Model):
         if len(parts) == 1:
             return parts[0][:2].upper()
         return ''.join(part[0].upper() for part in parts[:2])
+
+
+class OTPCode(models.Model):
+    """
+    Stores a one-time password (OTP) for password reset.
+    Each user can have multiple OTP records, but only the latest unused
+    and non-expired one is considered valid during verification.
+    """
+    user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otp_codes')
+    code       = models.CharField(max_length=4)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used    = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'OTP for {self.user.email} — {self.code}'
+
+    @property
+    def is_expired(self):
+        """Returns True if the OTP was created more than 2 minutes ago."""
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=2)
+
+    @classmethod
+    def generate_for_user(cls, user):
+        """
+        Marks all previous unused OTPs for this user as used,
+        then creates and returns a fresh 4-digit OTP.
+        Ensures only one active OTP exists per user at a time.
+        """
+        # Invalidate any previous unused codes
+        cls.objects.filter(user=user, is_used=False).update(is_used=True)
+
+        # Generate a new 4-digit code (zero-padded: 0000–9999)
+        code = str(random.randint(0, 9999)).zfill(4)
+        return cls.objects.create(user=user, code=code)

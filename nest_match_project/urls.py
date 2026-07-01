@@ -18,12 +18,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', include('core_app.urls')),
     path('auth/', include('accounts_app.urls')),
+    path('auth/', include('allauth.urls')),
     path('rooms/', include('listings_app.urls')),
     path('compatibility/', include('compatibility_app.urls')),
     path('applications/', include('applications_app.urls')),

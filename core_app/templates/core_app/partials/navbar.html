@@ -45,13 +45,13 @@
       <div class="relative" id="nm-user-menu">
         <button onclick="nmToggleUserMenu()"
                 class="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl border border-gray-200 bg-white hover:border-violet-300 hover:bg-violet-50 transition-all text-sm font-medium text-gray-700">
-          <span class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
-            {% if user.profile_pic %}
-              <img src="{{ user.profile_pic.url }}" class="w-7 h-7 rounded-full object-cover" alt="">
-            {% else %}
-              {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-            {% endif %}
-          </span>
+         <span class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
+          {% if user.profile_pic %}
+            <img id="nav-avatar-img" src="{{ user.profile_pic.url }}" class="w-7 h-7 rounded-full object-cover" alt="nav-avatar-img">
+          {% else %}
+            <span id="nav-avatar-placeholder">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+          {% endif %}
+        </span>
           <span class="max-w-[90px] truncate">{{ user.first_name }}</span>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 shrink-0">
             <path d="M6 9l6 6 6-6"/>
@@ -158,9 +158,9 @@
     <div class="flex items-center gap-3">
       <div class="w-11 h-11 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center text-white font-extrabold text-sm shrink-0">
         {% if user.profile_pic %}
-          <img src="{{ user.profile_pic.url }}" class="w-11 h-11 rounded-full object-cover" alt="">
+          <img id="nav-avatar-img-mobile" src="{{ user.profile_pic.url }}" class="w-11 h-11 rounded-full object-cover" alt="nav-avatar-img-mobile">
         {% else %}
-          {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+          <span id="nav-avatar-placeholder-mobile">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
         {% endif %}
       </div>
       <div class="min-w-0">

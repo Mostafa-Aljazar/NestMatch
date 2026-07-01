@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Account Settings | NestMatch</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    {% load static %}
     <script>
       tailwind.config = {
         theme: {
@@ -44,6 +45,28 @@
         background-color: #f9fafb;
         color: #1e293b;
       }
+      .tab-nav-btn {
+        position: relative;
+        transition: background-color 0.15s ease, color 0.15s ease;
+      }
+      /* Desktop: left accent bar */
+      @media (min-width: 1024px) {
+        .tab-nav-btn::before {
+          content: '';
+          position: absolute;
+          left: -1px;
+          top: 50%;
+          height: 0;
+          width: 3px;
+          border-radius: 999px;
+          background-color: #6d28d9;
+          transform: translateY(-50%);
+          transition: height 0.18s ease;
+        }
+        .tab-nav-btn.active::before {
+          height: 60%;
+        }
+      }
       .tab-nav-btn.active {
         background-color: #ede9fe;
         color: #5b21b6;
@@ -51,10 +74,115 @@
       .tab-nav-btn.active svg {
         color: #6d28d9;
       }
+      .tab-panel {
+        animation: tabFadeIn 0.22s ease;
+      }
+      @keyframes tabFadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .option-card {
+        transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+      }
+      .option-card:hover {
+        transform: translateY(-1px);
+      }
       .option-card.selected {
         border-color: #7c3aed;
         background-color: #f5f3ff;
         box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+      }
+      .bool-toggle .option-card {
+        text-align: center;
+      }
+      .field-icon-input {
+        padding-left: 2.5rem;
+      }
+      .field-icon-wrap {
+        position: relative;
+      }
+      .field-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        pointer-events: none;
+        transition: color 0.15s ease;
+      }
+      .field-icon-wrap:focus-within .field-icon {
+        color: #7c3aed;
+      }
+      .strength-check {
+        transition: color 0.15s ease;
+      }
+      .strength-check svg {
+        transition: stroke 0.15s ease, background-color 0.15s ease;
+      }
+      .header-blob {
+        animation: blobDrift 14s ease-in-out infinite;
+      }
+      .header-blob--two {
+        animation-duration: 18s;
+        animation-delay: -4s;
+      }
+      .header-blob--three {
+        animation-duration: 11s;
+        animation-delay: -7s;
+      }
+      @keyframes blobDrift {
+        0%   { transform: translate(0, 0) scale(1); }
+        33%  { transform: translate(-4%, 6%) scale(1.08); }
+        66%  { transform: translate(5%, -4%) scale(0.95); }
+        100% { transform: translate(0, 0) scale(1); }
+      }
+      .header-title-gradient {
+        background: linear-gradient(100deg, #4c1d95, #7c3aed 35%, #a78bfa 50%, #6d28d9 70%, #4c1d95);
+        background-size: 250% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: titleShine 7s linear infinite;
+      }
+      @keyframes titleShine {
+        0%   { background-position: 0% 50%; }
+        100% { background-position: 250% 50%; }
+      }
+      .header-fade-up {
+        animation: headerFadeUp 0.6s ease both;
+      }
+      .header-fade-up--delay {
+        animation-delay: 0.08s;
+      }
+      @keyframes headerFadeUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .verified-pulse-ring {
+        animation: verifiedPulse 2.4s ease-out infinite;
+      }
+      @keyframes verifiedPulse {
+        0%   { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.35); }
+        70%  { box-shadow: 0 0 0 6px rgba(124, 58, 237, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+      }
+      .strength-bar-fill {
+        transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      /* Photo upload hover ring */
+      #tab-photo-btn {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      #tab-photo-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 4px rgba(109, 40, 217, 0.2);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .tab-panel, .option-card, .tab-nav-btn::before,
+        .header-blob, .header-title-gradient, .header-fade-up, .verified-pulse-ring, .strength-bar-fill {
+          animation: none !important;
+          transition: none !important;
+        }
       }
       input:focus, select:focus, textarea:focus {
         outline: none;
@@ -64,92 +192,141 @@
   <body class="min-h-screen">
     {% include "core_app/partials/navbar.html" with active_page="profile" %}
 
-    <!-- Django messages framework output (validation errors / success notices) -->
-    {% if messages %}
-      <div class="top-20 right-4 z-[10001] fixed space-y-2 px-4 sm:px-0 w-full max-w-sm">
-        {% for message in messages %}
-          <div class="rounded-lg border px-4 py-3 text-sm font-medium shadow-soft
-            {% if message.tags == 'error' %}border-rose-200 bg-rose-50 text-rose-700
-            {% else %}border-emerald-200 bg-emerald-50 text-emerald-700{% endif %}">
-            {{ message }}
+    <!-- ================================================================== -->
+    <!-- Page header                                                         -->
+    <!-- ================================================================== -->
+    <header class="relative mt-[65px] overflow-hidden bg-gradient-to-br from-brand-900 via-brand-600 to-violet-500">
+
+      <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,_rgba(255,255,255,0.12)_1.5px,_transparent_1.5px)] bg-[length:28px_28px]"></div>
+      <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/5"></div>
+      <div class="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-white/5"></div>
+
+      <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col gap-6 py-8 sm:flex-row sm:items-center sm:justify-between">
+
+          <!-- Left: Avatar + Info -->
+          <div class="flex items-center gap-5">
+            <div class="relative flex-shrink-0">
+              {% if user_obj.profile_pic %}
+                <img id="header-avatar-image"
+                     src="{{ user_obj.profile_pic.url }}"
+                     alt="{{ user_obj.full_name }}"
+                     class="h-16 w-16 rounded-full border-2 border-white/30 object-cover sm:h-20 sm:w-20" />
+                <div id="header-avatar-placeholder"
+                     class="hidden h-16 w-16 items-center justify-center rounded-full border-2 border-white/30 bg-white/20 font-display text-xl font-bold text-white sm:h-20 sm:w-20 sm:text-2xl">
+                  {{ user_obj.first_name|first|upper }}{% if user_obj.last_name %}{{ user_obj.last_name|first|upper }}{% endif %}
+                </div>
+              {% else %}
+                <img id="header-avatar-image"
+                     src=""
+                     alt="{{ user_obj.full_name }}"
+                     class="hidden h-16 w-16 rounded-full border-2 border-white/30 object-cover sm:h-20 sm:w-20" />
+                <div id="header-avatar-placeholder"
+                     class="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/30 bg-white/20 font-display text-xl font-bold text-white sm:h-20 sm:w-20 sm:text-2xl">
+                  {{ user_obj.first_name|first|upper }}{% if user_obj.last_name %}{{ user_obj.last_name|first|upper }}{% endif %}
+                </div>
+              {% endif %}
+              <span class="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-400 sm:h-4 sm:w-4"></span>
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.15em] text-white/60">Account settings</p>
+              <h1 class="mt-1 font-display text-2xl font-bold text-white sm:text-3xl">
+                {{ user_obj.full_name }}
+              </h1>
+              <p class="mt-1 text-sm text-white/60">
+                Member since {{ user_obj.created_at|date:"F Y" }}
+              </p>
+              <div class="mt-3 flex flex-wrap items-center gap-2">
+                {% if user_obj.is_active %}
+                <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-200">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                  </svg>
+                  Verified
+                </span>
+                {% endif %}
+                {% if user_obj.gender %}
+                <span class="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  {{ user_obj.get_gender_display }}
+                </span>
+                {% endif %}
+                {% if user_obj.country %}
+                <span class="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.2 2.3 3.3 5.4 3.3 8.5s-1.1 6.2-3.3 8.5"/></svg>
+                  {{ user_obj.get_country_display }}
+                </span>
+                {% endif %}
+              </div>
+            </div>
           </div>
-        {% endfor %}
-      </div>
-    {% endif %}
 
-    <!-- Page header -->
-    <header class="bg-slate-50 mt-[65px] px-4 sm:px-6 lg:px-8 py-10 border-slate-200 border-b">
-      <div class="mx-auto max-w-6xl">
-        <p class="font-semibold text-brand-600 text-xs uppercase tracking-[0.18em]">Account settings</p>
-        <h1 class="mt-2 font-display font-bold text-slate-900 text-3xl tracking-tight">{{ user_obj.full_name }}</h1>
-        <p class="mt-1 text-slate-500 text-sm">Member since {{ user_obj.created_at|date:"F Y" }}</p>
+          <!-- Right: Profile strength card -->
+          <div class="w-full rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm sm:w-56 lg:w-64">
+            <div class="flex items-center justify-between">
+              <p class="text-xs font-semibold uppercase tracking-wide text-white/90">Profile strength</p>
+              <span id="profile-strength-value-header" class="text-lg font-bold text-white">{{ profile_strength }}%</span>
+            </div>
+            <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/20">
+              <div id="profile-strength-bar-header"
+                   class="strength-bar-fill h-full rounded-full bg-white"
+                   style="width: {{ profile_strength }}%">
+              </div>
+            </div>
+            <ul class="mt-4 space-y-2.5">
+              <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasPhoto">
+                <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
+                Profile photo
+              </li>
+              <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasBio">
+                <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
+                Bio
+              </li>
+              <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasPhone">
+                <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
+                Phone number
+              </li>
+              <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasLifestyle">
+                <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
+                Lifestyle profile
+              </li>
+            </ul>
+          </div>
 
-        <div class="flex flex-wrap gap-2 mt-5">
-          {% if user_obj.is_active %}
-          <span class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 border border-slate-200 rounded-full font-medium text-slate-700 text-xs">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z" />
-              <path d="M9 12l2 2 4-4" />
-            </svg>
-            Verified account
-          </span>
-          {% endif %}
         </div>
+        <div class="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
       </div>
     </header>
 
-    <main class="mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-6xl">
-      <div class="flex lg:flex-row flex-col lg:items-start gap-8">
-        <!-- Sidebar -->
-        <aside class="lg:top-24 lg:sticky flex-shrink-0 w-full lg:w-72">
-          <div class="bg-white p-6 border border-slate-200 rounded-2xl">
-            <div class="flex items-center gap-4">
-              <div id="profile-avatar-wrapper">
-                {% if user_obj.profile_pic %}
-                  <img id="profile-avatar-image" src="{{ user_obj.profile_pic.url }}" alt="{{ user_obj.full_name }}" class="border border-brand-200 rounded-full w-16 h-16 object-cover" />
-                {% else %}
-                  <div id="profile-avatar-placeholder" class="flex justify-center items-center bg-brand-100 border border-brand-200 rounded-full w-16 h-16 font-display font-bold text-brand-700 text-xl">
-                    {{ user_obj.first_name|first|upper }}
-                  </div>
-                {% endif %}
-              </div>
-              <div>
-                <p id="sidebar-user-name" class="font-display font-bold text-slate-900 text-sm">{{ user_obj.full_name }}</p>
-                <!-- Triggers the hidden file input inside the Personal Info form below -->
-                <button type="button" onclick="document.getElementById('profile_pic_input').click()" class="inline-flex items-center gap-1.5 mt-1 font-semibold text-brand-600 hover:text-brand-700 text-xs">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 17.5L3 21l3.5-1L17.8 8.7a1.5 1.5 0 000-2.1l-1.4-1.4a1.5 1.5 0 00-2.1 0L4 17.5z" />
-                  </svg>
-                  Change photo
-                </button>
-              </div>
-            </div>
+    <main class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <div class="flex flex-col gap-8 ">
 
-            <div class="bg-slate-200 my-5 h-px"></div>
+        <!-- ============================================================ -->
+        <!-- Aside -->
+        <!-- ============================================================ -->
+        <aside class="w-full flex-shrink-0 ">
+          <div class="rounded-2xl border border-slate-200 bg-white p-3 lg:p-4">
 
-            <div>
-              <div class="flex justify-between items-center font-semibold text-slate-700 text-xs">
-                <span>Profile strength</span>
-                <span class="text-brand-600">{{ profile_strength }}%</span>
-              </div>
-              <div class="bg-slate-200 mt-2 rounded-full w-full h-1.5 overflow-hidden">
-                <div class="bg-brand-600 rounded-full h-full" style="width: {{ profile_strength }}%"></div>
-              </div>
-              <p class="mt-2 text-slate-500 text-xs">Complete your lifestyle profile to unlock stronger matches.</p>
-            </div>
+            <nav class="grid grid-cols-2 gap-1 lg:flex  lg:gap-0 lg:space-y-1">
 
-            <div class="bg-slate-200 my-5 h-px"></div>
-
-            <nav class="space-y-1">
-              <button class="flex items-center gap-2.5 hover:bg-slate-100 px-3 py-2.5 rounded-lg w-full font-medium text-slate-600 text-sm text-left tab-nav-btn active" data-tab="info">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <button class="tab-nav-btn active
+                            flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100
+                            max-lg:flex-col max-lg:justify-center max-lg:gap-1.5 max-lg:py-3 max-lg:text-center max-lg:text-xs
+                            lg:gap-2.5 lg:text-left lg:whitespace-nowrap" data-tab="info">
+                <svg class="flex-shrink-0" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="8" r="3.2" />
                   <path d="M5.5 19c1-3.2 3.6-5 6.5-5s5.5 1.8 6.5 5" />
                 </svg>
-                Personal info
+                <span>Personal info</span>
               </button>
-              <button class="flex items-center gap-2.5 hover:bg-slate-100 px-3 py-2.5 rounded-lg w-full font-medium text-slate-600 text-sm text-left tab-nav-btn" data-tab="lifestyle">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+
+              <button class="tab-nav-btn
+                            flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100
+                            max-lg:flex-col max-lg:justify-center max-lg:gap-1.5 max-lg:py-3 max-lg:text-center max-lg:text-xs
+                            lg:gap-2.5 lg:text-left lg:whitespace-nowrap" data-tab="lifestyle">
+                <svg class="flex-shrink-0" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="5" y1="6" x2="5" y2="18" />
                   <line x1="12" y1="4" x2="12" y2="18" />
                   <line x1="19" y1="9" x2="19" y2="18" />
@@ -157,124 +334,188 @@
                   <circle cx="12" cy="13" r="1.5" fill="currentColor" stroke="none" />
                   <circle cx="19" cy="6" r="1.5" fill="currentColor" stroke="none" />
                 </svg>
-                Lifestyle profile
+                <span>Lifestyle profile</span>
               </button>
-              <button class="flex items-center gap-2.5 hover:bg-slate-100 px-3 py-2.5 rounded-lg w-full font-medium text-slate-600 text-sm text-left tab-nav-btn" data-tab="security">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+
+              <button class="tab-nav-btn
+                            flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100
+                            max-lg:flex-col max-lg:justify-center max-lg:gap-1.5 max-lg:py-3 max-lg:text-center max-lg:text-xs
+                            lg:gap-2.5 lg:text-left lg:whitespace-nowrap" data-tab="security">
+                <svg class="flex-shrink-0" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="5" y="11" width="14" height="9" rx="2" />
                   <path d="M8 11V8a4 4 0 018 0v3" />
                 </svg>
-                Security
+                <span>Security</span>
               </button>
+
+              <button class="tab-nav-btn
+                            flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100
+                            max-lg:flex-col max-lg:justify-center max-lg:gap-1.5 max-lg:py-3 max-lg:text-center max-lg:text-xs
+                            lg:gap-2.5 lg:text-left lg:whitespace-nowrap" data-tab="reviews">
+                <svg class="flex-shrink-0" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span>Reviews</span>
+              </button>
+
             </nav>
           </div>
         </aside>
-
-        <!-- Content -->
+        <!-- ============================================================ -->
+        <!-- Content                                                       -->
+        <!-- ============================================================ -->
         <div class="flex-1 min-w-0">
 
-          <!-- ============================================================ -->
-          <!-- TAB 1: Personal info — its own form, its own CSRF token,    -->
-          <!-- its own POST endpoint (profile_update_personal_info).      -->
-          <!-- ============================================================ -->
-          <div id="tab-info" class="space-y-6">
+          <!-- TAB 1: Personal info -->
+          <div id="tab-info" class="tab-panel space-y-6">
             <form id="personal-info-form" action="{% url 'accounts_app:profile_update_personal_info' %}" method="POST" enctype="multipart/form-data">
               {% csrf_token %}
-              <!-- Hidden file input used by the "Change photo" button in the sidebar -->
+              <!-- Hidden file input (triggered by the + button in the photo field) -->
               <input type="file" id="profile_pic_input" name="profile_pic" accept="image/png, image/jpeg, image/webp, image/gif" class="hidden" />
 
-              <div class="bg-white p-6 sm:p-8 border border-slate-200 rounded-2xl">
-                <h2 class="font-display font-bold text-slate-900 text-lg">Personal information</h2>
-                <p class="mt-1 text-slate-500 text-sm">This information is visible to people you match with.</p>
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+                <h2 class="font-display text-lg font-bold text-slate-900">Personal information</h2>
+                <p class="mt-1 text-sm text-slate-500">This information is visible to people you match with.</p>
 
-                <div class="gap-5 grid md:grid-cols-2 mt-6">
+                <!-- -------------------------------------------------- -->
+                <!-- Profile photo field                                  -->
+                <!-- -------------------------------------------------- -->
+                <div class="mt-6 pb-6 border-b border-slate-100">
+                  <label class="mb-3 block text-xs font-semibold uppercase tracking-wide text-slate-500">Profile photo</label>
+                  <div class="flex items-center gap-5">
+
+                    <!-- Text + secondary change link -->
+                    <div>
+                      <button type="button"
+                              onclick="document.getElementById('profile_pic_input').click()"
+                              class="mt-2.5 inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700 hover:bg-brand-100 transition-colors">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M4 17.5L3 21l3.5-1L17.8 8.7a1.5 1.5 0 000-2.1l-1.4-1.4a1.5 1.5 0 00-2.1 0L4 17.5z" />
+                        </svg>
+                        Change photo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- -------------------------------------------------- -->
+
+                <h3 class="mt-6 text-xs font-semibold uppercase tracking-wide text-slate-400">Basic info</h3>
+                <div class="mt-3 grid gap-5 md:grid-cols-2">
                   <div>
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">First name</label>
-                    <input type="text" name="first_name" value="{{ user_obj.first_name }}" required minlength="2"
-                      class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm" />
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="first_name"></p>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">First name</label>
+                    <div class="field-icon-wrap">
+                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5.5 19c1-3.2 3.6-5 6.5-5s5.5 1.8 6.5 5" /></svg>
+                      <input type="text" name="first_name" value="{{ user_obj.first_name }}" required minlength="2"
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                    </div>
+                    <p class="field-error mt-1 text-xs text-rose-600" data-field="first_name"></p>
                   </div>
                   <div>
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">Last name</label>
-                    <input type="text" name="last_name" value="{{ user_obj.last_name }}" required minlength="2"
-                      class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm" />
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="last_name"></p>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Last name</label>
+                    <div class="field-icon-wrap">
+                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5.5 19c1-3.2 3.6-5 6.5-5s5.5 1.8 6.5 5" /></svg>
+                      <input type="text" name="last_name" value="{{ user_obj.last_name }}" required minlength="2"
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                    </div>
+                    <p class="field-error mt-1 text-xs text-rose-600" data-field="last_name"></p>
                   </div>
                   <div class="md:col-span-2">
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">Username</label>
-                    <input type="text" name="username" value="{{ user_obj.username }}" required pattern="[a-zA-Z0-9_.]{3,30}"
-                      class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm" />
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="username"></p>
-                  </div>
-                  <div class="md:col-span-2">
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">Email</label>
-                    <input type="email" name="email" value="{{ user_obj.email }}" required
-                      class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm" />
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="email"></p>
-                  </div>
-                  <div>
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">Phone number</label>
-                    <input type="tel" name="phone_number" value="{{ user_obj.phone_number|default:'' }}"
-                      class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm" />
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="phone_number"></p>
-                  </div>
-                  <div>
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">Gender</label>
-                    <select name="gender" class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm">
-                      {% for value, label in genders %}
-                        <option value="{{ value }}" {% if user_obj.gender == value %}selected{% endif %}>{{ label }}</option>
-                      {% endfor %}
-                    </select>
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="gender"></p>
-                  </div>
-                  <div>
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">Nationality</label>
-                    <!-- Looped from User.COUNTRY_CHOICES instead of being hardcoded,
-                         so all 8 options are available, not just 4 -->
-                    <select name="country" class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm">
-                      {% for value, label in countries %}
-                        <option value="{{ value }}" {% if user_obj.country == value %}selected{% endif %}>{{ label }}</option>
-                      {% endfor %}
-                    </select>
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="country"></p>
-                  </div>
-                  <div>
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">Date of birth</label>
-                    <input type="date" name="date_of_birth" value="{{ user_obj.date_of_birth|date:'Y-m-d' }}" required
-                      class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm" />
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="date_of_birth"></p>
-                  </div>
-                  <div class="md:col-span-2">
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">Bio</label>
-                    <textarea name="bio" maxlength="1000"
-                      class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full min-h-28 text-slate-800 text-sm">{{ user_obj.bio|default:'' }}</textarea>
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="bio"></p>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Username</label>
+                    <div class="field-icon-wrap">
+                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /><path d="M16 12v1.5a2.5 2.5 0 005 0V12a9 9 0 10-3.5 7.1" /></svg>
+                      <input type="text" name="username" value="{{ user_obj.username }}" required pattern="[a-zA-Z0-9_.]{3,30}"
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                    </div>
+                    <p class="field-error mt-1 text-xs text-rose-600" data-field="username"></p>
                   </div>
                 </div>
 
-                <div id="personal-info-form-message" class="hidden mt-4"></div>
-                <div class="flex flex-wrap gap-3 mt-6">
-                  <button type="submit" class="bg-brand-600 hover:bg-brand-700 px-5 py-2.5 rounded-lg font-semibold text-white text-sm">Save changes</button>
-                  <button type="reset" class="hover:bg-slate-50 px-5 py-2.5 border border-slate-200 rounded-lg font-medium text-slate-600 text-sm">Discard</button>
+                <h3 class="mt-8 text-xs font-semibold uppercase tracking-wide text-slate-400">Contact & background</h3>
+                <div class="mt-3 grid gap-5 md:grid-cols-2">
+                  <div class="md:col-span-2">
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Email</label>
+                    <div class="field-icon-wrap">
+                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2" /><path d="M4 6.5l8 6 8-6" /></svg>
+                      <input type="email" name="email" value="{{ user_obj.email }}" required
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                    </div>
+                    <p class="field-error mt-1 text-xs text-rose-600" data-field="email"></p>
+                  </div>
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Phone number</label>
+                    <div class="field-icon-wrap">
+                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h3.5l1.5 4-2 1.5a11 11 0 005.5 5.5l1.5-2 4 1.5V18a1.5 1.5 0 01-1.6 1.5A15.5 15.5 0 015 6.1 1.5 1.5 0 015 4.5z" /></svg>
+                      <input type="tel" name="phone_number" value="{{ user_obj.phone_number|default:'' }}"
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                    </div>
+                    <p class="field-error mt-1 text-xs text-rose-600" data-field="phone_number"></p>
+                  </div>
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Gender</label>
+                    <div class="field-icon-wrap">
+                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5.5 19c1-3.2 3.6-5 6.5-5s5.5 1.8 6.5 5" /></svg>
+                      <select name="gender" class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                        {% for value, label in genders %}
+                          <option value="{{ value }}" {% if user_obj.gender == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <p class="field-error mt-1 text-xs text-rose-600" data-field="gender"></p>
+                  </div>
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nationality</label>
+                    <div class="field-icon-wrap">
+                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" /><path d="M3.5 12h17M12 3.5c2.2 2.3 3.3 5.4 3.3 8.5s-1.1 6.2-3.3 8.5c-2.2-2.3-3.3-5.4-3.3-8.5S9.8 5.8 12 3.5z" /></svg>
+                      <select name="country" class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                        {% for value, label in countries %}
+                          <option value="{{ value }}" {% if user_obj.country == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <p class="field-error mt-1 text-xs text-rose-600" data-field="country"></p>
+                  </div>
+                  <div>
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Date of birth</label>
+                    <div class="field-icon-wrap">
+                      <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2" /><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" /></svg>
+                      <input type="date" name="date_of_birth" value="{{ user_obj.date_of_birth|date:'Y-m-d' }}" required
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                    </div>
+                    <p class="field-error mt-1 text-xs text-rose-600" data-field="date_of_birth"></p>
+                  </div>
+                  <div class="md:col-span-2">
+                    <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Bio</label>
+                    <div class="field-icon-wrap">
+                      <svg class="field-icon" style="top: 0.95rem; transform: none;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17.5L3 21l3.5-1L17.8 8.7a1.5 1.5 0 000-2.1l-1.4-1.4a1.5 1.5 0 00-2.1 0L4 17.5z" /></svg>
+                      <textarea name="bio" maxlength="1000"
+                           class="field-icon-input min-h-28 w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">{{ user_obj.bio|default:'' }}</textarea>
+                    </div>
+                    <p class="field-error mt-1 text-xs text-rose-600" data-field="bio"></p>
+                  </div>
+                </div>
+
+                <div id="personal-info-form-message" class="mt-4 hidden"></div>
+                <div class="mt-6 flex flex-wrap gap-3">
+                  <button type="submit" class="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">Save changes</button>
+                  <button type="reset" class="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">Discard</button>
                 </div>
               </div>
             </form>
 
-            <div class="bg-white p-6 sm:p-8 border border-rose-200 rounded-2xl">
-              <p class="font-semibold text-rose-600 text-xs uppercase tracking-wide">Danger zone</p>
-              <h3 class="mt-1 font-display font-bold text-slate-900 text-base">Delete account</h3>
-              <p class="mt-2 text-slate-500 text-sm">Permanently deletes your NestMatch account and all associated data. This action cannot be undone.</p>
-              <button type="button" class="hover:bg-rose-50 mt-4 px-4 py-2 border border-rose-300 rounded-lg font-semibold text-rose-700 text-sm">Delete account</button>
+            <div class="rounded-2xl border border-rose-200 bg-white p-6 sm:p-8">
+              <p class="text-xs font-semibold uppercase tracking-wide text-rose-600">Danger zone</p>
+              <h3 class="mt-1 font-display text-base font-bold text-slate-900">Delete account</h3>
+              <p class="mt-2 text-sm text-slate-500">Permanently deletes your NestMatch account and all associated data. This action cannot be undone.</p>
+              <button type="button" onclick="openDeleteModal()" class="mt-4 rounded-lg border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-50">
+                Delete account
+              </button>
             </div>
           </div>
 
           <!-- ============================================================ -->
-          <!-- TAB 2: Lifestyle profile — separate form/CSRF/endpoint.     -->
-          <!-- Each option-card group has a hidden input that JS keeps    -->
-          <!-- in sync, so the actual value POSTed matches the selection. -->
-          <!-- Pre-selects the "selected" class from lifestyle_profile.   -->
+          <!-- TAB 2: Lifestyle profile                                      -->
           <!-- ============================================================ -->
-          <div id="tab-lifestyle" class="hidden space-y-6">
+          <div id="tab-lifestyle" class="tab-panel hidden space-y-6">
             <div class="flex items-start gap-3 bg-brand-50 p-4 border border-brand-200 rounded-xl">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="1.8" class="flex-shrink-0 mt-0.5">
                 <circle cx="12" cy="12" r="8" />
@@ -289,44 +530,39 @@
 
             <form id="lifestyle-form" action="{% url 'accounts_app:profile_update_lifestyle' %}" method="POST">
               {% csrf_token %}
-
-              <!-- Hidden inputs: these carry the REAL values submitted to the server.
-                   The visible buttons below only toggle the .selected class and update
-                   these inputs via JS — the server never reads button text, only these. -->
-              <input type="hidden" name="sleep_time" id="input-sleep_time" value="{{ lifestyle_profile.sleep_time|default:'' }}" />
-              <input type="hidden" name="wake_time" id="input-wake_time" value="{{ lifestyle_profile.wake_time|default:'' }}" />
-              <input type="hidden" name="noise_level" id="input-noise_level" value="{{ lifestyle_profile.noise_level|default:'' }}" />
-              <input type="hidden" name="social_type" id="input-social_type" value="{{ lifestyle_profile.social_type|default:'' }}" />
-              <input type="hidden" name="cleanliness" id="input-cleanliness" value="{{ lifestyle_profile.cleanliness|default:'' }}" />
-              <input type="hidden" name="smoking" id="input-smoking" value="{{ lifestyle_profile.smoking|default:'no' }}" />
+              <input type="hidden" name="sleep_time"          id="input-sleep_time"          value="{{ lifestyle_profile.sleep_time|default:'' }}" />
+              <input type="hidden" name="wake_time"           id="input-wake_time"           value="{{ lifestyle_profile.wake_time|default:'' }}" />
+              <input type="hidden" name="noise_level"         id="input-noise_level"         value="{{ lifestyle_profile.noise_level|default:'' }}" />
+              <input type="hidden" name="social_type"         id="input-social_type"         value="{{ lifestyle_profile.social_type|default:'' }}" />
+              <input type="hidden" name="cleanliness"         id="input-cleanliness"         value="{{ lifestyle_profile.cleanliness|default:'' }}" />
+              <input type="hidden" name="smoking"             id="input-smoking"             value="{{ lifestyle_profile.smoking|default:'no' }}" />
               <input type="hidden" name="preferred_roommates" id="input-preferred_roommates" value="{{ lifestyle_profile.preferred_roommates|default:'' }}" />
-              <input type="hidden" name="religion" id="input-religion" value="{{ lifestyle_profile.religion|default:'' }}" />
-              <input type="hidden" name="field" id="input-field" value="{{ lifestyle_profile.field|default:'' }}" />
-              <!-- cooking/pets are true booleans; "true"/"false" strings read by save_for_user -->
-              <input type="hidden" name="cooking" id="input-cooking" value="{% if lifestyle_profile.cooking %}true{% else %}false{% endif %}" />
-              <input type="hidden" name="pets" id="input-pets" value="{% if lifestyle_profile.pets %}true{% else %}false{% endif %}" />
+              <input type="hidden" name="religion"            id="input-religion"            value="{{ lifestyle_profile.religion|default:'' }}" />
+              <input type="hidden" name="field"               id="input-field"               value="{{ lifestyle_profile.field|default:'' }}" />
+              <input type="hidden" name="cooking"             id="input-cooking"             value="{% if lifestyle_profile.cooking %}true{% else %}false{% endif %}" />
+              <input type="hidden" name="pets"                id="input-pets"                value="{% if lifestyle_profile.pets %}true{% else %}false{% endif %}" />
 
-              <div class="bg-white p-6 sm:p-8 border border-slate-200 rounded-2xl">
-                <h3 class="flex items-center gap-2 font-display font-bold text-slate-900 text-base">
+              <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+                <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M13 3a8 8 0 109 9 7 7 0 01-9-9z" />
                   </svg>
                   Sleep & schedule
                 </h3>
-                <div class="space-y-5 mt-5">
+                <div class="mt-5 space-y-5">
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">When do you usually sleep?</p>
-                    <div class="flex flex-wrap gap-2.5" data-target="sleep_time">
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">When do you usually sleep?</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="sleep_time">
                       {% for value, label in sleep_time_choices %}
                         <button type="button" data-value="{{ value }}"
                           class="option-card {% if lifestyle_profile.sleep_time == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
-                    <p class="mt-2 text-rose-600 text-xs field-error" data-field="sleep_time"></p>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="sleep_time"></p>
                   </div>
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">When do you wake up?</p>
-                    <div class="flex flex-wrap gap-2.5" data-target="wake_time">
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">When do you wake up?</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="wake_time">
                       {% for value, label in wake_time_choices %}
                         <button type="button" data-value="{{ value }}"
                           class="option-card {% if lifestyle_profile.wake_time == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
@@ -336,8 +572,8 @@
                 </div>
               </div>
 
-              <div class="bg-white mt-6 p-6 sm:p-8 border border-slate-200 rounded-2xl">
-                <h3 class="flex items-center gap-2 font-display font-bold text-slate-900 text-base">
+              <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+                <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linecap="round">
                     <line x1="6" y1="14" x2="6" y2="18" />
                     <line x1="12" y1="9" x2="12" y2="18" />
@@ -345,31 +581,30 @@
                   </svg>
                   Noise & social
                 </h3>
-                <div class="space-y-5 mt-5">
+                <div class="mt-5 space-y-5">
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">Noise level at home?</p>
-                    <div class="flex flex-wrap gap-2.5" data-target="noise_level">
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Noise level at home?</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="noise_level">
                       {% for value, label in noise_level_choices %}
                         <button type="button" data-value="{{ value }}"
                           class="option-card {% if lifestyle_profile.noise_level == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
-                    <p class="mt-2 text-rose-600 text-xs field-error" data-field="noise_level"></p>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="noise_level"></p>
                   </div>
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">How social are you at home?</p>
-                    <div class="flex flex-wrap gap-2.5" data-target="social_type">
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">How social are you at home?</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="social_type">
                       {% for value, label in social_type_choices %}
                         <button type="button" data-value="{{ value }}"
                           class="option-card {% if lifestyle_profile.social_type == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
-                    <p class="mt-2 text-rose-600 text-xs field-error" data-field="social_type"></p>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="social_type"></p>
                   </div>
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">Preferred number of roommates?</p>
-                    <!-- NEW: previously missing from the UI despite existing in the DB schema -->
-                    <div class="flex flex-wrap gap-2.5" data-target="preferred_roommates">
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Preferred number of roommates?</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="preferred_roommates">
                       {% for value, label in preferred_roommates_choices %}
                         <button type="button" data-value="{{ value }}"
                           class="option-card {% if lifestyle_profile.preferred_roommates == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
@@ -379,66 +614,63 @@
                 </div>
               </div>
 
-              <div class="bg-white mt-6 p-6 sm:p-8 border border-slate-200 rounded-2xl">
-                <h3 class="flex items-center gap-2 font-display font-bold text-slate-900 text-base">
+              <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+                <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="4" y="4" width="16" height="16" rx="2" />
                     <path d="M8 12l2.5 2.5L16 9" />
                   </svg>
                   Cleanliness & habits
                 </h3>
-                <div class="space-y-5 mt-5">
+                <div class="mt-5 space-y-5">
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">Cleanliness level?</p>
-                    <div class="flex flex-wrap gap-2.5" data-target="cleanliness">
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Cleanliness level?</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="cleanliness">
                       {% for value, label in cleanliness_choices %}
                         <button type="button" data-value="{{ value }}"
                           class="option-card {% if lifestyle_profile.cleanliness == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
-                    <p class="mt-2 text-rose-600 text-xs field-error" data-field="cleanliness"></p>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="cleanliness"></p>
                   </div>
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">Do you smoke?</p>
-                    <div class="flex flex-wrap gap-2.5" data-target="smoking">
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Do you smoke?</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="smoking">
                       {% for value, label in smoking_choices %}
                         <button type="button" data-value="{{ value }}"
                           class="option-card {% if lifestyle_profile.smoking == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
-                    <p class="mt-2 text-rose-600 text-xs field-error" data-field="smoking"></p>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="smoking"></p>
                   </div>
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">Do you cook regularly?</p>
-                    <!-- NEW: was in the SQL schema (cooking TINYINT) but had no control in the UI -->
-                    <div class="flex flex-wrap gap-2.5" data-target="cooking" data-bool="true">
-                      <button type="button" data-value="true" class="option-card {% if lifestyle_profile.cooking %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Do you cook regularly?</p>
+                    <div class="bool-toggle grid max-w-xs grid-cols-2 gap-2.5" data-target="cooking" data-bool="true">
+                      <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.cooking %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
                       <button type="button" data-value="false" class="option-card {% if lifestyle_profile and not lifestyle_profile.cooking %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
                     </div>
                   </div>
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">Do you have pets?</p>
-                    <!-- NEW: was in the SQL schema (pets TINYINT) but had no control in the UI -->
-                    <div class="flex flex-wrap gap-2.5" data-target="pets" data-bool="true">
-                      <button type="button" data-value="true" class="option-card {% if lifestyle_profile.pets %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Do you have pets?</p>
+                    <div class="bool-toggle grid max-w-xs grid-cols-2 gap-2.5" data-target="pets" data-bool="true">
+                      <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.pets %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
                       <button type="button" data-value="false" class="option-card {% if lifestyle_profile and not lifestyle_profile.pets %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div class="bg-white mt-6 p-6 sm:p-8 border border-slate-200 rounded-2xl">
-                <h3 class="flex items-center gap-2 font-display font-bold text-slate-900 text-base">
+              <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+                <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z" />
                   </svg>
                   Background
                 </h3>
-                <div class="space-y-5 mt-5">
+                <div class="mt-5 space-y-5">
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">Religion <span class="font-normal text-slate-400">(optional)</span></p>
-                    <!-- NEW: existed in the SQL schema (religion ENUM) but had no control in the UI -->
-                    <div class="flex flex-wrap gap-2.5" data-target="religion">
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Religion <span class="font-normal text-slate-400">(optional)</span></p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="religion">
                       {% for value, label in religion_choices %}
                         <button type="button" data-value="{{ value }}"
                           class="option-card {% if lifestyle_profile.religion == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
@@ -446,9 +678,8 @@
                     </div>
                   </div>
                   <div>
-                    <p class="mb-2.5 font-medium text-slate-700 text-sm">Field of study / work <span class="font-normal text-slate-400">(optional)</span></p>
-                    <!-- NEW: existed in the SQL schema (field ENUM) but had no control in the UI -->
-                    <div class="flex flex-wrap gap-2.5" data-target="field">
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Field of study / work <span class="font-normal text-slate-400">(optional)</span></p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="field">
                       {% for value, label in field_choices %}
                         <button type="button" data-value="{{ value }}"
                           class="option-card {% if lifestyle_profile.field == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
@@ -458,327 +689,223 @@
                 </div>
               </div>
 
-              <div id="lifestyle-form-message" class="hidden mt-4"></div>
-              <button type="submit" class="bg-brand-600 hover:bg-brand-700 mt-6 px-5 py-3 rounded-lg w-full font-semibold text-white text-sm">Save lifestyle profile</button>
+              <div id="lifestyle-form-message" class="mt-4 hidden"></div>
+              <button type="submit" class="mt-6 w-full rounded-lg bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700">Save lifestyle profile</button>
             </form>
           </div>
 
           <!-- ============================================================ -->
-          <!-- TAB 3: Security — its own form/CSRF/endpoint               -->
+          <!-- TAB 3: Security                                               -->
           <!-- ============================================================ -->
-          <div id="tab-security" class="hidden space-y-6">
-            <form id="security-form" action="{% url 'accounts_app:change_password' %}" method="POST">
-              {% csrf_token %}
-              <div class="bg-white p-6 sm:p-8 border border-slate-200 rounded-2xl">
-                <h2 class="flex items-center gap-2 font-display font-bold text-slate-900 text-lg">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="5" y="11" width="14" height="9" rx="2" />
-                    <path d="M8 11V8a4 4 0 018 0v3" />
-                  </svg>
-                  Change password
-                </h2>
-                <div class="space-y-4 mt-5">
-                  <div>
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">Current password</label>
-                    <input type="password" name="current_password" required placeholder="••••••••"
-                      class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm" />
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="current_password"></p>
+            <div id="tab-security" class="tab-panel hidden space-y-6">
+              <form id="security-form" action="{% url 'accounts_app:change_password' %}" method="POST">
+                {% csrf_token %}
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+
+                  {% if user_obj.auth_provider == 'google' %}
+                  <!-- Google user: no current password, just set a new one -->
+                  <div class="mb-5 flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+                    <svg class="mt-0.5 shrink-0 text-blue-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <p class="text-sm text-blue-700">You signed in with Google. Set a password below to also enable email/password login.</p>
                   </div>
-                  <div>
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">New password</label>
-                    <input type="password" name="new_password" required minlength="8" placeholder="••••••••"
-                      class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm" />
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="new_password"></p>
+                  <h2 class="flex items-center gap-2 font-display text-lg font-bold text-slate-900">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                    Add a password
+                  </h2>
+                  <div class="mt-5 space-y-4">
+                    <div>
+                      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">New password</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                        <input type="password" name="new_password" required minlength="8" placeholder="••••••••"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                      </div>
+                      <p class="field-error mt-1 text-xs text-rose-600" data-field="new_password"></p>
+                    </div>
+                    <div>
+                      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Confirm password</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                        <input type="password" name="confirm_password" required minlength="8" placeholder="••••••••"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                      </div>
+                      <p class="field-error mt-1 text-xs text-rose-600" data-field="confirm_password"></p>
+                    </div>
                   </div>
-                  <div>
-                    <label class="block mb-1.5 font-semibold text-slate-500 text-xs uppercase tracking-wide">Confirm new password</label>
-                    <input type="password" name="confirm_password" required minlength="8" placeholder="••••••••"
-                      class="bg-white px-4 py-2.5 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-800 text-sm" />
-                    <p class="mt-1 text-rose-600 text-xs field-error" data-field="confirm_password"></p>
+                  <div id="security-form-message" class="mt-4 hidden"></div>
+                  <button type="submit" class="mt-6 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">Set password</button>
+
+                  {% else %}
+                  <!-- Normal user: must verify current password -->
+                  <h2 class="flex items-center gap-2 font-display text-lg font-bold text-slate-900">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                    Change password
+                  </h2>
+                  <div class="mt-5 space-y-4">
+                    <div>
+                      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Current password</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                        <input type="password" name="current_password" required placeholder="••••••••"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                      </div>
+                      <p class="field-error mt-1 text-xs text-rose-600" data-field="current_password"></p>
+                    </div>
+                    <div>
+                      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">New password</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                        <input type="password" name="new_password" required minlength="8" placeholder="••••••••"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                      </div>
+                      <p class="field-error mt-1 text-xs text-rose-600" data-field="new_password"></p>
+                    </div>
+                    <div>
+                      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Confirm new password</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                        <input type="password" name="confirm_password" required minlength="8" placeholder="••••••••"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                      </div>
+                      <p class="field-error mt-1 text-xs text-rose-600" data-field="confirm_password"></p>
+                    </div>
+                  </div>
+                  <div id="security-form-message" class="mt-4 hidden"></div>
+                  <button type="submit" class="mt-6 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">Update password</button>
+                  {% endif %}
+
+                </div>
+              </form>
+            </div>
+          <!-- ============================================================ -->
+          <!-- TAB 4: Reviews                                                -->
+          <!-- ============================================================ -->
+            <div id="tab-reviews" class="tab-panel hidden">
+              <div class="gap-6 grid lg:grid-cols-[1.2fr_0.8fr]">
+
+                <!-- Form -->
+                <div class="bg-white shadow-sm p-8 border border-slate-100 rounded-2xl">
+                  <h3 class="mb-5 font-display font-bold text-slate-900 text-xl">{{ review_section_heading }}</h3>
+                  <form id="review-form" action="{% url 'accounts_app:submit_review' %}" method="POST" class="space-y-5">
+                    {% csrf_token %}
+                    <div>
+                      <label for="reviewer_name" class="block mb-2 font-semibold text-slate-600 text-sm">Your name</label>
+                      <input id="reviewer_name" name="reviewer_name" type="text" required placeholder="e.g. Sara Ahmed"
+                        class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm" />
+                      <p class="mt-2 text-rose-600 text-xs field-error" data-field="reviewer_name"></p>
+                    </div>
+
+                    <div class="gap-5 grid sm:grid-cols-2">
+                      <div>
+                        <label for="role" class="block mb-2 font-semibold text-slate-600 text-sm">I am a</label>
+                        <select id="role" name="role" required
+                          class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm">
+                          <option value="">Select role</option>
+                          <option value="seeker">Room Seeker</option>
+                          <option value="poster">Room Poster</option>
+                        </select>
+                        <p class="mt-2 text-rose-600 text-xs field-error" data-field="role"></p>
+                      </div>
+                      <div>
+                        <label for="location" class="block mb-2 font-semibold text-slate-600 text-sm">Location</label>
+                        <input id="location" name="location" type="text" placeholder="e.g. Cairo, Heliopolis"
+                          class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label for="review_text" class="block mb-2 font-semibold text-slate-600 text-sm">Your review</label>
+                      <textarea id="review_text" name="review_text" rows="6" required placeholder="Tell us about your experience with NestMatch"
+                        class="bg-slate-50 focus:bg-white px-4 py-4 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm leading-6"></textarea>
+                      <p class="mt-2 text-rose-600 text-xs field-error" data-field="review_text"></p>
+                    </div>
+
+                    <button type="submit" class="bg-brand-600 hover:bg-brand-700 shadow-lg shadow-brand-200/30 px-4 py-3 rounded-lg w-full font-semibold text-white text-sm transition">
+                      Submit review
+                    </button>
+                  </form>
+                </div>
+
+                <!-- My submitted reviews -->
+                <div class="space-y-6">
+                  <div class="bg-white shadow-sm p-8 border border-slate-100 rounded-2xl">
+                    <h3 class="mb-4 font-display font-bold text-slate-900 text-lg">My submitted reviews</h3>
+                    {% if user_reviews %}
+                      <div class="space-y-4">
+                        {% for review in user_reviews %}
+                          <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl">
+                            <div class="flex justify-between items-center gap-3">
+                              <div>
+                                <p class="font-semibold text-slate-900">{{ review.reviewer_name }}</p>
+                                <p class="text-slate-500 text-xs">{{ review.get_role_display }}</p>
+                              </div>
+                              <div class="flex items-center gap-2">
+                                <span class="rounded-full px-3 py-1 text-[11px] font-semibold {{ review.approved|yesno:'bg-emerald-100 text-emerald-700,bg-yellow-50 text-yellow-700' }}">
+                                  {{ review.approved|yesno:'Approved,Pending approval' }}
+                                </span>
+                                <form action="{% url 'accounts_app:delete_review' review.id %}" method="POST">
+                                  {% csrf_token %}
+                                  <button type="submit" class="inline-flex items-center gap-1 bg-white hover:bg-rose-50 px-3 py-1 border border-rose-200 rounded-full font-semibold text-[11px] text-rose-700">
+                                    <span aria-hidden="true"></span> Delete
+                                  </button>
+                                </form>
+                              </div>
+                            </div>
+                            <p class="mt-3 text-slate-600 text-sm leading-6">{{ review.quote|truncatechars:140 }}</p>
+                            <div class="flex flex-wrap items-center gap-2 mt-3 text-slate-500 text-xs">
+                              {% if review.location %}<span>{{ review.location }}</span>{% endif %}
+                              <span>· {{ review.created_at|date:'M j, Y' }}</span>
+                            </div>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      <p class="text-slate-500 text-sm">You haven't submitted any reviews yet. Use the form to send your feedback.</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div id="security-form-message" class="hidden mt-4"></div>
-                <button type="submit" class="bg-brand-600 hover:bg-brand-700 mt-6 px-5 py-2.5 rounded-lg font-semibold text-white text-sm">Update password</button>
+
               </div>
-            </form>
-          </div>
+            </div>
+
         </div>
       </div>
     </main>
 
-    <!-- Review submission section -->
-    <section class="bg-gray-50 py-16">
-      <div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-        <div class="gap-6 grid lg:grid-cols-[1.2fr_0.8fr]">
-          <div class="bg-white shadow-sm p-8 border border-gray-100 rounded-3xl">
-            <h3 class="mb-5 font-bold text-gray-900 text-xl">{{ review_section_heading }}</h3>
-            <form id="review-form" action="{% url 'accounts_app:submit_review' %}" method="POST" class="space-y-5">
-              {% csrf_token %}
-              <div>
-                <label for="reviewer_name" class="block mb-2 font-semibold text-gray-600 text-sm">Your name</label>
-                <input id="reviewer_name" name="reviewer_name" type="text" required placeholder="e.g. Sara Ahmed"
-                  class="bg-gray-50 focus:bg-white px-4 py-3 border border-gray-200 focus:border-violet-500 rounded-2xl focus:ring-2 focus:ring-violet-100 w-full text-gray-900 text-sm" />
-                <p class="mt-2 text-rose-600 text-xs field-error" data-field="reviewer_name"></p>
-              </div>
 
-              <div class="gap-5 grid sm:grid-cols-2">
-                <div>
-                  <label for="role" class="block mb-2 font-semibold text-gray-600 text-sm">I am a</label>
-                  <select id="role" name="role" required
-                    class="bg-gray-50 focus:bg-white px-4 py-3 border border-gray-200 focus:border-violet-500 rounded-2xl focus:ring-2 focus:ring-violet-100 w-full text-gray-900 text-sm">
-                    <option value="">Select role</option>
-                    <option value="seeker">Room Seeker</option>
-                    <option value="poster">Room Poster</option>
-                  </select>
-                  <p class="mt-2 text-rose-600 text-xs field-error" data-field="role"></p>
-                </div>
-                <div>
-                  <label for="location" class="block mb-2 font-semibold text-gray-600 text-sm">Location</label>
-                  <input id="location" name="location" type="text" placeholder="e.g. Cairo, Heliopolis"
-                    class="bg-gray-50 focus:bg-white px-4 py-3 border border-gray-200 focus:border-violet-500 rounded-2xl focus:ring-2 focus:ring-violet-100 w-full text-gray-900 text-sm" />
-                </div>
-              </div>
-
-              <div>
-                <label for="review_text" class="block mb-2 font-semibold text-gray-600 text-sm">Your review</label>
-                <textarea id="review_text" name="review_text" rows="6" required placeholder="Tell us about your experience with NestMatch"
-                  class="bg-gray-50 focus:bg-white px-4 py-4 border border-gray-200 focus:border-violet-500 rounded-3xl focus:ring-2 focus:ring-violet-100 w-full text-gray-900 text-sm leading-6"></textarea>
-                <p class="mt-2 text-rose-600 text-xs field-error" data-field="review_text"></p>
-              </div>
-
-              <button type="submit" class="bg-violet-600 hover:bg-violet-700 shadow-lg shadow-violet-200/30 px-4 py-3 rounded-3xl w-full font-semibold text-white text-sm transition">Submit review</button>
-            </form>
-          </div>
-
-          <div class="space-y-6">
-            <div class="bg-white shadow-sm p-8 border border-gray-100 rounded-3xl">
-              <h3 class="mb-4 font-bold text-gray-900 text-lg">My submitted reviews</h3>
-              {% if user_reviews %}
-                <div class="space-y-4">
-                  {% for review in user_reviews %}
-                    <div class="bg-gray-50 p-4 border border-gray-200 rounded-3xl">
-                      <div class="flex justify-between items-center gap-3">
-                        <div>
-                          <p class="font-semibold text-gray-900">{{ review.reviewer_name }}</p>
-                          <p class="text-gray-500 text-xs">{{ review.get_role_display }}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                          <span class="rounded-full px-3 py-1 text-[11px] font-semibold {{ review.approved|yesno:'bg-emerald-100 text-emerald-700,bg-yellow-50 text-yellow-700' }}">
-                            {{ review.approved|yesno:'Approved,Pending approval' }}
-                          </span>
-                          <form action="{% url 'accounts_app:delete_review' review.id %}" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" class="inline-flex items-center gap-1 bg-white hover:bg-rose-50 px-3 py-1 border border-rose-200 rounded-full font-semibold text-[11px] text-rose-700">
-                              <span aria-hidden="true">🗑️</span>
-                              Delete
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                      <p class="mt-3 text-gray-600 text-sm leading-6">{{ review.quote|truncatechars:140 }}</p>
-                      <div class="flex flex-wrap items-center gap-2 mt-3 text-gray-500 text-xs">
-                        {% if review.location %}<span>📍 {{ review.location }}</span>{% endif %}
-                        <span>· {{ review.created_at|date:'M j, Y' }}</span>
-                      </div>
-                    </div>
-                  {% endfor %}
-                </div>
-              {% else %}
-                <p class="text-gray-500 text-sm">You haven’t submitted any reviews yet. Use the form to send your feedback.</p>
-              {% endif %}
-            </div>
-          </div>
+    <!-- ================================================================== -->
+    <!-- Delete Account Modal                                                -->
+    <!-- ================================================================== -->
+    <div id="delete-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div class="mx-4 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-rose-100">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+          </svg>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Delete account</h3>
+        <p class="mt-2 text-sm text-slate-500">Are you sure you want to delete your account? All your data will be permanently removed. This action cannot be undone.</p>
+        <div class="mt-6 flex gap-3">
+          <button type="button" onclick="closeDeleteModal()" class="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+            Cancel
+          </button>
+          <form id="delete-account-form" action="{% url 'accounts_app:delete_account' %}" method="POST" class="flex-1">
+            {% csrf_token %}
+            <button type="submit" class="w-full rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-700">
+              Yes, delete
+            </button>
+          </form>
         </div>
       </div>
-    </section>
+    </div>
 
-    <footer class="bg-slate-900 px-4 sm:px-6 lg:px-8 py-10 border-slate-200 border-t text-slate-300">
-      <div class="mx-auto max-w-6xl">
-        <div class="gap-8 grid md:grid-cols-3">
-          <div>
-            <div class="flex items-center gap-2">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12 12 3l9 9" />
-                <path d="M9 21V9h6v12" />
-              </svg>
-              <span class="font-display font-extrabold text-white text-base">NestMatch</span>
-            </div>
-            <p class="mt-3 max-w-xs text-slate-400 text-sm">AI-powered roommate matching for better living.</p>
-          </div>
-          <div>
-            <h4 class="font-semibold text-slate-400 text-xs uppercase tracking-[0.2em]">Platform</h4>
-            <div class="space-y-2 mt-3 text-sm">
-              <a href="#" class="block text-slate-400 hover:text-white">Home</a>
-              <a href="#" class="block text-slate-400 hover:text-white">Listings</a>
-              <a href="#" class="block text-slate-400 hover:text-white">Post a Room</a>
-            </div>
-          </div>
-          <div>
-            <h4 class="font-semibold text-slate-400 text-xs uppercase tracking-[0.2em]">Support</h4>
-            <div class="space-y-2 mt-3 text-sm">
-              <a href="#" class="block text-slate-400 hover:text-white">Contact</a>
-              <a href="#" class="block text-slate-400 hover:text-white">FAQ</a>
-              <a href="#" class="block text-slate-400 hover:text-white">Privacy Policy</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <!-- Hidden strength data spans -->
+    <span id="strength-has-phone"     data-value="{{ user_obj.phone_number|yesno:'true,false' }}" class="hidden"></span>
+    <span id="strength-has-bio"       data-value="{{ user_obj.bio|yesno:'true,false' }}"          class="hidden"></span>
+    <span id="strength-has-photo"     data-value="{{ user_obj.profile_pic|yesno:'true,false' }}"  class="hidden"></span>
+    <span id="strength-has-lifestyle" data-value="{{ lifestyle_profile|yesno:'true,false' }}"     class="hidden"></span>
 
-    <script>
-      // --- Tab navigation (unchanged logic, just re-confirmed working) ---
-      const tabButtons = document.querySelectorAll('.tab-nav-btn');
-      const tabPanels = {
-        info: document.getElementById('tab-info'),
-        lifestyle: document.getElementById('tab-lifestyle'),
-        security: document.getElementById('tab-security'),
-      };
-
-      tabButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-          tabButtons.forEach((btn) => btn.classList.remove('active'));
-          button.classList.add('active');
-
-          Object.entries(tabPanels).forEach(([key, panel]) => {
-            panel.classList.toggle('hidden', key !== button.dataset.tab);
-          });
-        });
-      });
-
-      // --- Option-card selection logic ---
-      // Each option-card group has a data-target attribute that matches the
-      // id of a hidden input (e.g. data-target="sleep_time" -> #input-sleep_time).
-      // Clicking a card both toggles the visual "selected" state AND writes
-      // the button's data-value into that hidden input, so the real value
-      // actually reaches the server when the form is submitted.
-      document.querySelectorAll('[data-target]').forEach((group) => {
-        const targetField = group.dataset.target;
-        const hiddenInput = document.getElementById(`input-${targetField}`);
-
-        group.querySelectorAll('.option-card').forEach((card) => {
-          card.addEventListener('click', () => {
-            group.querySelectorAll('.option-card').forEach((item) => item.classList.remove('selected'));
-            card.classList.add('selected');
-            if (hiddenInput) {
-              hiddenInput.value = card.dataset.value;
-            }
-          });
-        });
-      });
-
-      function clearFormFeedback(form) {
-        form.querySelectorAll('.field-error').forEach((element) => {
-          element.textContent = '';
-        });
-        form.querySelectorAll('input, select, textarea').forEach((element) => {
-          element.classList.remove('border-rose-300');
-        });
-        const messageBox = form.querySelector('[id$="-form-message"]');
-        if (messageBox) {
-          messageBox.textContent = '';
-          messageBox.className = 'hidden';
-        }
-      }
-
-      const profilePicInput = document.getElementById('profile_pic_input');
-      const profileAvatarImage = document.getElementById('profile-avatar-image');
-      const profileAvatarPlaceholder = document.getElementById('profile-avatar-placeholder');
-      const sidebarUserName = document.getElementById('sidebar-user-name');
-
-      if (profilePicInput) {
-        profilePicInput.addEventListener('change', (event) => {
-          const file = event.target.files && event.target.files[0];
-          if (!file) {
-            return;
-          }
-
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            if (profileAvatarImage) {
-              profileAvatarImage.src = e.target.result;
-            } else if (profileAvatarPlaceholder) {
-              profileAvatarPlaceholder.remove();
-              const img = document.createElement('img');
-              img.id = 'profile-avatar-image';
-              img.src = e.target.result;
-              img.alt = 'Profile preview';
-              img.className = 'h-16 w-16 rounded-full object-cover border border-brand-200';
-              document.getElementById('profile-avatar-wrapper').appendChild(img);
-            }
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      function refreshSidebarName(form) {
-        const firstNameInput = form.querySelector('[name="first_name"]');
-        const lastNameInput = form.querySelector('[name="last_name"]');
-        if (sidebarUserName && firstNameInput && lastNameInput) {
-          const fullName = `${firstNameInput.value.trim()} ${lastNameInput.value.trim()}`.trim();
-          sidebarUserName.textContent = fullName || sidebarUserName.textContent;
-        }
-      }
-
-      function showFieldErrors(form, errors) {
-        Object.entries(errors || {}).forEach(([field, message]) => {
-          const fieldMessage = form.querySelector(`.field-error[data-field="${field}"]`);
-          if (fieldMessage) {
-            fieldMessage.textContent = message;
-          }
-          const fieldInput = form.querySelector(`[name="${field}"]`);
-          if (fieldInput) {
-            fieldInput.classList.add('border-rose-300');
-          }
-        });
-      }
-
-      async function submitAjaxForm(form) {
-        form.addEventListener('submit', async (event) => {
-          event.preventDefault();
-          clearFormFeedback(form);
-
-          const formData = new FormData(form);
-          const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]')?.value || '';
-
-          try {
-            const response = await fetch(form.action, {
-              method: 'POST',
-              headers: { 'X-CSRFToken': csrfToken },
-              body: formData,
-            });
-
-            const data = await response.json();
-            if (data.success) {
-              if (form.id === 'personal-info-form') {
-                refreshSidebarName(form);
-              }
-              form.querySelectorAll('input[type="password"]').forEach((input) => {
-                input.value = '';
-              });
-            } else {
-              showFieldErrors(form, data.errors || {});
-            }
-          } catch (error) {
-            console.error('AJAX form submit failed', error);
-          }
-        });
-      }
-
-      ['personal-info-form', 'lifestyle-form', 'security-form'].forEach((formId) => {
-        const form = document.getElementById(formId);
-        if (form) {
-          submitAjaxForm(form);
-        }
-      });
-
-      // Auto-dismiss Django flash messages after 3 seconds.
-      const flashContainer = document.querySelector('.top-20.right-4');
-      if (flashContainer) {
-        setTimeout(() => {
-          flashContainer.classList.add('opacity-0', 'transition', 'duration-500');
-          setTimeout(() => flashContainer.remove(), 500);
-        }, 3000);
-      }
-    </script>
+    {% include "core_app/partials/footer.html" %}
+    <script src="{% static 'js/profile.js' %}"></script>
   </body>
 </html>
