@@ -140,14 +140,14 @@ def privacy_policy(request):
                 <p>To exercise any of these rights, visit your account settings or contact our privacy team.</p>
             '''
         },
-        {
-            'id': 'contact',
-            'title': 'Contact Us',
-            'content': '''
-                <p>If you have questions, concerns, or requests regarding this Privacy Policy or your data, we'd love to hear from you. You can reach our privacy team at <a href="mailto:privacy@nestmatch.app" class="font-semibold text-violet-600 hover:text-violet-700 underline-offset-4 hover:underline">privacy@nestmatch.app</a>.</p>
-                <p>We aim to respond to all privacy inquiries within two business days.</p>
-            '''
-        }
+{
+    'id': 'contact',
+    'title': 'Contact Us',
+    'content': '''
+        <p>If you have questions, concerns, or requests regarding this Privacy Policy or your data, we'd love to hear from you. You can reach our privacy team through our <a href="/contact/" class="font-semibold text-violet-600 hover:text-violet-700 underline-offset-4 hover:underline">Contact Us</a> page.</p>
+        <p>We aim to respond to all privacy inquiries within two business days.</p>
+    '''
+},
     ]
     
     context = {
