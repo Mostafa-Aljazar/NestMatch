@@ -9,8 +9,6 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111827;background:#F1F5F9;overflow-x:hidden}
 a{text-decoration:none;cursor:pointer}
-
-/* ── LAYOUT ── */
 .adm-shell{display:flex;min-height:100vh}
 .adm-sidebar{width:260px;flex-shrink:0;background:linear-gradient(180deg,#1E1B4B 0%,#2D2A6E 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto;transition:transform .3s}
 @media(max-width:900px){.adm-sidebar{transform:translateX(-260px)}.adm-sidebar.open{transform:translateX(0)}}
@@ -18,53 +16,36 @@ a{text-decoration:none;cursor:pointer}
 .adm-sidebar-overlay.open{display:block}
 .adm-body{flex:1;min-width:0;margin-left:260px;display:flex;flex-direction:column;min-height:100vh}
 @media(max-width:900px){.adm-body{margin-left:0;padding-top:56px}}
-
-/* ── TOPBAR ── */
 .adm-topbar{height:60px;background:#fff;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between;padding:0 28px;gap:12px;position:sticky;top:0;z-index:50;flex-shrink:0}
 .adm-mobile-top{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:#1E1B4B;z-index:300;align-items:center;padding:0 16px;gap:12px}
 @media(max-width:900px){.adm-mobile-top{display:flex}}
-
-/* ── SIDEBAR LINKS ── */
 .adm-nl{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:2px;cursor:pointer;transition:all .2s}
 .adm-nl:hover{background:rgba(255,255,255,.09);color:#fff}
+.adm-nl:hover svg{opacity:1}
 .adm-nl.active{background:rgba(124,58,237,.35);color:#fff;border-left:3px solid #A78BFA}
-
-/* ── METRIC CARDS ── */
+.adm-nl.active svg{opacity:1}
+.adm-nl svg{opacity:.55;transition:opacity .2s;flex-shrink:0}
 .adm-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
 @media(max-width:1200px){.adm-metrics{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.adm-metrics{grid-template-columns:1fr 1fr}}
 .adm-metric{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;overflow:hidden}
-
-/* ── TABLE ── */
 .adm-tbl{width:100%;border-collapse:collapse}
 .adm-tbl th{font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.7px;padding:11px 14px;border-bottom:1px solid #E5E7EB;text-align:left;background:#F9FAFB}
 .adm-tbl td{font-size:13px;color:#374151;padding:13px 14px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
 .adm-tbl tbody tr:hover td{background:#F9FAFB}
-
-/* ── BADGES ── */
 .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
 .badge-green{background:#D1FAE5;color:#059669}
 .badge-yellow{background:#FEF3C7;color:#D97706}
 .badge-red{background:#FFE4E6;color:#E11D48}
 .badge-purple{background:#EDE9FE;color:#7C3AED}
 .badge-gray{background:#F3F4F6;color:#6B7280}
-
-/* ── INPUTS ── */
 .adm-input{padding:9px 14px;font-size:13px;border:1.5px solid #E5E7EB;border-radius:8px;font-family:inherit;color:#111827;outline:none;background:#fff;transition:border-color .2s}
 .adm-input:focus{border-color:#7C3AED;box-shadow:0 0 0 3px rgba(124,58,237,.1)}
-
-/* ── MISC ── */
 .adm-card{background:#fff;border-radius:14px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:20px}
 .adm-section-title{font-size:15px;font-weight:700;color:#111827;margin-bottom:16px}
-.adm-tab{padding:8px 18px;font-size:12px;font-weight:600;border-radius:7px;border:1.5px solid transparent;cursor:pointer;font-family:inherit;background:none;color:#6B7280;transition:all .2s}
-.adm-tab.active{background:#7C3AED;color:#fff;border-color:#7C3AED}
-
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── ACTION BUTTONS ── */
 .btn-ban{font-size:11px;font-weight:600;color:#E11D48;background:#FFF1F2;border:1px solid #FECDD3;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit}
 .btn-unban{font-size:11px;font-weight:600;color:#059669;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit}
-.btn-profile{font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:6px;padding:4px 9px;cursor:pointer;font-family:inherit;white-space:nowrap}
 .btn-hide{font-size:11px;font-weight:600;color:#E11D48;background:#FFF1F2;border:1px solid #FECDD3;border-radius:6px;padding:4px 9px;cursor:pointer;font-family:inherit}
 .btn-restore{font-size:11px;font-weight:600;color:#059669;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:4px 9px;cursor:pointer;font-family:inherit}
 .btn-delete{font-size:11px;font-weight:600;color:#E11D48;background:#FFF1F2;border:1px solid #FECDD3;border-radius:6px;padding:4px 9px;cursor:pointer;font-family:inherit}
@@ -76,7 +57,7 @@ a{text-decoration:none;cursor:pointer}
 <!-- MOBILE TOP BAR -->
 <div class="adm-mobile-top">
   <button onclick="admToggle()" style="background:none;border:none;cursor:pointer;flex-shrink:0">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect y="3" width="20" height="2" rx="1" fill="#fff"/><rect y="9" width="20" height="2" rx="1" fill="#fff"/><rect y="15" width="20" height="2" rx="1" fill="#fff"/></svg>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
   </button>
   <div style="display:flex;align-items:center;gap:7px">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3L21 12V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V12Z" fill="#A78BFA"/></svg>
@@ -112,31 +93,63 @@ a{text-decoration:none;cursor:pointer}
     <!-- Nav -->
     <nav style="padding:0 10px;flex:1">
       <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.2px;text-transform:uppercase;padding:0 4px;margin-bottom:6px">MAIN</div>
-      <div class="adm-nl active" id="anl-overview" onclick="admTab('overview')"><span style="font-size:16px">📊</span> Overview</div>
+
+      <div class="adm-nl active" id="anl-overview" onclick="admTab('overview')">
+        <!-- Bar chart icon -->
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+        Overview
+      </div>
+
       <div class="adm-nl" id="anl-users" onclick="admTab('users')">
-        <span style="font-size:16px">👥</span> Users
+        <!-- Users icon -->
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
         <span style="margin-left:auto;background:rgba(124,58,237,.4);color:#DDD6FE;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ total_users }}</span>
       </div>
+
       <div class="adm-nl" id="anl-listings" onclick="admTab('listings')">
-        <span style="font-size:16px">🏠</span> Listings
+        <!-- Home / listing icon -->
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V20a1 1 0 0 1-1 1H15V15H9v6H4a1 1 0 0 1-1-1Z"/></svg>
+        Listings
         <span style="margin-left:auto;background:rgba(16,185,129,.2);color:#6EE7B7;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ active_listings }}</span>
       </div>
+
       <div class="adm-nl" id="anl-banned" onclick="admTab('banned')">
-        <span style="font-size:16px">🚫</span> Banned Users
+        <!-- Ban / block icon -->
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        Banned Users
         <span style="margin-left:auto;background:rgba(239,68,68,.25);color:#FCA5A5;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ banned_users }}</span>
       </div>
-      <div class="adm-nl" id="anl-site-content" onclick="admTab('site-content')"><span style="font-size:16px">🖋️</span> Site Content</div>
+
+      <div class="adm-nl" id="anl-site-content" onclick="admTab('site-content')">
+        <!-- Edit / pencil icon -->
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Site Content
+      </div>
+
       <div style="height:1px;background:rgba(255,255,255,.08);margin:12px 0"></div>
       <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.2px;text-transform:uppercase;padding:0 4px;margin-bottom:6px">SYSTEM</div>
-      <div class="adm-nl" id="anl-settings" onclick="admTab('settings')"><span style="font-size:16px">⚙️</span> Settings</div>
-      <a href="/" class="adm-nl"><span style="font-size:16px">🌐</span> View Site</a>
+
+      <div class="adm-nl" id="anl-settings" onclick="admTab('settings')">
+        <!-- Settings / gear icon -->
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+
+      <a href="/" class="adm-nl">
+        <!-- Globe icon -->
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        View Site
+      </a>
     </nav>
 
     <div style="padding:14px 10px">
       <a href="/auth/logout/" class="adm-nl" style="color:rgba(255,255,255,.45)"
          onmouseenter="this.style.background='rgba(239,68,68,.12)';this.style.color='#FCA5A5'"
          onmouseleave="this.style.background='transparent';this.style.color='rgba(255,255,255,.45)'">
-        <span style="font-size:16px">🚪</span> Logout
+        <!-- Logout icon -->
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
       </a>
     </div>
   </aside>
@@ -147,7 +160,10 @@ a{text-decoration:none;cursor:pointer}
 
     <!-- TOPBAR -->
     <div class="adm-topbar">
-      <div id="adm-page-lbl" style="font-size:16px;font-weight:800;color:#111827">📊 Overview</div>
+      <div id="adm-page-lbl" style="font-size:16px;font-weight:800;color:#111827;display:flex;align-items:center;gap:8px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+        Overview
+      </div>
       <div style="display:flex;align-items:center;gap:10px">
         <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#A78BFA);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff">
           {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
@@ -166,31 +182,42 @@ a{text-decoration:none;cursor:pointer}
           <div class="adm-metric">
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7C3AED,#A78BFA)"></div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-              <div style="width:40px;height:40px;border-radius:10px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:18px">👥</div>
+              <div style="width:40px;height:40px;border-radius:10px;background:#EDE9FE;display:flex;align-items:center;justify-content:center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
             </div>
             <div style="font-size:30px;font-weight:800;color:#111827;letter-spacing:-1.5px;line-height:1">{{ total_users }}</div>
             <div style="font-size:13px;color:#6B7280;font-weight:500;margin-top:5px">Total Users</div>
           </div>
+
           <div class="adm-metric">
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#10B981,#34D399)"></div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-              <div style="width:40px;height:40px;border-radius:10px;background:#D1FAE5;display:flex;align-items:center;justify-content:center;font-size:18px">🏠</div>
+              <div style="width:40px;height:40px;border-radius:10px;background:#D1FAE5;display:flex;align-items:center;justify-content:center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V20a1 1 0 0 1-1 1H15V15H9v6H4a1 1 0 0 1-1-1Z"/></svg>
+              </div>
             </div>
             <div style="font-size:30px;font-weight:800;color:#111827;letter-spacing:-1.5px;line-height:1">{{ active_listings }}</div>
             <div style="font-size:13px;color:#6B7280;font-weight:500;margin-top:5px">Active Listings</div>
           </div>
+
           <div class="adm-metric">
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-              <div style="width:40px;height:40px;border-radius:10px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;font-size:18px">📨</div>
+              <div style="width:40px;height:40px;border-radius:10px;background:#FEF3C7;display:flex;align-items:center;justify-content:center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
             </div>
             <div style="font-size:30px;font-weight:800;color:#111827;letter-spacing:-1.5px;line-height:1">{{ total_applications }}</div>
             <div style="font-size:13px;color:#6B7280;font-weight:500;margin-top:5px">Total Applications</div>
           </div>
+
           <div class="adm-metric">
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#EF4444,#F87171)"></div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-              <div style="width:40px;height:40px;border-radius:10px;background:#FFE4E6;display:flex;align-items:center;justify-content:center;font-size:18px">🚫</div>
+              <div style="width:40px;height:40px;border-radius:10px;background:#FFE4E6;display:flex;align-items:center;justify-content:center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              </div>
             </div>
             <div style="font-size:30px;font-weight:800;color:#111827;letter-spacing:-1.5px;line-height:1">{{ banned_users }}</div>
             <div style="font-size:13px;color:#6B7280;font-weight:500;margin-top:5px">Banned Users</div>
@@ -217,7 +244,10 @@ a{text-decoration:none;cursor:pointer}
 
           <!-- Top Cities -->
           <div class="adm-card" style="height:100%;margin-bottom:0">
-            <div class="adm-section-title">📍 Top Active Cities</div>
+            <div class="adm-section-title" style="display:flex;align-items:center;gap:8px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Top Active Cities
+            </div>
             <div style="display:flex;flex-direction:column;gap:14px">
               {% for city in top_cities %}
               <div>
@@ -236,7 +266,10 @@ a{text-decoration:none;cursor:pointer}
 
           <!-- Most Applied Listings -->
           <div class="adm-card" style="margin-bottom:0">
-            <div class="adm-section-title">🔥 Most Applied Listings</div>
+            <div class="adm-section-title" style="display:flex;align-items:center;gap:8px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Most Applied Listings
+            </div>
             <div style="display:flex;flex-direction:column;gap:12px">
               {% for listing in top_listings %}
               <div style="display:flex;align-items:center;gap:10px">
@@ -268,32 +301,21 @@ a{text-decoration:none;cursor:pointer}
                 <tr>
                   <td>
                     <div style="display:flex;align-items:center;gap:8px">
-                      <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#A78BFA);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">
-                        {{ u.first_name|first|upper }}
-                      </div>
+                      <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#A78BFA);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">{{ u.first_name|first|upper }}</div>
                       <span style="font-weight:600">{{ u.full_name }}</span>
                     </div>
                   </td>
                   <td style="color:#6B7280">{{ u.email }}</td>
                   <td style="color:#6B7280">{{ u.created_at|date:"M d, Y" }}</td>
                   <td>
-                    {% if u.is_active %}
-                      <span class="badge badge-green">Active</span>
-                    {% else %}
-                      <span class="badge badge-red">Banned</span>
-                    {% endif %}
+                    {% if u.is_active %}<span class="badge badge-green">Active</span>
+                    {% else %}<span class="badge badge-red">Banned</span>{% endif %}
                   </td>
                   <td>
                     {% if u.is_active %}
-                      <form method="post" action="{% url 'dashboard_app:ban_user' u.id %}" style="display:inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-ban">Ban</button>
-                      </form>
+                      <form method="post" action="{% url 'dashboard_app:ban_user' u.id %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn-ban">Ban</button></form>
                     {% else %}
-                      <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="display:inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-unban">Unban</button>
-                      </form>
+                      <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn-unban">Unban</button></form>
                     {% endif %}
                   </td>
                 </tr>
@@ -333,24 +355,15 @@ a{text-decoration:none;cursor:pointer}
                   <td style="text-align:center">{{ u.listing_count }}</td>
                   <td style="text-align:center">{{ u.application_count }}</td>
                   <td>
-                    {% if u.is_active %}
-                      <span class="badge badge-green">Active</span>
-                    {% else %}
-                      <span class="badge badge-red">Banned</span>
-                    {% endif %}
+                    {% if u.is_active %}<span class="badge badge-green">Active</span>
+                    {% else %}<span class="badge badge-red">Banned</span>{% endif %}
                   </td>
                   <td>
                     <div style="display:flex;gap:6px">
                       {% if u.is_active %}
-                        <form method="post" action="{% url 'dashboard_app:ban_user' u.id %}" style="display:inline">
-                          {% csrf_token %}
-                          <button type="submit" class="btn-ban">Ban</button>
-                        </form>
+                        <form method="post" action="{% url 'dashboard_app:ban_user' u.id %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn-ban">Ban</button></form>
                       {% else %}
-                        <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="display:inline">
-                          {% csrf_token %}
-                          <button type="submit" class="btn-unban">Unban</button>
-                        </form>
+                        <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn-unban">Unban</button></form>
                       {% endif %}
                     </div>
                   </td>
@@ -377,39 +390,23 @@ a{text-decoration:none;cursor:pointer}
               <tbody>
                 {% for listing in all_listings %}
                 <tr>
-                  <td>
-                    <span style="font-weight:600;font-size:12px">{{ listing.title }}</span>
-                  </td>
+                  <td><span style="font-weight:600;font-size:12px">{{ listing.title }}</span></td>
                   <td style="color:#6B7280;white-space:nowrap">{{ listing.city }}</td>
                   <td style="color:#6B7280;white-space:nowrap">{{ listing.poster.full_name }}</td>
                   <td style="font-weight:700;color:#7C3AED">${{ listing.price }}</td>
                   <td style="text-align:center">{{ listing.app_count }}</td>
                   <td>
-                    {% if listing.status == 'active' %}
-                      <span class="badge badge-green">Active</span>
-                    {% elif listing.status == 'draft' %}
-                      <span class="badge badge-yellow">Draft</span>
-                    {% else %}
-                      <span class="badge badge-gray">Closed</span>
-                    {% endif %}
+                    {% if listing.status == 'active' %}<span class="badge badge-green">Active</span>
+                    {% elif listing.status == 'draft' %}<span class="badge badge-yellow">Draft</span>
+                    {% else %}<span class="badge badge-gray">Closed</span>{% endif %}
                   </td>
                   <td>
                     <div style="display:flex;gap:5px">
                       {% if listing.status == 'active' or listing.status == 'draft' %}
-                        <form method="post" action="{% url 'dashboard_app:hide_listing' listing.id %}" style="display:inline">
-                          {% csrf_token %}
-                          <button type="submit" class="btn-hide">Hide</button>
-                        </form>
+                        <form method="post" action="{% url 'dashboard_app:hide_listing' listing.id %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn-hide">Hide</button></form>
                       {% else %}
-                        <form method="post" action="{% url 'dashboard_app:restore_listing' listing.id %}" style="display:inline">
-                          {% csrf_token %}
-                          <button type="submit" class="btn-restore">Restore</button>
-                        </form>
-                        <form method="post" action="{% url 'dashboard_app:delete_listing' listing.id %}" style="display:inline"
-                              onsubmit="return confirm('Delete this listing permanently?')">
-                          {% csrf_token %}
-                          <button type="submit" class="btn-delete">Delete</button>
-                        </form>
+                        <form method="post" action="{% url 'dashboard_app:restore_listing' listing.id %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn-restore">Restore</button></form>
+                        <form method="post" action="{% url 'dashboard_app:delete_listing' listing.id %}" style="display:inline" onsubmit="return confirm('Delete this listing permanently?')">{% csrf_token %}<button type="submit" class="btn-delete">Delete</button></form>
                       {% endif %}
                     </div>
                   </td>
@@ -446,10 +443,7 @@ a{text-decoration:none;cursor:pointer}
                   <td style="color:#6B7280">{{ u.get_country_display }}</td>
                   <td style="text-align:center">{{ u.listings.count }}</td>
                   <td>
-                    <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="display:inline">
-                      {% csrf_token %}
-                      <button type="submit" class="btn-unban">Unban</button>
-                    </form>
+                    <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn-unban">Unban</button></form>
                   </td>
                 </tr>
                 {% empty %}
@@ -461,68 +455,32 @@ a{text-decoration:none;cursor:pointer}
         </div>
       </div>
 
-      <!-- ═══ SITE CONTENT (Landing Page Editor) ═══ -->
+      <!-- ═══ SITE CONTENT ═══ -->
       <div id="av-site-content" style="display:none;animation:fadeIn .35s ease both">
         <div style="margin-bottom:20px">
           <h2 style="font-size:20px;font-weight:800;color:#111827">Landing Page Content</h2>
           <p style="font-size:13px;color:#6B7280;margin-top:2px">Edit the text shown on the public homepage. Changes go live immediately.</p>
         </div>
-
         <form method="post" action="{% url 'dashboard_app:update_site_content' %}">
           {% csrf_token %}
-
           <!-- Hero -->
           <div class="adm-card">
             <div class="adm-section-title">Hero Section</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Badge Text</label>
-                <input type="text" name="hero_badge_text" value="{{ site_content.hero_badge_text }}" class="adm-input" style="width:100%">
-              </div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Badge Text</label><input type="text" name="hero_badge_text" value="{{ site_content.hero_badge_text }}" class="adm-input" style="width:100%"></div>
               <div></div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title — Line 1</label>
-                <input type="text" name="hero_title_line1" value="{{ site_content.hero_title_line1 }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title — Line 2</label>
-                <input type="text" name="hero_title_line2" value="{{ site_content.hero_title_line2 }}" class="adm-input" style="width:100%">
-              </div>
-              <div style="grid-column:1 / -1">
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label>
-                <textarea name="hero_subtitle" rows="2" class="adm-input" style="width:100%;resize:vertical">{{ site_content.hero_subtitle }}</textarea>
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button Text</label>
-                <input type="text" name="hero_cta_primary_text" value="{{ site_content.hero_cta_primary_text }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button URL</label>
-                <input type="text" name="hero_cta_primary_url" value="{{ site_content.hero_cta_primary_url }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button Text</label>
-                <input type="text" name="hero_cta_secondary_text" value="{{ site_content.hero_cta_secondary_text }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button URL</label>
-                <input type="text" name="hero_cta_secondary_url" value="{{ site_content.hero_cta_secondary_url }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 1</label>
-                <input type="text" name="hero_feature_tag_1" value="{{ site_content.hero_feature_tag_1 }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 2</label>
-                <input type="text" name="hero_feature_tag_2" value="{{ site_content.hero_feature_tag_2 }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 3</label>
-                <input type="text" name="hero_feature_tag_3" value="{{ site_content.hero_feature_tag_3 }}" class="adm-input" style="width:100%">
-              </div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title — Line 1</label><input type="text" name="hero_title_line1" value="{{ site_content.hero_title_line1 }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title — Line 2</label><input type="text" name="hero_title_line2" value="{{ site_content.hero_title_line2 }}" class="adm-input" style="width:100%"></div>
+              <div style="grid-column:1 / -1"><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label><textarea name="hero_subtitle" rows="2" class="adm-input" style="width:100%;resize:vertical">{{ site_content.hero_subtitle }}</textarea></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button Text</label><input type="text" name="hero_cta_primary_text" value="{{ site_content.hero_cta_primary_text }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button URL</label><input type="text" name="hero_cta_primary_url" value="{{ site_content.hero_cta_primary_url }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button Text</label><input type="text" name="hero_cta_secondary_text" value="{{ site_content.hero_cta_secondary_text }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button URL</label><input type="text" name="hero_cta_secondary_url" value="{{ site_content.hero_cta_secondary_url }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 1</label><input type="text" name="hero_feature_tag_1" value="{{ site_content.hero_feature_tag_1 }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 2</label><input type="text" name="hero_feature_tag_2" value="{{ site_content.hero_feature_tag_2 }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 3</label><input type="text" name="hero_feature_tag_3" value="{{ site_content.hero_feature_tag_3 }}" class="adm-input" style="width:100%"></div>
             </div>
           </div>
-
           <!-- Stats -->
           <div class="adm-card">
             <div class="adm-section-title">Stats Bar</div>
@@ -536,25 +494,14 @@ a{text-decoration:none;cursor:pointer}
               {% endfor %}
             </div>
           </div>
-
           <!-- How it works -->
           <div class="adm-card">
             <div class="adm-section-title">How It Works Section</div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Eyebrow</label>
-                <input type="text" name="how_it_works_eyebrow" value="{{ site_content.how_it_works_eyebrow }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title</label>
-                <input type="text" name="how_it_works_title" value="{{ site_content.how_it_works_title }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label>
-                <input type="text" name="how_it_works_subtitle" value="{{ site_content.how_it_works_subtitle }}" class="adm-input" style="width:100%">
-              </div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Eyebrow</label><input type="text" name="how_it_works_eyebrow" value="{{ site_content.how_it_works_eyebrow }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title</label><input type="text" name="how_it_works_title" value="{{ site_content.how_it_works_title }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label><input type="text" name="how_it_works_subtitle" value="{{ site_content.how_it_works_subtitle }}" class="adm-input" style="width:100%"></div>
             </div>
-
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
               <div style="background:#F9FAFB;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
                 <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase">Step 1</div>
@@ -576,43 +523,20 @@ a{text-decoration:none;cursor:pointer}
               </div>
             </div>
           </div>
-
           <!-- Bottom CTA -->
           <div class="adm-card">
             <div class="adm-section-title">Bottom CTA Section</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Eyebrow</label>
-                <input type="text" name="cta_eyebrow" value="{{ site_content.cta_eyebrow }}" class="adm-input" style="width:100%">
-              </div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Eyebrow</label><input type="text" name="cta_eyebrow" value="{{ site_content.cta_eyebrow }}" class="adm-input" style="width:100%"></div>
               <div></div>
-              <div style="grid-column:1 / -1">
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title</label>
-                <input type="text" name="cta_title" value="{{ site_content.cta_title }}" class="adm-input" style="width:100%">
-              </div>
-              <div style="grid-column:1 / -1">
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label>
-                <input type="text" name="cta_subtitle" value="{{ site_content.cta_subtitle }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button Text</label>
-                <input type="text" name="cta_primary_text" value="{{ site_content.cta_primary_text }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button URL</label>
-                <input type="text" name="cta_primary_url" value="{{ site_content.cta_primary_url }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button Text</label>
-                <input type="text" name="cta_secondary_text" value="{{ site_content.cta_secondary_text }}" class="adm-input" style="width:100%">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button URL</label>
-                <input type="text" name="cta_secondary_url" value="{{ site_content.cta_secondary_url }}" class="adm-input" style="width:100%">
-              </div>
+              <div style="grid-column:1 / -1"><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title</label><input type="text" name="cta_title" value="{{ site_content.cta_title }}" class="adm-input" style="width:100%"></div>
+              <div style="grid-column:1 / -1"><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label><input type="text" name="cta_subtitle" value="{{ site_content.cta_subtitle }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button Text</label><input type="text" name="cta_primary_text" value="{{ site_content.cta_primary_text }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button URL</label><input type="text" name="cta_primary_url" value="{{ site_content.cta_primary_url }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button Text</label><input type="text" name="cta_secondary_text" value="{{ site_content.cta_secondary_text }}" class="adm-input" style="width:100%"></div>
+              <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button URL</label><input type="text" name="cta_secondary_url" value="{{ site_content.cta_secondary_url }}" class="adm-input" style="width:100%"></div>
             </div>
           </div>
-
           <div style="display:flex;align-items:center;gap:12px">
             <button type="submit" style="padding:11px 28px;font-size:13px;font-weight:700;color:#fff;background:#7C3AED;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Save Changes</button>
             <a href="/" target="_blank" style="font-size:12px;font-weight:600;color:#7C3AED">Preview Live Site →</a>
@@ -634,54 +558,36 @@ a{text-decoration:none;cursor:pointer}
         </div>
       </div>
 
-    </div><!-- /adm-content -->
-  </div><!-- /adm-body -->
-</div><!-- /adm-shell -->
+    </div>
+  </div>
+</div>
 
 <script>
-// ── Chart data from Django ────────────────────────────────────────────────────
 const usersData    = {{ chart_users|safe }};
 const listingsData = {{ chart_listings|safe }};
 
-// Build a unified 30-day date axis
 function last30Days() {
   const days = [];
   for (let i = 29; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
+    const d = new Date(); d.setDate(d.getDate() - i);
     days.push(d.toISOString().slice(0, 10));
   }
   return days;
 }
-
-const axis   = last30Days();
-const uMap   = Object.fromEntries(usersData.map(r => [r.day, r.count]));
-const lMap   = Object.fromEntries(listingsData.map(r => [r.day, r.count]));
-const uVals  = axis.map(d => uMap[d] || 0);
-const lVals  = axis.map(d => lMap[d] || 0);
+const axis  = last30Days();
+const uMap  = Object.fromEntries(usersData.map(r => [r.day, r.count]));
+const lMap  = Object.fromEntries(listingsData.map(r => [r.day, r.count]));
+const uVals = axis.map(d => uMap[d] || 0);
+const lVals = axis.map(d => lMap[d] || 0);
 const maxVal = Math.max(...uVals, ...lVals, 1);
 
-// Draw SVG sparklines on canvas-like approach (pure SVG via innerHTML)
 function drawChart() {
   const W = 600, H = 140, PAD = 10;
-  const pts = (vals) => vals.map((v, i) => {
-    const x = PAD + (i / (axis.length - 1)) * (W - PAD * 2);
-    const y = H - PAD - (v / maxVal) * (H - PAD * 2);
-    return [x, y];
-  });
-
-  const toPath = (pts) => pts.map((p, i) => (i === 0 ? `M${p[0]} ${p[1]}` : `L${p[0]} ${p[1]}`)).join(' ');
-  const toArea = (pts, color) => {
-    const line = toPath(pts);
-    const last = pts[pts.length - 1];
-    const first = pts[0];
-    return `${line} L${last[0]} ${H} L${first[0]} ${H} Z`;
-  };
-
-  const uPts = pts(uVals);
-  const lPts = pts(lVals);
-
-  const svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg">
+  const pts = vals => vals.map((v, i) => [PAD + (i/(axis.length-1))*(W-PAD*2), H-PAD-(v/maxVal)*(H-PAD*2)]);
+  const toPath = pts => pts.map((p,i) => (i===0?`M${p[0]} ${p[1]}`:`L${p[0]} ${p[1]}`)).join(' ');
+  const toArea = pts => { const l=toPath(pts),last=pts[pts.length-1],first=pts[0]; return `${l} L${last[0]} ${H} L${first[0]} ${H} Z`; };
+  const uPts=pts(uVals), lPts=pts(lVals);
+  const svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="gU" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7C3AED" stop-opacity=".18"/><stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/></linearGradient>
       <linearGradient id="gL" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10B981" stop-opacity=".18"/><stop offset="100%" stop-color="#10B981" stop-opacity="0"/></linearGradient>
@@ -698,19 +604,27 @@ function drawChart() {
 }
 drawChart();
 
-// ── Tab switching ─────────────────────────────────────────────────────────────
-const tabs   = ['overview','users','listings','banned','site-content','settings'];
-const labels = { overview:'📊 Overview', users:'👥 Users', listings:'🏠 Listings', banned:'🚫 Banned Users', 'site-content':'🖋️ Site Content', settings:'⚙️ Settings' };
+// Tab icons for topbar label
+const tabIcons = {
+  overview: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>`,
+  users:    `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  listings: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V20a1 1 0 0 1-1 1H15V15H9v6H4a1 1 0 0 1-1-1Z"/></svg>`,
+  banned:   `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`,
+  'site-content': `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
+  settings: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+};
+const tabLabels = { overview:'Overview', users:'Users', listings:'Listings', banned:'Banned Users', 'site-content':'Site Content', settings:'Settings' };
+const tabs = ['overview','users','listings','banned','site-content','settings'];
 
-window.admTab = (tab) => {
+window.admTab = tab => {
   tabs.forEach(t => {
     const view = document.getElementById('av-'+t);
     const link = document.getElementById('anl-'+t);
-    if (view) view.style.display = t === tab ? 'block' : 'none';
-    if (link) link.className = 'adm-nl' + (t === tab ? ' active' : '');
+    if (view) view.style.display = t===tab ? 'block' : 'none';
+    if (link) link.className = 'adm-nl' + (t===tab ? ' active' : '');
   });
   const lbl = document.getElementById('adm-page-lbl');
-  if (lbl) lbl.textContent = labels[tab] || tab;
+  if (lbl) lbl.innerHTML = (tabIcons[tab]||'') + tabLabels[tab];
   if (window.innerWidth <= 900) {
     document.getElementById('adm-sb')?.classList.remove('open');
     document.getElementById('adm-ov')?.classList.remove('open');
@@ -722,7 +636,6 @@ window.admToggle = () => {
   document.getElementById('adm-ov')?.classList.toggle('open');
 };
 
-// Open to correct tab if URL hash is set (e.g. #users)
 const hash = location.hash.replace('#','');
 if (tabs.includes(hash)) admTab(hash);
 </script>
