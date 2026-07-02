@@ -14,4 +14,7 @@ urlpatterns = [
     path('listing/hide/<int:listing_id>/',    views.hide_listing,    name='hide_listing'),
     path('listing/restore/<int:listing_id>/', views.restore_listing, name='restore_listing'),
     path('listing/delete/<int:listing_id>/',  views.delete_listing,  name='delete_listing'),
+
+    # Site content
+    path('site-content/', views.update_site_content, name='update_site_content'),
 ]

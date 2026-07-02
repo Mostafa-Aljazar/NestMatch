@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Count
 from django.db.models.functions import TruncDate
@@ -9,6 +10,7 @@ import json
 from accounts_app.models import User
 from listings_app.models import Listing
 from applications_app.models import Application
+from core_app.models import SiteContent
 
 
 def is_admin(user):
@@ -101,6 +103,9 @@ def index(request):
     # ── Banned users (for Banned tab) ────────────────────────────────────────
     banned_list = User.objects.filter(is_active=False).order_by('-updated_at')
 
+    # ── Site content (for Site Content tab) ──────────────────────────────────
+    site_content = SiteContent.load()
+
     context = {
         # cards
         'total_users':        total_users,
@@ -118,6 +123,7 @@ def index(request):
         'all_users':          all_users,
         'all_listings':       all_listings,
         'banned_list':        banned_list,
+        'site_content':       site_content,
     }
     return render(request, 'dashboard_app/index.html', context)
 
@@ -168,3 +174,25 @@ def delete_listing(request, listing_id):
         listing = get_object_or_404(Listing, id=listing_id)
         listing.delete()
     return redirect('dashboard_app:index')
+
+
+# ── Site content (landing page) ───────────────────────────────────────────────
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def update_site_content(request):
+    if request.method == 'POST':
+        content = SiteContent.load()
+
+        # Every field on the model is a simple text field, so we can just
+        # walk the POST data and set matching attributes — keeps this view
+        # short even though SiteContent has many fields.
+        editable_fields = [f.name for f in SiteContent._meta.get_fields()
+                            if f.concrete and f.name not in ('id', 'updated_at')]
+
+        for field in editable_fields:
+            if field in request.POST:
+                setattr(content, field, request.POST.get(field, '').strip())
+
+        content.save()
+
+    return redirect(f"{reverse('dashboard_app:index')}#site-content")

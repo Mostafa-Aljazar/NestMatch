@@ -1,17 +1,30 @@
 from django.shortcuts import render
+
+from .models import SiteContent
 from listings_app.models import Listing
 from accounts_app.models import Testimonial
 
 
 def index(request):
-    latest_listings = Listing.objects.filter(status='active').select_related('poster').prefetch_related('images')[:3]
-#    add filter(approved=True)
-    reviews = Testimonial.objects.all().select_related('user')[:3]
-    return render(request, 'core_app/landing.html', {
+    content = SiteContent.load()
+
+    latest_listings = (
+        Listing.objects
+        .filter(status='active')
+        .select_related('poster')
+        .prefetch_related('images')
+        .order_by('-created_at')[:6]
+    )
+
+    reviews = (
+        Testimonial.objects
+        .filter(approved=True)
+        .order_by('-created_at')[:6]
+    )
+
+    context = {
+        'content':         content,
         'latest_listings': latest_listings,
-        'reviews': reviews,
-    })
-
-
-#def index(request):
-#   return HttpResponse("<h1>core_app ✅</h1><p>Landing Page — OK</p>")
+        'reviews':         reviews,
+    }
+    return render(request, 'core_app/landing.html', context)
