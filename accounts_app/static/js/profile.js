@@ -7,31 +7,78 @@
 // ===========================================================================
 // 1. TAB NAVIGATION
 // ===========================================================================
+// const tabButtons = document.querySelectorAll('.tab-nav-btn');
+// const tabPanels = {
+//   info:      document.getElementById('tab-info'),
+//   lifestyle: document.getElementById('tab-lifestyle'),
+//   security:  document.getElementById('tab-security'),
+//   reviews:   document.getElementById('tab-reviews'),
+//   verification: document.getElementById('tab-verification'),
+// };
+
+// tabButtons.forEach((button) => {
+//   button.addEventListener('click', () => {
+//     tabButtons.forEach((btn) => btn.classList.remove('active'));
+//     Object.values(tabPanels).forEach((p) => p.classList.add('hidden'));
+//     button.classList.add('active');
+//     const target = button.dataset.tab;
+//     const panel = tabPanels[target];
+//     if (panel) {
+//       panel.classList.remove('hidden');
+//       panel.classList.remove('tab-panel');
+//       void panel.offsetWidth;
+//       panel.classList.add('tab-panel');
+//     }
+//     button.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+//   });
+// });
+// ===========================================================================
+// 1. TAB NAVIGATION
+// ===========================================================================
 const tabButtons = document.querySelectorAll('.tab-nav-btn');
 const tabPanels = {
   info:      document.getElementById('tab-info'),
   lifestyle: document.getElementById('tab-lifestyle'),
   security:  document.getElementById('tab-security'),
   reviews:   document.getElementById('tab-reviews'),
+  verification: document.getElementById('tab-verification'),
 };
+
+function activateTab(tabName) {
+  const target = tabPanels[tabName] ? tabName : 'info';
+
+  tabButtons.forEach((btn) => btn.classList.remove('active'));
+  Object.values(tabPanels).forEach((p) => {
+    if (p) p.classList.add('hidden');
+  });
+
+  const activeBtn = document.querySelector(`.tab-nav-btn[data-tab="${target}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+  if (tabPanels[target]) tabPanels[target].classList.remove('hidden');
+}
 
 tabButtons.forEach((button) => {
   button.addEventListener('click', () => {
-    tabButtons.forEach((btn) => btn.classList.remove('active'));
-    Object.values(tabPanels).forEach((p) => p.classList.add('hidden'));
-    button.classList.add('active');
     const target = button.dataset.tab;
-    const panel = tabPanels[target];
-    if (panel) {
-      panel.classList.remove('hidden');
-      panel.classList.remove('tab-panel');
-      void panel.offsetWidth;
-      panel.classList.add('tab-panel');
-    }
-    button.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    activateTab(target);
+
+    // Update the URL without reloading the page
+    // ?tab=lifestyle → يبيّن للمستخدم وين هو، وبيشتغل لو شارك الرابط
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', target);
+    window.history.pushState({tab: target}, '', url);
   });
 });
 
+// Restore tab from URL on page load (e.g. after refresh or shared link)
+const initialTab = new URL(window.location.href).searchParams.get('tab') || 'info';
+activateTab(initialTab);
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', (event) => {
+  const tab = event.state?.tab || new URL(window.location.href).searchParams.get('tab') || 'info';
+  activateTab(tab);
+});
 
 // ===========================================================================
 // 2. OPTION CARDS (Lifestyle Tab)
@@ -49,8 +96,6 @@ document.querySelectorAll('[data-target]').forEach((group) => {
     });
   });
 });
-
-
 // ===========================================================================
 // 3. DOM REFERENCES
 // ===========================================================================
@@ -74,10 +119,10 @@ let _pendingAvatarSrc = null;
 // 4. PROFILE STRENGTH
 // ===========================================================================
 const strengthState = {
-  hasPhone:     document.getElementById('strength-has-phone')?.dataset.value === 'true',
-  hasBio:       document.getElementById('strength-has-bio')?.dataset.value === 'true',
-  hasPhoto:     document.getElementById('strength-has-photo')?.dataset.value === 'true',
-  hasLifestyle: document.getElementById('strength-has-lifestyle')?.dataset.value === 'true',
+  hasPhone:        document.getElementById('strength-has-phone')?.dataset.value === 'true',
+  hasPhoto:        document.getElementById('strength-has-photo')?.dataset.value === 'true',
+  hasLifestyle:    document.getElementById('strength-has-lifestyle')?.dataset.value === 'true',
+  hasVerification: document.getElementById('strength-has-verification')?.dataset.value === 'true',
 };
 
 function recalcStrength() {
@@ -95,11 +140,15 @@ function recalcStrength() {
     if (icon) {
       icon.classList.toggle('border-slate-300',   !done);
       icon.classList.toggle('bg-white',           !done);
+
       icon.classList.toggle('border-emerald-500',  done);
       icon.classList.toggle('bg-emerald-500',      done);
       icon.classList.toggle('text-white',          done);
       icon.textContent = done ? '✓' : '';
     }
+    // النص لما يكون مكتمل يصير أبهت
+    item.classList.toggle('text-white/50', done);
+    item.classList.toggle('text-white', !done);
   });
 }
 
@@ -444,3 +493,51 @@ if (deleteAccountForm) {
     }
   });
 }
+
+// ===========================================================================
+// 11. VERIFICATION DOCUMENT UPLOAD — AJAX
+// ===========================================================================
+document.querySelectorAll('.verification-doc-form').forEach((form) => {
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const errorEl   = form.querySelector('.verification-form-error');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn?.textContent;
+    if (errorEl) errorEl.textContent = '';
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Uploading...'; }
+
+    const formData  = new FormData(form);
+    const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]')?.value || '';
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        _showToast(data.message || 'Document submitted for review.', false);
+        // Update the status badge in place
+        const card = form.closest('.rounded-2xl');
+        const badgeContainer = card?.querySelector('.flex.items-center.justify-between');
+        if (badgeContainer) {
+          const oldBadge = badgeContainer.querySelector('span');
+          if (oldBadge) {
+            oldBadge.outerHTML = `<span class="inline-flex items-center gap-1.5 rounded-full bg-yellow-50 px-3 py-1 text-xs font-semibold text-yellow-700">Pending review</span>`;
+          }
+        }
+        if (submitBtn) submitBtn.textContent = 'Replace file';
+      } else {
+        const firstError = Object.values(data.errors || {})[0];
+        if (errorEl) errorEl.textContent = firstError || 'Something went wrong.';
+      }
+    } catch {
+      if (errorEl) errorEl.textContent = 'Something went wrong. Please try again.';
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitBtn.textContent === 'Uploading...' ? originalText : submitBtn.textContent; }
+      form.reset();
+    }
+  });
+});

@@ -3,10 +3,10 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
-from .models import User, LifestyleProfile, Testimonial ,OTPCode
+from django.http import JsonResponse,FileResponse, Http404
+from .models import User, LifestyleProfile, Testimonial ,OTPCode ,VerificationDocument
 from django.core.mail import EmailMultiAlternatives
-
+from listings_app.models import Listing
 
 def index(request):
     """
@@ -114,6 +114,13 @@ def profile_view(request):
     """
     user = request.user
 
+    # Read ?tab= from URL so the template can set initial active state
+    # even before JS runs (progressive enhancement)
+    active_tab = request.GET.get('tab', 'info')
+    valid_tabs = {'info', 'lifestyle', 'security', 'reviews'}
+    if active_tab not in valid_tabs:
+        active_tab = 'info'
+
     # A user might not have filled out their lifestyle profile yet,
     # so this can legitimately be None — the template handles that case.
     lifestyle_profile = LifestyleProfile.objects.filter(user=user).first()
@@ -128,6 +135,14 @@ def profile_view(request):
         lifestyle_profile is not None,
     ])
     profile_strength = int((optional_fields_filled / 4) * 100)
+
+    documents = {d.document_type: d for d in user.verification_documents.all()}
+    verification_cards = [
+        ('id_document', 'ID Document', documents.get('id_document')),
+        ('rental_contract', 'Rental Contract', documents.get('rental_contract')),
+    ]
+    # جيبي الغرف المنشورة للمستخدم
+    user_listings = Listing.objects.filter(poster=user, status='active')
 
     context = {
         'user_obj': user,  # named user_obj to avoid clashing with request.user in template logic
@@ -146,6 +161,9 @@ def profile_view(request):
         'smoking_choices': LifestyleProfile.SMOKING_CHOICES,
         'user_reviews': Testimonial.objects.filter(user=user).order_by('-created_at'),
         'review_section_heading': 'Write a review',
+        'verification_cards': verification_cards,
+        'active_tab': active_tab,
+        'user_listings': user_listings,
     }
     return render(request, 'profile.html', context)
 
@@ -483,3 +501,51 @@ def reset_password_view(request):
         return redirect('accounts_app:login')
 
     return render(request, 'reset_password.html')
+
+
+@login_required
+@require_POST
+def verification_view(request):
+    """
+    Handles the "Verification" tab upload/resubmit form on the profile page.
+    AJAX-only (same pattern as profile_update_personal_info / profile_update_lifestyle):
+    returns JSON, never redirects or renders a template, so the front-end
+    JS can update the relevant document card in place without a full reload.
+    """
+    document_type = request.POST.get('document_type')
+    file = request.FILES.get('file')
+
+    if document_type not in dict(VerificationDocument.DOCUMENT_TYPE_CHOICES):
+        return JsonResponse({'success': False, 'errors': {'document_type': 'Invalid document type.'}})
+
+    if not file:
+        return JsonResponse({'success': False, 'errors': {'file': 'Please choose a file to upload.'}})
+
+    error = VerificationDocument.objects.validate_upload(file)
+    if error:
+        return JsonResponse({'success': False, 'errors': {'file': error}})
+
+    document = VerificationDocument.objects.submit_document(request.user, document_type, file)
+
+    return JsonResponse({
+        'success': True,
+        'message': 'Document submitted for review.',
+        'document_type': document.document_type,
+        'status': document.status,
+        'status_display': document.get_status_display(),
+        'updated_at': document.updated_at.strftime('%b %d, %Y').replace(' 0', ' '),
+    })
+
+@login_required
+def serve_verification_document(request, doc_id):
+    """
+    Protected file access — serves the actual ID/contract file ONLY to its
+    owner or to staff. This is why we don't link directly to document.file.url
+    in templates; always link to this view instead (see urls.py note).
+    """
+    document = get_object_or_404(VerificationDocument, id=doc_id)
+    if document.user_id != request.user.id and not request.user.is_staff:
+        raise Http404
+
+    return FileResponse(document.file.open('rb'), filename=document.file.name)
+

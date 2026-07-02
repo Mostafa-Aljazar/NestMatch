@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from datetime import date
-import re
 from PIL import Image, UnidentifiedImageError
-import random
+from django.utils import timezone
+import uuid ,random , re
+from pathlib import Path
 from django.utils import timezone
 
 class UserManager(BaseUserManager):
@@ -311,6 +312,28 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_birthday_today(self):
         today = date.today()
         return (self.date_of_birth.month, self.date_of_birth.day) == (today.month, today.day)
+    
+        
+    @property
+    def is_id_verified(self):
+        return self.verification_documents.filter(
+            document_type='id_document', status='approved'
+        ).exists()
+
+    @property
+    def is_rental_contract_verified(self):
+        return self.verification_documents.filter(
+            document_type='rental_contract', status='approved'
+        ).exists()
+
+    @property
+    def verification_status(self):
+        """e.g. {'id_document': 'approved', 'rental_contract': 'not_submitted'} — handy for templates."""
+        docs = {d.document_type: d.status for d in self.verification_documents.all()}
+        return {
+            'id_document': docs.get('id_document', 'not_submitted'),
+            'rental_contract': docs.get('rental_contract', 'not_submitted'),
+        }
 
 
 class LifestyleProfileManager(models.Manager):
@@ -567,3 +590,113 @@ class OTPCode(models.Model):
         # Generate a new 4-digit code (zero-padded: 0000–9999)
         code = str(random.randint(0, 9999)).zfill(4)
         return cls.objects.create(user=user, code=code)
+    
+
+def verification_document_path(instance, filename):
+    """
+    Builds an unguessable upload path: verification_docs/user_<id>/<doc_type>/<uuid>.<ext>
+    A UUID filename (instead of the original filename) means nobody can find or
+    guess another user's document path even if they somehow saw a sibling URL.
+    """
+    ext = Path(filename).suffix.lower()
+    unique_name = f'{uuid.uuid4().hex}{ext}'
+    return f'verification_docs/user_{instance.user_id}/{instance.document_type}/{unique_name}'
+
+
+class VerificationDocumentManager(models.Manager):
+    """
+    Same validator + create/update pattern as LifestyleProfileManager above,
+    so this stays consistent with the rest of the codebase.
+    """
+
+    ALLOWED_EXTENSIONS = ('.pdf', '.jpg', '.jpeg', '.png')
+    MAX_SIZE_BYTES = 8 * 1024 * 1024  # 8MB — contracts can be multi-page scans
+
+    def validate_upload(self, file):
+        """Returns an error string, or None if the uploaded file is valid."""
+        if file.size > self.MAX_SIZE_BYTES:
+            return 'File must be smaller than 8MB!'
+        ext = Path(file.name).suffix.lower()
+        if ext not in self.ALLOWED_EXTENSIONS:
+            return 'File must be a PDF, JPG, or PNG!'
+        return None
+
+    def submit_document(self, user, document_type, file):
+        """
+        Creates a new document row, or overwrites + resets to 'pending' if the
+        user already submitted this document_type before (e.g. resubmitting
+        after a rejection). One row per (user, document_type) — see Meta below.
+        """
+        doc, _created = self.update_or_create(
+            user=user,
+            document_type=document_type,
+            defaults={
+                'file': file,
+                'status': VerificationDocument.PENDING,
+                'rejection_reason': '',
+                'reviewed_by': None,
+                'reviewed_at': None,
+            },
+        )
+        return doc
+
+
+class VerificationDocument(models.Model):
+    ID_DOCUMENT = 'id_document'
+    RENTAL_CONTRACT = 'rental_contract'
+    DOCUMENT_TYPE_CHOICES = [
+        (ID_DOCUMENT, 'ID Document'),
+        (RENTAL_CONTRACT, 'Rental Contract'),
+    ]
+
+    PENDING = 'pending'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
+    STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (APPROVED, 'Approved'),
+        (REJECTED, 'Rejected'),
+    ]
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='verification_documents'
+    )
+    document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPE_CHOICES)
+    file = models.FileField(upload_to=verification_document_path)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
+    rejection_reason = models.TextField(blank=True)
+
+    # Who reviewed it and when — populated by approve()/reject() below,
+    # or automatically by the admin (see verification_admin.py)
+    reviewed_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='reviewed_documents', limit_choices_to={'is_staff': True},
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = VerificationDocumentManager()
+
+    class Meta:
+        # One row per document type per user — resubmission overwrites it (see submit_document above)
+        unique_together = ('user', 'document_type')
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f'{self.get_document_type_display()} — {self.user.username} ({self.get_status_display()})'
+
+    def approve(self, reviewer):
+        self.status = self.APPROVED
+        self.reviewed_by = reviewer
+        self.reviewed_at = timezone.now()
+        self.rejection_reason = ''
+        self.save()
+
+    def reject(self, reviewer, reason=''):
+        self.status = self.REJECTED
+        self.reviewed_by = reviewer
+        self.reviewed_at = timezone.now()
+        self.rejection_reason = reason
+        self.save()
