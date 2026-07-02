@@ -218,10 +218,57 @@ if (headerAvatarImage) headerAvatarImage.addEventListener('error', () => setAvat
 // ===========================================================================
 // 6. PROFILE PICTURE PREVIEW
 // ===========================================================================
+// ===========================================================================
+const MAX_PHOTO_SIZE_MB = 5;
+const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+const profilePicFilenameEl = document.getElementById('profile_pic_filename');
+const profilePicErrorEl    = document.querySelector('.field-error[data-field="profile_pic"]');
+
+function clearProfilePicError() {
+  if (profilePicErrorEl) profilePicErrorEl.textContent = '';
+}
+
+function setProfilePicError(message) {
+  if (profilePicErrorEl) profilePicErrorEl.textContent = message;
+}
+
+function setProfilePicFilename(name) {
+  if (profilePicFilenameEl) profilePicFilenameEl.textContent = name || '';
+}
+
+// تتحقق من صحة الملف المختار حالياً، ترجع true/false
+function validateSelectedProfilePic() {
+  clearProfilePicError();
+  const file = profilePicInput?.files?.[0];
+  if (!file) return true; // ما في ملف جديد = ما في شي نتحقق منه
+
+  if (file.size > MAX_PHOTO_SIZE_MB * 1024 * 1024) {
+    setProfilePicError('Profile picture must be smaller than 5MB!');
+    return false;
+  }
+
+  if (!ALLOWED_PHOTO_TYPES.includes(file.type)) {
+    setProfilePicError('Profile picture must be a JPEG, PNG, WEBP, or GIF image!');
+    return false;
+  }
+
+  return true;
+}
+
 if (profilePicInput) {
   profilePicInput.addEventListener('change', (event) => {
+    // فقط نظّفي الخطأ القديم واعرضي اسم الملف — بدون أي تحقق هون
+    clearProfilePicError();
+
     const file = event.target.files && event.target.files[0];
-    if (!file) return;
+    if (!file) {
+      setProfilePicFilename('');
+      return;
+    }
+
+    setProfilePicFilename(file.name);
+
     const reader = new FileReader();
     reader.onload = (e) => {
       _pendingAvatarSrc = e.target.result;
@@ -230,8 +277,6 @@ if (profilePicInput) {
     reader.readAsDataURL(file);
   });
 }
-
-
 // ===========================================================================
 // 7. FORM HELPERS
 // ===========================================================================
@@ -498,12 +543,24 @@ if (deleteAccountForm) {
 // 11. VERIFICATION DOCUMENT UPLOAD — AJAX
 // ===========================================================================
 document.querySelectorAll('.verification-doc-form').forEach((form) => {
+  const fileInput = form.querySelector('input[type="file"]');
+  const filenameEl = form.querySelector('.verif-filename');
+  const errorEl = form.querySelector('.field-error[data-field="file"]');
+
+  // اظهار اسم الملف فوراً بعد الاختيار
+  if (fileInput) {
+    fileInput.addEventListener('change', () => {
+      if (errorEl) errorEl.textContent = '';
+      const file = fileInput.files && fileInput.files[0];
+      if (filenameEl) filenameEl.textContent = file ? file.name : '';
+    });
+  }
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const errorEl   = form.querySelector('.verification-form-error');
+    if (errorEl) errorEl.textContent = '';
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn?.textContent;
-    if (errorEl) errorEl.textContent = '';
     if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Uploading...'; }
 
     const formData  = new FormData(form);
@@ -519,8 +576,9 @@ document.querySelectorAll('.verification-doc-form').forEach((form) => {
 
       if (data.success) {
         _showToast(data.message || 'Document submitted for review.', false);
-        // Update the status badge in place
-        const card = form.closest('.rounded-2xl');
+
+        // حدّثي الـ badge بنفس الكارد
+        const card = form.closest('.rounded-2xl, .min-w-0.flex-1');
         const badgeContainer = card?.querySelector('.flex.items-center.justify-between');
         if (badgeContainer) {
           const oldBadge = badgeContainer.querySelector('span');
@@ -528,7 +586,8 @@ document.querySelectorAll('.verification-doc-form').forEach((form) => {
             oldBadge.outerHTML = `<span class="inline-flex items-center gap-1.5 rounded-full bg-yellow-50 px-3 py-1 text-xs font-semibold text-yellow-700">Pending review</span>`;
           }
         }
-        if (submitBtn) submitBtn.textContent = 'Replace file';
+        const btn = form.querySelector('button[type="button"]');
+        if (btn) btn.textContent = 'Replace file';
       } else {
         const firstError = Object.values(data.errors || {})[0];
         if (errorEl) errorEl.textContent = firstError || 'Something went wrong.';
@@ -536,8 +595,9 @@ document.querySelectorAll('.verification-doc-form').forEach((form) => {
     } catch {
       if (errorEl) errorEl.textContent = 'Something went wrong. Please try again.';
     } finally {
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitBtn.textContent === 'Uploading...' ? originalText : submitBtn.textContent; }
-      form.reset();
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalText; }
+      if (filenameEl) filenameEl.textContent = '';
+      fileInput.value = '';
     }
   });
 });

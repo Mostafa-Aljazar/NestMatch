@@ -7,6 +7,13 @@ from django.http import JsonResponse,FileResponse, Http404
 from .models import User, LifestyleProfile, Testimonial ,OTPCode ,VerificationDocument
 from django.core.mail import EmailMultiAlternatives
 from listings_app.models import Listing
+# templatetags/dict_extras.py
+from django import template
+register = template.Library()
+
+@register.filter
+def get_item(d, key):
+    return d.get(key)
 
 def index(request):
     """
@@ -139,11 +146,15 @@ def profile_view(request):
     documents = {d.document_type: d for d in user.verification_documents.all()}
     verification_cards = [
         ('id_document', 'ID Document', documents.get('id_document')),
-        ('rental_contract', 'Rental Contract', documents.get('rental_contract')),
     ]
     # جيبي الغرف المنشورة للمستخدم
     user_listings = Listing.objects.filter(poster=user, status='active')
 
+    rental_contract_doc = documents.get('rental_contract')
+    contract_docs = {
+        d.listing_id: d
+        for d in user.verification_documents.filter(document_type='rental_contract')
+    }
     context = {
         'user_obj': user,  # named user_obj to avoid clashing with request.user in template logic
         'genders': User.GENDER_CHOICES,
@@ -161,9 +172,11 @@ def profile_view(request):
         'smoking_choices': LifestyleProfile.SMOKING_CHOICES,
         'user_reviews': Testimonial.objects.filter(user=user).order_by('-created_at'),
         'review_section_heading': 'Write a review',
+        'rental_contract_doc': rental_contract_doc,
         'verification_cards': verification_cards,
         'active_tab': active_tab,
         'user_listings': user_listings,
+        'contract_docs': contract_docs,
     }
     return render(request, 'profile.html', context)
 
@@ -502,16 +515,9 @@ def reset_password_view(request):
 
     return render(request, 'reset_password.html')
 
-
 @login_required
 @require_POST
 def verification_view(request):
-    """
-    Handles the "Verification" tab upload/resubmit form on the profile page.
-    AJAX-only (same pattern as profile_update_personal_info / profile_update_lifestyle):
-    returns JSON, never redirects or renders a template, so the front-end
-    JS can update the relevant document card in place without a full reload.
-    """
     document_type = request.POST.get('document_type')
     file = request.FILES.get('file')
 
@@ -521,16 +527,24 @@ def verification_view(request):
     if not file:
         return JsonResponse({'success': False, 'errors': {'file': 'Please choose a file to upload.'}})
 
+    listing = None
+    if document_type == VerificationDocument.RENTAL_CONTRACT:
+        listing_id = request.POST.get('listing_id')
+        listing = get_object_or_404(Listing, id=listing_id, poster=request.user)
+
     error = VerificationDocument.objects.validate_upload(file)
     if error:
         return JsonResponse({'success': False, 'errors': {'file': error}})
 
-    document = VerificationDocument.objects.submit_document(request.user, document_type, file)
+    document = VerificationDocument.objects.submit_document(
+        request.user, document_type, file, listing=listing
+    )
 
     return JsonResponse({
         'success': True,
         'message': 'Document submitted for review.',
         'document_type': document.document_type,
+        'listing_id': listing.id if listing else None,
         'status': document.status,
         'status_display': document.get_status_display(),
         'updated_at': document.updated_at.strftime('%b %d, %Y').replace(' 0', ' '),

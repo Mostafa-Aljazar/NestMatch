@@ -600,8 +600,9 @@ def verification_document_path(instance, filename):
     """
     ext = Path(filename).suffix.lower()
     unique_name = f'{uuid.uuid4().hex}{ext}'
+    if instance.document_type == 'rental_contract' and instance.listing_id:
+        return f'verification_docs/user_{instance.user_id}/rental_contract/listing_{instance.listing_id}/{unique_name}'
     return f'verification_docs/user_{instance.user_id}/{instance.document_type}/{unique_name}'
-
 
 class VerificationDocumentManager(models.Manager):
     """
@@ -621,15 +622,19 @@ class VerificationDocumentManager(models.Manager):
             return 'File must be a PDF, JPG, or PNG!'
         return None
 
-    def submit_document(self, user, document_type, file):
+    def submit_document(self, user, document_type, file, listing=None):
         """
         Creates a new document row, or overwrites + resets to 'pending' if the
         user already submitted this document_type before (e.g. resubmitting
         after a rejection). One row per (user, document_type) — see Meta below.
         """
+        lookup = {'user': user, 'document_type': document_type}
+        if document_type == VerificationDocument.RENTAL_CONTRACT:
+            if listing is None:
+                raise ValueError('A listing is required for rental_contract documents.')
+            lookup['listing'] = listing
         doc, _created = self.update_or_create(
-            user=user,
-            document_type=document_type,
+            **lookup,
             defaults={
                 'file': file,
                 'status': VerificationDocument.PENDING,
@@ -639,7 +644,6 @@ class VerificationDocumentManager(models.Manager):
             },
         )
         return doc
-
 
 class VerificationDocument(models.Model):
     ID_DOCUMENT = 'id_document'
@@ -662,12 +666,19 @@ class VerificationDocument(models.Model):
         User, on_delete=models.CASCADE, related_name='verification_documents'
     )
     document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPE_CHOICES)
+
+    # Only set for RENTAL_CONTRACT — each listing has its own contract,
+    # since a landlord with 3 rooms doesn't share one contract across all.
+    # Stays null for ID_DOCUMENT (that's one-per-user, not one-per-listing).
+    listing = models.ForeignKey(
+        'listings_app.Listing', on_delete=models.CASCADE, null=True, blank=True,
+        related_name='contract_documents',
+    )
+
     file = models.FileField(upload_to=verification_document_path)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
     rejection_reason = models.TextField(blank=True)
 
-    # Who reviewed it and when — populated by approve()/reject() below,
-    # or automatically by the admin (see verification_admin.py)
     reviewed_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='reviewed_documents', limit_choices_to={'is_staff': True},
@@ -680,23 +691,18 @@ class VerificationDocument(models.Model):
     objects = VerificationDocumentManager()
 
     class Meta:
-        # One row per document type per user — resubmission overwrites it (see submit_document above)
-        unique_together = ('user', 'document_type')
         ordering = ['-updated_at']
-
-    def __str__(self):
-        return f'{self.get_document_type_display()} — {self.user.username} ({self.get_status_display()})'
-
-    def approve(self, reviewer):
-        self.status = self.APPROVED
-        self.reviewed_by = reviewer
-        self.reviewed_at = timezone.now()
-        self.rejection_reason = ''
-        self.save()
-
-    def reject(self, reviewer, reason=''):
-        self.status = self.REJECTED
-        self.reviewed_by = reviewer
-        self.reviewed_at = timezone.now()
-        self.rejection_reason = reason
-        self.save()
+        constraints = [
+            # id_document: one per user (listing stays null)
+            models.UniqueConstraint(
+                fields=['user', 'document_type'],
+                condition=models.Q(document_type='id_document'),
+                name='unique_id_document_per_user',
+            ),
+            # rental_contract: one per listing (not per user!)
+            models.UniqueConstraint(
+                fields=['listing', 'document_type'],
+                condition=models.Q(document_type='rental_contract'),
+                name='unique_rental_contract_per_listing',
+            ),
+        ]
