@@ -3,10 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
-from .models import Listing, ListingImage
+from .models import Favorite, Listing, ListingImage
 
 
 def listings_page(request):
@@ -68,9 +69,17 @@ def listings_page(request):
     page = request.GET.get('page', 1)
     listings = paginator.get_page(page)
 
+    favorite_ids = set()
+    if request.user.is_authenticated:
+        favorite_ids = set(
+            Favorite.objects.filter(user=request.user, listing__in=listings.object_list)
+            .values_list('listing_id', flat=True)
+        )
+
     return render(request, 'listings_app/listings.html', {
         'listings':     listings,
         'search_query': q,
+        'favorite_ids': favorite_ids,
     })
 
 
@@ -141,6 +150,7 @@ def my_listings(request):
         .annotate(
             app_count=Count('applications'),
             pending_count=Count('applications', filter=Q(applications__status='pending')),
+            favorite_count=Count('favorited_by', distinct=True),
         )
         .order_by('-created_at')
     )
@@ -174,6 +184,7 @@ def room_detail(request, pk):
     can_review = False
     my_application = None
     is_own_listing = False
+    is_favorited = False
     if request.user.is_authenticated:
         is_own_listing = listing.poster_id == request.user.id
         my_application = Application.objects.filter(listing=listing, seeker=request.user).first()
@@ -182,6 +193,7 @@ def room_detail(request, pk):
             and my_application.status == Application.STATUS_ACCEPTED
             and not reviews.filter(reviewer=request.user).exists()
         )
+        is_favorited = Favorite.objects.filter(user=request.user, listing=listing).exists()
 
     return render(request, 'listings_app/room_detail.html', {
         'listing':        listing,
@@ -190,6 +202,41 @@ def room_detail(request, pk):
         'can_review':     can_review,
         'my_application': my_application,
         'is_own_listing': is_own_listing,
+        'is_favorited':   is_favorited,
+    })
+
+
+@login_required
+@require_POST
+def toggle_favorite(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, status='active')
+    favorite, created = Favorite.objects.get_or_create(user=request.user, listing=listing)
+    if not created:
+        favorite.delete()
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'favorited': created})
+
+    next_url = request.POST.get('next') or 'listings_app:room_detail'
+    if next_url == 'listings_app:room_detail':
+        return redirect(next_url, pk=pk)
+    return redirect(next_url)
+
+
+@login_required
+def favorites_page(request):
+    favorites = (
+        Favorite.objects
+        .filter(user=request.user)
+        .select_related('listing')
+        .prefetch_related('listing__images')
+    )
+    listings = [f.listing for f in favorites if f.listing.status == 'active']
+    favorite_ids = {l.id for l in listings}
+
+    return render(request, 'listings_app/favorites.html', {
+        'listings':     listings,
+        'favorite_ids': favorite_ids,
     })
 
 

@@ -384,6 +384,27 @@ input[type=range]::-webkit-slider-thumb {
     document.body.style.overflow = '';
   };
 
+  window.nmToggleFavForm = (event, btn) => {
+    event.preventDefault();
+    const form = btn.closest('form');
+    fetch(form.action, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value },
+      body: new FormData(form),
+    })
+      .then(r => r.json())
+      .then(data => {
+        btn.dataset.favorited = data.favorited ? '1' : '0';
+        btn.classList.toggle('text-rose-500', data.favorited);
+        btn.classList.toggle('text-slate-400', !data.favorited);
+        const svg = btn.querySelector('svg');
+        if (svg) svg.setAttribute('fill', data.favorited ? 'currentColor' : 'none');
+        btn.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.3)' }, { transform: 'scale(1)' }], { duration: 280, easing: 'ease-out' });
+      })
+      .catch(() => {});
+    return false;
+  };
+
   window.nmToggleTag = (el) => {
     document.querySelectorAll(`.nm-pill[data-group="${el.dataset.group}"]`).forEach(b => b.classList.remove('sel'));
     el.classList.add('sel');

@@ -179,22 +179,24 @@ ICONS = {
     'pin':           '<path d="M12 2l1.5 6.5L20 10l-6.5 1.5L12 18l-1.5-6.5L4 10l6.5-1.5z"/>',
     'mailbox':       '<rect x="3" y="9" width="14" height="10" rx="2"/><path d="M3 9a4 4 0 014-4h6a4 4 0 014 4"/><line x1="19" y1="13" x2="22" y2="13"/>',
     'plus':          '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+    'heart':         '<path d="M12 21s-7.5-4.6-10-9.3C.5 8.4 2.2 5 5.6 5c2 0 3.4 1 4.4 2.5C11 6 12.4 5 14.4 5c3.4 0 5.1 3.4 3.6 6.7C19.5 16.4 12 21 12 21z"/>',
 }
 
 
-def _wrap(inner, size, color):
+def _wrap(inner, size, color, filled=False):
     color_attr = f' style="color:{color}"' if color else ''
+    fill = 'currentColor' if filled else 'none'
     return mark_safe(
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 24 24" '
-        f'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" '
+        f'fill="{fill}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" '
         f'aria-hidden="true"{color_attr}>{inner}</svg>'
     )
 
 
 @register.simple_tag
-def icon(name, size=18, color=None):
-    """Usage: {% icon 'smoking' size=18 %} or {% icon 'smoking' size=18 color='#fff' %}"""
+def icon(name, size=18, color=None, filled=False):
+    """Usage: {% icon 'smoking' size=18 %} or {% icon 'smoking' size=18 color='#fff' %} or {% icon 'heart' filled=True %}"""
     inner = ICONS.get(name)
     if inner is None:
         return ''
-    return _wrap(inner, size, color)
+    return _wrap(inner, size, color, filled)
