@@ -1,11 +1,12 @@
 {% load static %}
 {% load icons %}
+{% load listing_extras %}
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Post a Room — NestMatch</title>
+<title>{% if listing %}Edit Room{% else %}Post a Room{% endif %} — NestMatch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -69,7 +70,7 @@ tailwind.config = {
   <div class="max-w-3xl mx-auto">
     <div class="flex items-start justify-between mb-3.5 gap-2">
       <div>
-        <h1 class="text-xl font-extrabold text-gray-900 tracking-tight">Post a Room</h1>
+        <h1 class="text-xl font-extrabold text-gray-900 tracking-tight">{% if listing %}Edit Room{% else %}Post a Room{% endif %}</h1>
         <p class="text-[13px] text-gray-500 mt-0.5" id="nm-step-hint">Step 1 of 5 — Basic Information</p>
       </div>
       <button type="button" onclick="parSubmit('draft')" class="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-[12px] font-semibold text-gray-500 hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50 transition-all shadow-sm cursor-pointer font-sans">
@@ -129,12 +130,46 @@ tailwind.config = {
 </div>
 
 <!-- FORM BODY -->
-<form id="par-form" method="POST" action="{% url 'listings_app:create_listing' %}" enctype="multipart/form-data" class="max-w-3xl mx-auto px-4 sm:px-6 py-8 pb-20">
+<form id="par-form" method="POST"
+      action="{% if listing %}{% url 'listings_app:update_listing' listing.pk %}{% else %}{% url 'listings_app:create_listing' %}{% endif %}"
+      enctype="multipart/form-data"
+      {% if listing %}data-edit-mode="1"{% endif %}
+      class="max-w-3xl mx-auto px-4 sm:px-6 py-8 pb-20">
 {% csrf_token %}
-<input type="hidden" name="action"        id="par-action"       value="draft">
-<input type="hidden" name="listing_type"  id="par-listing-type" value="private_room">
-<input type="hidden" name="max_occupants" id="par-max-occupants" value="3">
-<input type="hidden" name="custom_requirements" id="par-custom-json" value="[]">
+<input type="hidden" name="action"        id="par-action"       value="{% if listing %}{{ listing.status }}{% else %}draft{% endif %}">
+<input type="hidden" name="listing_type"  id="par-listing-type" value="{{ listing.listing_type|default:'private_room' }}">
+<input type="hidden" name="max_occupants" id="par-max-occupants" value="{{ listing.max_occupants|default:3 }}">
+<input type="hidden" name="custom_requirements" id="par-custom-json" value="{{ listing.custom_requirements_json|default:'[]' }}">
+<input type="hidden" name="kept_image_ids" id="par-kept-image-ids" value="">
+{% if listing %}{{ existing_images_json|json_script:"nm-existing-images-data" }}{% endif %}
+
+{% if errors %}
+<div class="bg-rose-50 border border-rose-200 rounded-lg px-4 py-3 mb-5 flex flex-col gap-1.5" id="par-server-errors">
+  <div class="text-sm font-extrabold text-rose-700">Your listing was NOT saved — please fix the following:</div>
+  {% for field, msgs in errors.items %}
+    {% for msg in msgs %}
+    <div class="text-[13px] text-rose-700 font-semibold flex items-center gap-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>
+      <span>{{ msg }}</span>
+    </div>
+    {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if errors %}
+<div class="bg-rose-50 border border-rose-200 rounded-lg px-4 py-3 mb-5 flex flex-col gap-1.5" id="par-server-errors">
+  <div class="text-sm font-extrabold text-rose-700">Your listing was NOT saved — please fix the following:</div>
+  {% for field, msgs in errors.items %}
+    {% for msg in msgs %}
+    <div class="text-[13px] text-rose-700 font-semibold flex items-center gap-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>
+      <span>{{ msg }}</span>
+    </div>
+    {% endfor %}
+  {% endfor %}
+</div>
+{% endif %}
 
   <!-- STEP 1: Basic Info -->
   <div id="par-s1" class="fade-up">
@@ -155,22 +190,22 @@ tailwind.config = {
         </div>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div class="nm-type-card sel" data-type="private_room" data-max-occ="5" onclick="parPickType(this)">
+        <div class="nm-type-card {% if listing %}{% if listing.listing_type == 'private_room' %}sel{% endif %}{% else %}sel{% endif %}" data-type="private_room" data-max-occ="5" onclick="parPickType(this)">
           <span class="ico">{% icon 'bed' size=26 %}</span>
           <span class="lbl">Private Room</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Your own room</span>
         </div>
-        <div class="nm-type-card" data-type="full_apartment" data-max-occ="20" onclick="parPickType(this)">
+        <div class="nm-type-card {% if listing.listing_type == 'full_apartment' %}sel{% endif %}" data-type="full_apartment" data-max-occ="20" onclick="parPickType(this)">
           <span class="ico">{% icon 'home' size=26 %}</span>
           <span class="lbl">Full Apartment</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Entire unit</span>
         </div>
-        <div class="nm-type-card" data-type="shared_bed" data-max-occ="2" onclick="parPickType(this)">
+        <div class="nm-type-card {% if listing.listing_type == 'shared_bed' %}sel{% endif %}" data-type="shared_bed" data-max-occ="2" onclick="parPickType(this)">
           <span class="ico">{% icon 'bunk-bed' size=26 %}</span>
           <span class="lbl">Shared Bed</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Shared room</span>
         </div>
-        <div class="nm-type-card" data-type="roommate_wanted" data-max-occ="1" onclick="parPickType(this)">
+        <div class="nm-type-card {% if listing.listing_type == 'roommate_wanted' %}sel{% endif %}" data-type="roommate_wanted" data-max-occ="1" onclick="parPickType(this)">
           <span class="ico">{% icon 'people' size=26 %}</span>
           <span class="lbl">Roommate Wanted</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Looking for someone</span>
@@ -192,13 +227,13 @@ tailwind.config = {
           <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Monthly Rent</label>
           <div class="relative">
             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-500">$</span>
-            <input type="number" id="par-rent" name="price" placeholder="250" class="nm-input pl-7" min="0">
+            <input type="number" id="par-rent" name="price" placeholder="250" value="{{ listing.price|default:'' }}" class="nm-input pl-7" min="0">
           </div>
           <div id="par-rent-hint" class="text-[11px] text-gray-400 mt-1">Per person / per month</div>
         </div>
         <div>
           <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Available From</label>
-          <input type="date" id="par-date" name="available_from" class="nm-input text-gray-800">
+          <input type="date" id="par-date" name="available_from" value="{{ listing.available_from|date:'Y-m-d'|default:'' }}" class="nm-input text-gray-800">
           <div class="text-[11px] text-gray-400 mt-1">Leave blank if available now</div>
         </div>
       </div>
@@ -219,7 +254,7 @@ tailwind.config = {
           <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
             <button type="button" onclick="parChangeOcc(-1)" class="px-4 py-3 bg-gray-50 border-none border-r border-gray-200 cursor-pointer text-lg font-bold text-gray-700 hover:bg-gray-100 transition-colors">−</button>
             <div class="flex-1 text-center">
-              <div id="par-occ" class="text-lg font-extrabold text-violet-600">3</div>
+              <div id="par-occ" class="text-lg font-extrabold text-violet-600">{{ listing.max_occupants|default:3 }}</div>
               <div id="par-occ-label" class="text-[11px] text-gray-400">people</div>
             </div>
             <button type="button" onclick="parChangeOcc(1)" class="px-4 py-3 bg-gray-50 border-none border-l border-gray-200 cursor-pointer text-lg font-bold text-gray-700 hover:bg-gray-100 transition-colors">+</button>
@@ -229,12 +264,12 @@ tailwind.config = {
         <div>
           <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Minimum Stay</label>
           <select name="min_stay_months" class="nm-input cursor-pointer text-gray-800">
-            <option value="1">1 month</option>
-            <option value="2">2 months</option>
-            <option value="3" selected>3 months</option>
-            <option value="6">6 months</option>
-            <option value="12">1 year</option>
-            <option value="0">Flexible</option>
+            <option value="1" {% if listing.min_stay_months == 1 %}selected{% endif %}>1 month</option>
+            <option value="2" {% if listing.min_stay_months == 2 %}selected{% endif %}>2 months</option>
+            <option value="3" {% if not listing or listing.min_stay_months == 3 %}selected{% endif %}>3 months</option>
+            <option value="6" {% if listing.min_stay_months == 6 %}selected{% endif %}>6 months</option>
+            <option value="12" {% if listing.min_stay_months == 12 %}selected{% endif %}>1 year</option>
+            <option value="0" {% if listing.min_stay_months == 0 %}selected{% endif %}>Flexible</option>
           </select>
           <div class="text-[11px] text-gray-400 mt-1">Minimum commitment required</div>
         </div>
@@ -255,7 +290,7 @@ tailwind.config = {
       </div>
 
       <!-- Anyone Welcome — full-width row toggle -->
-      <div id="par-tenant-anyone" class="nm-anyone-card mb-3" onclick="parPickAnyone()">
+      <div id="par-tenant-anyone" class="nm-anyone-card mb-3 {% if listing and 'anyone' in listing.tenant_types %}sel{% elif not listing %}sel{% endif %}" onclick="parPickAnyone()">
         <div class="flex items-center gap-3">
           <span class="text-violet-600 flex items-center">{% icon 'handshake' size=20 %}</span>
           <div>
@@ -264,22 +299,22 @@ tailwind.config = {
           </div>
         </div>
         <span id="par-anyone-check"
-              class="hidden w-5 h-5 rounded-full bg-violet-600 flex items-center justify-center text-white shrink-0">{% icon 'check' size=11 %}</span>
+              class="{% if not listing or 'anyone' in listing.tenant_types %}{% else %}hidden{% endif %} w-5 h-5 rounded-full bg-violet-600 flex items-center justify-center text-white shrink-0">{% icon 'check' size=11 %}</span>
       </div>
 
       <!-- Specific tenant types — 2-column grid -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="par-tenant-grid">
-        <div class="nm-type-card" data-tenant="students" onclick="parPickTenant(this)">
+        <div class="nm-type-card {% if listing and 'students' in listing.tenant_types %}sel{% endif %}" data-tenant="students" onclick="parPickTenant(this)">
           <span class="ico">{% icon 'graduation-cap' size=26 %}</span>
           <span class="lbl">Students</span>
           <span class="text-[11px] text-gray-400 mt-0.5">University / college</span>
         </div>
-        <div class="nm-type-card" data-tenant="professionals" onclick="parPickTenant(this)">
+        <div class="nm-type-card {% if listing and 'professionals' in listing.tenant_types %}sel{% endif %}" data-tenant="professionals" onclick="parPickTenant(this)">
           <span class="ico">{% icon 'briefcase' size=26 %}</span>
           <span class="lbl">Professionals</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Employed / remote</span>
         </div>
-        <div class="nm-type-card" data-tenant="families" onclick="parPickTenant(this)">
+        <div class="nm-type-card {% if listing and 'families' in listing.tenant_types %}sel{% endif %}" data-tenant="families" onclick="parPickTenant(this)">
           <span class="ico">{% icon 'people' size=26 %}</span>
           <span class="lbl">Families</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Couples or small families</span>
@@ -287,7 +322,7 @@ tailwind.config = {
       </div>
 
       <!-- Hidden input to collect value -->
-      <input type="hidden" id="par-tenant-value" name="tenant_types" value="anyone">
+      <input type="hidden" id="par-tenant-value" name="tenant_types" value="{{ listing.tenant_types|join:','|default:'anyone' }}">
     </div>
 
   </div>
@@ -309,7 +344,7 @@ tailwind.config = {
           <div class="text-xs text-gray-400">A clear title attracts the right tenants</div>
         </div>
       </div>
-      <input type="text" id="par-title" name="title" placeholder="e.g. Cozy Private Room Near Ain Shams University" class="nm-input" oninput="parUpdateTitleCount(this)">
+      <input type="text" id="par-title" name="title" placeholder="e.g. Cozy Private Room Near Ain Shams University" value="{{ listing.title|default:'' }}" class="nm-input" oninput="parUpdateTitleCount(this)">
       <div class="flex justify-between mt-1.5">
         <span class="text-xs text-gray-400">Be specific — mention area, university, or nearby landmark</span>
         <span id="par-title-count" class="text-xs text-gray-400">0 / 80</span>
@@ -324,33 +359,33 @@ tailwind.config = {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Country</label>
-            <input type="text" id="nm-field-country" name="country" placeholder="e.g. Palestine, Egypt" class="nm-input">
+            <input type="text" id="nm-field-country" name="country" placeholder="e.g. Palestine, Egypt" value="{{ listing.country|default:'' }}" class="nm-input">
           </div>
           <div>
             <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">City</label>
-            <input type="text" id="nm-field-city" name="city" placeholder="e.g. Gaza, Cairo" class="nm-input">
+            <input type="text" id="nm-field-city" name="city" placeholder="e.g. Gaza, Cairo" value="{{ listing.city|default:'' }}" class="nm-input">
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">District / Area</label>
-            <input type="text" id="nm-field-district" name="district" placeholder="e.g. Rimal, Nasr City" class="nm-input">
+            <input type="text" id="nm-field-district" name="district" placeholder="e.g. Rimal, Nasr City" value="{{ listing.district|default:'' }}" class="nm-input">
           </div>
           <div>
             <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Street</label>
-            <input type="text" id="nm-field-street" name="street" placeholder="e.g. Omar Al-Mukhtar St." class="nm-input">
+            <input type="text" id="nm-field-street" name="street" placeholder="e.g. Omar Al-Mukhtar St." value="{{ listing.street|default:'' }}" class="nm-input">
           </div>
         </div>
 
         <div>
           <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Full Address <span class="text-[11px] font-normal text-gray-400">— auto-filled from map</span></label>
-          <input type="text" id="nm-field-address" name="address" placeholder="Pin on the map below to auto-fill" class="nm-input bg-gray-50">
+          <input type="text" id="nm-field-address" name="address" placeholder="Pin on the map below to auto-fill" value="{{ listing.address|default:'' }}" class="nm-input bg-gray-50">
         </div>
 
         <div class="relative">
           <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Nearest Landmark</label>
-          <input type="text" id="nm-field-landmark" name="landmark" placeholder="e.g. University, Mosque, Hospital..." class="nm-input" autocomplete="off" oninput="parLandmarkSearch(this.value)" onkeydown="parLandmarkKey(event)">
+          <input type="text" id="nm-field-landmark" name="landmark" placeholder="e.g. University, Mosque, Hospital..." value="{{ listing.landmark|default:'' }}" class="nm-input" autocomplete="off" oninput="parLandmarkSearch(this.value)" onkeydown="parLandmarkKey(event)">
           <div id="nm-landmark-dropdown" class="hidden absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-56 overflow-y-auto mt-1"></div>
         </div>
         <!-- Map -->
@@ -368,8 +403,8 @@ tailwind.config = {
             <span class="inline-flex items-center gap-1 align-middle">{% icon 'map-pin' size=14 %}</span> <strong id="nm-map-address">Location pinned</strong>
             <span id="nm-map-coords" class="text-gray-500 ml-2"></span>
           </div>
-          <input type="hidden" id="nm-lat" name="lat">
-          <input type="hidden" id="nm-lng" name="lng">
+          <input type="hidden" id="nm-lat" name="lat" value="{{ listing.lat|default:'' }}">
+          <input type="hidden" id="nm-lng" name="lng" value="{{ listing.lng|default:'' }}">
         </div>
       </div>
     </div>
@@ -409,8 +444,8 @@ tailwind.config = {
           </button>
         </div>
         <div class="relative">
-          <textarea id="nm-desc-ta" name="description" placeholder="Describe your room — what makes it special, nearby landmarks, included amenities, house rules..." class="nm-input min-h-[140px] resize-y p-3.5 text-sm leading-relaxed"></textarea>
-          <input type="hidden" name="ai_generated" id="nm-ai-generated" value="0">
+          <textarea id="nm-desc-ta" name="description" placeholder="Describe your room — what makes it special, nearby landmarks, included amenities, house rules..." class="nm-input min-h-[140px] resize-y p-3.5 text-sm leading-relaxed">{{ listing.description|default:'' }}</textarea>
+          <input type="hidden" name="ai_generated" id="nm-ai-generated" value="{% if listing.ai_generated %}1{% else %}0{% endif %}">
           <div id="nm-ai-badge" class="hidden absolute top-2.5 right-2.5 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)"><span class="shrink-0">{% icon 'sparkle' size=11 %}</span> AI Generated</div>
         </div>
       </div>
@@ -429,10 +464,10 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'cigarette-ban' size=16 %}</span>Smoking & Substances</h3>
       <p class="text-xs text-gray-400 mb-4">Rules about smoking, vaping, and alcohol inside the property</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cigarette-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Smoking Allowed</div><div class="text-xs text-gray-400">Strictly no smoking inside</div></div></div><label class="nm-switch"><input type="checkbox" name="no_smoking" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cigarette' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smoking Allowed Outside Only</div><div class="text-xs text-gray-400">Permitted on balcony or outdoors</div></div></div><label class="nm-switch"><input type="checkbox" name="smoking_outside_ok"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Alcohol on Premises</div><div class="text-xs text-gray-400">Alcohol-free household</div></div></div><label class="nm-switch"><input type="checkbox" name="no_alcohol"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Vaping / E-Cigarettes</div><div class="text-xs text-gray-400">No vaping devices inside</div></div></div><label class="nm-switch"><input type="checkbox" name="no_vaping"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cigarette-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Smoking Allowed</div><div class="text-xs text-gray-400">Strictly no smoking inside</div></div></div><label class="nm-switch"><input type="checkbox" name="no_smoking" {% if listing %}{{ listing|bool_attr:'no_smoking' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cigarette' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smoking Allowed Outside Only</div><div class="text-xs text-gray-400">Permitted on balcony or outdoors</div></div></div><label class="nm-switch"><input type="checkbox" name="smoking_outside_ok" {% if listing %}{{ listing|bool_attr:'smoking_outside_ok' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Alcohol on Premises</div><div class="text-xs text-gray-400">Alcohol-free household</div></div></div><label class="nm-switch"><input type="checkbox" name="no_alcohol" {% if listing %}{{ listing|bool_attr:'no_alcohol' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Vaping / E-Cigarettes</div><div class="text-xs text-gray-400">No vaping devices inside</div></div></div><label class="nm-switch"><input type="checkbox" name="no_vaping" {% if listing %}{{ listing|bool_attr:'no_vaping' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -441,11 +476,11 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'mosque' size=16 %}</span>Religion & Culture</h3>
       <p class="text-xs text-gray-400 mb-4">Religious and cultural preferences for the household</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'mosque' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Muslims Only</div><div class="text-xs text-gray-400">Religious preference for tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="muslims_only" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cross' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Christians Only</div><div class="text-xs text-gray-400">Religious preference for tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="christians_only"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'globe' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">All Religions Welcome</div><div class="text-xs text-gray-400">No religion restriction</div></div></div><label class="nm-switch"><input type="checkbox" name="all_religions_ok"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'utensils' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Halal Kitchen Only</div><div class="text-xs text-gray-400">Only halal food prepared</div></div></div><label class="nm-switch"><input type="checkbox" name="halal_kitchen" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'prayer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Prayer Space Available</div><div class="text-xs text-gray-400">Dedicated area for prayer</div></div></div><label class="nm-switch"><input type="checkbox" name="prayer_space"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'mosque' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Muslims Only</div><div class="text-xs text-gray-400">Religious preference for tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="muslims_only" {% if listing %}{{ listing|bool_attr:'muslims_only' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cross' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Christians Only</div><div class="text-xs text-gray-400">Religious preference for tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="christians_only" {% if listing %}{{ listing|bool_attr:'christians_only' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'globe' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">All Religions Welcome</div><div class="text-xs text-gray-400">No religion restriction</div></div></div><label class="nm-switch"><input type="checkbox" name="all_religions_ok" {% if listing %}{{ listing|bool_attr:'all_religions_ok' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'utensils' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Halal Kitchen Only</div><div class="text-xs text-gray-400">Only halal food prepared</div></div></div><label class="nm-switch"><input type="checkbox" name="halal_kitchen" {% if listing %}{{ listing|bool_attr:'halal_kitchen' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'prayer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Prayer Space Available</div><div class="text-xs text-gray-400">Dedicated area for prayer</div></div></div><label class="nm-switch"><input type="checkbox" name="prayer_space" {% if listing %}{{ listing|bool_attr:'prayer_space' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -454,12 +489,12 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'people' size=16 %}</span>Gender & Tenant Type</h3>
       <p class="text-xs text-gray-400 mb-4">Who are you looking for as a housemate?</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Males Only</div><div class="text-xs text-gray-400">Male tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="males_only" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Females Only</div><div class="text-xs text-gray-400">Female tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="females_only"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'graduation-cap' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Students Only</div><div class="text-xs text-gray-400">University students preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="students_only" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'briefcase' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Working Professionals Only</div><div class="text-xs text-gray-400">Employed tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="professionals_only"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'plane' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Expats Welcome</div><div class="text-xs text-gray-400">Open to international tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="expats_welcome"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Children</div><div class="text-xs text-gray-400">Adults only household</div></div></div><label class="nm-switch"><input type="checkbox" name="no_children"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Males Only</div><div class="text-xs text-gray-400">Male tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="males_only" {% if listing %}{{ listing|bool_attr:'males_only' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Females Only</div><div class="text-xs text-gray-400">Female tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="females_only" {% if listing %}{{ listing|bool_attr:'females_only' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'graduation-cap' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Students Only</div><div class="text-xs text-gray-400">University students preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="students_only" {% if listing %}{{ listing|bool_attr:'students_only' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'briefcase' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Working Professionals Only</div><div class="text-xs text-gray-400">Employed tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="professionals_only" {% if listing %}{{ listing|bool_attr:'professionals_only' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'plane' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Expats Welcome</div><div class="text-xs text-gray-400">Open to international tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="expats_welcome" {% if listing %}{{ listing|bool_attr:'expats_welcome' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Children</div><div class="text-xs text-gray-400">Adults only household</div></div></div><label class="nm-switch"><input type="checkbox" name="no_children" {% if listing %}{{ listing|bool_attr:'no_children' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -468,10 +503,10 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'paw' size=16 %}</span>Pets & Animals</h3>
       <p class="text-xs text-gray-400 mb-4">Pet policy for the property</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'paw' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Pets Allowed</div><div class="text-xs text-gray-400">Small pets accepted</div></div></div><label class="nm-switch"><input type="checkbox" name="pets_allowed"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'dog' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dogs Allowed</div><div class="text-xs text-gray-400">Dog-friendly household</div></div></div><label class="nm-switch"><input type="checkbox" name="dogs_allowed"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cat' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Cats Allowed</div><div class="text-xs text-gray-400">Cat-friendly household</div></div></div><label class="nm-switch"><input type="checkbox" name="cats_allowed"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Pets Allowed</div><div class="text-xs text-gray-400">Strictly no animals</div></div></div><label class="nm-switch"><input type="checkbox" name="no_pets"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'paw' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Pets Allowed</div><div class="text-xs text-gray-400">Small pets accepted</div></div></div><label class="nm-switch"><input type="checkbox" name="pets_allowed" {% if listing %}{{ listing|bool_attr:'pets_allowed' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'dog' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dogs Allowed</div><div class="text-xs text-gray-400">Dog-friendly household</div></div></div><label class="nm-switch"><input type="checkbox" name="dogs_allowed" {% if listing %}{{ listing|bool_attr:'dogs_allowed' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cat' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Cats Allowed</div><div class="text-xs text-gray-400">Cat-friendly household</div></div></div><label class="nm-switch"><input type="checkbox" name="cats_allowed" {% if listing %}{{ listing|bool_attr:'cats_allowed' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Pets Allowed</div><div class="text-xs text-gray-400">Strictly no animals</div></div></div><label class="nm-switch"><input type="checkbox" name="no_pets" {% if listing %}{{ listing|bool_attr:'no_pets' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -480,12 +515,12 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'chef-hat' size=16 %}</span>Kitchen & Food</h3>
       <p class="text-xs text-gray-400 mb-4">Cooking habits and food rules in the shared kitchen</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'chef-hat' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Must Know Cooking</div><div class="text-xs text-gray-400">Basic cooking skills required</div></div></div><label class="nm-switch"><input type="checkbox" name="must_cook"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'leaf' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Vegetarian Household</div><div class="text-xs text-gray-400">No meat cooking in shared kitchen</div></div></div><label class="nm-switch"><input type="checkbox" name="vegetarian_house"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'fish-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Seafood Cooking</div><div class="text-xs text-gray-400">Seafood not allowed in kitchen</div></div></div><label class="nm-switch"><input type="checkbox" name="no_seafood"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cart' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Groceries</div><div class="text-xs text-gray-400">Housemates split grocery costs</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_groceries"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'plate' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Fully Equipped Kitchen</div><div class="text-xs text-gray-400">Fridge, stove, microwave included</div></div></div><label class="nm-switch"><input type="checkbox" name="equipped_kitchen" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'takeout-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Outside Food in Rooms</div><div class="text-xs text-gray-400">Eat only in kitchen/dining area</div></div></div><label class="nm-switch"><input type="checkbox" name="no_food_in_rooms"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'chef-hat' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Must Know Cooking</div><div class="text-xs text-gray-400">Basic cooking skills required</div></div></div><label class="nm-switch"><input type="checkbox" name="must_cook" {% if listing %}{{ listing|bool_attr:'must_cook' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'leaf' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Vegetarian Household</div><div class="text-xs text-gray-400">No meat cooking in shared kitchen</div></div></div><label class="nm-switch"><input type="checkbox" name="vegetarian_house" {% if listing %}{{ listing|bool_attr:'vegetarian_house' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'fish-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Seafood Cooking</div><div class="text-xs text-gray-400">Seafood not allowed in kitchen</div></div></div><label class="nm-switch"><input type="checkbox" name="no_seafood" {% if listing %}{{ listing|bool_attr:'no_seafood' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cart' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Groceries</div><div class="text-xs text-gray-400">Housemates split grocery costs</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_groceries" {% if listing %}{{ listing|bool_attr:'shared_groceries' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'plate' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Fully Equipped Kitchen</div><div class="text-xs text-gray-400">Fridge, stove, microwave included</div></div></div><label class="nm-switch"><input type="checkbox" name="equipped_kitchen" {% if listing %}{{ listing|bool_attr:'equipped_kitchen' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'takeout-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Outside Food in Rooms</div><div class="text-xs text-gray-400">Eat only in kitchen/dining area</div></div></div><label class="nm-switch"><input type="checkbox" name="no_food_in_rooms" {% if listing %}{{ listing|bool_attr:'no_food_in_rooms' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -494,12 +529,12 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'moon' size=16 %}</span>Noise & Schedule</h3>
       <p class="text-xs text-gray-400 mb-4">Quiet hours, sleep schedules, and noise expectations</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'moon' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quiet Hours After 10 PM</div><div class="text-xs text-gray-400">No noise after 10 PM</div></div></div><label class="nm-switch"><input type="checkbox" name="quiet_after_10"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'sunset' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Early Sleepers Only</div><div class="text-xs text-gray-400">Lights out before 11 PM</div></div></div><label class="nm-switch"><input type="checkbox" name="early_sleepers"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'music-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Loud Music</div><div class="text-xs text-gray-400">Keep volume low at all times</div></div></div><label class="nm-switch"><input type="checkbox" name="no_loud_music" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'party-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Parties</div><div class="text-xs text-gray-400">No gatherings or events</div></div></div><label class="nm-switch"><input type="checkbox" name="no_parties" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'lotus' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Calm & Respectful Environment</div><div class="text-xs text-gray-400">Peaceful living space preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="calm_environment"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'phone-mute' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Phone Calls in Common Areas</div><div class="text-xs text-gray-400">Take calls in your room</div></div></div><label class="nm-switch"><input type="checkbox" name="no_calls_common"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'moon' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quiet Hours After 10 PM</div><div class="text-xs text-gray-400">No noise after 10 PM</div></div></div><label class="nm-switch"><input type="checkbox" name="quiet_after_10" {% if listing %}{{ listing|bool_attr:'quiet_after_10' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'sunset' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Early Sleepers Only</div><div class="text-xs text-gray-400">Lights out before 11 PM</div></div></div><label class="nm-switch"><input type="checkbox" name="early_sleepers" {% if listing %}{{ listing|bool_attr:'early_sleepers' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'music-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Loud Music</div><div class="text-xs text-gray-400">Keep volume low at all times</div></div></div><label class="nm-switch"><input type="checkbox" name="no_loud_music" {% if listing %}{{ listing|bool_attr:'no_loud_music' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'party-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Parties</div><div class="text-xs text-gray-400">No gatherings or events</div></div></div><label class="nm-switch"><input type="checkbox" name="no_parties" {% if listing %}{{ listing|bool_attr:'no_parties' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'lotus' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Calm & Respectful Environment</div><div class="text-xs text-gray-400">Peaceful living space preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="calm_environment" {% if listing %}{{ listing|bool_attr:'calm_environment' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'phone-mute' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Phone Calls in Common Areas</div><div class="text-xs text-gray-400">Take calls in your room</div></div></div><label class="nm-switch"><input type="checkbox" name="no_calls_common" {% if listing %}{{ listing|bool_attr:'no_calls_common' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -508,11 +543,11 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'broom' size=16 %}</span>Cleanliness & Hygiene</h3>
       <p class="text-xs text-gray-400 mb-4">Expectations for shared space cleanliness</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'broom' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Cleaning Duties</div><div class="text-xs text-gray-400">Rotating cleaning schedule</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_cleaning"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shoe-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Shoes Inside</div><div class="text-xs text-gray-400">Remove footwear at the door</div></div></div><label class="nm-switch"><input type="checkbox" name="no_shoes_inside"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'handshake' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Respect Shared Spaces</div><div class="text-xs text-gray-400">Keep common areas clean</div></div></div><label class="nm-switch"><input type="checkbox" name="respect_spaces" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'droplet' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Clean Bathroom After Use</div><div class="text-xs text-gray-400">Leave bathroom tidy always</div></div></div><label class="nm-switch"><input type="checkbox" name="clean_bathroom" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'recycle' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Separate Recycling</div><div class="text-xs text-gray-400">Waste sorted and recycled</div></div></div><label class="nm-switch"><input type="checkbox" name="separate_recycling"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'broom' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Cleaning Duties</div><div class="text-xs text-gray-400">Rotating cleaning schedule</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_cleaning" {% if listing %}{{ listing|bool_attr:'shared_cleaning' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shoe-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Shoes Inside</div><div class="text-xs text-gray-400">Remove footwear at the door</div></div></div><label class="nm-switch"><input type="checkbox" name="no_shoes_inside" {% if listing %}{{ listing|bool_attr:'no_shoes_inside' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'handshake' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Respect Shared Spaces</div><div class="text-xs text-gray-400">Keep common areas clean</div></div></div><label class="nm-switch"><input type="checkbox" name="respect_spaces" {% if listing %}{{ listing|bool_attr:'respect_spaces' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'droplet' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Clean Bathroom After Use</div><div class="text-xs text-gray-400">Leave bathroom tidy always</div></div></div><label class="nm-switch"><input type="checkbox" name="clean_bathroom" {% if listing %}{{ listing|bool_attr:'clean_bathroom' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'recycle' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Separate Recycling</div><div class="text-xs text-gray-400">Waste sorted and recycled</div></div></div><label class="nm-switch"><input type="checkbox" name="separate_recycling" {% if listing %}{{ listing|bool_attr:'separate_recycling' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -521,10 +556,10 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'clock' size=16 %}</span>Guest Rules</h3>
       <p class="text-xs text-gray-400 mb-4">Visitor and overnight guest policies</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Overnight Guests</div><div class="text-xs text-gray-400">Visitors must leave by midnight</div></div></div><label class="nm-switch"><input type="checkbox" name="no_overnight_guests"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'people' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Guests Allowed with Notice</div><div class="text-xs text-gray-400">Inform housemates 24hrs ahead</div></div></div><label class="nm-switch"><input type="checkbox" name="guests_with_notice"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'clock' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Curfew After Midnight</div><div class="text-xs text-gray-400">No entry after 12 AM</div></div></div><label class="nm-switch"><input type="checkbox" name="curfew_midnight"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'speaker-mute' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Gatherings in Common Areas</div><div class="text-xs text-gray-400">Guests only in private room</div></div></div><label class="nm-switch"><input type="checkbox" name="no_gatherings"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Overnight Guests</div><div class="text-xs text-gray-400">Visitors must leave by midnight</div></div></div><label class="nm-switch"><input type="checkbox" name="no_overnight_guests" {% if listing %}{{ listing|bool_attr:'no_overnight_guests' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'people' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Guests Allowed with Notice</div><div class="text-xs text-gray-400">Inform housemates 24hrs ahead</div></div></div><label class="nm-switch"><input type="checkbox" name="guests_with_notice" {% if listing %}{{ listing|bool_attr:'guests_with_notice' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'clock' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Curfew After Midnight</div><div class="text-xs text-gray-400">No entry after 12 AM</div></div></div><label class="nm-switch"><input type="checkbox" name="curfew_midnight" {% if listing %}{{ listing|bool_attr:'curfew_midnight' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'speaker-mute' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Gatherings in Common Areas</div><div class="text-xs text-gray-400">Guests only in private room</div></div></div><label class="nm-switch"><input type="checkbox" name="no_gatherings" {% if listing %}{{ listing|bool_attr:'no_gatherings' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -533,16 +568,16 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'sofa' size=16 %}</span>Room Amenities</h3>
       <p class="text-xs text-gray-400 mb-4">What's included in or around the room?</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'chair' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Fully Furnished</div><div class="text-xs text-gray-400">Bed, wardrobe, study desk included</div></div></div><label class="nm-switch"><input type="checkbox" name="fully_furnished" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bathtub' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private En-Suite Bathroom</div><div class="text-xs text-gray-400">Bathroom attached to the room</div></div></div><label class="nm-switch"><input type="checkbox" name="en_suite_bathroom"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'snowflake' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Air Conditioning</div><div class="text-xs text-gray-400">A/C unit in the room</div></div></div><label class="nm-switch"><input type="checkbox" name="air_conditioning"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'thermometer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Heating</div><div class="text-xs text-gray-400">Central or room heater available</div></div></div><label class="nm-switch"><input type="checkbox" name="heating"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shower' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Hot Water 24/7</div><div class="text-xs text-gray-400">Always-on hot water supply</div></div></div><label class="nm-switch"><input type="checkbox" name="hot_water_24_7" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'window' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Natural Light / Windows</div><div class="text-xs text-gray-400">Room has windows with good light</div></div></div><label class="nm-switch"><input type="checkbox" name="natural_light" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'garden' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Balcony</div><div class="text-xs text-gray-400">Private or shared balcony access</div></div></div><label class="nm-switch"><input type="checkbox" name="balcony"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'box' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Storage Space</div><div class="text-xs text-gray-400">Extra closet or storage room</div></div></div><label class="nm-switch"><input type="checkbox" name="storage_space"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'tv' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">TV in Common Area</div><div class="text-xs text-gray-400">Shared living room TV</div></div></div><label class="nm-switch"><input type="checkbox" name="tv_common_area"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'elevator' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Elevator</div><div class="text-xs text-gray-400">Building has elevator access</div></div></div><label class="nm-switch"><input type="checkbox" name="elevator"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'chair' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Fully Furnished</div><div class="text-xs text-gray-400">Bed, wardrobe, study desk included</div></div></div><label class="nm-switch"><input type="checkbox" name="fully_furnished" {% if listing %}{{ listing|bool_attr:'fully_furnished' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bathtub' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private En-Suite Bathroom</div><div class="text-xs text-gray-400">Bathroom attached to the room</div></div></div><label class="nm-switch"><input type="checkbox" name="en_suite_bathroom" {% if listing %}{{ listing|bool_attr:'en_suite_bathroom' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'snowflake' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Air Conditioning</div><div class="text-xs text-gray-400">A/C unit in the room</div></div></div><label class="nm-switch"><input type="checkbox" name="air_conditioning" {% if listing %}{{ listing|bool_attr:'air_conditioning' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'thermometer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Heating</div><div class="text-xs text-gray-400">Central or room heater available</div></div></div><label class="nm-switch"><input type="checkbox" name="heating" {% if listing %}{{ listing|bool_attr:'heating' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shower' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Hot Water 24/7</div><div class="text-xs text-gray-400">Always-on hot water supply</div></div></div><label class="nm-switch"><input type="checkbox" name="hot_water_24_7" {% if listing %}{{ listing|bool_attr:'hot_water_24_7' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'window' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Natural Light / Windows</div><div class="text-xs text-gray-400">Room has windows with good light</div></div></div><label class="nm-switch"><input type="checkbox" name="natural_light" {% if listing %}{{ listing|bool_attr:'natural_light' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'garden' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Balcony</div><div class="text-xs text-gray-400">Private or shared balcony access</div></div></div><label class="nm-switch"><input type="checkbox" name="balcony" {% if listing %}{{ listing|bool_attr:'balcony' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'box' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Storage Space</div><div class="text-xs text-gray-400">Extra closet or storage room</div></div></div><label class="nm-switch"><input type="checkbox" name="storage_space" {% if listing %}{{ listing|bool_attr:'storage_space' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'tv' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">TV in Common Area</div><div class="text-xs text-gray-400">Shared living room TV</div></div></div><label class="nm-switch"><input type="checkbox" name="tv_common_area" {% if listing %}{{ listing|bool_attr:'tv_common_area' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'elevator' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Elevator</div><div class="text-xs text-gray-400">Building has elevator access</div></div></div><label class="nm-switch"><input type="checkbox" name="elevator" {% if listing %}{{ listing|bool_attr:'elevator' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -551,12 +586,12 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'bolt' size=16 %}</span>Bills & Utilities</h3>
       <p class="text-xs text-gray-400 mb-4">Which costs are already covered in the monthly rent?</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bolt' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Electricity Included</div><div class="text-xs text-gray-400">Electricity bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="electricity_included"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'droplet' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Water Included</div><div class="text-xs text-gray-400">Water bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="water_included"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'flame' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gas Included</div><div class="text-xs text-gray-400">Gas bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="gas_included"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'wifi' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Internet / Wi-Fi Included</div><div class="text-xs text-gray-400">High-speed Wi-Fi provided</div></div></div><label class="nm-switch"><input type="checkbox" name="wifi_included"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'recycle' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Waste Collection Included</div><div class="text-xs text-gray-400">Garbage fees covered</div></div></div><label class="nm-switch"><input type="checkbox" name="waste_included"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'receipt' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bills Split Equally</div><div class="text-xs text-gray-400">Utilities divided fairly among housemates</div></div></div><label class="nm-switch"><input type="checkbox" name="bills_split_equally"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bolt' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Electricity Included</div><div class="text-xs text-gray-400">Electricity bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="electricity_included" {% if listing %}{{ listing|bool_attr:'electricity_included' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'droplet' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Water Included</div><div class="text-xs text-gray-400">Water bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="water_included" {% if listing %}{{ listing|bool_attr:'water_included' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'flame' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gas Included</div><div class="text-xs text-gray-400">Gas bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="gas_included" {% if listing %}{{ listing|bool_attr:'gas_included' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'wifi' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Internet / Wi-Fi Included</div><div class="text-xs text-gray-400">High-speed Wi-Fi provided</div></div></div><label class="nm-switch"><input type="checkbox" name="wifi_included" {% if listing %}{{ listing|bool_attr:'wifi_included' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'recycle' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Waste Collection Included</div><div class="text-xs text-gray-400">Garbage fees covered</div></div></div><label class="nm-switch"><input type="checkbox" name="waste_included" {% if listing %}{{ listing|bool_attr:'waste_included' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'receipt' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bills Split Equally</div><div class="text-xs text-gray-400">Utilities divided fairly among housemates</div></div></div><label class="nm-switch"><input type="checkbox" name="bills_split_equally" {% if listing %}{{ listing|bool_attr:'bills_split_equally' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -565,10 +600,10 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'monitor' size=16 %}</span>Work & Study Setup</h3>
       <p class="text-xs text-gray-400 mb-4">Suitable for remote workers or students</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'chair' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dedicated Work / Study Desk</div><div class="text-xs text-gray-400">Desk included in the room</div></div></div><label class="nm-switch"><input type="checkbox" name="study_desk" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'lotus' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quiet Work Environment</div><div class="text-xs text-gray-400">Low noise during work / study hours</div></div></div><label class="nm-switch"><input type="checkbox" name="quiet_work_env"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'plug' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Multiple Power Outlets</div><div class="text-xs text-gray-400">Enough sockets for all devices</div></div></div><label class="nm-switch"><input type="checkbox" name="multiple_outlets"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'printer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Printer Access</div><div class="text-xs text-gray-400">Shared printer available</div></div></div><label class="nm-switch"><input type="checkbox" name="printer_access"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'chair' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dedicated Work / Study Desk</div><div class="text-xs text-gray-400">Desk included in the room</div></div></div><label class="nm-switch"><input type="checkbox" name="study_desk" {% if listing %}{{ listing|bool_attr:'study_desk' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'lotus' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quiet Work Environment</div><div class="text-xs text-gray-400">Low noise during work / study hours</div></div></div><label class="nm-switch"><input type="checkbox" name="quiet_work_env" {% if listing %}{{ listing|bool_attr:'quiet_work_env' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'plug' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Multiple Power Outlets</div><div class="text-xs text-gray-400">Enough sockets for all devices</div></div></div><label class="nm-switch"><input type="checkbox" name="multiple_outlets" {% if listing %}{{ listing|bool_attr:'multiple_outlets' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'printer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Printer Access</div><div class="text-xs text-gray-400">Shared printer available</div></div></div><label class="nm-switch"><input type="checkbox" name="printer_access" {% if listing %}{{ listing|bool_attr:'printer_access' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -577,12 +612,12 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'waves' size=16 %}</span>Building Facilities</h3>
       <p class="text-xs text-gray-400 mb-4">Shared amenities available in the building complex</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'waves' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Swimming Pool</div><div class="text-xs text-gray-400">Building pool available</div></div></div><label class="nm-switch"><input type="checkbox" name="swimming_pool"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'dumbbell' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gym Access</div><div class="text-xs text-gray-400">Building gym available</div></div></div><label class="nm-switch"><input type="checkbox" name="gym_access"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'sunset' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Rooftop Access</div><div class="text-xs text-gray-400">Shared rooftop area</div></div></div><label class="nm-switch"><input type="checkbox" name="rooftop_access"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'garden' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Garden / Outdoor Area</div><div class="text-xs text-gray-400">Green space on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="garden"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'coffee' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Common Lounge / Seating Area</div><div class="text-xs text-gray-400">Shared relaxation space</div></div></div><label class="nm-switch"><input type="checkbox" name="common_lounge"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'steam' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Sauna / Spa</div><div class="text-xs text-gray-400">Wellness facilities on-site</div></div></div><label class="nm-switch"><input type="checkbox" name="sauna"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'waves' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Swimming Pool</div><div class="text-xs text-gray-400">Building pool available</div></div></div><label class="nm-switch"><input type="checkbox" name="swimming_pool" {% if listing %}{{ listing|bool_attr:'swimming_pool' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'dumbbell' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gym Access</div><div class="text-xs text-gray-400">Building gym available</div></div></div><label class="nm-switch"><input type="checkbox" name="gym_access" {% if listing %}{{ listing|bool_attr:'gym_access' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'sunset' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Rooftop Access</div><div class="text-xs text-gray-400">Shared rooftop area</div></div></div><label class="nm-switch"><input type="checkbox" name="rooftop_access" {% if listing %}{{ listing|bool_attr:'rooftop_access' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'garden' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Garden / Outdoor Area</div><div class="text-xs text-gray-400">Green space on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="garden" {% if listing %}{{ listing|bool_attr:'garden' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'coffee' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Common Lounge / Seating Area</div><div class="text-xs text-gray-400">Shared relaxation space</div></div></div><label class="nm-switch"><input type="checkbox" name="common_lounge" {% if listing %}{{ listing|bool_attr:'common_lounge' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'steam' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Sauna / Spa</div><div class="text-xs text-gray-400">Wellness facilities on-site</div></div></div><label class="nm-switch"><input type="checkbox" name="sauna" {% if listing %}{{ listing|bool_attr:'sauna' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -591,12 +626,12 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'lock' size=16 %}</span>Security</h3>
       <p class="text-xs text-gray-400 mb-4">Security features at the property</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shield' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Security Guard</div><div class="text-xs text-gray-400">24/7 guard on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="security_guard"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'camera' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">CCTV Cameras</div><div class="text-xs text-gray-400">Surveillance in common areas</div></div></div><label class="nm-switch"><input type="checkbox" name="cctv"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'gate' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gated Building</div><div class="text-xs text-gray-400">Secured entrance with gate</div></div></div><label class="nm-switch"><input type="checkbox" name="gated_building"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'key' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private Room Lock</div><div class="text-xs text-gray-400">Individual lock on bedroom door</div></div></div><label class="nm-switch"><input type="checkbox" name="private_lock" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'smartphone-lock' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smart Lock / Keypad Entry</div><div class="text-xs text-gray-400">Digital or app-based door lock</div></div></div><label class="nm-switch"><input type="checkbox" name="smart_lock"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bell' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Intercom / Doorbell</div><div class="text-xs text-gray-400">Intercom system at entrance</div></div></div><label class="nm-switch"><input type="checkbox" name="intercom"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shield' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Security Guard</div><div class="text-xs text-gray-400">24/7 guard on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="security_guard" {% if listing %}{{ listing|bool_attr:'security_guard' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'camera' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">CCTV Cameras</div><div class="text-xs text-gray-400">Surveillance in common areas</div></div></div><label class="nm-switch"><input type="checkbox" name="cctv" {% if listing %}{{ listing|bool_attr:'cctv' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'gate' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gated Building</div><div class="text-xs text-gray-400">Secured entrance with gate</div></div></div><label class="nm-switch"><input type="checkbox" name="gated_building" {% if listing %}{{ listing|bool_attr:'gated_building' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'key' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private Room Lock</div><div class="text-xs text-gray-400">Individual lock on bedroom door</div></div></div><label class="nm-switch"><input type="checkbox" name="private_lock" {% if listing %}{{ listing|bool_attr:'private_lock' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'smartphone-lock' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smart Lock / Keypad Entry</div><div class="text-xs text-gray-400">Digital or app-based door lock</div></div></div><label class="nm-switch"><input type="checkbox" name="smart_lock" {% if listing %}{{ listing|bool_attr:'smart_lock' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bell' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Intercom / Doorbell</div><div class="text-xs text-gray-400">Intercom system at entrance</div></div></div><label class="nm-switch"><input type="checkbox" name="intercom" {% if listing %}{{ listing|bool_attr:'intercom' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -605,11 +640,11 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'car' size=16 %}</span>Parking & Transport</h3>
       <p class="text-xs text-gray-400 mb-4">Parking availability and nearby transit options</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'car' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private Parking</div><div class="text-xs text-gray-400">Dedicated parking spot</div></div></div><label class="nm-switch"><input type="checkbox" name="private_parking"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'parking' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Parking</div><div class="text-xs text-gray-400">Communal parking available</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_parking"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'train' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Near Metro Station</div><div class="text-xs text-gray-400">Walking distance to metro</div></div></div><label class="nm-switch"><input type="checkbox" name="near_metro"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bus' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bus Stop Nearby</div><div class="text-xs text-gray-400">Public bus access close by</div></div></div><label class="nm-switch"><input type="checkbox" name="bus_stop_nearby"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bike' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bike Storage</div><div class="text-xs text-gray-400">Secure bicycle parking</div></div></div><label class="nm-switch"><input type="checkbox" name="bike_storage"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'car' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private Parking</div><div class="text-xs text-gray-400">Dedicated parking spot</div></div></div><label class="nm-switch"><input type="checkbox" name="private_parking" {% if listing %}{{ listing|bool_attr:'private_parking' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'parking' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Parking</div><div class="text-xs text-gray-400">Communal parking available</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_parking" {% if listing %}{{ listing|bool_attr:'shared_parking' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'train' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Near Metro Station</div><div class="text-xs text-gray-400">Walking distance to metro</div></div></div><label class="nm-switch"><input type="checkbox" name="near_metro" {% if listing %}{{ listing|bool_attr:'near_metro' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bus' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bus Stop Nearby</div><div class="text-xs text-gray-400">Public bus access close by</div></div></div><label class="nm-switch"><input type="checkbox" name="bus_stop_nearby" {% if listing %}{{ listing|bool_attr:'bus_stop_nearby' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bike' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bike Storage</div><div class="text-xs text-gray-400">Secure bicycle parking</div></div></div><label class="nm-switch"><input type="checkbox" name="bike_storage" {% if listing %}{{ listing|bool_attr:'bike_storage' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -618,10 +653,10 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'washer' size=16 %}</span>Laundry</h3>
       <p class="text-xs text-gray-400 mb-4">Washing and laundry facilities available</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'washer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Washing Machine</div><div class="text-xs text-gray-400">Shared or in-unit washer</div></div></div><label class="nm-switch"><input type="checkbox" name="washing_machine"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'washer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dryer Available</div><div class="text-xs text-gray-400">Clothes dryer on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="dryer"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shirt' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Ironing Board</div><div class="text-xs text-gray-400">Iron and board available</div></div></div><label class="nm-switch"><input type="checkbox" name="ironing_board"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'clothesline' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Clothesline</div><div class="text-xs text-gray-400">Outdoor or indoor drying line</div></div></div><label class="nm-switch"><input type="checkbox" name="clothesline"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'washer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Washing Machine</div><div class="text-xs text-gray-400">Shared or in-unit washer</div></div></div><label class="nm-switch"><input type="checkbox" name="washing_machine" {% if listing %}{{ listing|bool_attr:'washing_machine' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'washer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dryer Available</div><div class="text-xs text-gray-400">Clothes dryer on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="dryer" {% if listing %}{{ listing|bool_attr:'dryer' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shirt' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Ironing Board</div><div class="text-xs text-gray-400">Iron and board available</div></div></div><label class="nm-switch"><input type="checkbox" name="ironing_board" {% if listing %}{{ listing|bool_attr:'ironing_board' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'clothesline' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Clothesline</div><div class="text-xs text-gray-400">Outdoor or indoor drying line</div></div></div><label class="nm-switch"><input type="checkbox" name="clothesline" {% if listing %}{{ listing|bool_attr:'clothesline' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -630,11 +665,11 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'dollar' size=16 %}</span>Financial Terms</h3>
       <p class="text-xs text-gray-400 mb-4">Payment expectations and deposit requirements</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bank' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Security Deposit Required</div><div class="text-xs text-gray-400">Refundable deposit on move-in</div></div></div><label class="nm-switch"><input type="checkbox" name="security_deposit" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'dollar' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Rent Negotiable</div><div class="text-xs text-gray-400">Open to price discussion</div></div></div><label class="nm-switch"><input type="checkbox" name="rent_negotiable"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'calendar' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Monthly Payment</div><div class="text-xs text-gray-400">Pay rent on a monthly basis</div></div></div><label class="nm-switch"><input type="checkbox" name="monthly_payment" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'calendar' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quarterly Payment Option</div><div class="text-xs text-gray-400">Pay every 3 months</div></div></div><label class="nm-switch"><input type="checkbox" name="quarterly_payment"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'credit-card' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Online Payment Accepted</div><div class="text-xs text-gray-400">Bank transfer or digital payment</div></div></div><label class="nm-switch"><input type="checkbox" name="online_payment"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bank' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Security Deposit Required</div><div class="text-xs text-gray-400">Refundable deposit on move-in</div></div></div><label class="nm-switch"><input type="checkbox" name="security_deposit" {% if listing %}{{ listing|bool_attr:'security_deposit' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'dollar' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Rent Negotiable</div><div class="text-xs text-gray-400">Open to price discussion</div></div></div><label class="nm-switch"><input type="checkbox" name="rent_negotiable" {% if listing %}{{ listing|bool_attr:'rent_negotiable' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'calendar' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Monthly Payment</div><div class="text-xs text-gray-400">Pay rent on a monthly basis</div></div></div><label class="nm-switch"><input type="checkbox" name="monthly_payment" {% if listing %}{{ listing|bool_attr:'monthly_payment' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'calendar' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quarterly Payment Option</div><div class="text-xs text-gray-400">Pay every 3 months</div></div></div><label class="nm-switch"><input type="checkbox" name="quarterly_payment" {% if listing %}{{ listing|bool_attr:'quarterly_payment' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'credit-card' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Online Payment Accepted</div><div class="text-xs text-gray-400">Bank transfer or digital payment</div></div></div><label class="nm-switch"><input type="checkbox" name="online_payment" {% if listing %}{{ listing|bool_attr:'online_payment' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -645,17 +680,17 @@ tailwind.config = {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
           <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Check-in After</label>
-          <input type="time" name="check_in_time" class="nm-input text-gray-800">
+          <input type="time" name="check_in_time" value="{{ listing.check_in_time|time:'H:i'|default:'' }}" class="nm-input text-gray-800">
         </div>
         <div>
           <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Checkout Before</label>
-          <input type="time" name="check_out_time" class="nm-input text-gray-800">
+          <input type="time" name="check_out_time" value="{{ listing.check_out_time|time:'H:i'|default:'' }}" class="nm-input text-gray-800">
         </div>
       </div>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'flame' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smoke Alarm Installed</div><div class="text-xs text-gray-400">Working smoke detector on site</div></div></div><label class="nm-switch"><input type="checkbox" name="smoke_alarm" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cloud' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Carbon Monoxide Alarm</div><div class="text-xs text-gray-400">CO detector installed</div></div></div><label class="nm-switch"><input type="checkbox" name="carbon_monoxide_alarm"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'first-aid' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">First Aid Kit Available</div><div class="text-xs text-gray-400">Basic first aid kit on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="first_aid_kit"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'flame' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smoke Alarm Installed</div><div class="text-xs text-gray-400">Working smoke detector on site</div></div></div><label class="nm-switch"><input type="checkbox" name="smoke_alarm" {% if listing %}{{ listing|bool_attr:'smoke_alarm' }}{% else %}checked{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cloud' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Carbon Monoxide Alarm</div><div class="text-xs text-gray-400">CO detector installed</div></div></div><label class="nm-switch"><input type="checkbox" name="carbon_monoxide_alarm" {% if listing %}{{ listing|bool_attr:'carbon_monoxide_alarm' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'first-aid' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">First Aid Kit Available</div><div class="text-xs text-gray-400">Basic first aid kit on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="first_aid_kit" {% if listing %}{{ listing|bool_attr:'first_aid_kit' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -664,10 +699,10 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'globe' size=16 %}</span>Language & Background</h3>
       <p class="text-xs text-gray-400 mb-4">Language and residency preferences for your household</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'message' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">English-Speaking Household</div><div class="text-xs text-gray-400">English is the common language</div></div></div><label class="nm-switch"><input type="checkbox" name="english_household"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'globe' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Arabic-Speaking Only</div><div class="text-xs text-gray-400">Arabic is the household language</div></div></div><label class="nm-switch"><input type="checkbox" name="arabic_only"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'map-pin-region' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Local Residents Preferred</div><div class="text-xs text-gray-400">Priority for local applicants</div></div></div><label class="nm-switch"><input type="checkbox" name="local_preferred"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'handshake' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Mixed Nationalities Welcome</div><div class="text-xs text-gray-400">No nationality restriction</div></div></div><label class="nm-switch"><input type="checkbox" name="mixed_nationalities"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'message' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">English-Speaking Household</div><div class="text-xs text-gray-400">English is the common language</div></div></div><label class="nm-switch"><input type="checkbox" name="english_household" {% if listing %}{{ listing|bool_attr:'english_household' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'globe' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Arabic-Speaking Only</div><div class="text-xs text-gray-400">Arabic is the household language</div></div></div><label class="nm-switch"><input type="checkbox" name="arabic_only" {% if listing %}{{ listing|bool_attr:'arabic_only' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'map-pin-region' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Local Residents Preferred</div><div class="text-xs text-gray-400">Priority for local applicants</div></div></div><label class="nm-switch"><input type="checkbox" name="local_preferred" {% if listing %}{{ listing|bool_attr:'local_preferred' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'handshake' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Mixed Nationalities Welcome</div><div class="text-xs text-gray-400">No nationality restriction</div></div></div><label class="nm-switch"><input type="checkbox" name="mixed_nationalities" {% if listing %}{{ listing|bool_attr:'mixed_nationalities' }}{% endif %}><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
@@ -692,7 +727,7 @@ tailwind.config = {
 
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
       <h3 class="text-base font-bold text-gray-900 mb-3.5">Additional Notes</h3>
-      <textarea name="notes" placeholder="Any other rules or information for potential roommates..." class="nm-input" style="min-height:100px;resize:vertical;padding:14px;font-size:14px;line-height:1.65"></textarea>
+      <textarea name="notes" placeholder="Any other rules or information for potential roommates..." class="nm-input" style="min-height:100px;resize:vertical;padding:14px;font-size:14px;line-height:1.65">{{ listing.notes|default:'' }}</textarea>
     </div>
   </div>
 
@@ -956,7 +991,7 @@ function parPickType(el) {
   parSyncListingType(isSelected ? null : el);
 }
 
-function parSyncListingType(el) {
+function parSyncListingType(el, preserveOcc) {
   var type      = el ? el.dataset.type : 'private_room';
   var maxOcc    = el ? parseInt(el.dataset.maxOcc) : 5;
   var ltInput   = document.getElementById('par-listing-type');
@@ -967,12 +1002,12 @@ function parSyncListingType(el) {
 
   if (type === 'roommate_wanted') {
     // Fixed at 1 — hide stepper controls
-    _parOcc = 1;
+    if (!preserveOcc) _parOcc = 1;
     _parOccMax = 1;
     if (occHint) occHint.textContent = 'Fixed — you are offering one spot';
   } else if (type === 'shared_bed') {
     _parOccMax = 2;
-    if (_parOcc > 2) _parOcc = 2;
+    if (!preserveOcc && _parOcc > 2) _parOcc = 2;
     if (occHint) occHint.textContent = 'Shared bed — max 2 people';
   } else {
     _parOccMax = maxOcc;
@@ -1080,7 +1115,7 @@ function parPickTenant(el) {
   }
 }
 
-var _parOcc    = 3;
+var _parOcc    = {{ listing.max_occupants|default:3 }};
 var _parOccMax = 20;
 function parChangeOcc(d) {
   _parOcc = Math.max(1, Math.min(_parOccMax, _parOcc + d));
@@ -1231,7 +1266,13 @@ var _marker = null;
 
 function parInitMap() {
   if (_map) return;
-  _map = L.map('nm-map', { zoomControl: true }).setView([30.0444, 31.2357], 12);
+  var latEl = document.getElementById('nm-lat');
+  var lngEl = document.getElementById('nm-lng');
+  var hasExistingPin = latEl && lngEl && latEl.value && lngEl.value;
+  var startLat = hasExistingPin ? parseFloat(latEl.value) : 30.0444;
+  var startLng = hasExistingPin ? parseFloat(lngEl.value) : 31.2357;
+
+  _map = L.map('nm-map', { zoomControl: true }).setView([startLat, startLng], hasExistingPin ? 16 : 12);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
     maxZoom: 19
@@ -1246,6 +1287,13 @@ function parInitMap() {
   _map.on('click', function(e) {
     parSetPin(e.latlng.lat, e.latlng.lng, null, pinIcon);
   });
+
+  // Edit mode: drop the existing pin without re-geocoding (address fields
+  // are already pre-filled from the DB — don't overwrite them on first load).
+  if (hasExistingPin) {
+    var addrEl = document.getElementById('nm-field-address');
+    parSetPin(startLat, startLng, (addrEl && addrEl.value) || 'Saved location', pinIcon);
+  }
 }
 
 function parSetPin(lat, lng, label, icon) {
@@ -1344,7 +1392,9 @@ parStep = function(s) {
 };
 
 // ── Photo upload ──────────────────────────────────────────
-var _photos = []; // { file, src, label }
+// Items: { kind:'existing', id, src, label } (already-uploaded ListingImage)
+//     or { kind:'new', file, src, label }   (freshly selected File)
+var _photos = [];
 var _ROOM_LABELS = [
   ['living_room', 'Living Room'],
   ['bedroom',     'Bedroom'],
@@ -1353,6 +1403,17 @@ var _ROOM_LABELS = [
   ['exterior',    'Exterior'],
   ['other',       'Additional Photos'],
 ];
+
+// Seed existing photos when editing a listing
+(function() {
+  var dataEl = document.getElementById('nm-existing-images-data');
+  if (!dataEl) return;
+  try {
+    JSON.parse(dataEl.textContent).forEach(function(img) {
+      _photos.push({ kind: 'existing', id: img.id, src: img.src, label: img.label || '' });
+    });
+  } catch (e) {}
+})();
 
 function parHandleFiles(files) {
   for (var i = 0; i < files.length; i++) {
@@ -1364,7 +1425,7 @@ function parHandleFiles(files) {
       parCompressImage(f, function(outputFile) {
         var reader = new FileReader();
         reader.onload = function(e) {
-          _photos.push({ file: outputFile, src: e.target.result, label: '' });
+          _photos.push({ kind: 'new', file: outputFile, src: e.target.result, label: '' });
           parSyncFileInput();
           parRenderPreviews();
         };
@@ -1409,11 +1470,22 @@ function parCompressImage(file, callback) {
 function parSyncFileInput() {
   var input = document.getElementById('nm-file-input');
   if (!input) return;
+  var newPhotos = _photos.filter(function(p) { return p.kind === 'new'; });
+
   var dt = new DataTransfer();
-  _photos.forEach(function(p) { dt.items.add(p.file); });
+  newPhotos.forEach(function(p) { dt.items.add(p.file); });
   input.files = dt.files;
+
   var labelsInput = document.getElementById('par-image-labels');
-  if (labelsInput) labelsInput.value = _photos.map(function(p){ return p.label; }).join(',');
+  if (labelsInput) labelsInput.value = newPhotos.map(function(p){ return p.label; }).join(',');
+
+  var keptInput = document.getElementById('par-kept-image-ids');
+  if (keptInput) {
+    var kept = _photos
+      .filter(function(p) { return p.kind === 'existing'; })
+      .map(function(p, idx) { return { id: p.id, label: p.label, order: idx }; });
+    keptInput.value = JSON.stringify(kept);
+  }
 }
 
 function parRenderPreviews() {
@@ -1671,6 +1743,10 @@ function parSubmit(action) {
       if (errs.length) {
         parStep(s);
         parShowStepErrors(s, errs);
+        // The inline banner alone is easy to miss — make the block impossible
+        // to overlook, since a silently-failed publish looks identical to a
+        // successful one at a glance (same page, no navigation).
+        alert('Your listing was NOT published:\n\n' + errs.map(function(e){ return '• ' + e.msg; }).join('\n'));
         return;
       }
     }
@@ -1814,6 +1890,15 @@ function parRestoreDraft() {
 }
 
 (function() {
+  var isEditMode = document.getElementById('par-form') &&
+                    document.getElementById('par-form').dataset.editMode === '1';
+
+  // Editing an existing listing must never offer to restore a stale
+  // create-flow draft (it would clobber the server-loaded data), and must
+  // never itself write an autosave draft (which could later get wrongly
+  // offered as a "resume?" prompt on a future create flow).
+  if (isEditMode) return;
+
   var raw = null;
   try { raw = localStorage.getItem(PAR_DRAFT_KEY); } catch (e) {}
   if (raw) {
@@ -1835,20 +1920,30 @@ function parRestoreDraft() {
 
 // Init defaults
 (function() {
-  // "Anyone Welcome" selected by default
+  var isEditMode = document.getElementById('par-form') &&
+                    document.getElementById('par-form').dataset.editMode === '1';
+
   var anyoneCard  = document.getElementById('par-tenant-anyone');
   var anyoneCheck = document.getElementById('par-anyone-check');
   var badge       = document.getElementById('par-tenant-badge');
-  if (anyoneCard) {
+  var selectedTenantCards = document.querySelectorAll('#par-tenant-grid .nm-type-card.sel');
+
+  if (isEditMode && selectedTenantCards.length) {
+    // Specific tenant types pre-selected from the DB — sync the badge to match
+    var labels = Array.from(selectedTenantCards).map(function(c) { return c.querySelector('.lbl').textContent; });
+    badge.textContent = labels.join(', ');
+    badge.classList.remove('hidden');
+  } else if (anyoneCard) {
+    // "Anyone Welcome" selected (create-mode default, or edit-mode with tenant_types=anyone)
     anyoneCard.classList.add('sel');
     anyoneCheck.classList.remove('hidden');
     badge.textContent = 'Anyone';
     badge.classList.remove('hidden');
   }
 
-  // Set today as default available-from date
+  // Set today as default available-from date (create mode only)
   var dateInput = document.getElementById('par-date');
-  if (dateInput && !dateInput.value) {
+  if (!isEditMode && dateInput && !dateInput.value) {
     var today = new Date();
     var y = today.getFullYear();
     var m = String(today.getMonth() + 1).padStart(2, '0');
@@ -1856,9 +1951,46 @@ function parRestoreDraft() {
     dateInput.value = y + '-' + m + '-' + d;
   }
 
-  // Sync the initially-selected listing type (Private Room)
+  // Sync the initially-selected listing type (edit mode preserves the
+  // listing's saved max_occupants instead of resetting it to the type default)
   var initCard = document.querySelector('.nm-type-card.sel[data-type]');
-  if (initCard) parSyncListingType(initCard);
+  if (initCard) parSyncListingType(initCard, isEditMode);
+
+  // Render any existing photos seeded from the DB (edit mode)
+  if (_photos.length) {
+    parSyncFileInput();
+    parRenderPreviews();
+  }
+  // Note: the map pin for edit mode is dropped inside parInitMap() itself,
+  // since the map only initializes once the user visits Step 2.
+
+  // Seed custom requirement rows from the DB (edit mode)
+  if (isEditMode) {
+    var jsonInput = document.getElementById('par-custom-json');
+    if (jsonInput && jsonInput.value) {
+      try {
+        JSON.parse(jsonInput.value).forEach(function(item) {
+          var row = parAddCustom();
+          if (!row) return;
+          var input = row.querySelector('.nm-custom-text-input');
+          var cb    = row.querySelector('input[type="checkbox"]');
+          if (input) input.value = item.text;
+          if (cb) cb.checked = !!item.enabled;
+        });
+      } catch (e) {}
+    }
+  }
+
+  // Server-side validation rejected the submission (a check the browser-side
+  // validators don't cover, e.g. occupant cap or a conflicting toggle pair).
+  // The inline banner alone is easy to miss since the page looks like a
+  // normal re-render of the form — make it impossible to overlook.
+  var serverErrors = document.getElementById('par-server-errors');
+  if (serverErrors) {
+    serverErrors.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var msgs = Array.from(serverErrors.querySelectorAll('span')).map(function(s){ return s.textContent; });
+    alert('Your listing was NOT saved:\n\n' + msgs.map(function(m){ return '• ' + m; }).join('\n'));
+  }
 })();
 
 </script>

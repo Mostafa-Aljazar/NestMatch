@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
@@ -157,3 +158,51 @@ def withdraw_application(request, pk):
 
     app.delete()
     return JsonResponse({'ok': True, 'stats': _application_stats(request.user)})
+
+
+# ── Poster-facing: applicants for a listing ──────────────────────────────────
+
+def _listing_application_stats(listing):
+    apps = Application.objects.filter(listing=listing)
+    return {
+        'total':    apps.count(),
+        'pending':  apps.filter(status=Application.STATUS_PENDING).count(),
+        'accepted': apps.filter(status=Application.STATUS_ACCEPTED).count(),
+        'rejected': apps.filter(status=Application.STATUS_REJECTED).count(),
+    }
+
+
+@login_required
+def listing_applicants(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, poster=request.user)
+    apps = (
+        Application.objects
+        .filter(listing=listing)
+        .select_related('seeker')
+        .order_by('-applied_at')
+    )
+    return render(request, 'applications_app/listing_applicants.html', {
+        'listing':      listing,
+        'applications': apps,
+        'stats':        _listing_application_stats(listing),
+    })
+
+
+@login_required
+@require_POST
+def accept_application(request, pk):
+    app = get_object_or_404(Application, pk=pk, listing__poster=request.user)
+    app.status = Application.STATUS_ACCEPTED
+    app.poster_note = request.POST.get('poster_note', '').strip()
+    app.save(update_fields=['status', 'poster_note', 'updated_at'])
+    return JsonResponse({'ok': True, 'stats': _listing_application_stats(app.listing)})
+
+
+@login_required
+@require_POST
+def reject_application(request, pk):
+    app = get_object_or_404(Application, pk=pk, listing__poster=request.user)
+    app.status = Application.STATUS_REJECTED
+    app.poster_note = request.POST.get('poster_note', '').strip()
+    app.save(update_fields=['status', 'poster_note', 'updated_at'])
+    return JsonResponse({'ok': True, 'stats': _listing_application_stats(app.listing)})

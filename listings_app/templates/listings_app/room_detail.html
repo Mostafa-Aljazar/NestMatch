@@ -876,7 +876,9 @@ tailwind.config = {
       </div>
 
       <!-- Apply / Cancel button -->
-      {% if my_application and my_application.status == 'pending' %}
+      {% if is_own_listing %}
+      <a href="{% url 'applications_app:listing_applicants' listing.pk %}" class="block w-full py-3.5 text-sm font-bold text-violet-700 bg-violet-50 border border-violet-200 rounded-xl text-center transition-all hover:bg-violet-100 active:scale-[.98] font-sans mb-2.5 no-underline">This is your listing — View Applicants {% icon 'people' size=14 %}</a>
+      {% elif my_application and my_application.status == 'pending' %}
       <button id="nm-cancel-apply-btn" onclick="nmCancelApply({{ my_application.pk }}, this)" class="block w-full py-3.5 text-sm font-bold text-white bg-rose-600 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-rose-700 active:scale-[.98] font-sans mb-2.5">Cancel Application {% icon 'close' size=14 color='#fff' %}</button>
       {% elif my_application %}
       <button disabled class="block w-full py-3.5 text-sm font-bold text-gray-500 bg-gray-100 border-none rounded-xl text-center cursor-default font-sans mb-2.5">Application {{ my_application.get_status_display }}</button>
