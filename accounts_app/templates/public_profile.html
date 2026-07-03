@@ -172,6 +172,114 @@ tailwind.config = {
         </div>
       </div>
       {% endif %}
+      {% if lifestyle_profile.budget_min or lifestyle_profile.budget_max %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'dollar' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Budget</div>
+          <div class="text-sm font-bold text-gray-800">{% if lifestyle_profile.budget_min %}${{ lifestyle_profile.budget_min }}{% else %}$0{% endif %}–{% if lifestyle_profile.budget_max %}${{ lifestyle_profile.budget_max }}{% else %}?{% endif %}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.roommate_gender_pref %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'people' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Roommate gender</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_roommate_gender_pref_display }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.dietary %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'salad' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Dietary</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_dietary_display }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.guest_tolerance %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'bell' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Guest tolerance</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_guest_tolerance_display }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.alcohol_ok is not None %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'wine-ban' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Alcohol</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.alcohol_ok|yesno:"Yes,No" }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.tenant_type %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'briefcase' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">I am a</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_tenant_type_display }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.household_lang_pref %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'globe' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Household</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_household_lang_pref_display }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.min_stay_pref is not None %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'calendar' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Min stay</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_min_stay_pref_display }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.listing_type_pref %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'home' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Room type</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_listing_type_pref_display }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.works_from_home is not None %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'monitor' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Works from home</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.works_from_home|yesno:"Yes,No" }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.wants_furnished is not None %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'sofa' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Wants furnished</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.wants_furnished|yesno:"Yes,No" }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if lifestyle_profile.wants_building_amenities is not None %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+        {% icon 'dumbbell' size=16 %}
+        <div>
+          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Wants amenities</div>
+          <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.wants_building_amenities|yesno:"Yes,No" }}</div>
+        </div>
+      </div>
+      {% endif %}
     </div>
     {% else %}
     <div class="flex flex-col items-center text-center py-8 px-4 rounded-xl bg-gray-50 border border-dashed border-gray-200">
