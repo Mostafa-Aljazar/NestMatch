@@ -118,16 +118,17 @@ def profile_view(request):
     # so this can legitimately be None — the template handles that case.
     lifestyle_profile = LifestyleProfile.objects.filter(user=user).first()
 
-    # Simple completeness score: personal info fields (out of 4 "nice to have"
-    # fields beyond the required ones) + whether a lifestyle profile exists at all.
-    # This replaces the previously hardcoded "72%" in the template.
-    optional_fields_filled = sum([
-        bool(user.phone_number),
-        bool(user.bio),
-        bool(user.profile_pic),
-        lifestyle_profile is not None,
-    ])
-    profile_strength = int((optional_fields_filled / 4) * 100)
+    # Completeness score: photo/bio/phone are each worth 25% (all-or-nothing),
+    # and the last 25% scales with how much of the lifestyle questionnaire is
+    # filled in (LifestyleProfile.completeness_fraction) rather than a flat
+    # "profile exists or not" checkbox — so filling in more of the extended
+    # preference fields visibly moves the needle.
+    lifestyle_completeness = lifestyle_profile.completeness_fraction if lifestyle_profile else 0.0
+    lifestyle_fields_filled = lifestyle_profile.fields_filled_count if lifestyle_profile else 0
+    lifestyle_fields_total = len(LifestyleProfile.ALL_PREFERENCE_FIELDS)
+    profile_strength = round(100 * (
+        (bool(user.profile_pic) + bool(user.bio) + bool(user.phone_number) + lifestyle_completeness) / 4
+    ))
 
     context = {
         'user_obj': user,  # named user_obj to avoid clashing with request.user in template logic
@@ -135,6 +136,9 @@ def profile_view(request):
         'countries': User.COUNTRY_CHOICES,
         'lifestyle_profile': lifestyle_profile,
         'profile_strength': profile_strength,
+        'lifestyle_completeness_pct': round(lifestyle_completeness * 100),
+        'lifestyle_fields_filled': lifestyle_fields_filled,
+        'lifestyle_fields_total': lifestyle_fields_total,
         'sleep_time_choices': LifestyleProfile.SLEEP_TIME_CHOICES,
         'wake_time_choices': LifestyleProfile.WAKE_TIME_CHOICES,
         'noise_level_choices': LifestyleProfile.NOISE_LEVEL_CHOICES,
@@ -144,6 +148,13 @@ def profile_view(request):
         'religion_choices': LifestyleProfile.RELIGION_CHOICES,
         'field_choices': LifestyleProfile.FIELD_CHOICES,
         'smoking_choices': LifestyleProfile.SMOKING_CHOICES,
+        'roommate_gender_pref_choices': LifestyleProfile.ROOMMATE_GENDER_PREF_CHOICES,
+        'dietary_choices': LifestyleProfile.DIETARY_CHOICES,
+        'guest_tolerance_choices': LifestyleProfile.GUEST_TOLERANCE_CHOICES,
+        'tenant_type_choices': LifestyleProfile.TENANT_TYPE_CHOICES,
+        'household_lang_pref_choices': LifestyleProfile.HOUSEHOLD_LANG_PREF_CHOICES,
+        'min_stay_pref_choices': LifestyleProfile.MIN_STAY_PREF_CHOICES,
+        'listing_type_pref_choices': LifestyleProfile.LISTING_TYPE_PREF_CHOICES,
         'user_reviews': Testimonial.objects.filter(user=user).order_by('-created_at'),
         'review_section_heading': 'Write a review',
     }
