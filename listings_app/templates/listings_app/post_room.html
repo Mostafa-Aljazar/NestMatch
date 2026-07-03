@@ -1,4 +1,5 @@
 {% load static %}
+{% load icons %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,21 +31,22 @@ tailwind.config = {
 .nm-switch input:checked + .nm-switch-slider{background:#7C3AED}
 .nm-switch input:checked + .nm-switch-slider:before{transform:translateX(20px)}
 /* Upload zone drag states */
-.nm-upload-zone{border:2px dashed #DDD6FE;border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:#F5F3FF}
+.nm-upload-zone{border:2px dashed #DDD6FE;border-radius:8px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:#F5F3FF}
 .nm-upload-zone:hover,.nm-upload-zone.drag{border-color:#7C3AED;background:#EDE9FE}
 /* Input focus ring */
 .nm-input{width:100%;padding:12px 16px;font-size:14px;border:1.5px solid #E5E7EB;border-radius:8px;font-family:inherit;color:#111827;outline:none;background:#fff;transition:border-color .2s,box-shadow .2s}
 .nm-input:focus{border-color:#7C3AED;box-shadow:0 0 0 3px rgba(124,58,237,.1)}
 .nm-input::placeholder{color:#9CA3AF}
 /* Type cards */
-.nm-type-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px;border:2px solid #E5E7EB;border-radius:12px;cursor:pointer;transition:all .2s;text-align:center;background:#fff}
+.nm-type-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px;border:2px solid #E5E7EB;border-radius:8px;cursor:pointer;transition:all .2s;text-align:center;background:#fff}
 .nm-type-card:hover{border-color:#A78BFA;background:#F5F3FF}
 .nm-type-card.sel{border-color:#7C3AED;background:#F5F3FF;box-shadow:0 0 0 3px rgba(124,58,237,.1)}
-.nm-type-card .ico{font-size:28px}
+.nm-type-card .ico{display:flex;align-items:center;justify-content:center;color:#9CA3AF}
+.nm-type-card.sel .ico{color:#7C3AED}
 .nm-type-card .lbl{font-size:13px;font-weight:700;color:#374151}
 .nm-type-card.sel .lbl{color:#7C3AED}
 /* "Anyone Welcome" row variant */
-.nm-anyone-card{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border:2px solid #E5E7EB;border-radius:12px;cursor:pointer;transition:all .2s;background:#fff;width:100%}
+.nm-anyone-card{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border:2px solid #E5E7EB;border-radius:8px;cursor:pointer;transition:all .2s;background:#fff;width:100%}
 .nm-anyone-card:hover{border-color:#A78BFA;background:#F5F3FF}
 .nm-anyone-card.sel{border-color:#7C3AED;background:#F5F3FF;box-shadow:0 0 0 3px rgba(124,58,237,.1)}
 .nm-anyone-card .lbl{font-size:13px;font-weight:700;color:#374151}
@@ -68,7 +70,7 @@ tailwind.config = {
     <div class="flex items-start justify-between mb-3.5 gap-2">
       <div>
         <h1 class="text-xl font-extrabold text-gray-900 tracking-tight">Post a Room</h1>
-        <p class="text-[13px] text-gray-500 mt-0.5" id="nm-step-hint">Step 1 of 4 — Basic Information</p>
+        <p class="text-[13px] text-gray-500 mt-0.5" id="nm-step-hint">Step 1 of 5 — Basic Information</p>
       </div>
       <button type="button" onclick="parSubmit('draft')" class="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-[12px] font-semibold text-gray-500 hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50 transition-all shadow-sm cursor-pointer font-sans">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M17 3v4H8V3M12 12v5m0 0l-2-2m2 2l2-2"/></svg>
@@ -109,9 +111,18 @@ tailwind.config = {
         <div class="relative flex items-center w-full mb-2">
           <div class="flex-1 h-0.5 bg-gray-200"></div>
           <div id="ps4-num" class="w-7 h-7 rounded-full bg-white text-gray-400 flex items-center justify-center text-[11px] font-extrabold shrink-0 border-2 border-gray-200 z-10">4</div>
-          <div class="flex-1 h-0.5 bg-transparent"></div>
+          <div class="flex-1 h-0.5 bg-gray-200"></div>
         </div>
         <span id="ps4-lbl" class="text-[11px] font-medium text-gray-400 text-center leading-tight">Requirements</span>
+      </div>
+      <!-- Step -->
+      <div id="ps5" class="flex flex-col items-center flex-1 cursor-pointer" onclick="parStep(5)">
+        <div class="relative flex items-center w-full mb-2">
+          <div class="flex-1 h-0.5 bg-gray-200"></div>
+          <div id="ps5-num" class="w-7 h-7 rounded-full bg-white text-gray-400 flex items-center justify-center text-[11px] font-extrabold shrink-0 border-2 border-gray-200 z-10">5</div>
+          <div class="flex-1 h-0.5 bg-transparent"></div>
+        </div>
+        <span id="ps5-lbl" class="text-[11px] font-medium text-gray-400 text-center leading-tight">Review</span>
       </div>
     </div>
   </div>
@@ -137,7 +148,7 @@ tailwind.config = {
     <!-- Listing Type -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
       <div class="flex items-center gap-2.5 mb-5">
-        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">🏷️</div>
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">{% icon 'tag' size=17 color='#fff' %}</div>
         <div>
           <div class="text-[15px] font-bold text-gray-900">Listing Type</div>
           <div class="text-xs text-gray-400">What kind of space are you offering?</div>
@@ -145,22 +156,22 @@ tailwind.config = {
       </div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div class="nm-type-card sel" data-type="private_room" data-max-occ="5" onclick="parPickType(this)">
-          <span class="ico">🛏️</span>
+          <span class="ico">{% icon 'bed' size=26 %}</span>
           <span class="lbl">Private Room</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Your own room</span>
         </div>
         <div class="nm-type-card" data-type="full_apartment" data-max-occ="20" onclick="parPickType(this)">
-          <span class="ico">🏠</span>
+          <span class="ico">{% icon 'home' size=26 %}</span>
           <span class="lbl">Full Apartment</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Entire unit</span>
         </div>
         <div class="nm-type-card" data-type="shared_bed" data-max-occ="2" onclick="parPickType(this)">
-          <span class="ico">🛌</span>
+          <span class="ico">{% icon 'bunk-bed' size=26 %}</span>
           <span class="lbl">Shared Bed</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Shared room</span>
         </div>
         <div class="nm-type-card" data-type="roommate_wanted" data-max-occ="1" onclick="parPickType(this)">
-          <span class="ico">👥</span>
+          <span class="ico">{% icon 'people' size=26 %}</span>
           <span class="lbl">Roommate Wanted</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Looking for someone</span>
         </div>
@@ -170,7 +181,7 @@ tailwind.config = {
     <!-- Price & Availability -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
       <div class="flex items-center gap-2.5 mb-5">
-        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">💰</div>
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">{% icon 'dollar' size=17 color='#fff' %}</div>
         <div>
           <div class="text-[15px] font-bold text-gray-900">Price & Availability</div>
           <div class="text-xs text-gray-400">Set your rent and when the room is ready</div>
@@ -196,7 +207,7 @@ tailwind.config = {
     <!-- Occupants & Stay -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
       <div class="flex items-center gap-2.5 mb-5">
-        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">🗓️</div>
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">{% icon 'calendar' size=17 color='#fff' %}</div>
         <div>
           <div class="text-[15px] font-bold text-gray-900">Capacity & Stay Duration</div>
           <div class="text-xs text-gray-400">How many people and how long can they stay?</div>
@@ -234,7 +245,7 @@ tailwind.config = {
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
       <div class="flex items-center justify-between gap-2 mb-5">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">🎯</div>
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">{% icon 'people' size=17 color='#fff' %}</div>
           <div>
             <div class="text-[15px] font-bold text-gray-900">Who Is This For?</div>
             <div id="par-tenant-subtitle" class="text-xs text-gray-400">Pick all that apply — or choose "Anyone"</div>
@@ -246,30 +257,30 @@ tailwind.config = {
       <!-- Anyone Welcome — full-width row toggle -->
       <div id="par-tenant-anyone" class="nm-anyone-card mb-3" onclick="parPickAnyone()">
         <div class="flex items-center gap-3">
-          <span class="text-xl leading-none">🤝</span>
+          <span class="text-violet-600 flex items-center">{% icon 'handshake' size=20 %}</span>
           <div>
             <div class="lbl">Anyone Welcome</div>
             <div class="text-[11px] text-gray-400 mt-0.5">No preference — open to all tenant types</div>
           </div>
         </div>
         <span id="par-anyone-check"
-              class="hidden w-5 h-5 rounded-full bg-violet-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">✓</span>
+              class="hidden w-5 h-5 rounded-full bg-violet-600 flex items-center justify-center text-white shrink-0">{% icon 'check' size=11 %}</span>
       </div>
 
       <!-- Specific tenant types — 2-column grid -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="par-tenant-grid">
         <div class="nm-type-card" data-tenant="students" onclick="parPickTenant(this)">
-          <span class="ico">📚</span>
+          <span class="ico">{% icon 'graduation-cap' size=26 %}</span>
           <span class="lbl">Students</span>
           <span class="text-[11px] text-gray-400 mt-0.5">University / college</span>
         </div>
         <div class="nm-type-card" data-tenant="professionals" onclick="parPickTenant(this)">
-          <span class="ico">💼</span>
+          <span class="ico">{% icon 'briefcase' size=26 %}</span>
           <span class="lbl">Professionals</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Employed / remote</span>
         </div>
         <div class="nm-type-card" data-tenant="families" onclick="parPickTenant(this)">
-          <span class="ico">👨‍👩‍👧</span>
+          <span class="ico">{% icon 'people' size=26 %}</span>
           <span class="lbl">Families</span>
           <span class="text-[11px] text-gray-400 mt-0.5">Couples or small families</span>
         </div>
@@ -277,12 +288,6 @@ tailwind.config = {
 
       <!-- Hidden input to collect value -->
       <input type="hidden" id="par-tenant-value" name="tenant_types" value="anyone">
-    </div>
-
-    <!-- Step 1 tip -->
-    <div class="bg-violet-50 border border-violet-200 rounded-xl px-4 py-3 flex items-center gap-2.5 cursor-pointer hover:bg-violet-100 transition-colors" onclick="parStep(4)">
-      <span class="text-lg shrink-0">💡</span>
-      <span class="text-[13px] text-violet-800">Room features, amenities, bills and house rules are all set in <strong>Step 4 — Requirements</strong>. <span class="text-violet-600 font-semibold">Go there →</span></span>
     </div>
 
   </div>
@@ -298,7 +303,7 @@ tailwind.config = {
     <!-- Listing Title -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
       <div class="flex items-center gap-2.5 mb-5">
-        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">✏️</div>
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">{% icon 'edit' size=17 color='#fff' %}</div>
         <div>
           <div class="text-[15px] font-bold text-gray-900">Listing Title</div>
           <div class="text-xs text-gray-400">A clear title attracts the right tenants</div>
@@ -312,7 +317,7 @@ tailwind.config = {
     </div>
 
     <div class="bg-white rounded-2xl p-7 shadow-card">
-      <h3 class="text-base font-bold text-gray-900 mb-1">📍 Address Details</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'map-pin' size=16 %}</span>Address Details</h3>
       <p class="text-xs text-gray-400 mb-4">These fields auto-fill when you drop a pin on the map below</p>
       <div class="flex flex-col gap-4">
 
@@ -346,7 +351,7 @@ tailwind.config = {
         <div class="relative">
           <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Nearest Landmark</label>
           <input type="text" id="nm-field-landmark" name="landmark" placeholder="e.g. University, Mosque, Hospital..." class="nm-input" autocomplete="off" oninput="parLandmarkSearch(this.value)" onkeydown="parLandmarkKey(event)">
-          <div id="nm-landmark-dropdown" class="hidden absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-56 overflow-y-auto mt-1"></div>
+          <div id="nm-landmark-dropdown" class="hidden absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-56 overflow-y-auto mt-1"></div>
         </div>
         <!-- Map -->
         <div>
@@ -355,12 +360,12 @@ tailwind.config = {
           <div class="flex gap-2 mb-2">
             <input type="text" id="nm-map-search" placeholder="Search address or place name..." class="nm-input flex-1" onkeydown="if(event.key==='Enter'){event.preventDefault();parMapSearch();}">
             <button type="button" onclick="parMapSearch()" class="px-4 py-3 text-[13px] font-bold text-white bg-violet-600 border-none rounded-lg cursor-pointer font-sans whitespace-nowrap hover:bg-violet-800 transition-colors">Search</button>
-            <button type="button" onclick="parMapLocate()" title="Use my location" class="px-3.5 py-3 text-base bg-violet-50 border border-violet-200 rounded-lg cursor-pointer hover:bg-violet-100 transition-colors">📍</button>
+            <button type="button" onclick="parMapLocate()" title="Use my location" class="px-3.5 py-3 bg-violet-50 border border-violet-200 rounded-lg cursor-pointer hover:bg-violet-100 transition-colors flex items-center justify-center text-violet-700">{% icon 'map-pin' size=17 %}</button>
           </div>
           <!-- Map container -->
-          <div id="nm-map" class="h-72 rounded-xl border border-gray-200 overflow-hidden" style="z-index:0"></div>
+          <div id="nm-map" class="h-72 rounded-lg border border-gray-200 overflow-hidden" style="z-index:0"></div>
           <div id="nm-map-info" class="hidden mt-2 px-3.5 py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-[13px] text-emerald-800">
-            📍 <strong id="nm-map-address">Location pinned</strong>
+            <span class="inline-flex items-center gap-1 align-middle">{% icon 'map-pin' size=14 %}</span> <strong id="nm-map-address">Location pinned</strong>
             <span id="nm-map-coords" class="text-gray-500 ml-2"></span>
           </div>
           <input type="hidden" id="nm-lat" name="lat">
@@ -380,31 +385,33 @@ tailwind.config = {
 
     <div class="flex flex-col gap-5">
       <div class="bg-white rounded-2xl p-7 shadow-card">
-        <h3 class="text-base font-bold text-gray-900 mb-4">📷 Photos (up to 10)</h3>
+        <h3 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2"><span class="shrink-0">{% icon 'camera' size=16 %}</span>Photos (up to 10)</h3>
         <input type="file" id="nm-file-input" name="images" accept="image/png,image/jpeg,image/jpg,image/webp" multiple style="display:none" onchange="parHandleFiles(this.files)">
+        <input type="hidden" name="image_labels" id="par-image-labels" value="">
         <div class="nm-upload-zone" id="nm-dropzone" onclick="document.getElementById('nm-file-input').click()" ondragover="parDragOver(event)" ondragleave="parDragLeave(event)" ondrop="parDrop(event)">
-          <div class="text-4xl mb-3">📁</div>
+          <div class="flex justify-center text-gray-300 mb-3">{% icon 'folder' size=44 %}</div>
           <div class="text-[15px] font-bold text-gray-700 mb-1">Drag &amp; drop photos here</div>
           <div class="text-[13px] text-gray-400 mb-3.5">PNG, JPG, WEBP up to 10MB each</div>
           <button type="button" class="px-6 py-2.5 text-[13px] font-bold text-violet-600 bg-white border border-violet-600 rounded-lg cursor-pointer font-sans hover:bg-violet-50 transition-colors">Browse Files</button>
         </div>
         <!-- photo count -->
         <div id="nm-photo-count" class="hidden text-xs text-gray-500 mt-2"></div>
+        <p class="text-xs text-gray-400 mt-3.5">Tag each photo below so seekers can browse by room in the photo tour.</p>
         <!-- Uploaded preview chips -->
-        <div id="nm-preview-list" class="flex gap-2.5 mt-3.5 flex-wrap"></div>
+        <div id="nm-preview-list" class="flex flex-col gap-2.5 mt-2"></div>
       </div>
 
       <div class="bg-white rounded-2xl p-7 shadow-card">
         <div class="flex items-center justify-between mb-3.5 flex-wrap gap-2.5">
-          <h3 class="text-base font-bold text-gray-900">📝 Description</h3>
+          <h3 class="text-base font-bold text-gray-900 flex items-center gap-2"><span class="shrink-0">{% icon 'notepad' size=16 %}</span>Description</h3>
           <button onclick="parGenerateAI()" id="nm-ai-btn" class="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold text-violet-600 bg-violet-50 border border-violet-200 rounded-lg cursor-pointer font-sans hover:bg-violet-100 transition-colors">
-            <span class="text-sm">✨</span> Generate with AI
+            <span class="shrink-0">{% icon 'sparkle' size=14 %}</span> Generate with AI
           </button>
         </div>
         <div class="relative">
           <textarea id="nm-desc-ta" name="description" placeholder="Describe your room — what makes it special, nearby landmarks, included amenities, house rules..." class="nm-input min-h-[140px] resize-y p-3.5 text-sm leading-relaxed"></textarea>
           <input type="hidden" name="ai_generated" id="nm-ai-generated" value="0">
-          <div id="nm-ai-badge" class="hidden absolute top-2.5 right-2.5 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">✨ AI Generated</div>
+          <div id="nm-ai-badge" class="hidden absolute top-2.5 right-2.5 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)"><span class="shrink-0">{% icon 'sparkle' size=11 %}</span> AI Generated</div>
         </div>
       </div>
     </div>
@@ -417,237 +424,258 @@ tailwind.config = {
       <p class="text-sm text-gray-500">Toggle everything that applies. Seekers are matched and filtered based on these preferences.</p>
     </div>
 
-    <!-- 🚭 Smoking & Substances -->
+    <!-- Smoking & Substances -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🚭 Smoking & Substances</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'cigarette-ban' size=16 %}</span>Smoking & Substances</h3>
       <p class="text-xs text-gray-400 mb-4">Rules about smoking, vaping, and alcohol inside the property</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🚭</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Smoking Allowed</div><div class="text-xs text-gray-400">Strictly no smoking inside</div></div></div><label class="nm-switch"><input type="checkbox" name="no_smoking" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🚬</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smoking Allowed Outside Only</div><div class="text-xs text-gray-400">Permitted on balcony or outdoors</div></div></div><label class="nm-switch"><input type="checkbox" name="smoking_outside_ok"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🚫</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Alcohol on Premises</div><div class="text-xs text-gray-400">Alcohol-free household</div></div></div><label class="nm-switch"><input type="checkbox" name="no_alcohol"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">💨</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Vaping / E-Cigarettes</div><div class="text-xs text-gray-400">No vaping devices inside</div></div></div><label class="nm-switch"><input type="checkbox" name="no_vaping"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cigarette-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Smoking Allowed</div><div class="text-xs text-gray-400">Strictly no smoking inside</div></div></div><label class="nm-switch"><input type="checkbox" name="no_smoking" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cigarette' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smoking Allowed Outside Only</div><div class="text-xs text-gray-400">Permitted on balcony or outdoors</div></div></div><label class="nm-switch"><input type="checkbox" name="smoking_outside_ok"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Alcohol on Premises</div><div class="text-xs text-gray-400">Alcohol-free household</div></div></div><label class="nm-switch"><input type="checkbox" name="no_alcohol"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Vaping / E-Cigarettes</div><div class="text-xs text-gray-400">No vaping devices inside</div></div></div><label class="nm-switch"><input type="checkbox" name="no_vaping"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🕌 Religion & Culture -->
+    <!-- Religion & Culture -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🕌 Religion & Culture</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'mosque' size=16 %}</span>Religion & Culture</h3>
       <p class="text-xs text-gray-400 mb-4">Religious and cultural preferences for the household</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🕌</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Muslims Only</div><div class="text-xs text-gray-400">Religious preference for tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="muslims_only" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">✝️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Christians Only</div><div class="text-xs text-gray-400">Religious preference for tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="christians_only"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🌍</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">All Religions Welcome</div><div class="text-xs text-gray-400">No religion restriction</div></div></div><label class="nm-switch"><input type="checkbox" name="all_religions_ok"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🥩</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Halal Kitchen Only</div><div class="text-xs text-gray-400">Only halal food prepared</div></div></div><label class="nm-switch"><input type="checkbox" name="halal_kitchen" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🧎</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Prayer Space Available</div><div class="text-xs text-gray-400">Dedicated area for prayer</div></div></div><label class="nm-switch"><input type="checkbox" name="prayer_space"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'mosque' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Muslims Only</div><div class="text-xs text-gray-400">Religious preference for tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="muslims_only" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cross' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Christians Only</div><div class="text-xs text-gray-400">Religious preference for tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="christians_only"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'globe' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">All Religions Welcome</div><div class="text-xs text-gray-400">No religion restriction</div></div></div><label class="nm-switch"><input type="checkbox" name="all_religions_ok"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'utensils' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Halal Kitchen Only</div><div class="text-xs text-gray-400">Only halal food prepared</div></div></div><label class="nm-switch"><input type="checkbox" name="halal_kitchen" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'prayer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Prayer Space Available</div><div class="text-xs text-gray-400">Dedicated area for prayer</div></div></div><label class="nm-switch"><input type="checkbox" name="prayer_space"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 👥 Gender & Tenant Type -->
+    <!-- Gender & Tenant Type -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">👥 Gender & Tenant Type</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'people' size=16 %}</span>Gender & Tenant Type</h3>
       <p class="text-xs text-gray-400 mb-4">Who are you looking for as a housemate?</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">👨</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Males Only</div><div class="text-xs text-gray-400">Male tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="males_only" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">👩</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Females Only</div><div class="text-xs text-gray-400">Female tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="females_only"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">📚</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Students Only</div><div class="text-xs text-gray-400">University students preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="students_only" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">💼</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Working Professionals Only</div><div class="text-xs text-gray-400">Employed tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="professionals_only"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">✈️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Expats Welcome</div><div class="text-xs text-gray-400">Open to international tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="expats_welcome"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">👴</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Children</div><div class="text-xs text-gray-400">Adults only household</div></div></div><label class="nm-switch"><input type="checkbox" name="no_children"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Males Only</div><div class="text-xs text-gray-400">Male tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="males_only" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Females Only</div><div class="text-xs text-gray-400">Female tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="females_only"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'graduation-cap' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Students Only</div><div class="text-xs text-gray-400">University students preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="students_only" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'briefcase' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Working Professionals Only</div><div class="text-xs text-gray-400">Employed tenants preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="professionals_only"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'plane' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Expats Welcome</div><div class="text-xs text-gray-400">Open to international tenants</div></div></div><label class="nm-switch"><input type="checkbox" name="expats_welcome"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Children</div><div class="text-xs text-gray-400">Adults only household</div></div></div><label class="nm-switch"><input type="checkbox" name="no_children"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🐾 Pets & Animals -->
+    <!-- Pets & Animals -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🐾 Pets & Animals</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'paw' size=16 %}</span>Pets & Animals</h3>
       <p class="text-xs text-gray-400 mb-4">Pet policy for the property</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🐾</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Pets Allowed</div><div class="text-xs text-gray-400">Small pets accepted</div></div></div><label class="nm-switch"><input type="checkbox" name="pets_allowed"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🐕</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dogs Allowed</div><div class="text-xs text-gray-400">Dog-friendly household</div></div></div><label class="nm-switch"><input type="checkbox" name="dogs_allowed"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🐈</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Cats Allowed</div><div class="text-xs text-gray-400">Cat-friendly household</div></div></div><label class="nm-switch"><input type="checkbox" name="cats_allowed"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">❌</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Pets Allowed</div><div class="text-xs text-gray-400">Strictly no animals</div></div></div><label class="nm-switch"><input type="checkbox" name="no_pets"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'paw' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Pets Allowed</div><div class="text-xs text-gray-400">Small pets accepted</div></div></div><label class="nm-switch"><input type="checkbox" name="pets_allowed"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'dog' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dogs Allowed</div><div class="text-xs text-gray-400">Dog-friendly household</div></div></div><label class="nm-switch"><input type="checkbox" name="dogs_allowed"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cat' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Cats Allowed</div><div class="text-xs text-gray-400">Cat-friendly household</div></div></div><label class="nm-switch"><input type="checkbox" name="cats_allowed"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Pets Allowed</div><div class="text-xs text-gray-400">Strictly no animals</div></div></div><label class="nm-switch"><input type="checkbox" name="no_pets"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🍳 Kitchen & Food -->
+    <!-- Kitchen & Food -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🍳 Kitchen & Food</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'chef-hat' size=16 %}</span>Kitchen & Food</h3>
       <p class="text-xs text-gray-400 mb-4">Cooking habits and food rules in the shared kitchen</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">👨‍🍳</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Must Know Cooking</div><div class="text-xs text-gray-400">Basic cooking skills required</div></div></div><label class="nm-switch"><input type="checkbox" name="must_cook"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🥗</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Vegetarian Household</div><div class="text-xs text-gray-400">No meat cooking in shared kitchen</div></div></div><label class="nm-switch"><input type="checkbox" name="vegetarian_house"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🐟</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Seafood Cooking</div><div class="text-xs text-gray-400">Seafood not allowed in kitchen</div></div></div><label class="nm-switch"><input type="checkbox" name="no_seafood"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🛒</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Groceries</div><div class="text-xs text-gray-400">Housemates split grocery costs</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_groceries"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🍽️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Fully Equipped Kitchen</div><div class="text-xs text-gray-400">Fridge, stove, microwave included</div></div></div><label class="nm-switch"><input type="checkbox" name="equipped_kitchen" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🥡</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Outside Food in Rooms</div><div class="text-xs text-gray-400">Eat only in kitchen/dining area</div></div></div><label class="nm-switch"><input type="checkbox" name="no_food_in_rooms"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'chef-hat' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Must Know Cooking</div><div class="text-xs text-gray-400">Basic cooking skills required</div></div></div><label class="nm-switch"><input type="checkbox" name="must_cook"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'leaf' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Vegetarian Household</div><div class="text-xs text-gray-400">No meat cooking in shared kitchen</div></div></div><label class="nm-switch"><input type="checkbox" name="vegetarian_house"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'fish-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Seafood Cooking</div><div class="text-xs text-gray-400">Seafood not allowed in kitchen</div></div></div><label class="nm-switch"><input type="checkbox" name="no_seafood"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cart' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Groceries</div><div class="text-xs text-gray-400">Housemates split grocery costs</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_groceries"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'plate' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Fully Equipped Kitchen</div><div class="text-xs text-gray-400">Fridge, stove, microwave included</div></div></div><label class="nm-switch"><input type="checkbox" name="equipped_kitchen" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'takeout-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Outside Food in Rooms</div><div class="text-xs text-gray-400">Eat only in kitchen/dining area</div></div></div><label class="nm-switch"><input type="checkbox" name="no_food_in_rooms"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🌙 Noise & Schedule -->
+    <!-- Noise & Schedule -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🌙 Noise & Schedule</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'moon' size=16 %}</span>Noise & Schedule</h3>
       <p class="text-xs text-gray-400 mb-4">Quiet hours, sleep schedules, and noise expectations</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🌙</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quiet Hours After 10 PM</div><div class="text-xs text-gray-400">No noise after 10 PM</div></div></div><label class="nm-switch"><input type="checkbox" name="quiet_after_10"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🌅</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Early Sleepers Only</div><div class="text-xs text-gray-400">Lights out before 11 PM</div></div></div><label class="nm-switch"><input type="checkbox" name="early_sleepers"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🎵</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Loud Music</div><div class="text-xs text-gray-400">Keep volume low at all times</div></div></div><label class="nm-switch"><input type="checkbox" name="no_loud_music" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🎉</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Parties</div><div class="text-xs text-gray-400">No gatherings or events</div></div></div><label class="nm-switch"><input type="checkbox" name="no_parties" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🧘</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Calm & Respectful Environment</div><div class="text-xs text-gray-400">Peaceful living space preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="calm_environment"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">📵</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Phone Calls in Common Areas</div><div class="text-xs text-gray-400">Take calls in your room</div></div></div><label class="nm-switch"><input type="checkbox" name="no_calls_common"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'moon' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quiet Hours After 10 PM</div><div class="text-xs text-gray-400">No noise after 10 PM</div></div></div><label class="nm-switch"><input type="checkbox" name="quiet_after_10"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'sunset' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Early Sleepers Only</div><div class="text-xs text-gray-400">Lights out before 11 PM</div></div></div><label class="nm-switch"><input type="checkbox" name="early_sleepers"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'music-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Loud Music</div><div class="text-xs text-gray-400">Keep volume low at all times</div></div></div><label class="nm-switch"><input type="checkbox" name="no_loud_music" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'party-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Parties</div><div class="text-xs text-gray-400">No gatherings or events</div></div></div><label class="nm-switch"><input type="checkbox" name="no_parties" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'lotus' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Calm & Respectful Environment</div><div class="text-xs text-gray-400">Peaceful living space preferred</div></div></div><label class="nm-switch"><input type="checkbox" name="calm_environment"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'phone-mute' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Phone Calls in Common Areas</div><div class="text-xs text-gray-400">Take calls in your room</div></div></div><label class="nm-switch"><input type="checkbox" name="no_calls_common"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🧹 Cleanliness & Hygiene -->
+    <!-- Cleanliness & Hygiene -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🧹 Cleanliness & Hygiene</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'broom' size=16 %}</span>Cleanliness & Hygiene</h3>
       <p class="text-xs text-gray-400 mb-4">Expectations for shared space cleanliness</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🧹</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Cleaning Duties</div><div class="text-xs text-gray-400">Rotating cleaning schedule</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_cleaning"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">👟</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Shoes Inside</div><div class="text-xs text-gray-400">Remove footwear at the door</div></div></div><label class="nm-switch"><input type="checkbox" name="no_shoes_inside"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🤝</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Respect Shared Spaces</div><div class="text-xs text-gray-400">Keep common areas clean</div></div></div><label class="nm-switch"><input type="checkbox" name="respect_spaces" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🧴</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Clean Bathroom After Use</div><div class="text-xs text-gray-400">Leave bathroom tidy always</div></div></div><label class="nm-switch"><input type="checkbox" name="clean_bathroom" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🗑️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Separate Recycling</div><div class="text-xs text-gray-400">Waste sorted and recycled</div></div></div><label class="nm-switch"><input type="checkbox" name="separate_recycling"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'broom' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Cleaning Duties</div><div class="text-xs text-gray-400">Rotating cleaning schedule</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_cleaning"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shoe-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Shoes Inside</div><div class="text-xs text-gray-400">Remove footwear at the door</div></div></div><label class="nm-switch"><input type="checkbox" name="no_shoes_inside"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'handshake' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Respect Shared Spaces</div><div class="text-xs text-gray-400">Keep common areas clean</div></div></div><label class="nm-switch"><input type="checkbox" name="respect_spaces" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'droplet' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Clean Bathroom After Use</div><div class="text-xs text-gray-400">Leave bathroom tidy always</div></div></div><label class="nm-switch"><input type="checkbox" name="clean_bathroom" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'recycle' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Separate Recycling</div><div class="text-xs text-gray-400">Waste sorted and recycled</div></div></div><label class="nm-switch"><input type="checkbox" name="separate_recycling"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 📋 Guest Rules -->
+    <!-- Guest Rules -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">📋 Guest Rules</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'clock' size=16 %}</span>Guest Rules</h3>
       <p class="text-xs text-gray-400 mb-4">Visitor and overnight guest policies</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🚷</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Overnight Guests</div><div class="text-xs text-gray-400">Visitors must leave by midnight</div></div></div><label class="nm-switch"><input type="checkbox" name="no_overnight_guests"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">👥</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Guests Allowed with Notice</div><div class="text-xs text-gray-400">Inform housemates 24hrs ahead</div></div></div><label class="nm-switch"><input type="checkbox" name="guests_with_notice"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🕐</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Curfew After Midnight</div><div class="text-xs text-gray-400">No entry after 12 AM</div></div></div><label class="nm-switch"><input type="checkbox" name="curfew_midnight"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🔇</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Gatherings in Common Areas</div><div class="text-xs text-gray-400">Guests only in private room</div></div></div><label class="nm-switch"><input type="checkbox" name="no_gatherings"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'person-ban' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Overnight Guests</div><div class="text-xs text-gray-400">Visitors must leave by midnight</div></div></div><label class="nm-switch"><input type="checkbox" name="no_overnight_guests"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'people' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Guests Allowed with Notice</div><div class="text-xs text-gray-400">Inform housemates 24hrs ahead</div></div></div><label class="nm-switch"><input type="checkbox" name="guests_with_notice"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'clock' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Curfew After Midnight</div><div class="text-xs text-gray-400">No entry after 12 AM</div></div></div><label class="nm-switch"><input type="checkbox" name="curfew_midnight"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'speaker-mute' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">No Gatherings in Common Areas</div><div class="text-xs text-gray-400">Guests only in private room</div></div></div><label class="nm-switch"><input type="checkbox" name="no_gatherings"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🛋️ Room Amenities -->
+    <!-- Room Amenities -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🛋️ Room Amenities</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'sofa' size=16 %}</span>Room Amenities</h3>
       <p class="text-xs text-gray-400 mb-4">What's included in or around the room?</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🪑</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Fully Furnished</div><div class="text-xs text-gray-400">Bed, wardrobe, study desk included</div></div></div><label class="nm-switch"><input type="checkbox" name="fully_furnished" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🛁</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private En-Suite Bathroom</div><div class="text-xs text-gray-400">Bathroom attached to the room</div></div></div><label class="nm-switch"><input type="checkbox" name="en_suite_bathroom"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">❄️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Air Conditioning</div><div class="text-xs text-gray-400">A/C unit in the room</div></div></div><label class="nm-switch"><input type="checkbox" name="air_conditioning"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🌡️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Heating</div><div class="text-xs text-gray-400">Central or room heater available</div></div></div><label class="nm-switch"><input type="checkbox" name="heating"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🚿</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Hot Water 24/7</div><div class="text-xs text-gray-400">Always-on hot water supply</div></div></div><label class="nm-switch"><input type="checkbox" name="hot_water_24_7" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🪟</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Natural Light / Windows</div><div class="text-xs text-gray-400">Room has windows with good light</div></div></div><label class="nm-switch"><input type="checkbox" name="natural_light" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🌿</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Balcony</div><div class="text-xs text-gray-400">Private or shared balcony access</div></div></div><label class="nm-switch"><input type="checkbox" name="balcony"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">📦</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Storage Space</div><div class="text-xs text-gray-400">Extra closet or storage room</div></div></div><label class="nm-switch"><input type="checkbox" name="storage_space"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">📺</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">TV in Common Area</div><div class="text-xs text-gray-400">Shared living room TV</div></div></div><label class="nm-switch"><input type="checkbox" name="tv_common_area"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🛗</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Elevator</div><div class="text-xs text-gray-400">Building has elevator access</div></div></div><label class="nm-switch"><input type="checkbox" name="elevator"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'chair' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Fully Furnished</div><div class="text-xs text-gray-400">Bed, wardrobe, study desk included</div></div></div><label class="nm-switch"><input type="checkbox" name="fully_furnished" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bathtub' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private En-Suite Bathroom</div><div class="text-xs text-gray-400">Bathroom attached to the room</div></div></div><label class="nm-switch"><input type="checkbox" name="en_suite_bathroom"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'snowflake' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Air Conditioning</div><div class="text-xs text-gray-400">A/C unit in the room</div></div></div><label class="nm-switch"><input type="checkbox" name="air_conditioning"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'thermometer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Heating</div><div class="text-xs text-gray-400">Central or room heater available</div></div></div><label class="nm-switch"><input type="checkbox" name="heating"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shower' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Hot Water 24/7</div><div class="text-xs text-gray-400">Always-on hot water supply</div></div></div><label class="nm-switch"><input type="checkbox" name="hot_water_24_7" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'window' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Natural Light / Windows</div><div class="text-xs text-gray-400">Room has windows with good light</div></div></div><label class="nm-switch"><input type="checkbox" name="natural_light" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'garden' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Balcony</div><div class="text-xs text-gray-400">Private or shared balcony access</div></div></div><label class="nm-switch"><input type="checkbox" name="balcony"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'box' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Storage Space</div><div class="text-xs text-gray-400">Extra closet or storage room</div></div></div><label class="nm-switch"><input type="checkbox" name="storage_space"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'tv' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">TV in Common Area</div><div class="text-xs text-gray-400">Shared living room TV</div></div></div><label class="nm-switch"><input type="checkbox" name="tv_common_area"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'elevator' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Elevator</div><div class="text-xs text-gray-400">Building has elevator access</div></div></div><label class="nm-switch"><input type="checkbox" name="elevator"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 💡 Bills & Utilities -->
+    <!-- Bills & Utilities -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">💡 Bills & Utilities</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'bolt' size=16 %}</span>Bills & Utilities</h3>
       <p class="text-xs text-gray-400 mb-4">Which costs are already covered in the monthly rent?</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">⚡</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Electricity Included</div><div class="text-xs text-gray-400">Electricity bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="electricity_included"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">💧</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Water Included</div><div class="text-xs text-gray-400">Water bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="water_included"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🔥</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gas Included</div><div class="text-xs text-gray-400">Gas bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="gas_included"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">📶</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Internet / Wi-Fi Included</div><div class="text-xs text-gray-400">High-speed Wi-Fi provided</div></div></div><label class="nm-switch"><input type="checkbox" name="wifi_included"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🗑️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Waste Collection Included</div><div class="text-xs text-gray-400">Garbage fees covered</div></div></div><label class="nm-switch"><input type="checkbox" name="waste_included"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🧾</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bills Split Equally</div><div class="text-xs text-gray-400">Utilities divided fairly among housemates</div></div></div><label class="nm-switch"><input type="checkbox" name="bills_split_equally"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bolt' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Electricity Included</div><div class="text-xs text-gray-400">Electricity bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="electricity_included"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'droplet' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Water Included</div><div class="text-xs text-gray-400">Water bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="water_included"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'flame' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gas Included</div><div class="text-xs text-gray-400">Gas bill covered in rent</div></div></div><label class="nm-switch"><input type="checkbox" name="gas_included"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'wifi' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Internet / Wi-Fi Included</div><div class="text-xs text-gray-400">High-speed Wi-Fi provided</div></div></div><label class="nm-switch"><input type="checkbox" name="wifi_included"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'recycle' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Waste Collection Included</div><div class="text-xs text-gray-400">Garbage fees covered</div></div></div><label class="nm-switch"><input type="checkbox" name="waste_included"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'receipt' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bills Split Equally</div><div class="text-xs text-gray-400">Utilities divided fairly among housemates</div></div></div><label class="nm-switch"><input type="checkbox" name="bills_split_equally"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🖥️ Work & Study -->
+    <!-- Work & Study -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🖥️ Work & Study Setup</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'monitor' size=16 %}</span>Work & Study Setup</h3>
       <p class="text-xs text-gray-400 mb-4">Suitable for remote workers or students</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🪑</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dedicated Work / Study Desk</div><div class="text-xs text-gray-400">Desk included in the room</div></div></div><label class="nm-switch"><input type="checkbox" name="study_desk" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🤫</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quiet Work Environment</div><div class="text-xs text-gray-400">Low noise during work / study hours</div></div></div><label class="nm-switch"><input type="checkbox" name="quiet_work_env"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🔌</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Multiple Power Outlets</div><div class="text-xs text-gray-400">Enough sockets for all devices</div></div></div><label class="nm-switch"><input type="checkbox" name="multiple_outlets"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🖨️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Printer Access</div><div class="text-xs text-gray-400">Shared printer available</div></div></div><label class="nm-switch"><input type="checkbox" name="printer_access"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'chair' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dedicated Work / Study Desk</div><div class="text-xs text-gray-400">Desk included in the room</div></div></div><label class="nm-switch"><input type="checkbox" name="study_desk" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'lotus' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quiet Work Environment</div><div class="text-xs text-gray-400">Low noise during work / study hours</div></div></div><label class="nm-switch"><input type="checkbox" name="quiet_work_env"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'plug' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Multiple Power Outlets</div><div class="text-xs text-gray-400">Enough sockets for all devices</div></div></div><label class="nm-switch"><input type="checkbox" name="multiple_outlets"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'printer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Printer Access</div><div class="text-xs text-gray-400">Shared printer available</div></div></div><label class="nm-switch"><input type="checkbox" name="printer_access"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🏊 Building Facilities -->
+    <!-- Building Facilities -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🏊 Building Facilities</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'waves' size=16 %}</span>Building Facilities</h3>
       <p class="text-xs text-gray-400 mb-4">Shared amenities available in the building complex</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🏊</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Swimming Pool</div><div class="text-xs text-gray-400">Building pool available</div></div></div><label class="nm-switch"><input type="checkbox" name="swimming_pool"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🏋️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gym Access</div><div class="text-xs text-gray-400">Building gym available</div></div></div><label class="nm-switch"><input type="checkbox" name="gym_access"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🌇</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Rooftop Access</div><div class="text-xs text-gray-400">Shared rooftop area</div></div></div><label class="nm-switch"><input type="checkbox" name="rooftop_access"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🌳</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Garden / Outdoor Area</div><div class="text-xs text-gray-400">Green space on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="garden"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">☕</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Common Lounge / Seating Area</div><div class="text-xs text-gray-400">Shared relaxation space</div></div></div><label class="nm-switch"><input type="checkbox" name="common_lounge"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🧖</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Sauna / Spa</div><div class="text-xs text-gray-400">Wellness facilities on-site</div></div></div><label class="nm-switch"><input type="checkbox" name="sauna"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'waves' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Swimming Pool</div><div class="text-xs text-gray-400">Building pool available</div></div></div><label class="nm-switch"><input type="checkbox" name="swimming_pool"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'dumbbell' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gym Access</div><div class="text-xs text-gray-400">Building gym available</div></div></div><label class="nm-switch"><input type="checkbox" name="gym_access"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'sunset' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Rooftop Access</div><div class="text-xs text-gray-400">Shared rooftop area</div></div></div><label class="nm-switch"><input type="checkbox" name="rooftop_access"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'garden' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Garden / Outdoor Area</div><div class="text-xs text-gray-400">Green space on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="garden"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'coffee' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Common Lounge / Seating Area</div><div class="text-xs text-gray-400">Shared relaxation space</div></div></div><label class="nm-switch"><input type="checkbox" name="common_lounge"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'steam' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Sauna / Spa</div><div class="text-xs text-gray-400">Wellness facilities on-site</div></div></div><label class="nm-switch"><input type="checkbox" name="sauna"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🔐 Security -->
+    <!-- Security -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🔐 Security</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'lock' size=16 %}</span>Security</h3>
       <p class="text-xs text-gray-400 mb-4">Security features at the property</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">💂</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Security Guard</div><div class="text-xs text-gray-400">24/7 guard on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="security_guard"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">📹</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">CCTV Cameras</div><div class="text-xs text-gray-400">Surveillance in common areas</div></div></div><label class="nm-switch"><input type="checkbox" name="cctv"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🚪</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gated Building</div><div class="text-xs text-gray-400">Secured entrance with gate</div></div></div><label class="nm-switch"><input type="checkbox" name="gated_building"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🔑</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private Room Lock</div><div class="text-xs text-gray-400">Individual lock on bedroom door</div></div></div><label class="nm-switch"><input type="checkbox" name="private_lock" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">📱</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smart Lock / Keypad Entry</div><div class="text-xs text-gray-400">Digital or app-based door lock</div></div></div><label class="nm-switch"><input type="checkbox" name="smart_lock"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🔔</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Intercom / Doorbell</div><div class="text-xs text-gray-400">Intercom system at entrance</div></div></div><label class="nm-switch"><input type="checkbox" name="intercom"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shield' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Security Guard</div><div class="text-xs text-gray-400">24/7 guard on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="security_guard"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'camera' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">CCTV Cameras</div><div class="text-xs text-gray-400">Surveillance in common areas</div></div></div><label class="nm-switch"><input type="checkbox" name="cctv"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'gate' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Gated Building</div><div class="text-xs text-gray-400">Secured entrance with gate</div></div></div><label class="nm-switch"><input type="checkbox" name="gated_building"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'key' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private Room Lock</div><div class="text-xs text-gray-400">Individual lock on bedroom door</div></div></div><label class="nm-switch"><input type="checkbox" name="private_lock" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'smartphone-lock' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smart Lock / Keypad Entry</div><div class="text-xs text-gray-400">Digital or app-based door lock</div></div></div><label class="nm-switch"><input type="checkbox" name="smart_lock"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bell' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Intercom / Doorbell</div><div class="text-xs text-gray-400">Intercom system at entrance</div></div></div><label class="nm-switch"><input type="checkbox" name="intercom"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🚗 Parking & Transport -->
+    <!-- Parking & Transport -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🚗 Parking & Transport</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'car' size=16 %}</span>Parking & Transport</h3>
       <p class="text-xs text-gray-400 mb-4">Parking availability and nearby transit options</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🚗</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private Parking</div><div class="text-xs text-gray-400">Dedicated parking spot</div></div></div><label class="nm-switch"><input type="checkbox" name="private_parking"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🅿️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Parking</div><div class="text-xs text-gray-400">Communal parking available</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_parking"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🚇</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Near Metro Station</div><div class="text-xs text-gray-400">Walking distance to metro</div></div></div><label class="nm-switch"><input type="checkbox" name="near_metro"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🚏</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bus Stop Nearby</div><div class="text-xs text-gray-400">Public bus access close by</div></div></div><label class="nm-switch"><input type="checkbox" name="bus_stop_nearby"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🚲</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bike Storage</div><div class="text-xs text-gray-400">Secure bicycle parking</div></div></div><label class="nm-switch"><input type="checkbox" name="bike_storage"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'car' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Private Parking</div><div class="text-xs text-gray-400">Dedicated parking spot</div></div></div><label class="nm-switch"><input type="checkbox" name="private_parking"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'parking' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Shared Parking</div><div class="text-xs text-gray-400">Communal parking available</div></div></div><label class="nm-switch"><input type="checkbox" name="shared_parking"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'train' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Near Metro Station</div><div class="text-xs text-gray-400">Walking distance to metro</div></div></div><label class="nm-switch"><input type="checkbox" name="near_metro"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bus' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bus Stop Nearby</div><div class="text-xs text-gray-400">Public bus access close by</div></div></div><label class="nm-switch"><input type="checkbox" name="bus_stop_nearby"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bike' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Bike Storage</div><div class="text-xs text-gray-400">Secure bicycle parking</div></div></div><label class="nm-switch"><input type="checkbox" name="bike_storage"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🧺 Laundry -->
+    <!-- Laundry -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🧺 Laundry</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'washer' size=16 %}</span>Laundry</h3>
       <p class="text-xs text-gray-400 mb-4">Washing and laundry facilities available</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🫧</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Washing Machine</div><div class="text-xs text-gray-400">Shared or in-unit washer</div></div></div><label class="nm-switch"><input type="checkbox" name="washing_machine"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🌀</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dryer Available</div><div class="text-xs text-gray-400">Clothes dryer on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="dryer"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">👔</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Ironing Board</div><div class="text-xs text-gray-400">Iron and board available</div></div></div><label class="nm-switch"><input type="checkbox" name="ironing_board"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🪢</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Clothesline</div><div class="text-xs text-gray-400">Outdoor or indoor drying line</div></div></div><label class="nm-switch"><input type="checkbox" name="clothesline"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'washer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Washing Machine</div><div class="text-xs text-gray-400">Shared or in-unit washer</div></div></div><label class="nm-switch"><input type="checkbox" name="washing_machine"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'washer' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Dryer Available</div><div class="text-xs text-gray-400">Clothes dryer on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="dryer"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'shirt' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Ironing Board</div><div class="text-xs text-gray-400">Iron and board available</div></div></div><label class="nm-switch"><input type="checkbox" name="ironing_board"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'clothesline' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Clothesline</div><div class="text-xs text-gray-400">Outdoor or indoor drying line</div></div></div><label class="nm-switch"><input type="checkbox" name="clothesline"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 💰 Financial -->
+    <!-- Financial -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">💰 Financial Terms</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'dollar' size=16 %}</span>Financial Terms</h3>
       <p class="text-xs text-gray-400 mb-4">Payment expectations and deposit requirements</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🏦</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Security Deposit Required</div><div class="text-xs text-gray-400">Refundable deposit on move-in</div></div></div><label class="nm-switch"><input type="checkbox" name="security_deposit" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🤑</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Rent Negotiable</div><div class="text-xs text-gray-400">Open to price discussion</div></div></div><label class="nm-switch"><input type="checkbox" name="rent_negotiable"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">📅</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Monthly Payment</div><div class="text-xs text-gray-400">Pay rent on a monthly basis</div></div></div><label class="nm-switch"><input type="checkbox" name="monthly_payment" checked><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">📆</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quarterly Payment Option</div><div class="text-xs text-gray-400">Pay every 3 months</div></div></div><label class="nm-switch"><input type="checkbox" name="quarterly_payment"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">💳</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Online Payment Accepted</div><div class="text-xs text-gray-400">Bank transfer or digital payment</div></div></div><label class="nm-switch"><input type="checkbox" name="online_payment"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'bank' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Security Deposit Required</div><div class="text-xs text-gray-400">Refundable deposit on move-in</div></div></div><label class="nm-switch"><input type="checkbox" name="security_deposit" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'dollar' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Rent Negotiable</div><div class="text-xs text-gray-400">Open to price discussion</div></div></div><label class="nm-switch"><input type="checkbox" name="rent_negotiable"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'calendar' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Monthly Payment</div><div class="text-xs text-gray-400">Pay rent on a monthly basis</div></div></div><label class="nm-switch"><input type="checkbox" name="monthly_payment" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'calendar' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Quarterly Payment Option</div><div class="text-xs text-gray-400">Pay every 3 months</div></div></div><label class="nm-switch"><input type="checkbox" name="quarterly_payment"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'credit-card' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Online Payment Accepted</div><div class="text-xs text-gray-400">Bank transfer or digital payment</div></div></div><label class="nm-switch"><input type="checkbox" name="online_payment"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- 🌍 Language & Background -->
+    <!-- House Rules & Safety -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
-      <h3 class="text-base font-bold text-gray-900 mb-1">🌍 Language & Background</h3>
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'clock' size=16 %}</span>House Rules & Safety</h3>
+      <p class="text-xs text-gray-400 mb-4">Check-in/out times and safety equipment on the property</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Check-in After</label>
+          <input type="time" name="check_in_time" class="nm-input text-gray-800">
+        </div>
+        <div>
+          <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Checkout Before</label>
+          <input type="time" name="check_out_time" class="nm-input text-gray-800">
+        </div>
+      </div>
+      <div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'flame' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Smoke Alarm Installed</div><div class="text-xs text-gray-400">Working smoke detector on site</div></div></div><label class="nm-switch"><input type="checkbox" name="smoke_alarm" checked><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'cloud' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Carbon Monoxide Alarm</div><div class="text-xs text-gray-400">CO detector installed</div></div></div><label class="nm-switch"><input type="checkbox" name="carbon_monoxide_alarm"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'first-aid' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">First Aid Kit Available</div><div class="text-xs text-gray-400">Basic first aid kit on premises</div></div></div><label class="nm-switch"><input type="checkbox" name="first_aid_kit"><span class="nm-switch-slider"></span></label></div>
+      </div>
+    </div>
+
+    <!-- Language & Background -->
+    <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
+      <h3 class="text-base font-bold text-gray-900 mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'globe' size=16 %}</span>Language & Background</h3>
       <p class="text-xs text-gray-400 mb-4">Language and residency preferences for your household</p>
       <div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🗣️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">English-Speaking Household</div><div class="text-xs text-gray-400">English is the common language</div></div></div><label class="nm-switch"><input type="checkbox" name="english_household"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🌐</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Arabic-Speaking Only</div><div class="text-xs text-gray-400">Arabic is the household language</div></div></div><label class="nm-switch"><input type="checkbox" name="arabic_only"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🗺️</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Local Residents Preferred</div><div class="text-xs text-gray-400">Priority for local applicants</div></div></div><label class="nm-switch"><input type="checkbox" name="local_preferred"><span class="nm-switch-slider"></span></label></div>
-        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span style="font-size:18px;flex-shrink:0">🤝</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Mixed Nationalities Welcome</div><div class="text-xs text-gray-400">No nationality restriction</div></div></div><label class="nm-switch"><input type="checkbox" name="mixed_nationalities"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'message' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">English-Speaking Household</div><div class="text-xs text-gray-400">English is the common language</div></div></div><label class="nm-switch"><input type="checkbox" name="english_household"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'globe' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Arabic-Speaking Only</div><div class="text-xs text-gray-400">Arabic is the household language</div></div></div><label class="nm-switch"><input type="checkbox" name="arabic_only"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'map-pin-region' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Local Residents Preferred</div><div class="text-xs text-gray-400">Priority for local applicants</div></div></div><label class="nm-switch"><input type="checkbox" name="local_preferred"><span class="nm-switch-slider"></span></label></div>
+        <div class="nm-toggle-row flex items-center justify-between py-3.5 border-b border-gray-100 last:border-0 gap-3"><div class="nm-toggle-label flex items-center gap-2.5 flex-1 min-w-0"><span class="shrink-0">{% icon 'handshake' size=18 %}</span><div class="nm-tl-text min-w-0"><div class="text-sm font-semibold text-gray-900 truncate">Mixed Nationalities Welcome</div><div class="text-xs text-gray-400">No nationality restriction</div></div></div><label class="nm-switch"><input type="checkbox" name="mixed_nationalities"><span class="nm-switch-slider"></span></label></div>
       </div>
     </div>
 
-    <!-- ✏️ Custom Requirements -->
+    <!-- Custom Requirements -->
     <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
       <div class="flex items-center justify-between mb-4 flex-wrap gap-2.5">
         <div>
-          <h3 class="text-base font-bold text-gray-900">✏️ Custom Requirements</h3>
+          <h3 class="text-base font-bold text-gray-900 flex items-center gap-2"><span class="shrink-0">{% icon 'edit' size=16 %}</span>Custom Requirements</h3>
           <p class="text-xs text-gray-400 mt-0.5">Add your own rules that don't fit the categories above</p>
         </div>
         <button onclick="parAddCustom()" class="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold text-violet-600 bg-violet-50 border border-violet-200 rounded-lg cursor-pointer font-sans hover:bg-violet-100 transition-colors">
@@ -666,21 +694,63 @@ tailwind.config = {
       <h3 class="text-base font-bold text-gray-900 mb-3.5">Additional Notes</h3>
       <textarea name="notes" placeholder="Any other rules or information for potential roommates..." class="nm-input" style="min-height:100px;resize:vertical;padding:14px;font-size:14px;line-height:1.65"></textarea>
     </div>
+  </div>
+
+  <!-- STEP 5: Review -->
+  <div id="par-s5" class="hidden fade-up">
+
+    <div class="mb-6">
+      <h2 class="text-xl font-extrabold text-gray-900 mb-1">Review & Publish</h2>
+      <p class="text-sm text-gray-500">Double-check everything before your listing goes live.</p>
+    </div>
+
+    <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
+      <div class="flex items-center justify-between mb-3.5">
+        <h3 class="text-base font-bold text-gray-900 flex items-center gap-2"><span class="shrink-0">{% icon 'tag' size=16 %}</span>Basic Info</h3>
+        <a href="javascript:void(0)" onclick="parStep(1)" class="text-[13px] font-semibold text-violet-600 hover:underline inline-flex items-center gap-1">Edit {% icon 'chevron-right' size=12 %}</a>
+      </div>
+      <div id="nm-review-basic" class="grid grid-cols-2 gap-3 text-[13px]"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
+      <div class="flex items-center justify-between mb-3.5">
+        <h3 class="text-base font-bold text-gray-900 flex items-center gap-2"><span class="shrink-0">{% icon 'map-pin' size=16 %}</span>Location</h3>
+        <a href="javascript:void(0)" onclick="parStep(2)" class="text-[13px] font-semibold text-violet-600 hover:underline inline-flex items-center gap-1">Edit {% icon 'chevron-right' size=12 %}</a>
+      </div>
+      <div id="nm-review-location" class="text-[13px] text-gray-700 leading-relaxed"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
+      <div class="flex items-center justify-between mb-3.5">
+        <h3 class="text-base font-bold text-gray-900 flex items-center gap-2"><span class="shrink-0">{% icon 'camera' size=16 %}</span>Photos & Description</h3>
+        <a href="javascript:void(0)" onclick="parStep(3)" class="text-[13px] font-semibold text-violet-600 hover:underline inline-flex items-center gap-1">Edit {% icon 'chevron-right' size=12 %}</a>
+      </div>
+      <div id="nm-review-photos" class="flex gap-2 flex-wrap mb-3"></div>
+      <div id="nm-review-desc" class="text-[13px] text-gray-500 leading-relaxed"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
+      <div class="flex items-center justify-between mb-3.5">
+        <h3 class="text-base font-bold text-gray-900 flex items-center gap-2"><span class="shrink-0">{% icon 'clipboard' size=16 %}</span>Key Requirements</h3>
+        <a href="javascript:void(0)" onclick="parStep(4)" class="text-[13px] font-semibold text-violet-600 hover:underline inline-flex items-center gap-1">Edit {% icon 'chevron-right' size=12 %}</a>
+      </div>
+      <div id="nm-review-requirements" class="flex gap-2 flex-wrap"></div>
+    </div>
 
     <!-- Publish banner -->
     <div class="rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4" style="background:linear-gradient(135deg,#4C1D95,#7C3AED)">
       <div>
-        <div class="text-base font-extrabold text-white mb-1">Ready to publish? 🚀</div>
+        <div class="text-base font-extrabold text-white mb-1 flex items-center gap-2"><span class="shrink-0">{% icon 'rocket' size=17 %}</span>Ready to publish?</div>
         <div class="text-[13px] text-white/75">Your listing will be live instantly and visible to thousands of seekers</div>
       </div>
-      <button type="button" onclick="parSubmit('publish')" class="px-8 py-3.5 text-[15px] font-bold text-violet-600 bg-white border-none rounded-lg cursor-pointer font-sans whitespace-nowrap hover:scale-105 transition-transform">Publish Listing ✅</button>
+      <button type="button" onclick="parSubmit('publish')" class="px-8 py-3.5 text-[15px] font-bold text-violet-600 bg-white border-none rounded-lg cursor-pointer font-sans whitespace-nowrap hover:scale-105 transition-transform flex items-center gap-2">Publish Listing <span class="shrink-0">{% icon 'check' size=15 %}</span></button>
     </div>
   </div>
 
   <!-- NAV BUTTONS -->
-  <div class="flex gap-3 mt-7 sticky bottom-0 pb-2 pt-4" style="background:linear-gradient(to top,#F9FAFB 80%,transparent)">
-    <button type="button" id="par-back" onclick="parStep(window._parStep-1)" class="hidden px-5 py-3 text-sm font-semibold text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer whitespace-nowrap hover:bg-gray-50 transition-colors">← Back</button>
-    <button type="button" id="par-next" onclick="parStep(window._parStep+1)" class="flex-1 py-3.5 text-[15px] font-bold text-white bg-violet-600 border-none rounded-lg cursor-pointer hover:bg-violet-800 transition-colors">Continue →</button>
+  <div class="flex gap-3 mt-7">
+    <button type="button" id="par-back" onclick="parStep(window._parStep-1)" class="hidden px-5 py-3 text-sm font-semibold text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer whitespace-nowrap hover:bg-gray-50 transition-colors"><span style="display:inline-flex;align-items:center;gap:6px">{% icon 'chevron-left' size=13 %} Back</span></button>
+    <button type="button" id="par-next" onclick="parStep(window._parStep+1)" class="flex-1 py-3.5 text-[15px] font-bold text-white bg-violet-600 border-none rounded-lg cursor-pointer hover:bg-violet-800 transition-colors flex items-center justify-center gap-1.5">Continue <span class="shrink-0">{% icon 'chevron-right' size=15 %}</span></button>
   </div>
 </form>
 
@@ -688,9 +758,111 @@ tailwind.config = {
 /* post_room.js — Post a Room wizard logic */
 
 window._parStep = 1;
+var PAR_TOTAL_STEPS = 5;
+var PAR_CHEVRON_RIGHT_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+var PAR_WARNING_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>';
+var PAR_TAG_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M20.6 12.9L12 21.5 2.5 12 2.5 2.5 12 2.5 20.6 11z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>';
+var PAR_STAR_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.1 8.6 22 9.3 17 14 18.2 21 12 17.6 5.8 21 7 14 2 9.3 8.9 8.6"/></svg>';
+var PAR_CLOSE_SVG = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+var PAR_MAP_PIN_LARGE_SVG = '<svg width="32" height="32" viewBox="0 0 24 24" fill="#7C3AED" stroke="#fff" stroke-width="1" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))"><path d="M12 21s7-6.5 7-12a7 7 0 00-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5" fill="#fff"/></svg>';
+function parPoiSvg(inner) {
+  return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+inner+'</svg>';
+}
+var PAR_POI_ICONS = {
+  mosque:     parPoiSvg('<path d="M12 3l3 4H9l3-4z"/><path d="M5 21V11a7 7 0 0114 0v10"/><path d="M5 21h14"/><path d="M12 21v-6"/>'),
+  university: parPoiSvg('<path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/>'),
+  hospital:   parPoiSvg('<rect x="3" y="4" width="18" height="17" rx="1"/><line x1="12" y1="9" x2="12" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/>'),
+  school:     parPoiSvg('<path d="M3 10l9-6 9 6-9 6-9-6z"/><path d="M7 12.5V18l5 3 5-3v-5.5"/>'),
+  station:    parPoiSvg('<rect x="5" y="3" width="14" height="14" rx="4"/><line x1="5" y1="12" x2="19" y2="12"/><circle cx="8.5" cy="15" r=".8"/><circle cx="15.5" cy="15" r=".8"/><path d="M8 21l1.5-3h5L16 21"/>'),
+  bus:        parPoiSvg('<rect x="3" y="5" width="18" height="12" rx="2"/><line x1="3" y1="11" x2="21" y2="11"/><circle cx="7.5" cy="19" r="1.5"/><circle cx="16.5" cy="19" r="1.5"/>'),
+  mall:       parPoiSvg('<circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M2 3h2l2.6 12.4a2 2 0 002 1.6h8.8a2 2 0 002-1.6L21 7H6"/>'),
+  park:       parPoiSvg('<path d="M12 21V9"/><path d="M12 9C7 9 5 5 5 5s0 6 7 6z"/><path d="M12 9c5 0 7-4 7-4s0 6-7 6z"/>'),
+  pharmacy:   parPoiSvg('<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'),
+  bank:       parPoiSvg('<line x1="3" y1="21" x2="21" y2="21"/><line x1="5" y1="21" x2="5" y2="10"/><line x1="19" y1="21" x2="19" y2="10"/><polygon points="12 3 21 9 3 9"/>'),
+  fallback:   parPoiSvg('<path d="M12 21s7-6.5 7-12a7 7 0 00-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>')
+};
+
+// ── Per-step validation ──────────────────────────────────
+var PAR_STEP_VALIDATORS = {
+  1: function() {
+    var errors = [];
+    var price = parseFloat((document.getElementById('par-rent') || {}).value);
+    if (!price || price <= 0) errors.push({ msg: 'Enter a monthly rent greater than 0.', focusEl: 'par-rent' });
+    var listingType = (document.getElementById('par-listing-type') || {}).value;
+    if (!listingType) errors.push({ msg: 'Select a listing type.', focusEl: null });
+    return errors;
+  },
+  2: function() {
+    var errors = [];
+    var title = (document.getElementById('par-title') || {}).value.trim();
+    if (title.length < 10) errors.push({ msg: 'Title must be at least 10 characters.', focusEl: 'par-title' });
+    return errors;
+  },
+  3: function() {
+    var errors = [];
+    if (_photos.length === 0) errors.push({ msg: 'Add at least 1 photo.', focusEl: null });
+    var unlabeled = _photos.filter(function(p){ return !p.label; });
+    if (unlabeled.length) errors.push({ msg: 'Every photo needs a room tag (' + unlabeled.length + ' remaining).', focusEl: null });
+    return errors;
+  },
+  4: function() { return []; }
+};
+
+function parValidateStep(s) {
+  var fn = PAR_STEP_VALIDATORS[s];
+  return fn ? fn() : [];
+}
+
+function parIsStepValid(s) {
+  return parValidateStep(s).length === 0;
+}
+
+function parShowStepErrors(stepNum, errors) {
+  var container = document.getElementById('par-s' + stepNum);
+  if (!container) return;
+  var existing = container.querySelector('.nm-step-error-banner');
+  if (existing) existing.remove();
+  var banner = document.createElement('div');
+  banner.className = 'nm-step-error-banner bg-rose-50 border border-rose-200 rounded-lg px-4 py-3 mb-5 flex flex-col gap-1.5';
+  errors.forEach(function(err) {
+    var line = document.createElement('div');
+    line.className = 'text-[13px] text-rose-700 font-semibold flex items-center gap-2';
+    line.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg><span></span>';
+    line.querySelector('span').textContent = err.msg;
+    banner.appendChild(line);
+  });
+  container.insertBefore(banner, container.firstChild);
+  banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  var focusId = errors[0] && errors[0].focusEl;
+  if (focusId) {
+    var el = document.getElementById(focusId);
+    if (el) setTimeout(function(){ el.focus(); }, 300);
+  }
+}
+
+function parClearStepErrors(stepNum) {
+  var container = document.getElementById('par-s' + stepNum);
+  if (!container) return;
+  var existing = container.querySelector('.nm-step-error-banner');
+  if (existing) existing.remove();
+}
 
 function parStep(s) {
-  if (s < 1 || s > 4) return;
+  if (s < 1 || s > PAR_TOTAL_STEPS) return;
+  if (typeof parSaveDraft === 'function') parSaveDraft();
+
+  // Moving forward: every step strictly between current and target must be valid
+  if (s > window._parStep) {
+    for (var check = window._parStep; check < s; check++) {
+      var errs = parValidateStep(check);
+      if (errs.length) {
+        parShowStepErrors(check, errs);
+        if (check !== window._parStep) parStep(check);
+        return;
+      }
+    }
+  }
+  parClearStepErrors(window._parStep);
 
   // Leaving step 2 → forward: auto-geocode if no pin was dropped
   if (window._parStep === 2 && s === 3) {
@@ -731,15 +903,14 @@ function parStep(s) {
   }
 
   window._parStep = s;
-  for (var i = 1; i <= 4; i++) {
+  for (var i = 1; i <= PAR_TOTAL_STEPS; i++) {
     var el = document.getElementById('par-s' + i);
     if (el) { el.classList.toggle('hidden', i !== s); }
   }
-  var hints = ['Basic Information', 'Title & Location', 'Photos & Description', 'Requirements & Publish'];
+  var hints = ['Basic Information', 'Title & Location', 'Photos & Description', 'Requirements', 'Review & Publish'];
   var lbl = document.getElementById('nm-step-hint');
-  if (lbl) lbl.textContent = 'Step ' + s + ' of 4 — ' + hints[s - 1];
-  var stepLabels = ['Basic Info', 'Location', 'Photos', 'Requirements'];
-  for (var i = 1; i <= 4; i++) {
+  if (lbl) lbl.textContent = 'Step ' + s + ' of ' + PAR_TOTAL_STEPS + ' — ' + hints[s - 1];
+  for (var i = 1; i <= PAR_TOTAL_STEPS; i++) {
     var num = document.getElementById('ps' + i + '-num');
     var lbl = document.getElementById('ps' + i + '-lbl');
     if (!num || !lbl) continue;
@@ -748,7 +919,7 @@ function parStep(s) {
     var lineR = row.children[2];
     if (i < s) {
       num.className = 'w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[11px] font-extrabold shrink-0 z-10';
-      num.textContent = '✓';
+      num.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
       lineL.className = 'flex-1 h-0.5 bg-emerald-300';
       lineR.className = 'flex-1 h-0.5 bg-emerald-300';
       lbl.className   = 'text-[11px] font-bold text-emerald-600 text-center leading-tight';
@@ -756,20 +927,25 @@ function parStep(s) {
       num.className = 'w-7 h-7 rounded-full bg-violet-600 text-white flex items-center justify-center text-[11px] font-extrabold shrink-0 shadow-sm shadow-violet-200 z-10';
       num.textContent = i;
       lineL.className = i === 1 ? 'flex-1 h-0.5 bg-transparent' : 'flex-1 h-0.5 bg-emerald-300';
-      lineR.className = i === 4 ? 'flex-1 h-0.5 bg-transparent' : 'flex-1 h-0.5 bg-gray-200';
+      lineR.className = i === PAR_TOTAL_STEPS ? 'flex-1 h-0.5 bg-transparent' : 'flex-1 h-0.5 bg-gray-200';
       lbl.className   = 'text-[11px] font-bold text-violet-600 text-center leading-tight';
     } else {
       num.className = 'w-7 h-7 rounded-full bg-white text-gray-400 flex items-center justify-center text-[11px] font-extrabold shrink-0 border-2 border-gray-200 z-10';
       num.textContent = i;
       lineL.className = i === 1 ? 'flex-1 h-0.5 bg-transparent' : 'flex-1 h-0.5 bg-gray-200';
-      lineR.className = i === 4 ? 'flex-1 h-0.5 bg-transparent' : 'flex-1 h-0.5 bg-gray-200';
+      lineR.className = i === PAR_TOTAL_STEPS ? 'flex-1 h-0.5 bg-transparent' : 'flex-1 h-0.5 bg-gray-200';
       lbl.className   = 'text-[11px] font-medium text-gray-400 text-center leading-tight';
     }
   }
   var back = document.getElementById('par-back');
   var next = document.getElementById('par-next');
   if (back) back.classList.toggle('hidden', s <= 1);
-  if (next) { next.textContent = s === 4 ? 'Publish Listing ✅' : 'Continue →'; next.classList.toggle('hidden', s === 4); }
+  if (next) {
+    next.innerHTML = 'Continue <span class="shrink-0" style="display:inline-flex;margin-left:6px">' + PAR_CHEVRON_RIGHT_SVG + '</span>';
+    next.classList.toggle('hidden', s === PAR_TOTAL_STEPS);
+  }
+
+  if (s === PAR_TOTAL_STEPS) { parRenderReview(); }
 }
 
 // Listing Type — single-select; drives occupants cap, rent hint, tenant subtitle
@@ -945,9 +1121,12 @@ function parFeatureLeave(label) {
   label.style.borderColor = '#E5E7EB';
 }
 
+var PAR_SPINNER_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:inline-block;animation:spin 1s linear infinite"><path d="M12 3a9 9 0 019 9"/></svg>';
+var PAR_SPARKLE_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/><path d="M19 15l.7 2.1L22 18l-2.3.9L19 21l-.7-2.1L16 18l2.3-.9z"/></svg>';
+
 function parGenerateAI() {
   var btn = document.getElementById('nm-ai-btn');
-  if (btn) { btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;font-size:14px">⏳</span> Generating...'; btn.disabled = true; }
+  if (btn) { btn.innerHTML = PAR_SPINNER_SVG + ' Generating...'; btn.disabled = true; }
   setTimeout(function() {
     var ta = document.getElementById('nm-desc-ta');
     if (ta) {
@@ -959,7 +1138,7 @@ function parGenerateAI() {
     if (badge) badge.classList.remove('hidden');
     var aiFlag = document.getElementById('nm-ai-generated');
     if (aiFlag) aiFlag.value = '1';
-    if (btn) { btn.innerHTML = '<span>✨</span> Generate with AI'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = PAR_SPARKLE_SVG + ' Generate with AI'; btn.disabled = false; }
   }, 2000);
 }
 
@@ -992,20 +1171,20 @@ function parLandmarkSearch(q) {
         results.forEach(function(r, i) {
           var item = document.createElement('div');
           item.style.cssText = 'padding:10px 14px;font-size:13px;color:#111827;cursor:pointer;border-bottom:1px solid #F3F4F6;display:flex;align-items:center;gap:10px';
-          var icon = r.type === 'mosque' ? '🕌'
-            : r.type === 'university' || r.type === 'college' ? '🎓'
-            : r.type === 'hospital'   || r.type === 'clinic'  ? '🏥'
-            : r.type === 'school'     ? '🏫'
-            : r.type === 'station'    || r.category === 'railway' ? '🚉'
-            : r.type === 'bus_stop'   ? '🚌'
-            : r.type === 'mall'       || r.type === 'supermarket' ? '🛒'
-            : r.type === 'park'       ? '🌳'
-            : r.type === 'pharmacy'   ? '💊'
-            : r.type === 'bank'       ? '🏦'
-            : '📍';
+          var icon = r.type === 'mosque' ? PAR_POI_ICONS.mosque
+            : r.type === 'university' || r.type === 'college' ? PAR_POI_ICONS.university
+            : r.type === 'hospital'   || r.type === 'clinic'  ? PAR_POI_ICONS.hospital
+            : r.type === 'school'     ? PAR_POI_ICONS.school
+            : r.type === 'station'    || r.category === 'railway' ? PAR_POI_ICONS.station
+            : r.type === 'bus_stop'   ? PAR_POI_ICONS.bus
+            : r.type === 'mall'       || r.type === 'supermarket' ? PAR_POI_ICONS.mall
+            : r.type === 'park'       ? PAR_POI_ICONS.park
+            : r.type === 'pharmacy'   ? PAR_POI_ICONS.pharmacy
+            : r.type === 'bank'       ? PAR_POI_ICONS.bank
+            : PAR_POI_ICONS.fallback;
           var name = r.namedetails && r.namedetails.name ? r.namedetails.name : r.display_name.split(',')[0];
           var sub  = r.display_name.split(',').slice(1,3).join(',').trim();
-          item.innerHTML = '<span style="font-size:16px;flex-shrink:0">'+icon+'</span>'
+          item.innerHTML = '<span style="flex-shrink:0;color:#7C3AED;display:inline-flex">'+icon+'</span>'
             + '<div><div style="font-weight:600;color:#111827">'+name+'</div>'
             + (sub ? '<div style="font-size:11px;color:#9CA3AF;margin-top:1px">'+sub+'</div>' : '')
             + '</div>';
@@ -1060,7 +1239,7 @@ function parInitMap() {
 
   var pinIcon = L.divIcon({
     className: '',
-    html: '<div style="font-size:32px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))">📍</div>',
+    html: PAR_MAP_PIN_LARGE_SVG,
     iconSize: [32, 32], iconAnchor: [16, 32]
   });
 
@@ -1073,7 +1252,7 @@ function parSetPin(lat, lng, label, icon) {
   if (_marker) _map.removeLayer(_marker);
   icon = icon || L.divIcon({
     className: '',
-    html: '<div style="font-size:32px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))">📍</div>',
+    html: PAR_MAP_PIN_LARGE_SVG,
     iconSize: [32, 32], iconAnchor: [16, 32]
   });
   _marker = L.marker([lat, lng], { icon: icon, draggable: true }).addTo(_map);
@@ -1165,7 +1344,15 @@ parStep = function(s) {
 };
 
 // ── Photo upload ──────────────────────────────────────────
-var _photos = [];
+var _photos = []; // { file, src, label }
+var _ROOM_LABELS = [
+  ['living_room', 'Living Room'],
+  ['bedroom',     'Bedroom'],
+  ['kitchen',     'Kitchen'],
+  ['bathroom',    'Bathroom'],
+  ['exterior',    'Exterior'],
+  ['other',       'Additional Photos'],
+];
 
 function parHandleFiles(files) {
   for (var i = 0; i < files.length; i++) {
@@ -1174,14 +1361,59 @@ function parHandleFiles(files) {
     if (!file.type.match('image.*')) continue;
     if (file.size > 10 * 1024 * 1024) { alert(file.name + ' exceeds 10MB limit.'); continue; }
     (function(f) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        _photos.push({ name: f.name, src: e.target.result });
-        parRenderPreviews();
-      };
-      reader.readAsDataURL(f);
+      parCompressImage(f, function(outputFile) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          _photos.push({ file: outputFile, src: e.target.result, label: '' });
+          parSyncFileInput();
+          parRenderPreviews();
+        };
+        reader.readAsDataURL(outputFile);
+      });
     })(file);
   }
+}
+
+// ── Client-side compression ─────────────────────────────────────────────
+// Skips PNGs to preserve transparency; caps longest side at 1920px; JPEG q=0.85
+function parCompressImage(file, callback) {
+  if (file.type === 'image/png') { callback(file); return; }
+
+  var img = new Image();
+  img.onload = function() {
+    var maxDim = 1920;
+    var w = img.width, h = img.height;
+    if (Math.max(w, h) > maxDim) {
+      var scale = maxDim / Math.max(w, h);
+      w = Math.round(w * scale);
+      h = Math.round(h * scale);
+    }
+    var canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    canvas.toBlob(function(blob) {
+      URL.revokeObjectURL(img.src);
+      if (!blob) { callback(file); return; }
+      callback(new File([blob], file.name, { type: 'image/jpeg' }));
+    }, 'image/jpeg', 0.85);
+  };
+  img.onerror = function() {
+    URL.revokeObjectURL(img.src);
+    callback(file);
+  };
+  img.src = URL.createObjectURL(file);
+}
+
+function parSyncFileInput() {
+  var input = document.getElementById('nm-file-input');
+  if (!input) return;
+  var dt = new DataTransfer();
+  _photos.forEach(function(p) { dt.items.add(p.file); });
+  input.files = dt.files;
+  var labelsInput = document.getElementById('par-image-labels');
+  if (labelsInput) labelsInput.value = _photos.map(function(p){ return p.label; }).join(',');
 }
 
 function parRenderPreviews() {
@@ -1189,25 +1421,109 @@ function parRenderPreviews() {
   var count = document.getElementById('nm-photo-count');
   if (!list) return;
   list.innerHTML = '';
+  var unlabeledCount = 0;
   _photos.forEach(function(p, idx) {
-    var div = document.createElement('div');
-    div.style.cssText = 'width:72px;height:72px;border-radius:10px;position:relative;overflow:hidden;flex-shrink:0;animation:fadeUp .25s ease both';
-    div.innerHTML = '<img src="'+p.src+'" style="width:100%;height:100%;object-fit:cover" alt="">'
-      + '<div onclick="parRemovePhoto('+idx+')" style="position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(239,68,68,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;cursor:pointer;line-height:1">✕</div>';
-    list.appendChild(div);
+    var isUnset = !p.label;
+    if (isUnset) unlabeledCount++;
+    var row = document.createElement('div');
+    row.id = 'nm-photo-row-' + idx;
+    row.draggable = true;
+    row.dataset.idx = idx;
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px;border:1.5px solid '+(isUnset ? '#FCA5A5' : '#F3F4F6')+';background:'+(isUnset ? '#FEF2F2' : '#fff')+';border-radius:8px;animation:fadeUp .25s ease both;cursor:grab';
+
+    var opts = '<option value="" disabled'+(isUnset?' selected':'')+'>Select room…</option>' + _ROOM_LABELS.map(function(l) {
+      return '<option value="'+l[0]+'"'+(l[0]===p.label?' selected':'')+'>'+l[1]+'</option>';
+    }).join('');
+
+    row.innerHTML =
+      '<span title="Drag to reorder" style="cursor:grab;color:#D1D5DB;font-size:14px;flex-shrink:0;user-select:none">⠿</span>'
+      + '<div style="position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;flex-shrink:0">'
+      +   '<img src="'+p.src+'" style="width:100%;height:100%;object-fit:cover" alt="">'
+      +   (idx === 0 ? '<span style="position:absolute;bottom:2px;left:2px;right:2px;background:rgba(124,58,237,.9);color:#fff;font-size:9px;font-weight:700;text-align:center;border-radius:4px;padding:1px 0">Cover</span>' : '')
+      + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      +   '<label style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:'+(isUnset ? '#DC2626' : '#7C3AED')+';margin-bottom:4px">'+(isUnset ? PAR_WARNING_SVG + ' Select a room to continue' : PAR_TAG_SVG + ' Which room is this?')+'</label>'
+      +   '<select class="nm-input" style="padding:8px 10px;font-size:13px;font-weight:600" onchange="parSetPhotoLabel('+idx+',this.value)">'+opts+'</select>'
+      + '</div>'
+      + (idx !== 0 ? '<div onclick="parPinAsCover('+idx+')" title="Pin as cover photo" style="width:28px;height:28px;background:#F5F3FF;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#7C3AED;cursor:pointer;flex-shrink:0">'+PAR_STAR_SVG+'</div>' : '')
+      + '<div onclick="parRemovePhoto('+idx+')" title="Remove photo" style="width:28px;height:28px;background:#FEE2E2;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#DC2626;cursor:pointer;flex-shrink:0">'+PAR_CLOSE_SVG+'</div>';
+
+    row.addEventListener('dragstart', parPhotoDragStart);
+    row.addEventListener('dragover', parPhotoDragOver);
+    row.addEventListener('dragleave', parPhotoDragLeave);
+    row.addEventListener('drop', parPhotoDrop);
+    row.addEventListener('dragend', parPhotoDragEnd);
+
+    list.appendChild(row);
   });
   if (_photos.length < 10) {
     var add = document.createElement('div');
     add.onclick = function(){ document.getElementById('nm-file-input').click(); };
-    add.style.cssText = 'width:72px;height:72px;border-radius:10px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px dashed #E5E7EB;cursor:pointer;color:#9CA3AF;flex-shrink:0';
-    add.textContent = '+';
+    add.style.cssText = 'width:100%;padding:10px;border-radius:8px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:700;border:2px dashed #E5E7EB;cursor:pointer;color:#9CA3AF';
+    add.textContent = '+ Add more photos';
     list.appendChild(add);
   }
-  if (count) { count.classList.remove('hidden'); count.textContent = _photos.length + ' / 10 photos added'; }
+  if (count) {
+    count.classList.remove('hidden');
+    count.textContent = _photos.length + ' / 10 photos added'
+      + (unlabeledCount ? ' — ' + unlabeledCount + ' need' + (unlabeledCount===1?'s':'') + ' a room tag' : '');
+    count.style.color = unlabeledCount ? '#DC2626' : '';
+    count.style.fontWeight = unlabeledCount ? '700' : '';
+  }
+}
+
+function parSetPhotoLabel(idx, label) {
+  if (_photos[idx]) _photos[idx].label = label;
+  parSyncFileInput();
+  parRenderPreviews();
+}
+
+// ── Drag-to-reorder (native HTML5 DnD) — position 0 = cover photo ──────────
+var _dragSrcIdx = null;
+
+function parPhotoDragStart(e) {
+  _dragSrcIdx = parseInt(this.dataset.idx, 10);
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', String(_dragSrcIdx));
+  this.style.opacity = '0.4';
+}
+function parPhotoDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  this.style.borderColor = '#7C3AED';
+  return false;
+}
+function parPhotoDragLeave(e) {
+  this.style.borderColor = '';
+}
+function parPhotoDrop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+  var targetIdx = parseInt(this.dataset.idx, 10);
+  if (_dragSrcIdx === null || _dragSrcIdx === targetIdx) return false;
+  var moved = _photos.splice(_dragSrcIdx, 1)[0];
+  _photos.splice(targetIdx, 0, moved);
+  parSyncFileInput();
+  parRenderPreviews();
+  return false;
+}
+function parPhotoDragEnd(e) {
+  this.style.opacity = '';
+  _dragSrcIdx = null;
+}
+
+// One-click cover pin — touch-friendly alternative to dragging to position 0
+function parPinAsCover(idx) {
+  if (idx <= 0 || idx >= _photos.length) return;
+  var moved = _photos.splice(idx, 1)[0];
+  _photos.unshift(moved);
+  parSyncFileInput();
+  parRenderPreviews();
 }
 
 function parRemovePhoto(idx) {
   _photos.splice(idx, 1);
+  parSyncFileInput();
   parRenderPreviews();
   if (_photos.length === 0) {
     var count = document.getElementById('nm-photo-count');
@@ -1245,14 +1561,16 @@ function parAddCustom() {
 
   var row = document.createElement('div');
   row.id  = id;
-  row.style.cssText = 'display:flex;align-items:center;gap:10px;background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:10px;padding:12px 14px;animation:fadeUp .3s ease both';
+  row.className = 'nm-custom-item';
+  row.style.cssText = 'display:flex;align-items:center;gap:10px;background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:8px;padding:12px 14px;animation:fadeUp .3s ease both';
   row.innerHTML = '<select onchange="parCustomEmoji(this)" style="font-size:18px;border:none;background:transparent;cursor:pointer;padding:2px;outline:none;flex-shrink:0">'
     + _emojiOptions.map(function(e){ return '<option value="'+e+'">'+e+'</option>'; }).join('')
     + '</select>'
-    + '<input type="text" placeholder="e.g. Must water the plants on Fridays" style="flex:1;border:none;background:transparent;font-size:14px;font-weight:500;color:#111827;outline:none;font-family:inherit" />'
+    + '<input type="text" class="nm-custom-text-input" placeholder="e.g. Must water the plants on Fridays" style="flex:1;border:none;background:transparent;font-size:14px;font-weight:500;color:#111827;outline:none;font-family:inherit" />'
     + '<label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;cursor:pointer;inset:0;background:#7C3AED;border-radius:24px;transition:.3s" onclick="this.style.background=this.previousElementSibling.checked?\'#E5E7EB\':\'#7C3AED\'"><span style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;transform:translateX(20px);box-shadow:0 1px 4px rgba(0,0,0,.2)"></span></span></label>'
-    + '<button onclick="parRemoveCustom(\''+id+'\')" style="width:26px;height:26px;border-radius:50%;background:#FEE2E2;border:none;cursor:pointer;font-size:13px;color:#EF4444;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit">✕</button>';
+    + '<button onclick="parRemoveCustom(\''+id+'\')" style="width:26px;height:26px;border-radius:50%;background:#FEE2E2;border:none;cursor:pointer;color:#EF4444;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit">'+PAR_CLOSE_SVG+'</button>';
   list.appendChild(row);
+  return row;
 }
 
 function parRemoveCustom(id) {
@@ -1263,8 +1581,101 @@ function parRemoveCustom(id) {
   if (list && empty && list.children.length === 0) empty.style.display = 'block';
 }
 
+function parCollectCustomRequirements() {
+  var items = [];
+  document.querySelectorAll('#nm-custom-list .nm-custom-item').forEach(function(row) {
+    var cb    = row.querySelector('input[type="checkbox"]');
+    var input = row.querySelector('.nm-custom-text-input');
+    var text  = input ? input.value.trim() : '';
+    if (text) items.push({ text: text, enabled: cb ? cb.checked : true });
+  });
+  return items;
+}
+
 // Form submission — syncs hidden inputs then submits
+// ── Step 5: Review — reads live form state, no parallel store ──────────────
+function parRenderReview() {
+  // Basic Info
+  var typeCard = document.querySelector('.nm-type-card.sel[data-type]');
+  var typeLbl  = typeCard ? typeCard.querySelector('.lbl').textContent : '—';
+  var price    = (document.getElementById('par-rent') || {}).value || '—';
+  var avail    = (document.getElementById('par-date') || {}).value || 'Now';
+  var stayEl   = document.querySelector('select[name="min_stay_months"]');
+  var stayTxt  = stayEl ? stayEl.options[stayEl.selectedIndex].textContent : '—';
+  var tenantBadge = document.getElementById('par-tenant-badge');
+  var tenantTxt   = (tenantBadge && !tenantBadge.classList.contains('hidden')) ? tenantBadge.textContent : 'Anyone';
+
+  var basic = document.getElementById('nm-review-basic');
+  if (basic) {
+    basic.innerHTML =
+      '<div><div class="text-gray-400">Type</div><div class="font-bold text-gray-900">' + typeLbl + '</div></div>' +
+      '<div><div class="text-gray-400">Price</div><div class="font-bold text-gray-900">$' + price + '/mo</div></div>' +
+      '<div><div class="text-gray-400">Available</div><div class="font-bold text-gray-900">' + avail + '</div></div>' +
+      '<div><div class="text-gray-400">Max Occupants</div><div class="font-bold text-gray-900">' + _parOcc + '</div></div>' +
+      '<div><div class="text-gray-400">Min Stay</div><div class="font-bold text-gray-900">' + stayTxt + '</div></div>' +
+      '<div><div class="text-gray-400">Who\'s Welcome</div><div class="font-bold text-gray-900">' + tenantTxt + '</div></div>';
+  }
+
+  // Location
+  var title    = (document.getElementById('par-title') || {}).value || '—';
+  var addrParts = ['street', 'district', 'city', 'country'].map(function(name) {
+    var el = document.getElementById('nm-field-' + name);
+    return el && el.value ? el.value : null;
+  }).filter(Boolean);
+  var loc = document.getElementById('nm-review-location');
+  if (loc) {
+    loc.innerHTML =
+      '<div class="font-bold text-gray-900 mb-1">' + title + '</div>' +
+      '<div>' + (addrParts.length ? addrParts.join(', ') : 'No address entered') + '</div>';
+  }
+
+  // Photos & Description
+  var photosEl = document.getElementById('nm-review-photos');
+  if (photosEl) {
+    photosEl.innerHTML = _photos.map(function(p) {
+      return '<div style="width:48px;height:48px;border-radius:8px;overflow:hidden"><img src="' + p.src + '" style="width:100%;height:100%;object-fit:cover" alt=""></div>';
+    }).join('') || '<div class="text-gray-400 text-[13px]">No photos added</div>';
+  }
+  var descEl = document.getElementById('nm-review-desc');
+  var descVal = (document.getElementById('nm-desc-ta') || {}).value || '';
+  var aiFlag  = (document.getElementById('nm-ai-generated') || {}).value === '1';
+  if (descEl) {
+    var preview = descVal.length > 150 ? descVal.slice(0, 150) + '…' : descVal;
+    descEl.innerHTML = (preview ? preview : '<span class="italic text-gray-400">No description added</span>') +
+      (aiFlag ? ' <span class="text-violet-600 font-semibold inline-flex items-center gap-1">' + PAR_SPARKLE_SVG + ' AI Generated</span>' : '');
+  }
+
+  // Key requirements — only checked toggles
+  var reqEl = document.getElementById('nm-review-requirements');
+  if (reqEl) {
+    var checked = document.querySelectorAll('#par-s4 input[type="checkbox"]:checked');
+    if (checked.length === 0) {
+      reqEl.innerHTML = '<div class="text-gray-400 text-[13px]">No specific requirements set.</div>';
+    } else {
+      var chips = [];
+      checked.forEach(function(cb) {
+        var row = cb.closest('.nm-toggle-row');
+        var labelEl = row ? row.querySelector('.text-sm.font-semibold') : null;
+        if (labelEl) chips.push('<span class="text-[12px] font-semibold text-violet-700 bg-violet-50 border border-violet-200 px-2.5 py-1 rounded-full">' + labelEl.textContent + '</span>');
+      });
+      reqEl.innerHTML = chips.join('');
+    }
+  }
+}
+
 function parSubmit(action) {
+  // Publishing requires every step (1-4) to pass its validator
+  if (action === 'publish') {
+    for (var s = 1; s <= 4; s++) {
+      var errs = parValidateStep(s);
+      if (errs.length) {
+        parStep(s);
+        parShowStepErrors(s, errs);
+        return;
+      }
+    }
+  }
+
   // Sync action (publish / draft)
   var actionInput = document.getElementById('par-action');
   if (actionInput) actionInput.value = action;
@@ -1274,17 +1685,153 @@ function parSubmit(action) {
   if (occInput) occInput.value = _parOcc;
 
   // Sync custom requirements as JSON
-  var items = [];
-  document.querySelectorAll('#nm-custom-list .nm-custom-item').forEach(function(row) {
-    var cb   = row.querySelector('input[type="checkbox"]');
-    var span = row.querySelector('.nm-custom-text');
-    if (span) items.push({ text: span.textContent.trim(), enabled: cb ? cb.checked : true });
-  });
+  var items = parCollectCustomRequirements();
   var jsonInput = document.getElementById('par-custom-json');
   if (jsonInput) jsonInput.value = JSON.stringify(items);
 
+  parSyncFileInput();
+
+  try { localStorage.removeItem('nestmatch_post_room_draft_v1'); } catch (e) {}
+
   document.getElementById('par-form').submit();
 }
+
+// ── Autosave / Resume Draft ─────────────────────────────────────────────
+var PAR_DRAFT_KEY = 'nestmatch_post_room_draft_v1';
+
+function parSerializeDraft() {
+  var fields = {};
+  document.querySelectorAll('#par-form input[name], #par-form select[name], #par-form textarea[name]').forEach(function(el) {
+    if (el.type === 'file') return;
+    if (el.name === 'images' || el.name === 'image_labels' || el.name === 'csrfmiddlewaretoken' || el.name === 'action' || el.name === 'custom_requirements') return;
+    if (el.type === 'checkbox') fields[el.name] = el.checked;
+    else fields[el.name] = el.value;
+  });
+  return {
+    savedAt: new Date().toISOString(),
+    fields: fields,
+    listingType: (document.getElementById('par-listing-type') || {}).value,
+    maxOccupants: _parOcc,
+    tenantValue: (document.getElementById('par-tenant-value') || {}).value,
+    customRequirements: parCollectCustomRequirements()
+  };
+}
+
+var _parAutosaveTimer = null;
+function parScheduleAutosave() {
+  clearTimeout(_parAutosaveTimer);
+  _parAutosaveTimer = setTimeout(parSaveDraft, 800);
+}
+
+function parSaveDraft() {
+  try {
+    localStorage.setItem(PAR_DRAFT_KEY, JSON.stringify(parSerializeDraft()));
+  } catch (e) { /* quota exceeded / private browsing — fail silently */ }
+}
+
+function parRelativeTime(iso) {
+  var diffMs = Date.now() - new Date(iso).getTime();
+  var mins = Math.round(diffMs / 60000);
+  if (mins < 1) return 'just now';
+  if (mins === 1) return '1 minute ago';
+  if (mins < 60) return mins + ' minutes ago';
+  var hours = Math.round(mins / 60);
+  if (hours === 1) return '1 hour ago';
+  return hours + ' hours ago';
+}
+
+function parShowResumeBanner(draft) {
+  var form = document.getElementById('par-form');
+  if (!form) return;
+  var banner = document.createElement('div');
+  banner.id = 'nm-resume-banner';
+  banner.className = 'bg-violet-50 border border-violet-200 rounded-lg px-4 py-3.5 mb-5 flex items-center justify-between gap-3 flex-wrap';
+  banner.innerHTML =
+    '<div class="text-[13px] text-violet-800"><strong>Resume your unsaved listing?</strong> Saved ' + parRelativeTime(draft.savedAt) + '. Photos aren\'t saved — you\'ll need to re-upload them.</div>' +
+    '<div class="flex gap-2 shrink-0">' +
+      '<button type="button" onclick="parRestoreDraft()" class="px-4 py-2 text-[12px] font-bold text-white bg-violet-600 rounded-lg cursor-pointer">Restore</button>' +
+      '<button type="button" onclick="parDiscardDraft()" class="px-4 py-2 text-[12px] font-bold text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer">Discard</button>' +
+    '</div>';
+  form.insertBefore(banner, form.firstChild);
+  window._parPendingDraft = draft;
+}
+
+function parDiscardDraft() {
+  try { localStorage.removeItem(PAR_DRAFT_KEY); } catch (e) {}
+  var banner = document.getElementById('nm-resume-banner');
+  if (banner) banner.remove();
+}
+
+function parRestoreDraft() {
+  var draft = window._parPendingDraft;
+  var banner = document.getElementById('nm-resume-banner');
+  if (banner) banner.remove();
+  if (!draft) return;
+
+  Object.keys(draft.fields || {}).forEach(function(name) {
+    var el = document.querySelector('#par-form [name="' + name + '"]');
+    if (!el) return;
+    if (el.type === 'checkbox') el.checked = !!draft.fields[name];
+    else el.value = draft.fields[name];
+  });
+
+  if (draft.listingType) {
+    var typeCard = document.querySelector('.nm-type-card[data-type="' + draft.listingType + '"]');
+    if (typeCard) {
+      document.querySelectorAll('.nm-type-card[data-type]').forEach(function(c){ c.classList.remove('sel'); });
+      typeCard.classList.add('sel');
+      parSyncListingType(typeCard);
+    }
+  }
+
+  if (draft.maxOccupants) {
+    _parOcc = draft.maxOccupants;
+    var occEl = document.getElementById('par-occ');
+    if (occEl) occEl.textContent = _parOcc;
+  }
+
+  if (draft.tenantValue && draft.tenantValue !== 'anyone') {
+    var tenants = draft.tenantValue.split(',');
+    tenants.forEach(function(t) {
+      var card = document.querySelector('#par-tenant-grid .nm-type-card[data-tenant="' + t + '"]');
+      if (card) parPickTenant(card);
+    });
+  }
+
+  (draft.customRequirements || []).forEach(function(item) {
+    var row = parAddCustom();
+    if (!row) return;
+    var input = row.querySelector('.nm-custom-text-input');
+    var cb    = row.querySelector('input[type="checkbox"]');
+    if (input) input.value = item.text;
+    if (cb) cb.checked = !!item.enabled;
+  });
+
+  var titleEl = document.getElementById('par-title');
+  if (titleEl) parUpdateTitleCount(titleEl);
+
+  parStep(1);
+}
+
+(function() {
+  var raw = null;
+  try { raw = localStorage.getItem(PAR_DRAFT_KEY); } catch (e) {}
+  if (raw) {
+    try {
+      var draft = JSON.parse(raw);
+      parShowResumeBanner(draft);
+    } catch (e) {
+      try { localStorage.removeItem(PAR_DRAFT_KEY); } catch (e2) {}
+    }
+  }
+
+  var form = document.getElementById('par-form');
+  if (form) {
+    form.addEventListener('blur', parScheduleAutosave, true);
+    form.addEventListener('change', parScheduleAutosave, true);
+  }
+  setInterval(parSaveDraft, 30000);
+})();
 
 // Init defaults
 (function() {

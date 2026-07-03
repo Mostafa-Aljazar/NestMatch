@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photo Tour — {{ listing.title }} — NestMatch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: { violet: { 50:'#F5F3FF', 100:'#EDE9FE', 200:'#DDD6FE', 400:'#A78BFA', 600:'#7C3AED', 800:'#5B21B6' } },
+      fontFamily: { sans: ["'Plus Jakarta Sans'", 'sans-serif'] }
+    }
+  }
+}
+</script>
+<style>
+.nm-tour-tabs{scrollbar-width:none}
+.nm-tour-tabs::-webkit-scrollbar{display:none}
+.nm-tour-tab{cursor:pointer;flex-shrink:0;text-align:center;padding-bottom:8px;border-bottom:2px solid transparent}
+.nm-tour-tab.active{border-bottom-color:#7C3AED}
+.nm-tour-tab img{border-radius:10px;object-fit:cover;width:64px;height:64px;transition:opacity .2s}
+.nm-tour-tab:not(.active) img{opacity:.6}
+.nm-tour-tab span{display:block;font-size:11px;font-weight:600;color:#6B7280;margin-top:4px;max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nm-tour-tab.active span{color:#7C3AED}
+</style>
+</head>
+<body class="font-sans bg-white text-gray-900">
+
+<!-- HEADER -->
+<div class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-4">
+    <a href="{% url 'listings_app:room_detail' listing.id %}" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shrink-0" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="flex-1 min-w-0">
+      <div class="text-sm font-extrabold text-gray-900 truncate">{{ listing.title }}</div>
+      <div class="text-xs text-gray-400">{{ total }} photo{{ total|pluralize }}</div>
+    </div>
+  </div>
+  {% if groups|length > 1 %}
+  <div class="nm-tour-tabs max-w-4xl mx-auto px-4 sm:px-6 pb-3 flex gap-4 overflow-x-auto">
+    {% for group in groups %}
+    <div class="nm-tour-tab{% if forloop.first %} active{% endif %}" data-target="tour-{{ group.slug }}" onclick="nmTourJump('tour-{{ group.slug }}', this)">
+      <img src="{{ group.images.0.image.url }}" alt="{{ group.name }}">
+      <span>{{ group.name }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<!-- GROUPS -->
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+  {% if groups %}
+    {% for group in groups %}
+    <section id="tour-{{ group.slug }}" class="mb-14 scroll-mt-32">
+      <h2 class="text-xl font-extrabold text-gray-900 mb-1">{{ group.name }}</h2>
+      <p class="text-xs text-gray-400 mb-4">{{ group.images|length }} photo{{ group.images|length|pluralize }}</p>
+      <div class="grid grid-cols-2 gap-2">
+        {% for img in group.images %}
+        <div class="rounded-xl overflow-hidden bg-gray-100 {% if forloop.counter0|divisibleby:5 %}col-span-2{% endif %}">
+          <img src="{{ img.image.url }}" alt="{{ listing.title }}" class="w-full h-full object-cover" loading="lazy" style="{% if forloop.counter0|divisibleby:5 %}aspect-ratio:16/9{% else %}aspect-ratio:1/1{% endif %}">
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  {% else %}
+    <div class="text-center py-24 text-gray-400">
+      <div class="text-5xl mb-3">🏠</div>
+      <div class="text-sm font-semibold">No photos have been added to this listing yet.</div>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+function nmTourJump(id, tabEl) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.nm-tour-tab').forEach(function(t){ t.classList.remove('active'); });
+  tabEl.classList.add('active');
+}
+
+// Highlight active tab on scroll
+(function() {
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section[id^="tour-"]'));
+  if (!sections.length) return;
+  window.addEventListener('scroll', function() {
+    var pos = window.scrollY + 140;
+    var current = sections[0].id;
+    sections.forEach(function(s) { if (s.offsetTop <= pos) current = s.id; });
+    document.querySelectorAll('.nm-tour-tab').forEach(function(t) {
+      t.classList.toggle('active', t.dataset.target === current);
+    });
+  }, { passive: true });
+})();
+</script>
+
+</body>
+</html>

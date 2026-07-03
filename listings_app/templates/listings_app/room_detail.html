@@ -80,9 +80,9 @@ tailwind.config = {
     </div>
     <!-- photo count -->
     {% if images %}
-    <div class="absolute bottom-3.5 left-3.5 bg-black/[.52] backdrop-blur-md text-white text-xs font-semibold px-[13px] py-[5px] rounded-full cursor-pointer">
+    <a href="{% url 'listings_app:photo_tour' listing.id %}" class="absolute bottom-3.5 left-3.5 bg-black/[.52] backdrop-blur-md text-white text-xs font-semibold px-[13px] py-[5px] rounded-full cursor-pointer hover:bg-black/[.68] transition-colors">
       📷 {{ images|length }} Photo{{ images|length|pluralize }}
-    </div>
+    </a>
     {% endif %}
   </div>
 
@@ -96,14 +96,14 @@ tailwind.config = {
   {% endif %}
 
   {% if images|length >= 3 %}
-  <div class="rounded-xl overflow-hidden cursor-pointer relative bg-gradient-to-br from-indigo-100 to-indigo-200 group" onclick="nmLbOpen(2)">
+  <a href="{% url 'listings_app:photo_tour' listing.id %}" class="rounded-xl overflow-hidden cursor-pointer relative block bg-gradient-to-br from-indigo-100 to-indigo-200 group">
     <img src="{{ images.2.image.url }}" alt="" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" onerror="this.style.display='none'">
     {% if images|length > 3 %}
     <div class="absolute inset-0 bg-gray-900/45 backdrop-blur-sm flex items-center justify-center">
       <span class="text-white text-sm font-extrabold tracking-tight">+{{ images|length|add:"-3" }} more</span>
     </div>
     {% endif %}
-  </div>
+  </a>
   {% else %}
   <div class="rounded-xl overflow-hidden cursor-default bg-gradient-to-br from-amber-100 to-amber-300"></div>
   {% endif %}
@@ -127,7 +127,7 @@ tailwind.config = {
   </div>
   <!-- photo count top-right -->
   {% if images %}
-  <div class="absolute top-3.5 right-3.5 bg-black/[.52] backdrop-blur-md text-white text-xs font-semibold px-3 py-[5px] rounded-full z-10 cursor-pointer" onclick="nmLbOpen(0)">📷 {{ images|length }} Photo{{ images|length|pluralize }}</div>
+  <a href="{% url 'listings_app:photo_tour' listing.id %}" class="absolute top-3.5 right-3.5 bg-black/[.52] backdrop-blur-md text-white text-xs font-semibold px-3 py-[5px] rounded-full z-10 cursor-pointer">📷 {{ images|length }} Photo{{ images|length|pluralize }}</a>
   {% endif %}
 
   <!-- Swiper -->
@@ -164,7 +164,7 @@ tailwind.config = {
 
   <!-- view all button -->
   {% if images|length > 1 %}
-  <button class="absolute bottom-3.5 right-3.5 bg-white/95 text-gray-900 text-xs font-bold px-3.5 py-[7px] rounded-full border-none cursor-pointer z-10 shadow-[0_2px_8px_rgba(0,0,0,.3)]" onclick="nmLbOpen(0)">View all {{ images|length }} photos</button>
+  <a href="{% url 'listings_app:photo_tour' listing.id %}" class="absolute bottom-3.5 right-3.5 bg-white/95 text-gray-900 text-xs font-bold px-3.5 py-[7px] rounded-full border-none cursor-pointer z-10 shadow-[0_2px_8px_rgba(0,0,0,.3)]">View all {{ images|length }} photos</a>
   {% endif %}
 </div>
 
@@ -713,6 +713,93 @@ tailwind.config = {
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- ─── 9. Things to Know ─── -->
+    {% if listing.check_in_time or listing.check_out_time or listing.smoke_alarm or listing.carbon_monoxide_alarm or listing.first_aid_kit %}
+    <div class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100 mb-4 last:mb-0 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-[18px] sm:mb-2.5" style="animation-delay:.2s">
+      <h3 class="text-[17px] font-extrabold text-gray-900 mb-[18px] tracking-tight sm:text-[15px] sm:mb-3.5">Things to Know</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        {% if listing.check_in_time or listing.check_out_time %}
+        <div>
+          <div class="text-[13px] font-extrabold text-gray-900 mb-2 flex items-center gap-1.5">🕒 House Rules</div>
+          <div class="flex flex-col gap-1.5 text-[13px] text-gray-500">
+            {% if listing.check_in_time %}<div>Check-in after {{ listing.check_in_time|time:"g:i A" }}</div>{% endif %}
+            {% if listing.check_out_time %}<div>Checkout before {{ listing.check_out_time|time:"g:i A" }}</div>{% endif %}
+            <div>{{ listing.max_occupants }} occupant{{ listing.max_occupants|pluralize }} max</div>
+          </div>
+        </div>
+        {% endif %}
+        {% if listing.smoke_alarm or listing.carbon_monoxide_alarm or listing.first_aid_kit %}
+        <div>
+          <div class="text-[13px] font-extrabold text-gray-900 mb-2 flex items-center gap-1.5">🛟 Safety & Property</div>
+          <div class="flex flex-col gap-1.5 text-[13px] text-gray-500">
+            {% if listing.smoke_alarm %}<div>🔥 Smoke alarm installed</div>{% endif %}
+            {% if listing.carbon_monoxide_alarm %}<div>🌫️ Carbon monoxide alarm installed</div>{% endif %}
+            {% if listing.first_aid_kit %}<div>🩹 First aid kit available</div>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ─── 10. Reviews ─── -->
+    <div class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100 mb-4 last:mb-0 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-[18px] sm:mb-2.5" style="animation-delay:.22s">
+      <div class="flex items-center gap-2 mb-[18px] sm:mb-3.5">
+        <h3 class="text-[17px] font-extrabold text-gray-900 tracking-tight sm:text-[15px]">Reviews</h3>
+        {% if rating_avg %}
+        <span class="flex items-center gap-1 text-[13px] font-bold text-gray-900">★ {{ rating_avg|floatformat:1 }}</span>
+        <span class="text-[13px] text-gray-400">({{ reviews|length }})</span>
+        {% endif %}
+      </div>
+
+      {% if messages %}
+      <div class="mb-4 flex flex-col gap-2">
+        {% for message in messages %}
+        <div class="text-[13px] font-semibold px-3.5 py-2.5 rounded-xl {% if message.tags == 'error' %}bg-rose-50 text-rose-600 border border-rose-200{% else %}bg-emerald-50 text-emerald-700 border border-emerald-200{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if can_review %}
+      <form method="POST" action="{% url 'listings_app:post_review' listing.id %}" class="mb-5 p-4 bg-gray-50 rounded-xl border border-gray-100">
+        {% csrf_token %}
+        <div class="text-[13px] font-bold text-gray-900 mb-2.5">Leave a review</div>
+        <div class="flex items-center gap-1 mb-3" id="nm-star-picker">
+          {% for i in "12345" %}
+          <span class="nm-star-btn text-2xl cursor-pointer text-gray-300 transition-colors" data-val="{{ i }}" onclick="nmSetRating({{ i }})">★</span>
+          {% endfor %}
+          <input type="hidden" name="rating" id="nm-rating-input" value="0">
+        </div>
+        <textarea name="comment" required maxlength="2000" placeholder="Share your experience with this room or roommate..." class="w-full p-3 text-sm border border-gray-200 rounded-lg resize-y min-h-[80px] focus:outline-none focus:border-violet-400" style="font-family:inherit"></textarea>
+        <button type="submit" class="mt-2.5 px-5 py-2.5 text-[13px] font-bold text-white bg-violet-700 rounded-lg cursor-pointer hover:bg-violet-800 transition-colors">Post Review</button>
+      </form>
+      {% endif %}
+
+      {% if reviews %}
+      <div class="flex flex-col gap-4">
+        {% for review in reviews %}
+        <div class="flex gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-700 to-violet-400 flex items-center justify-center text-xs font-extrabold text-white shrink-0">
+            {{ review.reviewer.first_name|first|upper|default:"?" }}{{ review.reviewer.last_name|first|upper }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[13px] font-bold text-gray-900">{{ review.reviewer.get_full_name|default:review.reviewer.username }}</span>
+              <span class="text-amber-500 text-xs">{% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+              <span class="text-[11px] text-gray-400">{{ review.created_at|date:"M Y" }}</span>
+            </div>
+            <p class="text-[13px] text-gray-600 leading-relaxed mt-1 break-words">{{ review.comment }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% elif not can_review %}
+      <p class="text-sm text-gray-400 italic">No reviews yet.</p>
+      {% endif %}
     </div>
 
   </div>

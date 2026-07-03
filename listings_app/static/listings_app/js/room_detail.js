@@ -264,3 +264,14 @@ function nmShare() {
     });
   }
 }
+
+
+/* ── REVIEW STAR PICKER ──────────────────────────────────── */
+function nmSetRating(val) {
+  var input = document.getElementById('nm-rating-input');
+  if (input) input.value = val;
+  document.querySelectorAll('#nm-star-picker .nm-star-btn').forEach(function (star) {
+    var starVal = parseInt(star.dataset.val, 10);
+    star.style.color = starVal <= val ? '#F59E0B' : '#D1D5DB';
+  });
+}

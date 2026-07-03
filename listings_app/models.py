@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, time
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -35,6 +35,7 @@ _BOOL_FIELDS = [
     'washing_machine', 'dryer', 'ironing_board', 'clothesline',
     'security_deposit', 'rent_negotiable', 'monthly_payment', 'quarterly_payment', 'online_payment',
     'english_household', 'arabic_only', 'local_preferred', 'mixed_nationalities',
+    'smoke_alarm', 'carbon_monoxide_alarm', 'first_aid_kit',
 ]
 
 
@@ -203,6 +204,15 @@ class ListingManager(models.Manager):
 
         bool_fields = {name: flag(name) for name in _BOOL_FIELDS}
 
+        try:
+            check_in_time = time.fromisoformat(post_data.get('check_in_time', '')) if post_data.get('check_in_time') else None
+        except ValueError:
+            check_in_time = None
+        try:
+            check_out_time = time.fromisoformat(post_data.get('check_out_time', '')) if post_data.get('check_out_time') else None
+        except ValueError:
+            check_out_time = None
+
         # ── Custom requirements ───────────────────────────────────────────────
 
         try:
@@ -245,6 +255,8 @@ class ListingManager(models.Manager):
             notes=notes,
             custom_requirements=custom_requirements,
             status=status,
+            check_in_time=check_in_time,
+            check_out_time=check_out_time,
             **bool_fields,
         )
 
@@ -252,12 +264,17 @@ class ListingManager(models.Manager):
 
         if files:
             _allowed = {'image/jpeg', 'image/png', 'image/webp'}
-            valid_images = [
-                img for img in files.getlist('images')[:10]
-                if img.size <= 10 * 1024 * 1024 and img.content_type in _allowed
-            ]
-            for order, img in enumerate(valid_images):
-                ListingImage.objects.create(listing=listing, image=img, order=order)
+            _valid_labels = {c for c, _ in ListingImage.ROOM_LABEL_CHOICES}
+            raw_labels = post_data.get('image_labels', '').split(',')
+            order = 0
+            for i, img in enumerate(files.getlist('images')[:10]):
+                if img.size > 10 * 1024 * 1024 or img.content_type not in _allowed:
+                    continue
+                label = raw_labels[i].strip() if i < len(raw_labels) else ''
+                if label not in _valid_labels:
+                    label = 'other'
+                ListingImage.objects.create(listing=listing, image=img, room_label=label, order=order)
+                order += 1
 
         return listing
 
@@ -449,6 +466,14 @@ class Listing(models.Model):
     quarterly_payment = models.BooleanField(default=False)
     online_payment    = models.BooleanField(default=False)
 
+    # ── Step 4: House Rules & Safety ─────────────────────────────────────────
+
+    check_in_time         = models.TimeField(null=True, blank=True)
+    check_out_time        = models.TimeField(null=True, blank=True)
+    smoke_alarm            = models.BooleanField(default=False)
+    carbon_monoxide_alarm  = models.BooleanField(default=False)
+    first_aid_kit           = models.BooleanField(default=False)
+
     # ── Step 4: Language & Background ────────────────────────────────────────
 
     english_household   = models.BooleanField(default=False)
@@ -486,8 +511,18 @@ class Listing(models.Model):
         return self.status == 'active'
 
 class ListingImage(models.Model):
+    ROOM_LABEL_CHOICES = [
+        ('living_room', 'Living Room'),
+        ('bedroom',     'Bedroom'),
+        ('kitchen',     'Kitchen'),
+        ('bathroom',    'Bathroom'),
+        ('exterior',    'Exterior'),
+        ('other',       'Additional Photos'),
+    ]
+
     listing     = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='images')
     image       = models.ImageField(upload_to='listings/%Y/%m/')
+    room_label  = models.CharField(max_length=20, choices=ROOM_LABEL_CHOICES, default='other')
     order       = models.PositiveSmallIntegerField(default=0)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 

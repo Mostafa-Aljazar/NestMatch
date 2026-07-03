@@ -1,9 +1,12 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Avg, Q
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
 
-from .models import Listing
+from .models import Listing, ListingImage
 
 
 def listings_page(request):
@@ -80,15 +83,69 @@ def create_listing(request):
         return render(request, 'listings_app/post_room.html')
 
     try:
-        Listing.objects.create_from_post(request.POST, request.FILES, request.user)
+        listing = Listing.objects.create_from_post(request.POST, request.FILES, request.user)
     except ValidationError as e:
         return render(request, 'listings_app/post_room.html', {
             'errors': e.message_dict,
         })
 
+    if listing.status == 'active':
+        return redirect('listings_app:room_detail', pk=listing.pk)
     return redirect('dashboard_app:index')
 
 
 def room_detail(request, pk):
+    from applications_app.models import Application, ListingReview
+
     listing = get_object_or_404(Listing, pk=pk, status='active')
-    return render(request, 'listings_app/room_detail.html', {'listing': listing})
+    reviews = listing.reviews.select_related('reviewer').all()
+    rating_avg = reviews.aggregate(avg=Avg('rating'))['avg']
+
+    can_review = False
+    if request.user.is_authenticated:
+        can_review = (
+            Application.objects.filter(listing=listing, seeker=request.user, status=Application.STATUS_ACCEPTED).exists()
+            and not reviews.filter(reviewer=request.user).exists()
+        )
+
+    return render(request, 'listings_app/room_detail.html', {
+        'listing':    listing,
+        'reviews':    reviews,
+        'rating_avg': rating_avg,
+        'can_review': can_review,
+    })
+
+
+@login_required
+@require_POST
+def post_review(request, pk):
+    from applications_app.models import ListingReview
+
+    listing = get_object_or_404(Listing, pk=pk, status='active')
+    try:
+        ListingReview.objects.create_from_post(listing, request.user, request.POST)
+        messages.success(request, 'Your review has been posted.')
+    except ValidationError as e:
+        for field_errors in e.message_dict.values():
+            for msg in field_errors:
+                messages.error(request, msg)
+
+    return redirect('listings_app:room_detail', pk=pk)
+
+
+def photo_tour(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, status='active')
+    images = listing.images.all()
+
+    label_display = dict(ListingImage.ROOM_LABEL_CHOICES)
+    groups = []
+    for slug, name in ListingImage.ROOM_LABEL_CHOICES:
+        group_images = [img for img in images if img.room_label == slug]
+        if group_images:
+            groups.append({'slug': slug, 'name': name, 'images': group_images})
+
+    return render(request, 'listings_app/photo_tour.html', {
+        'listing': listing,
+        'groups':  groups,
+        'total':   len(images),
+    })
