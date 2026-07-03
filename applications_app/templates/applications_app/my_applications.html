@@ -343,9 +343,9 @@
             <span class="text-xs text-gray-400">📅 {{ app.applied_at|date:"M j, Y" }}</span>
           </div>
           <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</div>
+            <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</a>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-gray-900">{{ app.listing.poster.get_full_name }}</div>
+              <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="text-xs font-bold text-gray-900 hover:text-violet-600 transition-colors">{{ app.listing.poster.get_full_name }}</a>
               <div class="text-xs text-gray-500">Room Poster · <span class="text-emerald-600 font-semibold">✓ Verified</span></div>
             </div>
           </div>
@@ -388,9 +388,9 @@
             <span class="text-xs text-gray-400">📅 {{ app.applied_at|date:"M j, Y" }}</span>
           </div>
           <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</div>
+            <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</a>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-gray-900">{{ app.listing.poster.get_full_name }}</div>
+              <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="text-xs font-bold text-gray-900 hover:text-violet-600 transition-colors">{{ app.listing.poster.get_full_name }}</a>
               <div class="text-xs text-gray-500">Room Poster</div>
             </div>
           </div>
@@ -437,9 +437,9 @@
             <span class="text-xs text-gray-400">📅 {{ app.applied_at|date:"M j, Y" }}</span>
           </div>
           <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-gray-400 to-gray-500">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</div>
+            <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-gray-400 to-gray-500">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</a>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-gray-400">{{ app.listing.poster.get_full_name }}</div>
+              <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="text-xs font-bold text-gray-400 hover:text-violet-600 transition-colors">{{ app.listing.poster.get_full_name }}</a>
               <div class="text-xs text-gray-400">Room Poster</div>
             </div>
           </div>

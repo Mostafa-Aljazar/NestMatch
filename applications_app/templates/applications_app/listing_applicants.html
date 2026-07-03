@@ -97,20 +97,20 @@
       <div class="flex flex-col sm:flex-row gap-3 p-4">
 
         <!-- avatar -->
-        <div class="w-12 h-12 rounded-full shrink-0 flex items-center justify-center text-sm font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600 overflow-hidden">
+        <a href="{% url 'accounts_app:public_profile' app.seeker.pk %}" class="w-12 h-12 rounded-full shrink-0 flex items-center justify-center text-sm font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600 overflow-hidden">
           {% if app.seeker.profile_pic %}
             <img src="{{ app.seeker.profile_pic.url }}" class="w-full h-full object-cover" alt="">
           {% else %}
             {{ app.seeker.first_name|first|upper }}{{ app.seeker.last_name|first|upper }}
           {% endif %}
-        </div>
+        </a>
 
         <div class="flex-1 min-w-0">
 
           <!-- name + status -->
           <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
             <div>
-              <div class="text-sm font-bold text-gray-900 leading-snug">{{ app.seeker.full_name }}</div>
+              <a href="{% url 'accounts_app:public_profile' app.seeker.pk %}" class="text-sm font-bold text-gray-900 leading-snug hover:text-violet-600 transition-colors">{{ app.seeker.full_name }}</a>
               <div class="text-xs text-gray-500 mt-0.5">{{ app.seeker.email }}</div>
             </div>
             <span data-status-badge

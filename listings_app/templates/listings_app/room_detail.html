@@ -699,12 +699,12 @@ tailwind.config = {
     <!-- ─── 8. About the Poster ─── -->
     <div class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100 mb-4 last:mb-0 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-[18px] sm:mb-2.5" style="animation-delay:.18s">
       <h3 class="text-[17px] font-extrabold text-gray-900 mb-[18px] tracking-tight sm:text-[15px] sm:mb-3.5">About the Poster</h3>
-      <div class="flex items-center gap-4">
+      <a href="{% url 'accounts_app:public_profile' listing.poster.pk %}" class="flex items-center gap-4 group">
         <div class="w-[60px] h-[60px] rounded-full bg-gradient-to-br from-violet-700 to-violet-400 flex items-center justify-center text-[22px] font-extrabold text-white shrink-0">
           {{ listing.poster.first_name|first|upper|default:"?" }}{{ listing.poster.last_name|first|upper }}
         </div>
         <div class="flex-1">
-          <div class="text-base font-extrabold text-gray-900">{{ listing.poster.get_full_name|default:listing.poster.username }}</div>
+          <div class="text-base font-extrabold text-gray-900 group-hover:text-violet-600 transition-colors">{{ listing.poster.get_full_name|default:listing.poster.username }}</div>
           <div class="text-xs text-gray-400 mt-0.5">Member since {{ listing.poster.date_joined|date:"F Y" }}</div>
           <div class="flex gap-[7px] mt-2 flex-wrap">
             <span class="bg-emerald-100 text-emerald-700 text-[11px] font-bold px-[10px] py-[3px] rounded-full">{% icon 'check' size=12 %} Verified</span>
@@ -713,7 +713,7 @@ tailwind.config = {
             </span>
           </div>
         </div>
-      </div>
+      </a>
     </div>
 
     <!-- ─── 9. Things to Know ─── -->

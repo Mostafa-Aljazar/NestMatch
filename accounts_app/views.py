@@ -151,6 +151,36 @@ def profile_view(request):
 
 
 @login_required
+def public_profile_view(request, user_id):
+    """
+    Read-only profile page for viewing ANOTHER user — a poster checking
+    out a seeker who applied to their room, or a seeker checking out the
+    poster before applying. No edit forms, no security tab, no email/phone
+    (those stay private to the profile owner).
+    """
+    profile_user = get_object_or_404(User, pk=user_id)
+
+    # Viewing your own public profile link just sends you to the real
+    # (editable) profile page instead of a read-only mirror of it.
+    if profile_user.pk == request.user.pk:
+        return redirect('accounts_app:profile')
+
+    lifestyle_profile = LifestyleProfile.objects.filter(user=profile_user).first()
+    active_listings = profile_user.listings.filter(status='active').prefetch_related('images').order_by('-created_at')
+    listing_count = active_listings.count()
+    shown_listings = active_listings[:4]
+
+    context = {
+        'profile_user': profile_user,
+        'lifestyle_profile': lifestyle_profile,
+        'listing_count': listing_count,
+        'active_listings': shown_listings,
+        'more_listings_count': max(0, listing_count - len(shown_listings)),
+    }
+    return render(request, 'public_profile.html', context)
+
+
+@login_required
 @require_POST  # this view only ever makes sense as a POST; GET here is a 405, not a silent no-op
 def profile_update_personal_info(request):
     """

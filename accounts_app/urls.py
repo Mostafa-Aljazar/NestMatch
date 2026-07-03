@@ -12,6 +12,10 @@ urlpatterns = [
     # Profile page (GET) — shows the user's data across all tabs
     path('profile/', views.profile_view, name='profile'),
 
+    # Public, read-only profile of another user (poster viewing a seeker,
+    # or seeker viewing a poster) — no edit access, no security tab.
+    path('profile/<int:user_id>/', views.public_profile_view, name='public_profile'),
+
     # Separate POST-only endpoints, one per form on the profile page.
     # Keeping these independent means a validation error in the lifestyle
     # form never touches/overwrites the personal info data, and vice versa.
