@@ -195,6 +195,13 @@ function nmCloseModal() {
   document.body.style.overflow = '';
 }
 
+function nmGetCookie(name) {
+  var value = '; ' + document.cookie;
+  var parts = value.split('; ' + name + '=');
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return '';
+}
+
 function nmSubmitApply() {
   var msg = document.getElementById('nm-apply-msg');
   if (msg && !msg.value.trim()) {
@@ -208,16 +215,101 @@ function nmSubmitApply() {
     btn.disabled = true;
     btn.style.opacity = '.8';
   }
-  setTimeout(function () {
-    nmCloseModal();
-    nmShowToast(null, null);   /* uses default toast state */
-    if (btn) {
-      btn.textContent = 'Send Application ✈️';
-      btn.disabled = false;
-      btn.style.opacity = '1';
-    }
-    if (msg) msg.value = '';
-  }, 1200);
+
+  var csrf = nmGetCookie('csrftoken');
+
+  fetch(window.NM.applyUrl, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': csrf || '',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'message=' + encodeURIComponent(msg ? msg.value.trim() : '')
+  })
+    .then(function (r) {
+      return r.json().then(function (data) { return { ok: r.ok, data: data }; });
+    })
+    .then(function (result) {
+      if (btn) {
+        btn.textContent = 'Send Application ✈️';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+      if (result.ok) {
+        nmCloseModal();
+        nmShowToast(null, null);   /* uses default toast state */
+        if (msg) msg.value = '';
+
+        var applyNowBtn = document.getElementById('nm-apply-now-btn');
+        if (applyNowBtn) {
+          var appId = result.data.application_id;
+          var cancelBtn = document.createElement('button');
+          cancelBtn.id = 'nm-cancel-apply-btn';
+          cancelBtn.className = 'block w-full py-3.5 text-sm font-bold text-white bg-rose-600 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-rose-700 active:scale-[.98] font-sans mb-2.5';
+          cancelBtn.textContent = 'Cancel Application ✕';
+          cancelBtn.addEventListener('click', function () { nmCancelApply(appId, cancelBtn); });
+          applyNowBtn.replaceWith(cancelBtn);
+        }
+      } else {
+        nmShowToast('#E11D48', result.data.error || 'Could not send application.');
+      }
+    })
+    .catch(function (err) {
+      console.error('Apply network error:', err);
+      if (btn) {
+        btn.textContent = 'Send Application ✈️';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+      nmShowToast('#E11D48', 'Network error — please try again.');
+    });
+}
+
+function nmCancelApply(appPk, btn) {
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '.8';
+    btn.textContent = '⏳ Cancelling…';
+  }
+
+  var csrf = nmGetCookie('csrftoken');
+
+  fetch('/applications/withdraw/' + appPk + '/', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrf || '' }
+  })
+    .then(function (r) {
+      return r.json().then(function (data) { return { ok: r.ok, data: data }; });
+    })
+    .then(function (result) {
+      if (result.ok) {
+        nmShowToast('#374151', 'Application cancelled.');
+        if (btn) {
+          var applyNowBtn = document.createElement('button');
+          applyNowBtn.id = 'nm-apply-now-btn';
+          applyNowBtn.className = 'block w-full py-3.5 text-sm font-bold text-white bg-violet-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-violet-800 active:scale-[.98] font-sans mb-2.5';
+          applyNowBtn.textContent = 'Apply Now 🚀';
+          applyNowBtn.addEventListener('click', function () { nmOpenModal(); });
+          btn.replaceWith(applyNowBtn);
+        }
+      } else {
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.textContent = 'Cancel Application ✕';
+        }
+        nmShowToast('#E11D48', result.data.error || 'Could not cancel application.');
+      }
+    })
+    .catch(function (err) {
+      console.error('Cancel application network error:', err);
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.textContent = 'Cancel Application ✕';
+      }
+      nmShowToast('#E11D48', 'Network error — please try again.');
+    });
 }
 
 /* close modal on backdrop click */

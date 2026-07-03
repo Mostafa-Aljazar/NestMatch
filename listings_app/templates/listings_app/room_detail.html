@@ -1,4 +1,5 @@
 {% load static %}
+{% load icons %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,27 +62,27 @@ tailwind.config = {
     {% if images %}
       <img src="{{ images.0.image.url }}" alt="{{ listing.title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" onerror="this.style.display='none'">
     {% else %}
-      <div class="w-full h-full flex items-center justify-center text-[64px] opacity-[.35]">🏠</div>
+      <div class="w-full h-full flex items-center justify-center opacity-[.35] text-violet-400">{% icon 'home' size=64 %}</div>
     {% endif %}
     <!-- badges -->
     <div class="absolute top-3.5 left-3.5 flex gap-1.5 flex-wrap">
       {% if listing.listing_type == 'private_room' %}
-        <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-violet-700">🛏️ Private Room</span>
+        <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-violet-700">{% icon 'bed' size=12 %} Private Room</span>
       {% elif listing.listing_type == 'full_apartment' %}
-        <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-blue-700">🏠 Full Apartment</span>
+        <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-blue-700">{% icon 'home' size=12 %} Full Apartment</span>
       {% elif listing.listing_type == 'shared_bed' %}
-        <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-emerald-700">🛌 Shared Room</span>
+        <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-emerald-700">{% icon 'bunk-bed' size=12 %} Shared Room</span>
       {% else %}
-        <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-amber-700">👥 Roommate Wanted</span>
+        <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-amber-700">{% icon 'people' size=12 %} Roommate Wanted</span>
       {% endif %}
       {% if listing.ai_generated %}
-        <span class="bg-emerald-500/90 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-white">✨ AI Description</span>
+        <span class="bg-emerald-500/90 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-white">{% icon 'sparkle' size=12 %} AI Description</span>
       {% endif %}
     </div>
     <!-- photo count -->
     {% if images %}
     <a href="{% url 'listings_app:photo_tour' listing.id %}" class="absolute bottom-3.5 left-3.5 bg-black/[.52] backdrop-blur-md text-white text-xs font-semibold px-[13px] py-[5px] rounded-full cursor-pointer hover:bg-black/[.68] transition-colors">
-      📷 {{ images|length }} Photo{{ images|length|pluralize }}
+      {% icon 'photo' size=12 %} {{ images|length }} Photo{{ images|length|pluralize }}
     </a>
     {% endif %}
   </div>
@@ -116,18 +117,18 @@ tailwind.config = {
   <!-- type badge top-left -->
   <div class="absolute top-3.5 left-3.5 flex gap-1.5 flex-wrap z-10">
     {% if listing.listing_type == 'private_room' %}
-      <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-violet-700">🛏️ Private Room</span>
+      <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-violet-700">{% icon 'bed' size=12 %} Private Room</span>
     {% elif listing.listing_type == 'full_apartment' %}
-      <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-blue-700">🏠 Full Apartment</span>
+      <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-blue-700">{% icon 'home' size=12 %} Full Apartment</span>
     {% elif listing.listing_type == 'shared_bed' %}
-      <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-emerald-700">🛌 Shared Room</span>
+      <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-emerald-700">{% icon 'bunk-bed' size=12 %} Shared Room</span>
     {% else %}
-      <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-amber-700">👥 Roommate Wanted</span>
+      <span class="bg-white/95 backdrop-blur text-[11px] font-bold px-[11px] py-1 rounded-full text-amber-700">{% icon 'people' size=12 %} Roommate Wanted</span>
     {% endif %}
   </div>
   <!-- photo count top-right -->
   {% if images %}
-  <a href="{% url 'listings_app:photo_tour' listing.id %}" class="absolute top-3.5 right-3.5 bg-black/[.52] backdrop-blur-md text-white text-xs font-semibold px-3 py-[5px] rounded-full z-10 cursor-pointer">📷 {{ images|length }} Photo{{ images|length|pluralize }}</a>
+  <a href="{% url 'listings_app:photo_tour' listing.id %}" class="absolute top-3.5 right-3.5 bg-black/[.52] backdrop-blur-md text-white text-xs font-semibold px-3 py-[5px] rounded-full z-10 cursor-pointer">{% icon 'photo' size=12 %} {{ images|length }} Photo{{ images|length|pluralize }}</a>
   {% endif %}
 
   <!-- Swiper -->
@@ -141,7 +142,7 @@ tailwind.config = {
         {% endfor %}
       {% else %}
         <div class="swiper-slide">
-          <div class="w-full h-full flex items-center justify-center text-[72px] opacity-25 bg-gradient-to-br from-violet-200 to-violet-300">🏠</div>
+          <div class="w-full h-full flex items-center justify-center opacity-25 bg-gradient-to-br from-violet-200 to-violet-300 text-violet-500">{% icon 'home' size=72 %}</div>
         </div>
       {% endif %}
     </div>
@@ -175,7 +176,7 @@ tailwind.config = {
 <div class="nm-lb hidden fixed inset-0 bg-black/[.95] z-[900] flex-col" id="nm-lb">
   <div class="shrink-0 flex items-center justify-between px-5 py-3.5">
     <span class="text-white/75 text-[13px] font-semibold">{{ listing.title }}</span>
-    <button class="bg-white/[.12] border-none text-white w-10 h-10 rounded-xl text-lg cursor-pointer flex items-center justify-center transition-colors hover:bg-white/[.22]" onclick="nmLbClose()">✕</button>
+    <button class="bg-white/[.12] border-none text-white w-10 h-10 rounded-xl text-lg cursor-pointer flex items-center justify-center transition-colors hover:bg-white/[.22]" onclick="nmLbClose()">{% icon 'close' size=16 color='#fff' %}</button>
   </div>
   <div class="nm-lb-swiper-wrap flex-1 min-h-0 relative">
     <div class="swiper" id="nm-lb-swiper">
@@ -192,7 +193,7 @@ tailwind.config = {
       <div class="swiper-button-next"></div>
       <div class="swiper-pagination"></div>
     </div>
-    <div class="nm-lb-zoom-hint absolute bottom-[52px] left-1/2 -translate-x-1/2 bg-black/50 text-white/70 text-[11px] font-semibold px-3 py-[5px] rounded-full pointer-events-none opacity-100 transition-opacity duration-[600ms] whitespace-nowrap" id="nm-lb-zoom-hint">👆 Pinch to zoom</div>
+    <div class="nm-lb-zoom-hint absolute bottom-[52px] left-1/2 -translate-x-1/2 bg-black/50 text-white/70 text-[11px] font-semibold px-3 py-[5px] rounded-full pointer-events-none opacity-100 transition-opacity duration-[600ms] whitespace-nowrap" id="nm-lb-zoom-hint">{% icon 'hand-point' size=12 %} Pinch to zoom</div>
   </div>
   <div class="shrink-0 text-center py-2.5 pb-4 text-white/55 text-xs font-semibold" id="nm-lb-count"></div>
 </div>
@@ -222,22 +223,22 @@ tailwind.config = {
       <!-- Badges row -->
       <div class="flex gap-[7px] flex-wrap mb-[14px]">
         {% if listing.listing_type == 'private_room' %}
-          <span class="bg-violet-100 text-violet-700 text-[11px] font-bold px-[11px] py-1 rounded-full">🛏️ Private Room</span>
+          <span class="bg-violet-100 text-violet-700 text-[11px] font-bold px-[11px] py-1 rounded-full">{% icon 'bed' size=12 %} Private Room</span>
         {% elif listing.listing_type == 'full_apartment' %}
-          <span class="bg-blue-100 text-blue-700 text-[11px] font-bold px-[11px] py-1 rounded-full">🏠 Full Apartment</span>
+          <span class="bg-blue-100 text-blue-700 text-[11px] font-bold px-[11px] py-1 rounded-full">{% icon 'home' size=12 %} Full Apartment</span>
         {% elif listing.listing_type == 'shared_bed' %}
-          <span class="bg-emerald-100 text-emerald-700 text-[11px] font-bold px-[11px] py-1 rounded-full">🛌 Shared Room</span>
+          <span class="bg-emerald-100 text-emerald-700 text-[11px] font-bold px-[11px] py-1 rounded-full">{% icon 'bunk-bed' size=12 %} Shared Room</span>
         {% else %}
-          <span class="bg-amber-100 text-amber-700 text-[11px] font-bold px-[11px] py-1 rounded-full">👥 Roommate Wanted</span>
+          <span class="bg-amber-100 text-amber-700 text-[11px] font-bold px-[11px] py-1 rounded-full">{% icon 'people' size=12 %} Roommate Wanted</span>
         {% endif %}
-        <span class="bg-emerald-100 text-emerald-700 text-[11px] font-bold px-[11px] py-1 rounded-full">✅ Available</span>
-        <span class="bg-gray-100 text-gray-600 text-[11px] font-semibold px-[11px] py-1 rounded-full border border-gray-200">👥 Max {{ listing.max_occupants }}</span>
+        <span class="bg-emerald-100 text-emerald-700 text-[11px] font-bold px-[11px] py-1 rounded-full">{% icon 'check' size=12 %} Available</span>
+        <span class="bg-gray-100 text-gray-600 text-[11px] font-semibold px-[11px] py-1 rounded-full border border-gray-200">{% icon 'people' size=12 %} Max {{ listing.max_occupants }}</span>
         {% if listing.tenant_types %}
           {% for t in listing.tenant_types %}
-            {% if t == 'students' %}<span class="bg-amber-50 text-amber-600 text-[11px] font-semibold px-[11px] py-1 rounded-full border border-amber-200">📚 Students</span>
-            {% elif t == 'professionals' %}<span class="bg-blue-50 text-blue-700 text-[11px] font-semibold px-[11px] py-1 rounded-full border border-blue-200">💼 Professionals</span>
-            {% elif t == 'families' %}<span class="bg-emerald-50 text-emerald-700 text-[11px] font-semibold px-[11px] py-1 rounded-full border border-emerald-200">👨‍👩‍👧 Families</span>
-            {% elif t == 'anyone' %}<span class="bg-violet-50 text-violet-700 text-[11px] font-semibold px-[11px] py-1 rounded-full border border-violet-200">🤝 Anyone</span>
+            {% if t == 'students' %}<span class="bg-amber-50 text-amber-600 text-[11px] font-semibold px-[11px] py-1 rounded-full border border-amber-200">{% icon 'graduation-cap' size=12 %} Students</span>
+            {% elif t == 'professionals' %}<span class="bg-blue-50 text-blue-700 text-[11px] font-semibold px-[11px] py-1 rounded-full border border-blue-200">{% icon 'briefcase' size=12 %} Professionals</span>
+            {% elif t == 'families' %}<span class="bg-emerald-50 text-emerald-700 text-[11px] font-semibold px-[11px] py-1 rounded-full border border-emerald-200">{% icon 'people' size=12 %} Families</span>
+            {% elif t == 'anyone' %}<span class="bg-violet-50 text-violet-700 text-[11px] font-semibold px-[11px] py-1 rounded-full border border-violet-200">{% icon 'handshake' size=12 %} Anyone</span>
             {% endif %}
           {% endfor %}
         {% endif %}
@@ -288,7 +289,7 @@ tailwind.config = {
       {% endif %}
       {% if listing.notes %}
         <div class="mt-3.5 p-3 bg-amber-50 border border-amber-200 rounded-xl text-[13px] text-amber-800 leading-relaxed break-words">
-          <strong>📝 Note:</strong> {{ listing.notes }}
+          <strong>{% icon 'notepad' size=13 %} Note:</strong> {{ listing.notes }}
         </div>
       {% endif %}
     </div>
@@ -308,24 +309,24 @@ tailwind.config = {
       <!-- Bills included -->
       {% if listing.electricity_included or listing.water_included or listing.wifi_included or listing.gas_included or listing.waste_included or listing.bills_split_equally %}
       <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl mb-3.5">
-        <div class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-[.8px] mb-2.5">✅ Included in Rent</div>
+        <div class="text-[11px] font-extrabold text-emerald-600 uppercase tracking-[.8px] mb-2.5">{% icon 'check' size=12 %} Included in Rent</div>
         <div class="flex flex-wrap gap-[7px]">
-          {% if listing.electricity_included %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">⚡ Electricity</span>{% endif %}
-          {% if listing.water_included %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">💧 Water</span>{% endif %}
-          {% if listing.wifi_included %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">📶 WiFi</span>{% endif %}
-          {% if listing.gas_included %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">🔥 Gas</span>{% endif %}
-          {% if listing.waste_included %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">🗑️ Waste</span>{% endif %}
-          {% if listing.bills_split_equally %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">🔀 Bills Split</span>{% endif %}
+          {% if listing.electricity_included %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">{% icon 'bolt' size=12 %} Electricity</span>{% endif %}
+          {% if listing.water_included %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">{% icon 'droplet' size=12 %} Water</span>{% endif %}
+          {% if listing.wifi_included %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">{% icon 'wifi' size=12 %} WiFi</span>{% endif %}
+          {% if listing.gas_included %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">{% icon 'flame' size=12 %} Gas</span>{% endif %}
+          {% if listing.waste_included %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">{% icon 'recycle' size=12 %} Waste</span>{% endif %}
+          {% if listing.bills_split_equally %}<span class="text-xs text-gray-700 bg-white px-2.5 py-1 rounded-full border border-emerald-100 font-semibold">{% icon 'recycle' size=12 %} Bills Split</span>{% endif %}
         </div>
       </div>
       {% endif %}
 
       <!-- Payment terms -->
       <div class="flex flex-wrap gap-2">
-        {% if listing.security_deposit %}<div class="flex items-center gap-1.5 text-[13px] text-gray-500"><span class="text-amber-600">🔑</span> Security deposit required</div>{% endif %}
-        {% if listing.monthly_payment %}<span class="text-xs font-semibold text-gray-700 px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-full">📅 Monthly</span>{% endif %}
-        {% if listing.quarterly_payment %}<span class="text-xs font-semibold text-gray-700 px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-full">📅 Quarterly</span>{% endif %}
-        {% if listing.online_payment %}<span class="text-xs font-semibold text-gray-700 px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-full">💳 Online Payment</span>{% endif %}
+        {% if listing.security_deposit %}<div class="flex items-center gap-1.5 text-[13px] text-gray-500"><span class="text-amber-600">{% icon 'key' size=13 %}</span> Security deposit required</div>{% endif %}
+        {% if listing.monthly_payment %}<span class="text-xs font-semibold text-gray-700 px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-full">{% icon 'calendar' size=12 %} Monthly</span>{% endif %}
+        {% if listing.quarterly_payment %}<span class="text-xs font-semibold text-gray-700 px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-full">{% icon 'calendar' size=12 %} Quarterly</span>{% endif %}
+        {% if listing.online_payment %}<span class="text-xs font-semibold text-gray-700 px-2.5 py-1 bg-gray-50 border border-gray-200 rounded-full">{% icon 'credit-card' size=12 %} Online Payment</span>{% endif %}
       </div>
     </div>
 
@@ -335,114 +336,114 @@ tailwind.config = {
 
       <!-- Smoking & Substances -->
       {% if listing.no_smoking or listing.smoking_outside_ok or listing.no_alcohol or listing.no_vaping %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🚭 Smoking & Substances</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'cigarette-ban' size=11 %} Smoking & Substances</div>
       <div class="grid grid-cols-3 gap-2.5 mb-4 sm:grid-cols-2">
-        {% if listing.no_smoking %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">🚭 No Smoking</div>{% endif %}
-        {% if listing.smoking_outside_ok %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-orange-50 text-orange-700">🚬 Outside Only</div>{% endif %}
-        {% if listing.no_alcohol %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">🍷 No Alcohol</div>{% endif %}
-        {% if listing.no_vaping %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">💨 No Vaping</div>{% endif %}
+        {% if listing.no_smoking %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">{% icon 'cigarette-ban' size=12 %} No Smoking</div>{% endif %}
+        {% if listing.smoking_outside_ok %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-orange-50 text-orange-700">{% icon 'cigarette' size=12 %} Outside Only</div>{% endif %}
+        {% if listing.no_alcohol %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">{% icon 'wine-ban' size=12 %} No Alcohol</div>{% endif %}
+        {% if listing.no_vaping %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">{% icon 'cigarette-ban' size=12 %} No Vaping</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Religion & Culture -->
       {% if listing.muslims_only or listing.christians_only or listing.all_religions_ok or listing.halal_kitchen or listing.prayer_space %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🕌 Religion & Culture</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'mosque' size=11 %} Religion & Culture</div>
       <div class="grid grid-cols-3 gap-2.5 mb-4 sm:grid-cols-2">
-        {% if listing.muslims_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">🕌 Muslims Only</div>{% endif %}
-        {% if listing.christians_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-blue-50 text-blue-700">✝️ Christians Only</div>{% endif %}
-        {% if listing.all_religions_ok %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">🌍 All Religions OK</div>{% endif %}
-        {% if listing.halal_kitchen %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">🍽️ Halal Kitchen</div>{% endif %}
-        {% if listing.prayer_space %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">🧕 Prayer Space</div>{% endif %}
+        {% if listing.muslims_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">{% icon 'mosque' size=12 %} Muslims Only</div>{% endif %}
+        {% if listing.christians_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-blue-50 text-blue-700">{% icon 'cross' size=12 %} Christians Only</div>{% endif %}
+        {% if listing.all_religions_ok %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">{% icon 'globe' size=12 %} All Religions OK</div>{% endif %}
+        {% if listing.halal_kitchen %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">{% icon 'utensils' size=12 %} Halal Kitchen</div>{% endif %}
+        {% if listing.prayer_space %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">{% icon 'prayer' size=12 %} Prayer Space</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Gender & Tenants -->
       {% if listing.males_only or listing.females_only or listing.students_only or listing.professionals_only or listing.expats_welcome or listing.no_children %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">👥 Who's Welcome</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'people' size=11 %} Who's Welcome</div>
       <div class="grid grid-cols-3 gap-2.5 mb-4 sm:grid-cols-2">
-        {% if listing.males_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-blue-50 text-blue-700">👨 Males Only</div>{% endif %}
-        {% if listing.females_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-fuchsia-50 text-fuchsia-700">👩 Females Only</div>{% endif %}
-        {% if listing.students_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-amber-50 text-amber-600">📚 Students Only</div>{% endif %}
-        {% if listing.professionals_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-blue-50 text-blue-700">💼 Professionals</div>{% endif %}
-        {% if listing.expats_welcome %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">🌐 Expats Welcome</div>{% endif %}
-        {% if listing.no_children %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-orange-50 text-orange-700">🚸 No Children</div>{% endif %}
+        {% if listing.males_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-blue-50 text-blue-700">{% icon 'man' size=12 %} Males Only</div>{% endif %}
+        {% if listing.females_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-fuchsia-50 text-fuchsia-700">{% icon 'woman' size=12 %} Females Only</div>{% endif %}
+        {% if listing.students_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-amber-50 text-amber-600">{% icon 'graduation-cap' size=12 %} Students Only</div>{% endif %}
+        {% if listing.professionals_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-blue-50 text-blue-700">{% icon 'briefcase' size=12 %} Professionals</div>{% endif %}
+        {% if listing.expats_welcome %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">{% icon 'globe' size=12 %} Expats Welcome</div>{% endif %}
+        {% if listing.no_children %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-orange-50 text-orange-700">{% icon 'ban' size=12 %} No Children</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Pets -->
       {% if listing.pets_allowed or listing.dogs_allowed or listing.cats_allowed or listing.no_pets %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🐾 Pets</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'paw' size=11 %} Pets</div>
       <div class="grid grid-cols-3 gap-2.5 mb-4 sm:grid-cols-2">
-        {% if listing.pets_allowed %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">🐾 Pets Allowed</div>{% endif %}
-        {% if listing.dogs_allowed %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">🐕 Dogs OK</div>{% endif %}
-        {% if listing.cats_allowed %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">🐈 Cats OK</div>{% endif %}
-        {% if listing.no_pets %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">❌ No Pets</div>{% endif %}
+        {% if listing.pets_allowed %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">{% icon 'paw' size=12 %} Pets Allowed</div>{% endif %}
+        {% if listing.dogs_allowed %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">{% icon 'dog' size=12 %} Dogs OK</div>{% endif %}
+        {% if listing.cats_allowed %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">{% icon 'cat' size=12 %} Cats OK</div>{% endif %}
+        {% if listing.no_pets %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">{% icon 'ban' size=12 %} No Pets</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Kitchen & Food -->
       {% if listing.must_cook or listing.vegetarian_house or listing.no_seafood or listing.shared_groceries or listing.equipped_kitchen or listing.no_food_in_rooms %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🍳 Kitchen & Food</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'chef-hat' size=11 %} Kitchen & Food</div>
       <div class="grid grid-cols-3 gap-2.5 mb-4 sm:grid-cols-2">
-        {% if listing.must_cook %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">👨‍🍳 Must Cook</div>{% endif %}
-        {% if listing.vegetarian_house %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">🥗 Vegetarian</div>{% endif %}
-        {% if listing.no_seafood %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-orange-50 text-orange-700">🦑 No Seafood</div>{% endif %}
-        {% if listing.shared_groceries %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">🛒 Shared Groceries</div>{% endif %}
-        {% if listing.equipped_kitchen %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">🍳 Equipped Kitchen</div>{% endif %}
-        {% if listing.no_food_in_rooms %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">🚫 No Food in Rooms</div>{% endif %}
+        {% if listing.must_cook %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">{% icon 'chef-hat' size=12 %} Must Cook</div>{% endif %}
+        {% if listing.vegetarian_house %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">{% icon 'salad' size=12 %} Vegetarian</div>{% endif %}
+        {% if listing.no_seafood %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-orange-50 text-orange-700">{% icon 'fish-ban' size=12 %} No Seafood</div>{% endif %}
+        {% if listing.shared_groceries %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">{% icon 'cart' size=12 %} Shared Groceries</div>{% endif %}
+        {% if listing.equipped_kitchen %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">{% icon 'chef-hat' size=12 %} Equipped Kitchen</div>{% endif %}
+        {% if listing.no_food_in_rooms %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">{% icon 'ban' size=12 %} No Food in Rooms</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Noise & Schedule -->
       {% if listing.quiet_after_10 or listing.early_sleepers or listing.no_loud_music or listing.no_parties or listing.calm_environment or listing.no_calls_common %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🔊 Noise & Schedule</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'speaker-mute' size=11 %} Noise & Schedule</div>
       <div class="grid grid-cols-3 gap-2.5 mb-4 sm:grid-cols-2">
-        {% if listing.quiet_after_10 %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">🌙 Quiet After 10</div>{% endif %}
-        {% if listing.early_sleepers %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">🌅 Early Sleepers</div>{% endif %}
-        {% if listing.no_loud_music %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">🎵 No Loud Music</div>{% endif %}
-        {% if listing.no_parties %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">🎉 No Parties</div>{% endif %}
-        {% if listing.calm_environment %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">🕊️ Calm Environment</div>{% endif %}
-        {% if listing.no_calls_common %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-orange-50 text-orange-700">📵 No Calls in Common</div>{% endif %}
+        {% if listing.quiet_after_10 %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">{% icon 'moon' size=12 %} Quiet After 10</div>{% endif %}
+        {% if listing.early_sleepers %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">{% icon 'sunrise' size=12 %} Early Sleepers</div>{% endif %}
+        {% if listing.no_loud_music %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">{% icon 'music-ban' size=12 %} No Loud Music</div>{% endif %}
+        {% if listing.no_parties %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">{% icon 'party-ban' size=12 %} No Parties</div>{% endif %}
+        {% if listing.calm_environment %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-violet-50 text-violet-700">{% icon 'lotus' size=12 %} Calm Environment</div>{% endif %}
+        {% if listing.no_calls_common %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-orange-50 text-orange-700">{% icon 'phone-ban' size=12 %} No Calls in Common</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Cleanliness -->
       {% if listing.shared_cleaning or listing.no_shoes_inside or listing.respect_spaces or listing.clean_bathroom or listing.separate_recycling %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🧹 Cleanliness</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'broom' size=11 %} Cleanliness</div>
       <div class="grid grid-cols-3 gap-2.5 mb-4 sm:grid-cols-2">
-        {% if listing.shared_cleaning %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">🧹 Shared Cleaning</div>{% endif %}
-        {% if listing.no_shoes_inside %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">👟 No Shoes Inside</div>{% endif %}
-        {% if listing.respect_spaces %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">🤝 Respect Spaces</div>{% endif %}
-        {% if listing.clean_bathroom %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">🚿 Clean Bathroom</div>{% endif %}
-        {% if listing.separate_recycling %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">♻️ Recycling</div>{% endif %}
+        {% if listing.shared_cleaning %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">{% icon 'broom' size=12 %} Shared Cleaning</div>{% endif %}
+        {% if listing.no_shoes_inside %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">{% icon 'shoe-ban' size=12 %} No Shoes Inside</div>{% endif %}
+        {% if listing.respect_spaces %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">{% icon 'handshake' size=12 %} Respect Spaces</div>{% endif %}
+        {% if listing.clean_bathroom %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">{% icon 'shower' size=12 %} Clean Bathroom</div>{% endif %}
+        {% if listing.separate_recycling %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">{% icon 'recycle' size=12 %} Recycling</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Guests -->
       {% if listing.no_overnight_guests or listing.guests_with_notice or listing.curfew_midnight or listing.no_gatherings %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🚪 Guest Policy</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'door-ban' size=11 %} Guest Policy</div>
       <div class="grid grid-cols-3 gap-2.5 mb-4 sm:grid-cols-2">
-        {% if listing.no_overnight_guests %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">🚫 No Overnight Guests</div>{% endif %}
-        {% if listing.guests_with_notice %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-amber-50 text-amber-600">🔔 Guests w/ Notice</div>{% endif %}
-        {% if listing.curfew_midnight %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-orange-50 text-orange-700">🕛 Midnight Curfew</div>{% endif %}
-        {% if listing.no_gatherings %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">🚫 No Gatherings</div>{% endif %}
+        {% if listing.no_overnight_guests %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">{% icon 'door-ban' size=12 %} No Overnight Guests</div>{% endif %}
+        {% if listing.guests_with_notice %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-amber-50 text-amber-600">{% icon 'bell-ring' size=12 %} Guests w/ Notice</div>{% endif %}
+        {% if listing.curfew_midnight %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-orange-50 text-orange-700">{% icon 'clock-ban' size=12 %} Midnight Curfew</div>{% endif %}
+        {% if listing.no_gatherings %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-rose-50 text-rose-600">{% icon 'party-ban' size=12 %} No Gatherings</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Language -->
       {% if listing.english_household or listing.arabic_only or listing.local_preferred or listing.mixed_nationalities %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🌐 Language & Background</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'globe' size=11 %} Language & Background</div>
       <div class="grid grid-cols-3 gap-2.5 mb-4 sm:grid-cols-2">
-        {% if listing.english_household %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-blue-50 text-blue-700">🇬🇧 English Household</div>{% endif %}
-        {% if listing.arabic_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-amber-50 text-amber-600">🇸🇦 Arabic Only</div>{% endif %}
-        {% if listing.local_preferred %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">🏠 Local Preferred</div>{% endif %}
-        {% if listing.mixed_nationalities %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">🌍 Mixed Welcome</div>{% endif %}
+        {% if listing.english_household %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-blue-50 text-blue-700">{% icon 'flag' size=12 %} English Household</div>{% endif %}
+        {% if listing.arabic_only %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-amber-50 text-amber-600">{% icon 'flag' size=12 %} Arabic Only</div>{% endif %}
+        {% if listing.local_preferred %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-gray-50 text-gray-700">{% icon 'home' size=12 %} Local Preferred</div>{% endif %}
+        {% if listing.mixed_nationalities %}<div class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold leading-snug bg-emerald-50 text-emerald-700">{% icon 'globe' size=12 %} Mixed Welcome</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Custom requirements -->
       {% if listing.custom_requirements %}
-        <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5 mt-1">📋 Additional Rules</div>
+        <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5 mt-1">{% icon 'clipboard' size=11 %} Additional Rules</div>
         <div class="flex flex-col gap-[7px]">
           {% for req in listing.custom_requirements %}
             {% if req.enabled %}
@@ -461,86 +462,86 @@ tailwind.config = {
 
       <!-- Room amenities -->
       {% if listing.fully_furnished or listing.air_conditioning or listing.heating or listing.hot_water_24_7 or listing.en_suite_bathroom or listing.natural_light or listing.balcony or listing.storage_space or listing.tv_common_area or listing.elevator %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🛏️ Room & Flat</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'bed' size=11 %} Room & Flat</div>
       <div class="grid grid-cols-4 gap-2 mb-4 sm:grid-cols-2">
-        {% if listing.fully_furnished %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🛋️ Furnished</div>{% endif %}
-        {% if listing.air_conditioning %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">❄️ A/C</div>{% endif %}
-        {% if listing.heating %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🔆 Heating</div>{% endif %}
-        {% if listing.hot_water_24_7 %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🚿 24/7 Hot Water</div>{% endif %}
-        {% if listing.en_suite_bathroom %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🚪 En-Suite</div>{% endif %}
-        {% if listing.natural_light %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">☀️ Natural Light</div>{% endif %}
-        {% if listing.balcony %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🌿 Balcony</div>{% endif %}
-        {% if listing.storage_space %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">📦 Storage</div>{% endif %}
-        {% if listing.tv_common_area %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">📺 TV Area</div>{% endif %}
-        {% if listing.elevator %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🛗 Elevator</div>{% endif %}
+        {% if listing.fully_furnished %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'sofa' size=12 %} Furnished</div>{% endif %}
+        {% if listing.air_conditioning %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'snowflake' size=12 %} A/C</div>{% endif %}
+        {% if listing.heating %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'thermometer' size=12 %} Heating</div>{% endif %}
+        {% if listing.hot_water_24_7 %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'shower' size=12 %} 24/7 Hot Water</div>{% endif %}
+        {% if listing.en_suite_bathroom %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'door-ban' size=12 %} En-Suite</div>{% endif %}
+        {% if listing.natural_light %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'sunset' size=12 %} Natural Light</div>{% endif %}
+        {% if listing.balcony %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'leaf' size=12 %} Balcony</div>{% endif %}
+        {% if listing.storage_space %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'box' size=12 %} Storage</div>{% endif %}
+        {% if listing.tv_common_area %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'tv' size=12 %} TV Area</div>{% endif %}
+        {% if listing.elevator %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'elevator' size=12 %} Elevator</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Work & Study -->
       {% if listing.study_desk or listing.quiet_work_env or listing.multiple_outlets or listing.printer_access or listing.wifi_included %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">💻 Work & Study</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'monitor' size=11 %} Work & Study</div>
       <div class="grid grid-cols-4 gap-2 mb-4 sm:grid-cols-2">
-        {% if listing.study_desk %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">📖 Study Desk</div>{% endif %}
-        {% if listing.quiet_work_env %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🤫 Quiet Work Env.</div>{% endif %}
-        {% if listing.multiple_outlets %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🔌 Multi Outlets</div>{% endif %}
-        {% if listing.printer_access %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🖨️ Printer</div>{% endif %}
-        {% if listing.wifi_included %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">📶 WiFi</div>{% endif %}
+        {% if listing.study_desk %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'notepad' size=12 %} Study Desk</div>{% endif %}
+        {% if listing.quiet_work_env %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'moon' size=12 %} Quiet Work Env.</div>{% endif %}
+        {% if listing.multiple_outlets %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'plug' size=12 %} Multi Outlets</div>{% endif %}
+        {% if listing.printer_access %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'printer' size=12 %} Printer</div>{% endif %}
+        {% if listing.wifi_included %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'wifi' size=12 %} WiFi</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Building Facilities -->
       {% if listing.swimming_pool or listing.gym_access or listing.rooftop_access or listing.garden or listing.common_lounge or listing.sauna %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🏢 Building</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'home' size=11 %} Building</div>
       <div class="grid grid-cols-4 gap-2 mb-4 sm:grid-cols-2">
-        {% if listing.swimming_pool %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🏊 Pool</div>{% endif %}
-        {% if listing.gym_access %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🏋️ Gym</div>{% endif %}
-        {% if listing.rooftop_access %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🏙️ Rooftop</div>{% endif %}
-        {% if listing.garden %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🌳 Garden</div>{% endif %}
-        {% if listing.common_lounge %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🛋️ Lounge</div>{% endif %}
-        {% if listing.sauna %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🧖 Sauna</div>{% endif %}
+        {% if listing.swimming_pool %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'waves' size=12 %} Pool</div>{% endif %}
+        {% if listing.gym_access %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'dumbbell' size=12 %} Gym</div>{% endif %}
+        {% if listing.rooftop_access %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'sunset' size=12 %} Rooftop</div>{% endif %}
+        {% if listing.garden %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'garden' size=12 %} Garden</div>{% endif %}
+        {% if listing.common_lounge %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'sofa' size=12 %} Lounge</div>{% endif %}
+        {% if listing.sauna %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'steam' size=12 %} Sauna</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Security -->
       {% if listing.security_guard or listing.cctv or listing.gated_building or listing.private_lock or listing.smart_lock or listing.intercom %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🔐 Security</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'shield' size=11 %} Security</div>
       <div class="grid grid-cols-4 gap-2 mb-4 sm:grid-cols-2">
-        {% if listing.security_guard %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">👮 Security Guard</div>{% endif %}
-        {% if listing.cctv %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">📹 CCTV</div>{% endif %}
-        {% if listing.gated_building %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🚧 Gated</div>{% endif %}
-        {% if listing.private_lock %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🔒 Private Lock</div>{% endif %}
-        {% if listing.smart_lock %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">📱 Smart Lock</div>{% endif %}
-        {% if listing.intercom %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🔔 Intercom</div>{% endif %}
+        {% if listing.security_guard %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'shield' size=12 %} Security Guard</div>{% endif %}
+        {% if listing.cctv %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'camera' size=12 %} CCTV</div>{% endif %}
+        {% if listing.gated_building %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'gate' size=12 %} Gated</div>{% endif %}
+        {% if listing.private_lock %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'lock' size=12 %} Private Lock</div>{% endif %}
+        {% if listing.smart_lock %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'smartphone-lock' size=12 %} Smart Lock</div>{% endif %}
+        {% if listing.intercom %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'bell' size=12 %} Intercom</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Transport & Parking -->
       {% if listing.private_parking or listing.shared_parking or listing.near_metro or listing.bus_stop_nearby or listing.bike_storage %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">🚗 Transport & Parking</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'car' size=11 %} Transport & Parking</div>
       <div class="grid grid-cols-4 gap-2 mb-4 sm:grid-cols-2">
-        {% if listing.private_parking %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🅿️ Private Parking</div>{% endif %}
-        {% if listing.shared_parking %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🅿️ Shared Parking</div>{% endif %}
-        {% if listing.near_metro %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🚇 Near Metro</div>{% endif %}
-        {% if listing.bus_stop_nearby %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🚌 Bus Stop</div>{% endif %}
-        {% if listing.bike_storage %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🚲 Bike Storage</div>{% endif %}
+        {% if listing.private_parking %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'parking' size=12 %} Private Parking</div>{% endif %}
+        {% if listing.shared_parking %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'parking' size=12 %} Shared Parking</div>{% endif %}
+        {% if listing.near_metro %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'train' size=12 %} Near Metro</div>{% endif %}
+        {% if listing.bus_stop_nearby %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'bus' size=12 %} Bus Stop</div>{% endif %}
+        {% if listing.bike_storage %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'bike' size=12 %} Bike Storage</div>{% endif %}
       </div>
       {% endif %}
 
       <!-- Laundry -->
       {% if listing.washing_machine or listing.dryer or listing.ironing_board or listing.clothesline %}
-      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">👕 Laundry</div>
+      <div class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[1px] mb-2.5">{% icon 'shirt' size=11 %} Laundry</div>
       <div class="grid grid-cols-4 gap-2 mb-4 sm:grid-cols-2">
-        {% if listing.washing_machine %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🫧 Washing Machine</div>{% endif %}
-        {% if listing.dryer %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">💨 Dryer</div>{% endif %}
-        {% if listing.ironing_board %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">👔 Ironing Board</div>{% endif %}
-        {% if listing.clothesline %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">🧺 Clothesline</div>{% endif %}
+        {% if listing.washing_machine %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'washer' size=12 %} Washing Machine</div>{% endif %}
+        {% if listing.dryer %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'washer' size=12 %} Dryer</div>{% endif %}
+        {% if listing.ironing_board %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'shirt' size=12 %} Ironing Board</div>{% endif %}
+        {% if listing.clothesline %}<div class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-700">{% icon 'clothesline' size=12 %} Clothesline</div>{% endif %}
       </div>
       {% endif %}
     </div>
 
     <!-- ─── 6. AI Compatibility ─── -->
     <div class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100 mb-4 last:mb-0 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-[18px] sm:mb-2.5" style="animation-delay:.14s">
-      <h3 class="text-[17px] font-extrabold text-gray-900 mb-[18px] tracking-tight sm:text-[15px] sm:mb-3.5">🤖 AI Compatibility Score</h3>
+      <h3 class="text-[17px] font-extrabold text-gray-900 mb-[18px] tracking-tight sm:text-[15px] sm:mb-3.5">{% icon 'sparkle' size=15 %} AI Compatibility Score</h3>
       {% if user.is_authenticated %}
         <div class="flex items-center gap-5 flex-wrap">
           <!-- Ring placeholder -->
@@ -558,13 +559,13 @@ tailwind.config = {
             <div class="text-sm font-bold text-gray-900 mb-1">Complete your profile to get matched</div>
             <p class="text-[13px] text-gray-500 leading-relaxed mb-3">NestMatch uses AI to compare your lifestyle preferences with this listing's requirements.</p>
             <a href="/questionnaire/" class="inline-flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold text-white bg-violet-700 rounded-lg">
-              ✨ Complete Profile
+              {% icon 'sparkle' size=13 %} Complete Profile
             </a>
           </div>
         </div>
       {% else %}
         <div class="flex flex-col items-center gap-2.5 p-7 bg-violet-50 rounded-xl border-[1.5px] border-dashed border-violet-300 text-center">
-          <div class="text-[36px]">🔒</div>
+          <div class="text-[36px] flex justify-center">{% icon 'lock' size=36 %}</div>
           <div class="text-[15px] font-bold text-violet-700">Login to see your AI compatibility score</div>
           <p class="text-[13px] text-gray-500 max-w-[360px]">NestMatch compares your sleep schedule, cleanliness, noise tolerance, and more with this listing.</p>
           <a href="/auth/" class="px-[22px] py-[9px] text-[13px] font-bold text-white bg-violet-700 rounded-lg mt-1">Login / Register Free</a>
@@ -572,9 +573,9 @@ tailwind.config = {
       {% endif %}
     </div>
 
-    <!-- ─── 7. 📍 Address Details + Map ─── -->
+    <!-- ─── 7. Address Details + Map ─── -->
     <div class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100 mb-4 last:mb-0 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-[18px] sm:mb-2.5" style="animation-delay:.16s">
-      <h3 class="text-[17px] font-extrabold text-gray-900 mb-[18px] tracking-tight sm:text-[15px] sm:mb-3.5">📍 Address Details</h3>
+      <h3 class="text-[17px] font-extrabold text-gray-900 mb-[18px] tracking-tight sm:text-[15px] sm:mb-3.5">{% icon 'map-pin' size=15 %} Address Details</h3>
 
       <!-- Address grid -->
       <div class="grid grid-cols-2 gap-2.5 mb-[18px] sm:grid-cols-1">
@@ -605,7 +606,7 @@ tailwind.config = {
         {% if listing.landmark %}
         <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 col-span-2 sm:col-span-1">
           <div class="text-[10px] font-bold text-gray-400 uppercase tracking-[.8px] mb-[3px]">Nearest Landmark</div>
-          <div class="text-[13px] font-semibold text-gray-900">📌 {{ listing.landmark }}</div>
+          <div class="text-[13px] font-semibold text-gray-900">{% icon 'pin' size=12 %} {{ listing.landmark }}</div>
         </div>
         {% endif %}
         {% if listing.address %}
@@ -619,8 +620,8 @@ tailwind.config = {
       <!-- Transport tags -->
       {% if listing.near_metro or listing.bus_stop_nearby %}
       <div class="flex flex-wrap gap-2 mb-4">
-        {% if listing.near_metro %}<span class="flex items-center gap-1.5 text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-[5px] rounded-full border border-blue-200">🚇 Near Metro Station</span>{% endif %}
-        {% if listing.bus_stop_nearby %}<span class="flex items-center gap-1.5 text-xs font-semibold text-gray-700 bg-gray-50 px-3 py-[5px] rounded-full border border-gray-200">🚌 Bus Stop Nearby</span>{% endif %}
+        {% if listing.near_metro %}<span class="flex items-center gap-1.5 text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-[5px] rounded-full border border-blue-200">{% icon 'train' size=12 %} Near Metro Station</span>{% endif %}
+        {% if listing.bus_stop_nearby %}<span class="flex items-center gap-1.5 text-xs font-semibold text-gray-700 bg-gray-50 px-3 py-[5px] rounded-full border border-gray-200">{% icon 'bus' size=12 %} Bus Stop Nearby</span>{% endif %}
       </div>
       {% endif %}
 
@@ -631,35 +632,35 @@ tailwind.config = {
           <div style="height:1px;background:#F3F4F6;margin-bottom:8px"></div>
           {% if listing.street %}
           <div style="display:flex;gap:6px;font-size:12px;color:#374151;margin-bottom:4px">
-            <span style="color:#9CA3AF;flex-shrink:0">🏠</span><span>{{ listing.street }}</span>
+            <span style="color:#9CA3AF;flex-shrink:0;display:inline-flex">{% icon 'home' size=12 %}</span><span>{{ listing.street }}</span>
           </div>
           {% endif %}
           {% if listing.district %}
           <div style="display:flex;gap:6px;font-size:12px;color:#374151;margin-bottom:4px">
-            <span style="color:#9CA3AF;flex-shrink:0">🏘️</span><span>{{ listing.district }}</span>
+            <span style="color:#9CA3AF;flex-shrink:0;display:inline-flex">{% icon 'home' size=12 %}</span><span>{{ listing.district }}</span>
           </div>
           {% endif %}
           {% if listing.city %}
           <div style="display:flex;gap:6px;font-size:12px;color:#374151;margin-bottom:4px">
-            <span style="color:#9CA3AF;flex-shrink:0">🏙️</span>
+            <span style="color:#9CA3AF;flex-shrink:0;display:inline-flex">{% icon 'home' size=12 %}</span>
             <span>{{ listing.city }}{% if listing.country %}, {{ listing.country }}{% endif %}</span>
           </div>
           {% endif %}
           {% if listing.landmark %}
           <div style="display:flex;gap:6px;font-size:12px;color:#374151;margin-bottom:4px">
-            <span style="color:#9CA3AF;flex-shrink:0">📌</span><span>{{ listing.landmark }}</span>
+            <span style="color:#9CA3AF;flex-shrink:0;display:inline-flex">{% icon 'pin' size=12 %}</span><span>{{ listing.landmark }}</span>
           </div>
           {% endif %}
           {% if listing.address %}
           <div style="display:flex;gap:6px;font-size:12px;color:#6B7280;margin-bottom:4px">
-            <span style="flex-shrink:0">📬</span><span>{{ listing.address }}</span>
+            <span style="flex-shrink:0;display:inline-flex">{% icon 'mailbox' size=12 %}</span><span>{{ listing.address }}</span>
           </div>
           {% endif %}
           {% if listing.near_metro or listing.bus_stop_nearby %}
           <div style="height:1px;background:#F3F4F6;margin:8px 0"></div>
           <div style="display:flex;flex-wrap:wrap;gap:5px">
-            {% if listing.near_metro %}<span style="font-size:11px;font-weight:600;color:#2563EB;background:#EFF6FF;padding:3px 8px;border-radius:20px;border:1px solid #BFDBFE">🚇 Near Metro</span>{% endif %}
-            {% if listing.bus_stop_nearby %}<span style="font-size:11px;font-weight:600;color:#374151;background:#F9FAFB;padding:3px 8px;border-radius:20px;border:1px solid #E5E7EB">🚌 Bus Stop</span>{% endif %}
+            {% if listing.near_metro %}<span style="font-size:11px;font-weight:600;color:#2563EB;background:#EFF6FF;padding:3px 8px;border-radius:20px;border:1px solid #BFDBFE">{% icon 'train' size=11 %} Near Metro</span>{% endif %}
+            {% if listing.bus_stop_nearby %}<span style="font-size:11px;font-weight:600;color:#374151;background:#F9FAFB;padding:3px 8px;border-radius:20px;border:1px solid #E5E7EB">{% icon 'bus' size=11 %} Bus Stop</span>{% endif %}
           </div>
           {% endif %}
           <div style="height:1px;background:#F3F4F6;margin:8px 0"></div>
@@ -681,7 +682,7 @@ tailwind.config = {
 
       <!-- Location footer line -->
       <div class="mt-2.5 flex items-center gap-1.5 text-xs text-gray-500 flex-wrap">
-        <span class="text-violet-700">📍</span>
+        <span class="text-violet-700 inline-flex">{% icon 'map-pin' size=13 %}</span>
         <span>
           {% if listing.district %}{{ listing.district }}, {% endif %}{{ listing.city }}
           {% if listing.landmark %} — {{ listing.landmark }}{% endif %}
@@ -706,9 +707,9 @@ tailwind.config = {
           <div class="text-base font-extrabold text-gray-900">{{ listing.poster.get_full_name|default:listing.poster.username }}</div>
           <div class="text-xs text-gray-400 mt-0.5">Member since {{ listing.poster.date_joined|date:"F Y" }}</div>
           <div class="flex gap-[7px] mt-2 flex-wrap">
-            <span class="bg-emerald-100 text-emerald-700 text-[11px] font-bold px-[10px] py-[3px] rounded-full">✅ Verified</span>
+            <span class="bg-emerald-100 text-emerald-700 text-[11px] font-bold px-[10px] py-[3px] rounded-full">{% icon 'check' size=12 %} Verified</span>
             <span class="bg-violet-100 text-violet-700 text-[11px] font-bold px-[10px] py-[3px] rounded-full">
-              🏠 {{ listing.poster.listings.count }} listing{{ listing.poster.listings.count|pluralize }}
+              {% icon 'home' size=12 %} {{ listing.poster.listings.count }} listing{{ listing.poster.listings.count|pluralize }}
             </span>
           </div>
         </div>
@@ -722,7 +723,7 @@ tailwind.config = {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {% if listing.check_in_time or listing.check_out_time %}
         <div>
-          <div class="text-[13px] font-extrabold text-gray-900 mb-2 flex items-center gap-1.5">🕒 House Rules</div>
+          <div class="text-[13px] font-extrabold text-gray-900 mb-2 flex items-center gap-1.5">{% icon 'clock' size=13 %} House Rules</div>
           <div class="flex flex-col gap-1.5 text-[13px] text-gray-500">
             {% if listing.check_in_time %}<div>Check-in after {{ listing.check_in_time|time:"g:i A" }}</div>{% endif %}
             {% if listing.check_out_time %}<div>Checkout before {{ listing.check_out_time|time:"g:i A" }}</div>{% endif %}
@@ -732,11 +733,11 @@ tailwind.config = {
         {% endif %}
         {% if listing.smoke_alarm or listing.carbon_monoxide_alarm or listing.first_aid_kit %}
         <div>
-          <div class="text-[13px] font-extrabold text-gray-900 mb-2 flex items-center gap-1.5">🛟 Safety & Property</div>
+          <div class="text-[13px] font-extrabold text-gray-900 mb-2 flex items-center gap-1.5">{% icon 'shield' size=13 %} Safety & Property</div>
           <div class="flex flex-col gap-1.5 text-[13px] text-gray-500">
-            {% if listing.smoke_alarm %}<div>🔥 Smoke alarm installed</div>{% endif %}
-            {% if listing.carbon_monoxide_alarm %}<div>🌫️ Carbon monoxide alarm installed</div>{% endif %}
-            {% if listing.first_aid_kit %}<div>🩹 First aid kit available</div>{% endif %}
+            {% if listing.smoke_alarm %}<div>{% icon 'flame' size=13 %} Smoke alarm installed</div>{% endif %}
+            {% if listing.carbon_monoxide_alarm %}<div>{% icon 'cloud' size=13 %} Carbon monoxide alarm installed</div>{% endif %}
+            {% if listing.first_aid_kit %}<div>{% icon 'first-aid' size=13 %} First aid kit available</div>{% endif %}
           </div>
         </div>
         {% endif %}
@@ -816,22 +817,22 @@ tailwind.config = {
           <span class="text-[15px] font-medium text-gray-400"> / month</span>
         </div>
         {% if listing.rent_negotiable %}
-          <div class="mt-1 text-xs font-semibold text-amber-600">💬 Price negotiable</div>
+          <div class="mt-1 text-xs font-semibold text-amber-600">{% icon 'message' size=12 %} Price negotiable</div>
         {% endif %}
       </div>
 
       <!-- Key details -->
       <div class="bg-gray-50 rounded-xl p-3.5 mb-3.5 border border-gray-100">
         <div class="flex justify-between items-center text-[13px] py-[7px] border-b border-gray-100">
-          <span class="text-gray-500">📅 Available from</span>
+          <span class="text-gray-500">{% icon 'calendar' size=12 %} Available from</span>
           <span class="font-bold text-gray-900">{{ listing.available_from|date:"M j, Y" }}</span>
         </div>
         <div class="flex justify-between items-center text-[13px] py-[7px] border-b border-gray-100">
-          <span class="text-gray-500">👥 Max occupants</span>
+          <span class="text-gray-500">{% icon 'people' size=12 %} Max occupants</span>
           <span class="font-bold text-emerald-500">{{ listing.max_occupants }} people</span>
         </div>
         <div class="flex justify-between items-center text-[13px] py-[7px] border-b border-gray-100">
-          <span class="text-gray-500">📋 Min stay</span>
+          <span class="text-gray-500">{% icon 'clipboard' size=12 %} Min stay</span>
           <span class="font-bold text-gray-900">
             {% if listing.min_stay_months == 0 %}Flexible
             {% elif listing.min_stay_months == 12 %}1 Year
@@ -840,7 +841,7 @@ tailwind.config = {
         </div>
         {% if listing.listing_type %}
         <div class="flex justify-between items-center text-[13px] py-[7px]">
-          <span class="text-gray-500">🏠 Type</span>
+          <span class="text-gray-500">{% icon 'home' size=12 %} Type</span>
           <span class="font-bold text-gray-900">{{ listing.get_listing_type_display }}</span>
         </div>
         {% endif %}
@@ -849,11 +850,11 @@ tailwind.config = {
       <!-- Bills summary -->
       {% if listing.electricity_included or listing.water_included or listing.wifi_included %}
       <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-3.5 py-2.5 mb-3.5 text-xs font-semibold text-emerald-600">
-        ✅ Some bills included — {% if listing.electricity_included %}Elec {% endif %}{% if listing.water_included %}Water {% endif %}{% if listing.wifi_included %}WiFi{% endif %}
+        {% icon 'check' size=12 %} Some bills included — {% if listing.electricity_included %}Elec {% endif %}{% if listing.water_included %}Water {% endif %}{% if listing.wifi_included %}WiFi{% endif %}
       </div>
       {% elif listing.bills_split_equally %}
       <div class="bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2.5 mb-3.5 text-xs font-semibold text-amber-700">
-        🔀 Bills split equally between tenants
+        {% icon 'recycle' size=12 %} Bills split equally between tenants
       </div>
       {% endif %}
 
@@ -861,7 +862,7 @@ tailwind.config = {
       <div class="bg-violet-50 border-[1.5px] border-violet-200 rounded-xl p-3 mb-4">
         {% if user.is_authenticated %}
         <div class="flex items-center justify-between mb-[7px]">
-          <span class="text-[13px] font-bold text-violet-700">🤖 AI Match Score</span>
+          <span class="text-[13px] font-bold text-violet-700">{% icon 'sparkle' size=13 %} AI Match Score</span>
           <span class="text-[11px] font-bold text-violet-700 bg-violet-100 px-2 py-0.5 rounded-full">Calculating…</span>
         </div>
         <div class="h-[5px] bg-violet-200 rounded-full overflow-hidden">
@@ -869,42 +870,48 @@ tailwind.config = {
         </div>
         {% else %}
         <a href="/auth/" class="flex items-center justify-center gap-1.5 text-[13px] font-bold text-violet-700">
-          🔒 Login to see your match score
+          {% icon 'lock' size=13 %} Login to see your match score
         </a>
         {% endif %}
       </div>
 
-      <!-- Apply button -->
-      <button onclick="nmOpenModal()" class="block w-full py-3.5 text-sm font-bold text-white bg-violet-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-violet-800 active:scale-[.98] font-sans mb-2.5">Apply Now 🚀</button>
+      <!-- Apply / Cancel button -->
+      {% if my_application and my_application.status == 'pending' %}
+      <button id="nm-cancel-apply-btn" onclick="nmCancelApply({{ my_application.pk }}, this)" class="block w-full py-3.5 text-sm font-bold text-white bg-rose-600 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-rose-700 active:scale-[.98] font-sans mb-2.5">Cancel Application {% icon 'close' size=14 color='#fff' %}</button>
+      {% elif my_application %}
+      <button disabled class="block w-full py-3.5 text-sm font-bold text-gray-500 bg-gray-100 border-none rounded-xl text-center cursor-default font-sans mb-2.5">Application {{ my_application.get_status_display }}</button>
+      {% else %}
+      <button id="nm-apply-now-btn" onclick="nmOpenModal()" class="block w-full py-3.5 text-sm font-bold text-white bg-violet-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-violet-800 active:scale-[.98] font-sans mb-2.5">Apply Now {% icon 'rocket' size=14 color='#fff' %}</button>
+      {% endif %}
 
       <!-- WhatsApp placeholder -->
       <div class="block w-full py-3 text-[13px] font-semibold text-gray-400 bg-gray-50 border border-gray-200 rounded-xl text-center mb-4 cursor-default">
-        📞 Contact unlocked after applying
+        {% icon 'phone-mute' size=12 %} Contact unlocked after applying
       </div>
 
       <!-- Quick rules -->
       <div class="h-px bg-gray-100 my-4"></div>
       <div class="flex flex-col gap-[7px]">
-        {% if listing.no_smoking %}<div class="flex items-center gap-2 text-xs text-gray-500">🚭 No Smoking</div>{% endif %}
-        {% if listing.muslims_only %}<div class="flex items-center gap-2 text-xs text-gray-500">🕌 Muslims Only</div>{% endif %}
-        {% if listing.males_only %}<div class="flex items-center gap-2 text-xs text-gray-500">👨 Males Only</div>{% endif %}
-        {% if listing.females_only %}<div class="flex items-center gap-2 text-xs text-gray-500">👩 Females Only</div>{% endif %}
-        {% if listing.no_pets %}<div class="flex items-center gap-2 text-xs text-gray-500">❌ No Pets</div>{% endif %}
-        {% if listing.pets_allowed %}<div class="flex items-center gap-2 text-xs text-gray-500">🐾 Pets Welcome</div>{% endif %}
-        {% if listing.quiet_after_10 %}<div class="flex items-center gap-2 text-xs text-gray-500">🌙 Quiet After 10 PM</div>{% endif %}
-        {% if listing.no_parties %}<div class="flex items-center gap-2 text-xs text-gray-500">🎉 No Parties</div>{% endif %}
-        <div class="flex items-center gap-2 text-xs text-gray-500">👥 Max {{ listing.max_occupants }} people</div>
-        {% if listing.security_deposit %}<div class="flex items-center gap-2 text-xs text-amber-600">🔑 Security deposit required</div>{% endif %}
+        {% if listing.no_smoking %}<div class="flex items-center gap-2 text-xs text-gray-500">{% icon 'cigarette-ban' size=12 %} No Smoking</div>{% endif %}
+        {% if listing.muslims_only %}<div class="flex items-center gap-2 text-xs text-gray-500">{% icon 'mosque' size=12 %} Muslims Only</div>{% endif %}
+        {% if listing.males_only %}<div class="flex items-center gap-2 text-xs text-gray-500">{% icon 'man' size=12 %} Males Only</div>{% endif %}
+        {% if listing.females_only %}<div class="flex items-center gap-2 text-xs text-gray-500">{% icon 'woman' size=12 %} Females Only</div>{% endif %}
+        {% if listing.no_pets %}<div class="flex items-center gap-2 text-xs text-gray-500">{% icon 'ban' size=12 %} No Pets</div>{% endif %}
+        {% if listing.pets_allowed %}<div class="flex items-center gap-2 text-xs text-gray-500">{% icon 'paw' size=12 %} Pets Welcome</div>{% endif %}
+        {% if listing.quiet_after_10 %}<div class="flex items-center gap-2 text-xs text-gray-500">{% icon 'moon' size=12 %} Quiet After 10 PM</div>{% endif %}
+        {% if listing.no_parties %}<div class="flex items-center gap-2 text-xs text-gray-500">{% icon 'party-ban' size=12 %} No Parties</div>{% endif %}
+        <div class="flex items-center gap-2 text-xs text-gray-500">{% icon 'people' size=12 %} Max {{ listing.max_occupants }} people</div>
+        {% if listing.security_deposit %}<div class="flex items-center gap-2 text-xs text-amber-600">{% icon 'key' size=12 %} Security deposit required</div>{% endif %}
       </div>
     </div>
 
     <!-- Save / Share -->
     <div class="flex gap-2.5 mt-2.5">
       <button class="flex-1 py-[11px] text-[13px] font-semibold text-gray-700 bg-white border-[1.5px] border-gray-200 rounded-xl cursor-pointer transition-all hover:border-violet-700 hover:text-violet-700 font-sans">
-        🔖 Save
+        {% icon 'bookmark' size=13 %} Save
       </button>
       <button onclick="nmShare()" class="flex-1 py-[11px] text-[13px] font-semibold text-gray-700 bg-white border-[1.5px] border-gray-200 rounded-xl cursor-pointer transition-all hover:border-violet-700 hover:text-violet-700 font-sans">
-        🔗 Share
+        {% icon 'link' size=13 %} Share
       </button>
     </div>
   </div>
@@ -919,14 +926,14 @@ tailwind.config = {
 ════════════════════════════════════════════════ -->
 <div class="nm-modal-bg hidden fixed inset-0 bg-black/50 z-[500] items-center justify-center p-5 max-sm:items-end max-sm:p-0" id="nm-apply-modal">
   <div class="bg-white rounded-[20px] w-full max-w-[520px] p-8 relative shadow-[0_20px_60px_rgba(0,0,0,.2)] max-sm:rounded-t-[20px] max-sm:rounded-b-none max-sm:p-6 max-sm:max-w-full">
-    <button onclick="nmCloseModal()" class="absolute top-4 right-4 bg-gray-50 border-none w-[34px] h-[34px] rounded-lg cursor-pointer text-lg text-gray-500 flex items-center justify-center">✕</button>
+    <button onclick="nmCloseModal()" class="absolute top-4 right-4 bg-gray-50 border-none w-[34px] h-[34px] rounded-lg cursor-pointer text-gray-500 flex items-center justify-center">{% icon 'close' size=16 %}</button>
 
-    <h3 class="text-xl font-extrabold text-gray-900 mb-1 tracking-tight">Apply to This Room 🚀</h3>
+    <h3 class="text-xl font-extrabold text-gray-900 mb-1 tracking-tight">Apply to This Room {% icon 'rocket' size=18 %}</h3>
     <p class="text-[13px] text-gray-500 mb-5">Your message will be sent to <strong>{{ listing.poster.get_full_name|default:listing.poster.username }}</strong>.</p>
 
     <!-- Listing info -->
     <div class="bg-violet-50 border border-violet-200 rounded-xl px-3.5 py-3 mb-5 flex items-center gap-3">
-      <div class="text-[22px]">🏠</div>
+      <div class="text-[22px] flex items-center text-violet-700">{% icon 'home' size=22 %}</div>
       <div>
         <div class="text-[13px] font-bold text-gray-900">{{ listing.title }}</div>
         <div class="text-xs text-gray-400 mt-0.5">
@@ -948,14 +955,14 @@ tailwind.config = {
           class="w-full px-3.5 py-3 text-sm border-[1.5px] border-gray-200 rounded-xl font-sans text-gray-900 outline-none resize-y min-h-[130px] leading-relaxed transition-colors focus:border-violet-700 focus:ring-2 focus:ring-violet-700/10"></textarea>
         <div class="text-[11px] text-gray-400 mt-1">Be specific — better messages get faster replies.</div>
       </div>
-      <button id="nm-apply-btn" onclick="nmSubmitApply()" class="block w-full py-3.5 text-sm font-bold text-white bg-violet-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-violet-800 active:scale-[.98] font-sans">Send Application ✈️</button>
+      <button id="nm-apply-btn" onclick="nmSubmitApply()" class="block w-full py-3.5 text-sm font-bold text-white bg-violet-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-violet-800 active:scale-[.98] font-sans">Send Application {% icon 'plane' size=14 color='#fff' %}</button>
     {% endif %}
   </div>
 </div>
 
 <!-- TOAST -->
 <div class="nm-toast hidden fixed bottom-6 left-4 right-4 sm:top-20 sm:bottom-auto sm:left-auto sm:right-6 sm:w-auto z-[700] px-5 py-3 rounded-xl text-sm font-semibold items-center gap-2.5 shadow-lg bg-emerald-600 text-white" id="nm-toast">
-  ✅ Application sent! {{ listing.poster.first_name|default:"The poster" }} will reply soon.
+  {% icon 'check' size=14 color='#fff' %} Application sent! {{ listing.poster.first_name|default:"The poster" }} will reply soon.
 </div>
 
 <!-- ═══════════════════════════════════════════════
@@ -970,10 +977,12 @@ tailwind.config = {
 <script>
 window.NM = {
   title:      '{{ listing.title|escapejs }}',
-  imageCount: '{{ images|length }}'
+  imageCount: '{{ images|length }}',
+  listingPk:  '{{ listing.pk }}',
+  applyUrl:   '{% url "applications_app:apply" listing.pk %}'
 };
 </script>
-<script src="{% static 'listings_app/js/room_detail.js' %}"></script>
+<script src="{% static 'listings_app/js/room_detail.js' %}?v={% now 'U' %}"></script>
 
 </body>
 </html>

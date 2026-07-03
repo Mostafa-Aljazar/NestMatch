@@ -87,13 +87,24 @@ def _build_demo_apps():
     return apps
 
 
+def _application_stats(user):
+    apps = Application.objects.filter(seeker=user)
+    return {
+        'total':    apps.count(),
+        'pending':  apps.filter(status=Application.STATUS_PENDING).count(),
+        'accepted': apps.filter(status=Application.STATUS_ACCEPTED).count(),
+        'rejected': apps.filter(status=Application.STATUS_REJECTED).count(),
+    }
+
+
 def my_applications(request):
     if request.user.is_authenticated:
         apps     = Application.objects.filter(seeker=request.user).select_related('listing', 'listing__poster').prefetch_related('listing__images')
-        total    = apps.count()
-        pending  = apps.filter(status=Application.STATUS_PENDING).count()
-        accepted = apps.filter(status=Application.STATUS_ACCEPTED).count()
-        rejected = apps.filter(status=Application.STATUS_REJECTED).count()
+        stats    = _application_stats(request.user)
+        total    = stats['total']
+        pending  = stats['pending']
+        accepted = stats['accepted']
+        rejected = stats['rejected']
         is_demo  = False
     else:
         apps     = _build_demo_apps()
@@ -114,6 +125,27 @@ def my_applications(request):
 
 
 @require_POST
+def apply_to_listing(request, pk):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Login required'}, status=401)
+
+    listing = get_object_or_404(Listing, pk=pk, status='active')
+
+    if listing.poster_id == request.user.id:
+        return JsonResponse({'error': 'You cannot apply to your own listing'}, status=400)
+
+    if Application.objects.filter(listing=listing, seeker=request.user).exists():
+        return JsonResponse({'error': 'You have already applied to this listing'}, status=400)
+
+    message = request.POST.get('message', '').strip()
+    if not message:
+        return JsonResponse({'error': 'A message is required'}, status=400)
+
+    application = Application.objects.create(listing=listing, seeker=request.user, message=message)
+    return JsonResponse({'ok': True, 'application_id': application.pk})
+
+
+@require_POST
 def withdraw_application(request, pk):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Login required'}, status=401)
@@ -124,4 +156,4 @@ def withdraw_application(request, pk):
         return JsonResponse({'error': 'Only pending applications can be withdrawn'}, status=400)
 
     app.delete()
-    return JsonResponse({'ok': True})
+    return JsonResponse({'ok': True, 'stats': _application_stats(request.user)})

@@ -102,17 +102,21 @@ def room_detail(request, pk):
     rating_avg = reviews.aggregate(avg=Avg('rating'))['avg']
 
     can_review = False
+    my_application = None
     if request.user.is_authenticated:
+        my_application = Application.objects.filter(listing=listing, seeker=request.user).first()
         can_review = (
-            Application.objects.filter(listing=listing, seeker=request.user, status=Application.STATUS_ACCEPTED).exists()
+            my_application is not None
+            and my_application.status == Application.STATUS_ACCEPTED
             and not reviews.filter(reviewer=request.user).exists()
         )
 
     return render(request, 'listings_app/room_detail.html', {
-        'listing':    listing,
-        'reviews':    reviews,
-        'rating_avg': rating_avg,
-        'can_review': can_review,
+        'listing':        listing,
+        'reviews':        reviews,
+        'rating_avg':     rating_avg,
+        'can_review':     can_review,
+        'my_application': my_application,
     })
 
 
