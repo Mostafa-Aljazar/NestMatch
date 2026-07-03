@@ -2,7 +2,7 @@
   Navbar partial — include with:
     {% include "core_app/partials/navbar.html" with active_page="home" %}
 
-  active_page values: "home" | "listings" | "post_room" | "profile" | "dashboard" | "my_listings"
+  active_page values: "home" | "listings" | "post_room" | "profile" | "dashboard" | "my_listings" | "favorites"
 {% endcomment %}
 
 <nav id="nm-nav" class="fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center px-5 transition-all duration-300" style="z-index:9998">
@@ -87,6 +87,13 @@
                 <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
               </svg>
               My Listings
+            </a>
+            <a href="{% url 'listings_app:favorites' %}" class="group flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 hover:pl-5 transition-all duration-200 ease-out
+              {% if active_page == 'favorites' %}bg-violet-50 text-violet-600{% endif %}">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 ease-out group-hover:scale-110">
+                <path d="M12 21s-7.5-4.6-10-9.3C.5 8.4 2.2 5 5.6 5c2 0 3.4 1 4.4 2.5C11 6 12.4 5 14.4 5c3.4 0 5.1 3.4 3.6 6.7C19.5 16.4 12 21 12 21z"/>
+              </svg>
+              Favorites
             </a>
             <a href="/applications/" class="group flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 hover:pl-5 transition-all duration-200 ease-out">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 ease-out group-hover:scale-110">
@@ -237,6 +244,14 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       </span>
       My Listings
+    </a>
+
+    <a href="{% url 'listings_app:favorites' %}" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
+      {% if active_page == 'favorites' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'favorites' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-10-9.3C.5 8.4 2.2 5 5.6 5c2 0 3.4 1 4.4 2.5C11 6 12.4 5 14.4 5c3.4 0 5.1 3.4 3.6 6.7C19.5 16.4 12 21 12 21z"/></svg>
+      </span>
+      Favorites
     </a>
 
     <a href="/applications/" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold text-gray-700 hover:bg-gray-50 transition-all duration-200 ease-out mb-0.5 hover:translate-x-1">
