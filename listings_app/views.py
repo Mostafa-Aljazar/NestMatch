@@ -1,9 +1,12 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Avg, Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
 
-from .models import Listing
+from .models import Listing, ListingImage
 
 
 def listings_page(request):
@@ -71,24 +74,155 @@ def listings_page(request):
     })
 
 
-def post_room_page(request):
-    return render(request, 'listings_app/post_room.html')
+def post_room_page(request, pk=None):
+    listing = None
+    if pk is not None:
+        listing = get_object_or_404(Listing, pk=pk, poster=request.user)
+
+    existing_images = [
+        {'id': img.pk, 'src': img.image.url, 'label': img.room_label}
+        for img in listing.images.all()
+    ] if listing else []
+
+    return render(request, 'listings_app/post_room.html', {
+        'listing': listing,
+        'existing_images_json': existing_images,
+    })
 
 
+@login_required
 def create_listing(request):
     if request.method == 'GET':
         return render(request, 'listings_app/post_room.html')
 
     try:
-        Listing.objects.create_from_post(request.POST, request.FILES, request.user)
+        listing = Listing.objects.create_from_post(request.POST, request.FILES, request.user)
     except ValidationError as e:
         return render(request, 'listings_app/post_room.html', {
             'errors': e.message_dict,
         })
 
-    return redirect('dashboard_app:index')
+    if listing.status == 'active':
+        return redirect('listings_app:room_detail', pk=listing.pk)
+    return redirect('listings_app:my_listings')
+
+
+@login_required
+@require_POST
+def update_listing(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, poster=request.user)
+
+    try:
+        listing = Listing.objects.update_from_post(
+            listing, request.POST, request.FILES,
+            kept_images_json=request.POST.get('kept_image_ids', '[]'),
+        )
+    except ValidationError as e:
+        return render(request, 'listings_app/post_room.html', {
+            'errors': e.message_dict,
+            'listing': listing,
+            'existing_images_json': [
+                {'id': img.pk, 'src': img.image.url, 'label': img.room_label}
+                for img in listing.images.all()
+            ],
+        })
+
+    if listing.status == 'active':
+        return redirect('listings_app:room_detail', pk=listing.pk)
+    return redirect('listings_app:my_listings')
+
+
+@login_required
+def my_listings(request):
+    listings = (
+        Listing.objects
+        .filter(poster=request.user)
+        .prefetch_related('images')
+        .annotate(
+            app_count=Count('applications'),
+            pending_count=Count('applications', filter=Q(applications__status='pending')),
+        )
+        .order_by('-created_at')
+    )
+    stats = {
+        'total':  listings.count(),
+        'active': sum(1 for l in listings if l.status == 'active'),
+        'draft':  sum(1 for l in listings if l.status == 'draft'),
+        'closed': sum(1 for l in listings if l.status == 'closed'),
+    }
+    return render(request, 'listings_app/my_listings.html', {
+        'listings': listings,
+        'stats': stats,
+    })
+
+
+@login_required
+@require_POST
+def delete_listing(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, poster=request.user)
+    listing.delete()
+    return redirect('listings_app:my_listings')
 
 
 def room_detail(request, pk):
+    from applications_app.models import Application, ListingReview
+
     listing = get_object_or_404(Listing, pk=pk, status='active')
-    return render(request, 'listings_app/room_detail.html', {'listing': listing})
+    reviews = listing.reviews.select_related('reviewer').all()
+    rating_avg = reviews.aggregate(avg=Avg('rating'))['avg']
+
+    can_review = False
+    my_application = None
+    is_own_listing = False
+    if request.user.is_authenticated:
+        is_own_listing = listing.poster_id == request.user.id
+        my_application = Application.objects.filter(listing=listing, seeker=request.user).first()
+        can_review = (
+            my_application is not None
+            and my_application.status == Application.STATUS_ACCEPTED
+            and not reviews.filter(reviewer=request.user).exists()
+        )
+
+    return render(request, 'listings_app/room_detail.html', {
+        'listing':        listing,
+        'reviews':        reviews,
+        'rating_avg':     rating_avg,
+        'can_review':     can_review,
+        'my_application': my_application,
+        'is_own_listing': is_own_listing,
+    })
+
+
+@login_required
+@require_POST
+def post_review(request, pk):
+    from applications_app.models import ListingReview
+
+    listing = get_object_or_404(Listing, pk=pk, status='active')
+    try:
+        ListingReview.objects.create_from_post(listing, request.user, request.POST)
+        messages.success(request, 'Your review has been posted.')
+    except ValidationError as e:
+        for field_errors in e.message_dict.values():
+            for msg in field_errors:
+                messages.error(request, msg)
+
+    return redirect('listings_app:room_detail', pk=pk)
+
+
+def photo_tour(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, status='active')
+    images = listing.images.all()
+
+    label_display = dict(ListingImage.ROOM_LABEL_CHOICES)
+    groups = []
+    for slug, name in ListingImage.ROOM_LABEL_CHOICES:
+        group_images = [img for img in images if img.room_label == slug]
+        if group_images:
+            groups.append({'slug': slug, 'name': name, 'images': group_images})
+
+    return render(request, 'listings_app/photo_tour.html', {
+        'listing': listing,
+        'groups':  groups,
+        'total':   len(images),
+    })

@@ -1,0 +1,188 @@
+{% load static %}
+{% load icons %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Applicants — {{ listing.title }} — NestMatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { jakarta: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            violet: { 50:'#F5F3FF', 100:'#EDE9FE', 200:'#DDD6FE', 600:'#7C3AED', 700:'#6D28D9' },
+          },
+          keyframes: {
+            fadeUp:  { from:{ opacity:'0', transform:'translateY(10px)' }, to:{ opacity:'1', transform:'translateY(0)' } },
+            toastIn: { from:{ opacity:'0', transform:'translateX(24px)' }, to:{ opacity:'1', transform:'translateX(0)' } },
+            toastOut:{ to:  { opacity:'0', transform:'translateX(24px)' } },
+          },
+          animation: {
+            fadeUp:   'fadeUp .4s ease both',
+            toastIn:  'toastIn .3s ease both',
+            toastOut: 'toastOut .3s ease forwards',
+          },
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="font-jakarta bg-gray-50 text-gray-900 overflow-x-hidden">
+
+{% include "core_app/partials/navbar.html" with active_page="my_listings" %}
+
+<!-- ═══ PAGE CONTENT ═══ -->
+<div class="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+
+  <!-- ── Back link ── -->
+  <a href="{% url 'listings_app:my_listings' %}"
+     class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-violet-600 transition-colors mb-4">
+    {% icon 'chevron-left' size=14 %}
+    Back to My Listings
+  </a>
+
+  <!-- ── Page Header ── -->
+  <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+    <div class="w-full sm:w-24 h-32 sm:h-20 rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-violet-200 to-violet-300">
+      {% with img=listing.images.first %}
+      {% if img %}<img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover"/>{% endif %}
+      {% endwith %}
+    </div>
+    <div class="min-w-0 flex-1">
+      <h1 class="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight leading-tight truncate">{{ listing.title }}</h1>
+      <p class="text-sm text-gray-500 mt-1">{{ listing.district }}, {{ listing.city }} &middot; ${{ listing.price }}/mo</p>
+    </div>
+  </div>
+
+  <!-- ── Stats ── -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+      <div id="nm-stat-total" class="text-2xl font-extrabold text-violet-600">{{ stats.total }}</div>
+      <div class="text-xs text-gray-500 font-medium mt-1">Total</div>
+    </div>
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+      <div id="nm-stat-pending" class="text-2xl font-extrabold text-amber-500">{{ stats.pending }}</div>
+      <div class="text-xs text-gray-500 font-medium mt-1">Pending</div>
+    </div>
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+      <div id="nm-stat-accepted" class="text-2xl font-extrabold text-emerald-500">{{ stats.accepted }}</div>
+      <div class="text-xs text-gray-500 font-medium mt-1">Accepted</div>
+    </div>
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+      <div id="nm-stat-rejected" class="text-2xl font-extrabold text-red-500">{{ stats.rejected }}</div>
+      <div class="text-xs text-gray-500 font-medium mt-1">Rejected</div>
+    </div>
+  </div>
+
+  <!-- ── Applicant Cards ── -->
+  <div id="nm-applicant-list" class="flex flex-col gap-4">
+
+    {% if not applications %}
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm px-6 py-20 text-center animate-fadeUp">
+      <div class="flex justify-center text-gray-300 mb-4">{% icon 'people' size=48 %}</div>
+      <div class="text-lg font-extrabold text-gray-900 mb-2">No applicants yet</div>
+      <p class="text-sm text-gray-500 max-w-xs mx-auto">Once someone applies to this room, they'll show up here.</p>
+    </div>
+    {% else %}
+
+    {% for app in applications %}
+    <div data-app-pk="{{ app.pk }}" data-status="{{ app.status }}"
+         class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 animate-fadeUp">
+      <div class="flex flex-col sm:flex-row gap-3 p-4">
+
+        <!-- avatar -->
+        <a href="{% url 'accounts_app:public_profile' app.seeker.pk %}" class="w-12 h-12 rounded-full shrink-0 flex items-center justify-center text-sm font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600 overflow-hidden">
+          {% if app.seeker.profile_pic %}
+            <img src="{{ app.seeker.profile_pic.url }}" class="w-full h-full object-cover" alt="">
+          {% else %}
+            {{ app.seeker.first_name|first|upper }}{{ app.seeker.last_name|first|upper }}
+          {% endif %}
+        </a>
+
+        <div class="flex-1 min-w-0">
+
+          <!-- name + status -->
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <div>
+              <a href="{% url 'accounts_app:public_profile' app.seeker.pk %}" class="text-sm font-bold text-gray-900 leading-snug hover:text-violet-600 transition-colors">{{ app.seeker.full_name }}</a>
+              <div class="text-xs text-gray-500 mt-0.5">{{ app.seeker.email }}</div>
+            </div>
+            <span data-status-badge
+              class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold shrink-0 self-start
+              {% if app.status == 'accepted' %}bg-emerald-100 text-emerald-700
+              {% elif app.status == 'pending' %}bg-amber-100 text-amber-700
+              {% else %}bg-rose-100 text-rose-600{% endif %}">
+              {{ app.get_status_display }}
+            </span>
+          </div>
+
+          <!-- compatibility + date -->
+          <div class="flex flex-wrap items-center gap-2 mt-2.5">
+            {% if app.compatibility %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-violet-50 text-violet-600">
+              {% icon 'award' size=12 %} {{ app.compatibility }}% Match
+            </span>
+            {% endif %}
+            <span class="inline-flex items-center gap-1 text-xs text-gray-400">
+              {% icon 'calendar' size=12 %} {{ app.applied_at|date:"M j, Y" }}
+            </span>
+          </div>
+
+          <!-- message -->
+          {% if app.message %}
+          <div class="mt-3 px-3 py-2.5 bg-gray-50 border-l-[3px] border-violet-200 rounded-r-lg text-xs text-gray-600 italic leading-relaxed">
+            "{{ app.message }}"
+          </div>
+          {% endif %}
+
+          <!-- poster note (shown once decided) -->
+          <div data-poster-note class="mt-3 px-3 py-2.5 bg-violet-50 border-l-[3px] border-violet-300 rounded-r-lg text-xs text-violet-700 leading-relaxed {% if not app.poster_note %}hidden{% endif %}">
+            <span data-poster-note-text>{{ app.poster_note }}</span>
+          </div>
+
+          <!-- actions -->
+          <div data-actions class="flex flex-col sm:flex-row gap-2 mt-3 {% if app.status != 'pending' %}hidden{% endif %}">
+            <button onclick="nmAccept({{ app.pk }}, this)"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer font-jakarta">
+              {% icon 'check' size=13 %} Accept
+            </button>
+            <button onclick="nmReject({{ app.pk }}, this)"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors cursor-pointer font-jakarta">
+              {% icon 'close' size=13 %} Reject
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    {% endif %}
+  </div>
+
+</div>
+
+{% include "core_app/partials/footer.html" %}
+
+<!-- ── Toast container ── -->
+<div id="nm-toast-wrap" class="fixed top-20 right-4 left-4 z-[9999] flex flex-col items-end gap-2.5 pointer-events-none sm:left-auto sm:right-6"></div>
+
+<style>
+  .nm-toast-success{background:#059669;color:#fff}
+  .nm-toast-error  {background:#E11D48;color:#fff}
+  .nm-toast-info   {background:#7C3AED;color:#fff}
+  @keyframes nmToastIn {from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes nmToastOut{from{opacity:1}to{opacity:0;transform:translateX(20px)}}
+  .nm-toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;font-family:"Plus Jakarta Sans",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:240px;max-width:340px;width:auto;animation:nmToastIn .3s ease}
+  @media(max-width:480px){.nm-toast{min-width:0;width:100%}}
+</style>
+
+<script src="{% static 'applications_app/js/listing_applicants.js' %}?v={% now 'U' %}"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, time
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -35,6 +35,7 @@ _BOOL_FIELDS = [
     'washing_machine', 'dryer', 'ironing_board', 'clothesline',
     'security_deposit', 'rent_negotiable', 'monthly_payment', 'quarterly_payment', 'online_payment',
     'english_household', 'arabic_only', 'local_preferred', 'mixed_nationalities',
+    'smoke_alarm', 'carbon_monoxide_alarm', 'first_aid_kit',
 ]
 
 
@@ -148,15 +149,12 @@ class ListingManager(models.Manager):
 
         return errors
 
-    def create_from_post(self, post_data, files, poster):
+    def _extract_fields(self, post_data):
         """
-        Validate, then create and return a Listing from raw POST data.
-        Raises ValidationError({field: [msg]}) if validation fails.
+        Parse raw POST data into a dict of Listing field values (everything
+        except `poster` and `status`). Shared by create_from_post and
+        update_from_post — does NOT validate and does NOT touch the database.
         """
-        errors = self.listing_validator(post_data, files)
-        if errors:
-            raise ValidationError(errors)
-
         def flag(name):
             return name in post_data or post_data.get(name) in ('on', '1', 'true')
 
@@ -203,6 +201,15 @@ class ListingManager(models.Manager):
 
         bool_fields = {name: flag(name) for name in _BOOL_FIELDS}
 
+        try:
+            check_in_time = time.fromisoformat(post_data.get('check_in_time', '')) if post_data.get('check_in_time') else None
+        except ValueError:
+            check_in_time = None
+        try:
+            check_out_time = time.fromisoformat(post_data.get('check_out_time', '')) if post_data.get('check_out_time') else None
+        except ValueError:
+            check_out_time = None
+
         # ── Custom requirements ───────────────────────────────────────────────
 
         try:
@@ -217,47 +224,115 @@ class ListingManager(models.Manager):
         except (json.JSONDecodeError, ValueError, TypeError):
             custom_requirements = []
 
-        # ── Status ────────────────────────────────────────────────────────────
+        return {
+            'listing_type': listing_type,
+            'tenant_types': tenant_types,
+            'price': price,
+            'available_from': available_from,
+            'max_occupants': max_occupants,
+            'min_stay_months': min_stay_months,
+            'title': title,
+            'country': country,
+            'city': city,
+            'district': district,
+            'street': street,
+            'address': address,
+            'landmark': landmark,
+            'lat': lat,
+            'lng': lng,
+            'description': description,
+            'ai_generated': ai_generated,
+            'notes': notes,
+            'custom_requirements': custom_requirements,
+            'check_in_time': check_in_time,
+            'check_out_time': check_out_time,
+            **bool_fields,
+        }
 
+    def _save_new_images(self, listing, files, post_data, order=0):
+        """Create ListingImage rows from uploaded files, starting at `order`. Returns the next free order."""
+        if not files:
+            return order
+        _allowed = {'image/jpeg', 'image/png', 'image/webp'}
+        _valid_labels = {c for c, _ in ListingImage.ROOM_LABEL_CHOICES}
+        raw_labels = post_data.get('image_labels', '').split(',')
+        for i, img in enumerate(files.getlist('images')[:10]):
+            if img.size > 10 * 1024 * 1024 or img.content_type not in _allowed:
+                continue
+            label = raw_labels[i].strip() if i < len(raw_labels) else ''
+            if label not in _valid_labels:
+                label = 'other'
+            ListingImage.objects.create(listing=listing, image=img, room_label=label, order=order)
+            order += 1
+        return order
+
+    def create_from_post(self, post_data, files, poster):
+        """
+        Validate, then create and return a Listing from raw POST data.
+        Raises ValidationError({field: [msg]}) if validation fails.
+        """
+        errors = self.listing_validator(post_data, files)
+        if errors:
+            raise ValidationError(errors)
+
+        fields = self._extract_fields(post_data)
         status = 'active' if post_data.get('action') == 'publish' else 'draft'
 
-        # ── Save listing ──────────────────────────────────────────────────────
+        listing = self.create(poster=poster, status=status, **fields)
 
-        listing = self.create(
-            poster=poster,
-            listing_type=listing_type,
-            tenant_types=tenant_types,
-            price=price,
-            available_from=available_from,
-            max_occupants=max_occupants,
-            min_stay_months=min_stay_months,
-            title=title,
-            country=country,
-            city=city,
-            district=district,
-            street=street,
-            address=address,
-            landmark=landmark,
-            lat=lat,
-            lng=lng,
-            description=description,
-            ai_generated=ai_generated,
-            notes=notes,
-            custom_requirements=custom_requirements,
-            status=status,
-            **bool_fields,
-        )
+        self._save_new_images(listing, files, post_data)
 
-        # ── Save images ───────────────────────────────────────────────────────
+        return listing
 
-        if files:
-            _allowed = {'image/jpeg', 'image/png', 'image/webp'}
-            valid_images = [
-                img for img in files.getlist('images')[:10]
-                if img.size <= 10 * 1024 * 1024 and img.content_type in _allowed
-            ]
-            for order, img in enumerate(valid_images):
-                ListingImage.objects.create(listing=listing, image=img, order=order)
+    def update_from_post(self, listing, post_data, files, kept_images_json='[]'):
+        """
+        Validate, then update `listing` in place from raw POST data.
+        Raises ValidationError({field: [msg]}) if validation fails.
+
+        kept_images_json: JSON string of [{"id": <ListingImage.pk>, "label": <str>,
+        "order": <int>}, ...] for existing images to keep (with possibly-updated
+        label/order). Existing images NOT listed are deleted. New files in
+        files.getlist('images') are appended after the kept ones.
+        """
+        errors = self.listing_validator(post_data, files)
+        if errors:
+            raise ValidationError(errors)
+
+        fields = self._extract_fields(post_data)
+        status = 'active' if post_data.get('action') == 'publish' else 'draft'
+
+        for field, value in fields.items():
+            setattr(listing, field, value)
+        listing.status = status
+        listing.save()
+
+        # ── Reconcile existing images ────────────────────────────────────────
+        try:
+            kept = json.loads(kept_images_json or '[]')
+            if not isinstance(kept, list):
+                kept = []
+        except (json.JSONDecodeError, ValueError, TypeError):
+            kept = []
+
+        kept_by_id = {
+            int(item['id']): item
+            for item in kept
+            if isinstance(item, dict) and str(item.get('id', '')).isdigit()
+        }
+
+        _valid_labels = {c for c, _ in ListingImage.ROOM_LABEL_CHOICES}
+        order = 0
+        for img in listing.images.all():
+            if img.pk in kept_by_id:
+                label = kept_by_id[img.pk].get('label', img.room_label)
+                img.room_label = label if label in _valid_labels else img.room_label
+                img.order = order
+                img.save(update_fields=['room_label', 'order'])
+                order += 1
+            else:
+                img.delete()
+
+        self._save_new_images(listing, files, post_data, order=order)
 
         return listing
 
@@ -449,6 +524,14 @@ class Listing(models.Model):
     quarterly_payment = models.BooleanField(default=False)
     online_payment    = models.BooleanField(default=False)
 
+    # ── Step 4: House Rules & Safety ─────────────────────────────────────────
+
+    check_in_time         = models.TimeField(null=True, blank=True)
+    check_out_time        = models.TimeField(null=True, blank=True)
+    smoke_alarm            = models.BooleanField(default=False)
+    carbon_monoxide_alarm  = models.BooleanField(default=False)
+    first_aid_kit           = models.BooleanField(default=False)
+
     # ── Step 4: Language & Background ────────────────────────────────────────
 
     english_household   = models.BooleanField(default=False)
@@ -485,9 +568,23 @@ class Listing(models.Model):
     def is_active(self):
         return self.status == 'active'
 
+    @property
+    def custom_requirements_json(self):
+        return json.dumps(self.custom_requirements)
+
 class ListingImage(models.Model):
+    ROOM_LABEL_CHOICES = [
+        ('living_room', 'Living Room'),
+        ('bedroom',     'Bedroom'),
+        ('kitchen',     'Kitchen'),
+        ('bathroom',    'Bathroom'),
+        ('exterior',    'Exterior'),
+        ('other',       'Additional Photos'),
+    ]
+
     listing     = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='images')
     image       = models.ImageField(upload_to='listings/%Y/%m/')
+    room_label  = models.CharField(max_length=20, choices=ROOM_LABEL_CHOICES, default='other')
     order       = models.PositiveSmallIntegerField(default=0)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
