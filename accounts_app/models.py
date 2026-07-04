@@ -334,6 +334,14 @@ class LifestyleProfileManager(models.Manager):
             'social_type': LifestyleProfile.SOCIAL_TYPE_CHOICES,
             'preferred_roommates': LifestyleProfile.PREFERRED_ROOMMATES_CHOICES,
             'smoking': LifestyleProfile.SMOKING_CHOICES,
+            # --- Extended preferences: required so every seeker has full
+            # signal for compatibility_app's Gemini scoring ---
+            'roommate_gender_pref': LifestyleProfile.ROOMMATE_GENDER_PREF_CHOICES,
+            'dietary': LifestyleProfile.DIETARY_CHOICES,
+            'guest_tolerance': LifestyleProfile.GUEST_TOLERANCE_CHOICES,
+            'tenant_type': LifestyleProfile.TENANT_TYPE_CHOICES,
+            'household_lang_pref': LifestyleProfile.HOUSEHOLD_LANG_PREF_CHOICES,
+            'listing_type_pref': LifestyleProfile.LISTING_TYPE_PREF_CHOICES,
         }
         for field_name, choices in required_choice_fields.items():
             value = postData.get(field_name)
@@ -354,23 +362,11 @@ class LifestyleProfileManager(models.Manager):
         if field_of_study and field_of_study not in dict(LifestyleProfile.FIELD_CHOICES):
             errors['field'] = 'Invalid field of study/work option!'
 
-        # --- Extended preferences (all optional, but must be a valid choice if present) ---
-        optional_choice_fields = {
-            'roommate_gender_pref': LifestyleProfile.ROOMMATE_GENDER_PREF_CHOICES,
-            'dietary': LifestyleProfile.DIETARY_CHOICES,
-            'guest_tolerance': LifestyleProfile.GUEST_TOLERANCE_CHOICES,
-            'tenant_type': LifestyleProfile.TENANT_TYPE_CHOICES,
-            'household_lang_pref': LifestyleProfile.HOUSEHOLD_LANG_PREF_CHOICES,
-            'listing_type_pref': LifestyleProfile.LISTING_TYPE_PREF_CHOICES,
-        }
-        for field_name, choices in optional_choice_fields.items():
-            value = postData.get(field_name)
-            if value and value not in dict(choices):
-                errors[field_name] = 'Invalid option!'
-
         # min_stay_pref choices use int keys, but POST data always arrives as a string
         min_stay_pref = postData.get('min_stay_pref')
-        if min_stay_pref:
+        if min_stay_pref in (None, ''):
+            errors['min_stay_pref'] = 'Please select an option!'
+        else:
             try:
                 if int(min_stay_pref) not in dict(LifestyleProfile.MIN_STAY_PREF_CHOICES):
                     raise ValueError
@@ -379,12 +375,14 @@ class LifestyleProfileManager(models.Manager):
 
         for field_name in ('budget_min', 'budget_max'):
             value = postData.get(field_name)
-            if value:
-                try:
-                    if int(value) < 0:
-                        raise ValueError
-                except ValueError:
-                    errors[field_name] = 'Must be a positive whole number!'
+            if not value:
+                errors[field_name] = 'Required!'
+                continue
+            try:
+                if int(value) < 0:
+                    raise ValueError
+            except ValueError:
+                errors[field_name] = 'Must be a positive whole number!'
 
         budget_min = postData.get('budget_min')
         budget_max = postData.get('budget_max')
@@ -394,6 +392,11 @@ class LifestyleProfileManager(models.Manager):
                     errors['budget_max'] = 'Max budget must be greater than or equal to min budget!'
             except ValueError:
                 pass
+
+        # Required booleans: must be explicitly "true"/"false", not absent.
+        for field_name in ('alcohol_ok', 'works_from_home', 'wants_furnished', 'wants_building_amenities'):
+            if postData.get(field_name) not in ('true', 'false'):
+                errors[field_name] = 'Please select an option!'
 
         return errors
 
@@ -416,20 +419,20 @@ class LifestyleProfileManager(models.Manager):
             'preferred_roommates': postData.get('preferred_roommates'),
             'religion': postData.get('religion') or None,
             'field': postData.get('field') or None,
-            # --- Extended preferences (all optional) ---
-            'roommate_gender_pref': postData.get('roommate_gender_pref') or None,
-            'budget_min': int(postData['budget_min']) if postData.get('budget_min') else None,
-            'budget_max': int(postData['budget_max']) if postData.get('budget_max') else None,
-            'dietary': postData.get('dietary') or None,
-            'guest_tolerance': postData.get('guest_tolerance') or None,
-            'tenant_type': postData.get('tenant_type') or None,
-            'household_lang_pref': postData.get('household_lang_pref') or None,
-            'alcohol_ok': postData.get('alcohol_ok') == 'true' if postData.get('alcohol_ok') else None,
-            'min_stay_pref': int(postData['min_stay_pref']) if postData.get('min_stay_pref') else None,
-            'listing_type_pref': postData.get('listing_type_pref') or None,
-            'works_from_home': postData.get('works_from_home') == 'true' if postData.get('works_from_home') else None,
-            'wants_furnished': postData.get('wants_furnished') == 'true' if postData.get('wants_furnished') else None,
-            'wants_building_amenities': postData.get('wants_building_amenities') == 'true' if postData.get('wants_building_amenities') else None,
+            # --- Extended preferences (required) ---
+            'roommate_gender_pref': postData.get('roommate_gender_pref'),
+            'budget_min': int(postData['budget_min']),
+            'budget_max': int(postData['budget_max']),
+            'dietary': postData.get('dietary'),
+            'guest_tolerance': postData.get('guest_tolerance'),
+            'tenant_type': postData.get('tenant_type'),
+            'household_lang_pref': postData.get('household_lang_pref'),
+            'alcohol_ok': postData.get('alcohol_ok') == 'true',
+            'min_stay_pref': int(postData['min_stay_pref']),
+            'listing_type_pref': postData.get('listing_type_pref'),
+            'works_from_home': postData.get('works_from_home') == 'true',
+            'wants_furnished': postData.get('wants_furnished') == 'true',
+            'wants_building_amenities': postData.get('wants_building_amenities') == 'true',
         }
         profile, _created = self.update_or_create(user=user, defaults=defaults)
         return profile
@@ -446,9 +449,9 @@ class LifestyleProfile(models.Model):
     Extended preference fields (roommate_gender_pref, budget_min/max, dietary,
     guest_tolerance, tenant_type, household_lang_pref, alcohol_ok, min_stay_pref,
     listing_type_pref, works_from_home, wants_furnished, wants_building_amenities)
-    were added later to give seeker-side counterparts to more Listing house-rule
-    groups for compatibility scoring — all optional/nullable so existing rows
-    stay valid without a backfill.
+    give seeker-side counterparts to more Listing house-rule groups. Required
+    (not nullable): compatibility_app's Gemini scoring needs full signal for
+    every seeker, not a partially-filled profile.
     """
 
     # --- Choice sets (kept identical to the ENUM values in the SQL schema) ---
@@ -586,21 +589,20 @@ class LifestyleProfile(models.Model):
     religion = models.CharField(max_length=25, choices=RELIGION_CHOICES, blank=True, null=True)
     field = models.CharField(max_length=20, choices=FIELD_CHOICES, blank=True, null=True)
 
-    # --- Extended preferences (all optional — added after the original 6-step
-    # questionnaire shipped, so existing rows won't have these filled in) ---
-    roommate_gender_pref = models.CharField(max_length=15, choices=ROOMMATE_GENDER_PREF_CHOICES, blank=True, null=True)
-    budget_min = models.PositiveIntegerField(blank=True, null=True)
-    budget_max = models.PositiveIntegerField(blank=True, null=True)
-    dietary = models.CharField(max_length=15, choices=DIETARY_CHOICES, blank=True, null=True)
-    guest_tolerance = models.CharField(max_length=10, choices=GUEST_TOLERANCE_CHOICES, blank=True, null=True)
-    tenant_type = models.CharField(max_length=15, choices=TENANT_TYPE_CHOICES, blank=True, null=True)
-    household_lang_pref = models.CharField(max_length=15, choices=HOUSEHOLD_LANG_PREF_CHOICES, blank=True, null=True)
-    alcohol_ok = models.BooleanField(blank=True, null=True)
-    min_stay_pref = models.PositiveSmallIntegerField(choices=MIN_STAY_PREF_CHOICES, blank=True, null=True)
-    listing_type_pref = models.CharField(max_length=20, choices=LISTING_TYPE_PREF_CHOICES, blank=True, null=True)
-    works_from_home = models.BooleanField(blank=True, null=True)
-    wants_furnished = models.BooleanField(blank=True, null=True)
-    wants_building_amenities = models.BooleanField(blank=True, null=True)
+    # --- Extended preferences (required) ---
+    roommate_gender_pref = models.CharField(max_length=15, choices=ROOMMATE_GENDER_PREF_CHOICES)
+    budget_min = models.PositiveIntegerField()
+    budget_max = models.PositiveIntegerField()
+    dietary = models.CharField(max_length=15, choices=DIETARY_CHOICES)
+    guest_tolerance = models.CharField(max_length=10, choices=GUEST_TOLERANCE_CHOICES)
+    tenant_type = models.CharField(max_length=15, choices=TENANT_TYPE_CHOICES)
+    household_lang_pref = models.CharField(max_length=15, choices=HOUSEHOLD_LANG_PREF_CHOICES)
+    alcohol_ok = models.BooleanField()
+    min_stay_pref = models.PositiveSmallIntegerField(choices=MIN_STAY_PREF_CHOICES)
+    listing_type_pref = models.CharField(max_length=20, choices=LISTING_TYPE_PREF_CHOICES)
+    works_from_home = models.BooleanField()
+    wants_furnished = models.BooleanField()
+    wants_building_amenities = models.BooleanField()
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -609,11 +611,10 @@ class LifestyleProfile(models.Model):
     objects = LifestyleProfileManager()
 
     # Every field the questionnaire can collect, used to compute a granular
-    # completeness score (see `completeness_fraction`) instead of a flat
-    # "has a lifestyle profile at all" checkbox. sleep_time/noise_level/
-    # cleanliness/social_type/preferred_roommates/smoking are required at
-    # creation so they're always filled once a profile exists; the rest are
-    # optional and drive the score up as a seeker fills in more detail.
+    # completeness score (see `completeness_fraction`). Only wake_time,
+    # religion, and field remain genuinely optional — everything else is
+    # required at save time (see lifestyle_validator), so a saved profile
+    # is always at/near full completeness.
     ALL_PREFERENCE_FIELDS = [
         'sleep_time', 'wake_time', 'noise_level', 'cleanliness', 'smoking',
         'social_type', 'preferred_roommates', 'religion', 'field',

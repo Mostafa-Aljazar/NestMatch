@@ -5,8 +5,11 @@ certifi==2026.6.17
 charset-normalizer==3.4.7
 Django==6.0.5
 django-summernote==0.8.20.0
+google-genai
 idna==3.18
 pillow==12.2.0
+pydantic
+python-dotenv
 requests==2.34.2
 sqlparse==0.5.5
 tzdata==2026.2

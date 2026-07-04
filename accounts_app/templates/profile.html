@@ -706,20 +706,21 @@
                     <circle cx="12" cy="12" r="9" />
                     <path d="M12 7v10M9 9.5a2.5 2.5 0 012.5-1.5h1a2.5 2.5 0 010 5h-1a2.5 2.5 0 000 5h1a2.5 2.5 0 002.5-1.5" />
                   </svg>
-                  Room preferences <span class="font-normal text-slate-400">(optional)</span>
+                  Room preferences <span class="font-normal text-slate-400">(required)</span>
                 </h3>
                 <div class="mt-5 space-y-5">
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Monthly budget range</p>
                     <div class="flex items-center gap-3 max-w-xs">
-                      <input type="number" min="0" name="budget_min" id="input-budget_min" placeholder="Min"
+                      <input type="number" min="0" name="budget_min" id="input-budget_min" placeholder="Min" required
                         value="{{ lifestyle_profile.budget_min|default:'' }}"
                         class="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-700 focus:border-brand-500 focus:outline-none" />
                       <span class="text-slate-400">–</span>
-                      <input type="number" min="0" name="budget_max" id="input-budget_max" placeholder="Max"
+                      <input type="number" min="0" name="budget_max" id="input-budget_max" placeholder="Max" required
                         value="{{ lifestyle_profile.budget_max|default:'' }}"
                         class="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-700 focus:border-brand-500 focus:outline-none" />
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="budget_min"></p>
                     <p class="field-error mt-2 text-xs text-rose-600" data-field="budget_max"></p>
                   </div>
                   <div>
@@ -730,6 +731,7 @@
                           class="option-card {% if lifestyle_profile.roommate_gender_pref == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="roommate_gender_pref"></p>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Dietary preference</p>
@@ -739,6 +741,7 @@
                           class="option-card {% if lifestyle_profile.dietary == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="dietary"></p>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Guests tolerance</p>
@@ -748,6 +751,7 @@
                           class="option-card {% if lifestyle_profile.guest_tolerance == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="guest_tolerance"></p>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Are you drinking alcohol?</p>
@@ -755,6 +759,7 @@
                       <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.alcohol_ok %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
                       <button type="button" data-value="false" class="option-card {% if lifestyle_profile.alcohol_ok is not None and not lifestyle_profile.alcohol_ok %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="alcohol_ok"></p>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">I am a</p>
@@ -764,6 +769,7 @@
                           class="option-card {% if lifestyle_profile.tenant_type == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="tenant_type"></p>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Household language / nationality preference</p>
@@ -773,6 +779,7 @@
                           class="option-card {% if lifestyle_profile.household_lang_pref == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="household_lang_pref"></p>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Preferred minimum stay</p>
@@ -782,6 +789,7 @@
                           class="option-card {% if lifestyle_profile.min_stay_pref == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="min_stay_pref"></p>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Preferred room type</p>
@@ -791,6 +799,7 @@
                           class="option-card {% if lifestyle_profile.listing_type_pref == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="listing_type_pref"></p>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Do you work/study from home?</p>
@@ -798,6 +807,7 @@
                       <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.works_from_home %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
                       <button type="button" data-value="false" class="option-card {% if lifestyle_profile.works_from_home is not None and not lifestyle_profile.works_from_home %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="works_from_home"></p>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Do you want a fully furnished room?</p>
@@ -805,6 +815,7 @@
                       <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.wants_furnished %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
                       <button type="button" data-value="false" class="option-card {% if lifestyle_profile.wants_furnished is not None and not lifestyle_profile.wants_furnished %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="wants_furnished"></p>
                   </div>
                   <div>
                     <p class="mb-2.5 text-sm font-medium text-slate-700">Do you want building amenities (pool, gym, rooftop)?</p>
@@ -812,6 +823,7 @@
                       <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.wants_building_amenities %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
                       <button type="button" data-value="false" class="option-card {% if lifestyle_profile.wants_building_amenities is not None and not lifestyle_profile.wants_building_amenities %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
                     </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="wants_building_amenities"></p>
                   </div>
                 </div>
               </div>

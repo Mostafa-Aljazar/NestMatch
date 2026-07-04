@@ -64,10 +64,36 @@ def listings_page(request):
     else:
         qs = qs.order_by('-created_at')
 
-    # ── Paginate ──────────────────────────────────────────────────────────────
-    paginator = Paginator(qs, 12)
-    page = request.GET.get('page', 1)
-    listings = paginator.get_page(page)
+    # ── AI compatibility scoring (per-seeker) ───────────────────────────────────
+    profile = None
+    if request.user.is_authenticated:
+        profile = getattr(request.user, 'lifestyle_profile', None)
+
+    if profile is not None:
+        from compatibility_app.scoring import get_or_compute_scores_bulk
+
+        all_listings = list(qs)
+        scores = get_or_compute_scores_bulk(request.user, profile, all_listings)
+        for listing in all_listings:
+            score_row = scores.get(listing.pk)
+            listing.compat_score = score_row.overall_score if score_row else None
+
+        compat_min = request.GET.get('compat_min')
+        if compat_min:
+            try:
+                compat_min = int(compat_min)
+                all_listings = [l for l in all_listings if l.compat_score is not None and l.compat_score >= compat_min]
+            except ValueError:
+                pass
+
+        paginator = Paginator(all_listings, 12)
+        page = request.GET.get('page', 1)
+        listings = paginator.get_page(page)
+    else:
+        # Anonymous or no profile yet: unchanged DB-level pagination, zero added cost.
+        paginator = Paginator(qs, 12)
+        page = request.GET.get('page', 1)
+        listings = paginator.get_page(page)
 
     favorite_ids = set()
     if request.user.is_authenticated:
@@ -185,6 +211,8 @@ def room_detail(request, pk):
     my_application = None
     is_own_listing = False
     is_favorited = False
+    has_profile = False
+    compatibility = None
     if request.user.is_authenticated:
         is_own_listing = listing.poster_id == request.user.id
         my_application = Application.objects.filter(listing=listing, seeker=request.user).first()
@@ -195,6 +223,13 @@ def room_detail(request, pk):
         )
         is_favorited = Favorite.objects.filter(user=request.user, listing=listing).exists()
 
+        if not is_own_listing:
+            from compatibility_app.scoring import get_or_compute_score
+
+            profile = getattr(request.user, 'lifestyle_profile', None)
+            has_profile = profile is not None
+            compatibility = get_or_compute_score(request.user, profile, listing)
+
     return render(request, 'listings_app/room_detail.html', {
         'listing':        listing,
         'reviews':        reviews,
@@ -203,6 +238,8 @@ def room_detail(request, pk):
         'my_application': my_application,
         'is_own_listing': is_own_listing,
         'is_favorited':   is_favorited,
+        'has_profile':    has_profile,
+        'compatibility':  compatibility,
     })
 
 
