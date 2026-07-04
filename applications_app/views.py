@@ -142,7 +142,17 @@ def apply_to_listing(request, pk):
     if not message:
         return JsonResponse({'error': 'A message is required'}, status=400)
 
-    application = Application.objects.create(listing=listing, seeker=request.user, message=message)
+    from compatibility_app.scoring import get_or_compute_score
+
+    profile = getattr(request.user, 'lifestyle_profile', None)
+    compat_row = get_or_compute_score(request.user, profile, listing)
+    # Frozen at creation time, same as message/applied_at — later profile or
+    # listing edits update the live CompatibilityScore cache but never this value.
+    compatibility = compat_row.overall_score if compat_row else None
+
+    application = Application.objects.create(
+        listing=listing, seeker=request.user, message=message, compatibility=compatibility,
+    )
     return JsonResponse({'ok': True, 'application_id': application.pk})
 
 
