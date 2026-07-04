@@ -182,9 +182,9 @@ function nmWithdraw(pk, btn) {
 }
 
 /* ─────────────────────────────────────────
-   Download Agreement (simulated)
+   Download Agreement (demo card — no backing Application row)
 ───────────────────────────────────────── */
-function nmDownloadAgreement(btn, title) {
+function nmDownloadAgreementDemo(btn, title) {
   var orig  = btn.innerHTML;
   btn.innerHTML = '⏳ Generating…';
   btn.disabled  = true;
@@ -193,4 +193,40 @@ function nmDownloadAgreement(btn, title) {
     btn.disabled  = false;
     nmToast('Agreement for “' + title + '” downloaded!', 'success');
   }, 1800);
+}
+
+/* ─────────────────────────────────────────
+   Generate Agreement (real) — generates the agreement, then
+   reloads so the server re-renders the card with a real
+   "View & Sign Agreement" link, rather than jumping straight
+   to a PDF download (the seeker needs to reach the view page
+   to sign it, same as the poster-side flow).
+───────────────────────────────────────── */
+function nmDownloadAgreement(btn, title, applicationPk) {
+  var orig = btn.innerHTML;
+  btn.innerHTML = '⏳ Generating…';
+  btn.disabled = true;
+
+  var csrf = getCookie('csrftoken');
+  fetch('/agreements/application/' + applicationPk + '/generate/', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrf || '' }
+  })
+    .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+    .then(function (result) {
+      if (result.ok) {
+        window.location.reload();
+      } else {
+        console.error('Agreement generation failed:', result.data);
+        nmToast('Could not generate agreement — please try again.', 'error');
+        btn.innerHTML = orig;
+        btn.disabled = false;
+      }
+    })
+    .catch(function (err) {
+      console.error('Agreement network error:', err);
+      nmToast('Network error — check your connection.', 'error');
+      btn.innerHTML = orig;
+      btn.disabled = false;
+    });
 }
