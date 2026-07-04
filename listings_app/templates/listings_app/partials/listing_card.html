@@ -1,32 +1,60 @@
-<div class="flex flex-col bg-white shadow-[0_4px_12px_rgba(0,0,0,0.06)] border border-slate-100 rounded-2xl overflow-hidden">
-  <a href="{% url 'listings_app:room_detail' listing.pk %}"
-     class="block overflow-hidden cursor-pointer">
+{% load icons %}
+{% load listing_extras %}
+<div class="group flex flex-col bg-white shadow-[0_2px_10px_rgba(0,0,0,0.05)] hover:shadow-[0_16px_32px_rgba(0,0,0,0.10)] border border-slate-100 rounded-2xl overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1">
 
-    <div class="relative h-[190px] overflow-hidden {% if listing.listing_type == 'full_apartment' %}bg-gradient-to-br from-emerald-200 to-emerald-300{% elif listing.listing_type == 'roommate_wanted' %}bg-gradient-to-br from-yellow-200 to-amber-400{% elif listing.listing_type == 'shared_bed' %}bg-gradient-to-br from-teal-100 to-emerald-200{% else %}bg-gradient-to-br from-violet-100 to-purple-200{% endif %}">
+  <div class="relative h-[190px] overflow-hidden {% if listing.listing_type == 'full_apartment' %}bg-gradient-to-br from-emerald-200 to-emerald-300{% elif listing.listing_type == 'roommate_wanted' %}bg-gradient-to-br from-yellow-200 to-amber-400{% elif listing.listing_type == 'shared_bed' %}bg-gradient-to-br from-teal-100 to-emerald-200{% else %}bg-gradient-to-br from-violet-100 to-purple-200{% endif %}">
+    <a href="{% url 'listings_app:room_detail' listing.pk %}" class="block w-full h-full cursor-pointer">
       {% with fi=listing.images.first %}
         {% if fi %}
-          <img src="{{ fi.image.url }}" alt="{{ listing.title }}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500 ease-in-out" loading="lazy" onerror="this.style.display='none'">
+          <img src="{{ fi.image.url }}" alt="{{ listing.title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-in-out" loading="lazy" onerror="this.style.display='none'">
         {% endif %}
       {% endwith %}
-      <div class="top-2 left-2 absolute bg-white/95 px-2.5 py-1 rounded-full font-semibold text-[11px] text-slate-900">
-        {% if listing.listing_type == 'private_room' %}🛏️ Private Room
-        {% elif listing.listing_type == 'full_apartment' %}🏠 Full Apartment
-        {% elif listing.listing_type == 'shared_bed' %}🛌 Shared Room
-        {% else %}👥 Roommate Wanted{% endif %}
-      </div>
-      <div class="top-2 right-2 absolute bg-emerald-500 px-2.5 py-1 rounded-full font-semibold text-[11px] text-white">Available</div>
+      <div class="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+    </a>
+
+    <div class="top-2.5 left-2.5 absolute bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-full font-semibold text-[11px] text-slate-900 flex items-center gap-1 shadow-sm pointer-events-none">
+      {% if listing.listing_type == 'private_room' %}{% icon 'bed' size=13 %} Private Room
+      {% elif listing.listing_type == 'full_apartment' %}{% icon 'home' size=13 %} Full Apartment
+      {% elif listing.listing_type == 'shared_bed' %}{% icon 'bunk-bed' size=13 %} Shared Room
+      {% else %}{% icon 'people' size=13 %} Roommate Wanted{% endif %}
     </div>
 
+    <!-- Favorite heart -->
+    {% if user.is_authenticated %}
+    {% with is_fav=listing.pk|in_favorites:favorite_ids %}
+    <form method="POST" action="{% url 'listings_app:toggle_favorite' listing.pk %}" class="nm-fav-form absolute top-2.5 right-2.5 z-10">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button type="submit"
+              aria-label="Toggle favorite"
+              onclick="return nmToggleFavForm(event, this)"
+              data-favorited="{% if is_fav %}1{% else %}0{% endif %}"
+              class="nm-fav-btn w-8 h-8 rounded-full bg-white/95 backdrop-blur-sm shadow-sm flex items-center justify-center transition-transform duration-150 ease-out hover:scale-110 active:scale-90 {% if is_fav %}text-rose-500{% else %}text-slate-400{% endif %}">
+        {% icon 'heart' size=15 filled=is_fav %}
+      </button>
+    </form>
+    {% endwith %}
+    {% else %}
+    <a href="/auth/login/" title="Login to save favorites"
+       class="absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full bg-white/95 backdrop-blur-sm shadow-sm flex items-center justify-center text-slate-400 hover:text-rose-500 hover:scale-110 active:scale-90 transition-transform duration-150 ease-out">
+      {% icon 'heart' size=15 %}
+    </a>
+    {% endif %}
+
+    <div class="bottom-2.5 left-2.5 absolute bg-emerald-500 px-2.5 py-1 rounded-full font-semibold text-[11px] text-white shadow-sm pointer-events-none">Available</div>
+  </div>
+
+  <a href="{% url 'listings_app:room_detail' listing.pk %}" class="block cursor-pointer">
     <div class="p-4">
-      <div class="mb-1 font-bold text-[15px] text-slate-900">{{ listing.title }}</div>
-      <div class="mb-2 text-[12px] text-slate-500">📍 {{ listing.city }}{% if listing.district %} · {{ listing.district }}{% endif %}</div>
+      <div class="mb-1 font-bold text-[15px] text-slate-900 group-hover:text-violet-700 transition-colors duration-200 truncate">{{ listing.title }}</div>
+      <div class="mb-2 text-[12px] text-slate-500 flex items-center gap-1">{% icon 'map-pin' size=12 %} {{ listing.city }}{% if listing.district %} · {{ listing.district }}{% endif %}</div>
       <div class="mb-3 font-extrabold text-[19px] text-violet-600">${{ listing.price|floatformat:0 }}<span class="font-medium text-[12px] text-slate-500">/mo</span></div>
 
       {% if listing.compat_score %}
         {% if listing.compat_score >= 80 %}
           <div class="bg-emerald-50 mb-3 px-3 py-2.5 border border-emerald-200 rounded-[10px]">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-              <span class="font-semibold text-[12px] text-emerald-700">🤖 {{ listing.compat_score }}% Compatible</span>
+              <span class="font-semibold text-[12px] text-emerald-700 flex items-center gap-1">{% icon 'sparkle' size=12 %} {{ listing.compat_score }}% Compatible</span>
               <span class="bg-emerald-100 px-2 py-0.5 rounded-full font-semibold text-[11px] text-emerald-700">Excellent</span>
             </div>
             <div class="bg-emerald-200 rounded-full h-1 overflow-hidden"><div class="bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full h-full" style="width: {{ listing.compat_score }}%"></div></div>
@@ -34,7 +62,7 @@
         {% elif listing.compat_score >= 60 %}
           <div class="bg-amber-50 mb-3 px-3 py-2.5 border border-amber-200 rounded-[10px]">
             <div class="flex justify-between items-center gap-2 mb-1">
-              <span class="font-semibold text-[12px] text-amber-700">🤖 {{ listing.compat_score }}% Compatible</span>
+              <span class="font-semibold text-[12px] text-amber-700 flex items-center gap-1">{% icon 'sparkle' size=12 %} {{ listing.compat_score }}% Compatible</span>
               <span class="bg-amber-100 px-2 py-0.5 rounded-full font-semibold text-[11px] text-amber-700">Good</span>
             </div>
             <div class="bg-amber-200 rounded-full h-1 overflow-hidden"><div class="bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full h-full" style="width: {{ listing.compat_score }}%"></div></div>
@@ -42,7 +70,7 @@
         {% else %}
           <div class="bg-rose-50 mb-3 px-3 py-2.5 border border-rose-200 rounded-[10px]">
             <div class="flex justify-between items-center gap-2 mb-1">
-              <span class="font-semibold text-[12px] text-rose-700">🤖 {{ listing.compat_score }}% Compatible</span>
+              <span class="font-semibold text-[12px] text-rose-700 flex items-center gap-1">{% icon 'sparkle' size=12 %} {{ listing.compat_score }}% Compatible</span>
               <span class="bg-rose-100 px-2 py-0.5 rounded-full font-semibold text-[11px] text-rose-700">Low</span>
             </div>
             <div class="bg-rose-200 rounded-full h-1 overflow-hidden"><div class="bg-gradient-to-r from-rose-500 to-rose-400 rounded-full h-full" style="width: {{ listing.compat_score }}%"></div></div>
@@ -51,27 +79,27 @@
       {% else %}
         <div class="bg-slate-50 mb-3 px-3 py-2.5 border border-slate-200 rounded-[10px] text-center">
           {% if user.is_authenticated %}
-            <span class="text-[12px] text-slate-400">🤖 Calculating match…</span>
+            <span class="text-[12px] text-slate-400 inline-flex items-center gap-1">{% icon 'sparkle' size=12 %} Calculating match…</span>
           {% else %}
             <a href="/auth/" class="font-semibold text-[12px] text-violet-600">Login to see match score</a>
           {% endif %}
         </div>
       {% endif %}
 
-      <div class="flex justify-between items-center gap-3">
+      <div class="flex justify-between items-center gap-3 pt-3 border-t border-slate-100">
         <div class="flex flex-wrap gap-2">
           {% if listing.no_smoking %}
-            <span class="text-[11px] text-slate-500">🚭 No Smoke</span>
+            <span class="text-[11px] text-slate-500 inline-flex items-center gap-1">{% icon 'cigarette-ban' size=12 %} No Smoke</span>
           {% else %}
-            <span class="text-[11px] text-slate-500">🚬 Smoking OK</span>
+            <span class="text-[11px] text-slate-500 inline-flex items-center gap-1">{% icon 'cigarette' size=12 %} Smoking OK</span>
           {% endif %}
           {% if listing.pets_allowed %}
-            <span class="text-[11px] text-slate-500">🐾 Pets OK</span>
+            <span class="text-[11px] text-slate-500 inline-flex items-center gap-1">{% icon 'paw' size=12 %} Pets OK</span>
           {% else %}
-            <span class="text-[11px] text-slate-500">❌ No Pets</span>
+            <span class="text-[11px] text-slate-500 inline-flex items-center gap-1">{% icon 'ban' size=12 %} No Pets</span>
           {% endif %}
         </div>
-        <span class="text-[11px] text-slate-400">👥 {{ listing.max_occupants }}</span>
+        <span class="text-[11px] text-slate-400 inline-flex items-center gap-1">{% icon 'people' size=12 %} {{ listing.max_occupants }}</span>
       </div>
     </div>
   </a>

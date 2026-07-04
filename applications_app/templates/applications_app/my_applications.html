@@ -63,19 +63,19 @@
   <!-- ── Stats ── -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
     <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
-      <div class="text-2xl font-extrabold text-violet-600">{{ total }}</div>
+      <div id="nm-stat-total" class="text-2xl font-extrabold text-violet-600">{{ total }}</div>
       <div class="text-xs text-gray-500 font-medium mt-1">Total</div>
     </div>
     <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
-      <div class="text-2xl font-extrabold text-amber-500">{{ pending }}</div>
+      <div id="nm-stat-pending" class="text-2xl font-extrabold text-amber-500">{{ pending }}</div>
       <div class="text-xs text-gray-500 font-medium mt-1">Pending</div>
     </div>
     <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
-      <div class="text-2xl font-extrabold text-emerald-500">{{ accepted }}</div>
+      <div id="nm-stat-accepted" class="text-2xl font-extrabold text-emerald-500">{{ accepted }}</div>
       <div class="text-xs text-gray-500 font-medium mt-1">Accepted</div>
     </div>
     <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
-      <div class="text-2xl font-extrabold text-red-500">{{ rejected }}</div>
+      <div id="nm-stat-rejected" class="text-2xl font-extrabold text-red-500">{{ rejected }}</div>
       <div class="text-xs text-gray-500 font-medium mt-1">Rejected</div>
     </div>
   </div>
@@ -84,19 +84,19 @@
   <div id="nm-tabs" class="flex gap-2 mb-5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden">
     <button onclick="nmAppTab(this,'all')"
       class="nm-tab shrink-0 px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all duration-200 cursor-pointer bg-violet-600 text-white border-violet-600">
-      All ({{ total }})
+      All (<span id="nm-tab-total">{{ total }}</span>)
     </button>
     <button onclick="nmAppTab(this,'pending')"
       class="nm-tab shrink-0 px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all duration-200 cursor-pointer text-gray-500 bg-transparent hover:border-violet-200 hover:text-violet-600">
-      🟡 Pending ({{ pending }})
+      🟡 Pending (<span id="nm-tab-pending">{{ pending }}</span>)
     </button>
     <button onclick="nmAppTab(this,'accepted')"
       class="nm-tab shrink-0 px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all duration-200 cursor-pointer text-gray-500 bg-transparent hover:border-violet-200 hover:text-violet-600">
-      🟢 Accepted ({{ accepted }})
+      🟢 Accepted (<span id="nm-tab-accepted">{{ accepted }}</span>)
     </button>
     <button onclick="nmAppTab(this,'rejected')"
       class="nm-tab shrink-0 px-4 py-2 rounded-lg text-sm font-semibold border border-transparent transition-all duration-200 cursor-pointer text-gray-500 bg-transparent hover:border-violet-200 hover:text-violet-600">
-      🔴 Rejected ({{ rejected }})
+      🔴 Rejected (<span id="nm-tab-rejected">{{ rejected }}</span>)
     </button>
   </div>
 
@@ -343,9 +343,9 @@
             <span class="text-xs text-gray-400">📅 {{ app.applied_at|date:"M j, Y" }}</span>
           </div>
           <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</div>
+            <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</a>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-gray-900">{{ app.listing.poster.get_full_name }}</div>
+              <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="text-xs font-bold text-gray-900 hover:text-violet-600 transition-colors">{{ app.listing.poster.get_full_name }}</a>
               <div class="text-xs text-gray-500">Room Poster · <span class="text-emerald-600 font-semibold">✓ Verified</span></div>
             </div>
           </div>
@@ -388,9 +388,9 @@
             <span class="text-xs text-gray-400">📅 {{ app.applied_at|date:"M j, Y" }}</span>
           </div>
           <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</div>
+            <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-violet-400 to-violet-600">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</a>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-gray-900">{{ app.listing.poster.get_full_name }}</div>
+              <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="text-xs font-bold text-gray-900 hover:text-violet-600 transition-colors">{{ app.listing.poster.get_full_name }}</a>
               <div class="text-xs text-gray-500">Room Poster</div>
             </div>
           </div>
@@ -437,9 +437,9 @@
             <span class="text-xs text-gray-400">📅 {{ app.applied_at|date:"M j, Y" }}</span>
           </div>
           <div class="flex items-center gap-2.5 mt-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-            <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-gray-400 to-gray-500">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</div>
+            <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-extrabold text-white bg-gradient-to-br from-gray-400 to-gray-500">{{ app.listing.poster.first_name|first|upper }}{{ app.listing.poster.last_name|first|upper }}</a>
             <div class="min-w-0">
-              <div class="text-xs font-bold text-gray-400">{{ app.listing.poster.get_full_name }}</div>
+              <a href="{% url 'accounts_app:public_profile' app.listing.poster.pk %}" class="text-xs font-bold text-gray-400 hover:text-violet-600 transition-colors">{{ app.listing.poster.get_full_name }}</a>
               <div class="text-xs text-gray-400">Room Poster</div>
             </div>
           </div>
@@ -461,12 +461,12 @@
 
   <!-- ── Timeline ── -->
   {% if applications %}
-  <div class="mt-10">
+  <div id="nm-timeline-section" class="mt-10">
     <div class="text-sm font-bold text-gray-900 mb-3">Application Timeline</div>
     <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-      <div class="flex flex-col">
+      <div id="nm-timeline-list" class="flex flex-col">
         {% for app in applications %}
-        <div class="relative flex gap-4 {% if not forloop.last %}pb-5{% endif %}">
+        <div {% if not is_demo %}data-timeline-pk="{{ app.pk }}"{% endif %} class="relative flex gap-4 {% if not forloop.last %}pb-5{% endif %}">
           {% if not forloop.last %}
           <div class="absolute left-[4px] top-4 bottom-0 w-0.5 bg-gray-100"></div>
           {% endif %}
@@ -571,6 +571,6 @@
 </style>
 
 {% if not is_demo %}<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">{% endif %}
-<script src="{% static 'applications_app/js/my_applications.js' %}"></script>
+<script src="{% static 'applications_app/js/my_applications.js' %}?v={% now 'U' %}"></script>
 </body>
 </html>

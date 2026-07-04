@@ -134,16 +134,17 @@ def profile_view(request):
     # so this can legitimately be None — the template handles that case.
     lifestyle_profile = LifestyleProfile.objects.filter(user=user).first()
 
-    # Simple completeness score: personal info fields (out of 4 "nice to have"
-    # fields beyond the required ones) + whether a lifestyle profile exists at all.
-    # This replaces the previously hardcoded "72%" in the template.
-    optional_fields_filled = sum([
-        bool(user.phone_number),
-        bool(user.bio),
-        bool(user.profile_pic),
-        lifestyle_profile is not None,
-    ])
-    profile_strength = int((optional_fields_filled / 4) * 100)
+    # Completeness score: photo/bio/phone are each worth 25% (all-or-nothing),
+    # and the last 25% scales with how much of the lifestyle questionnaire is
+    # filled in (LifestyleProfile.completeness_fraction) rather than a flat
+    # "profile exists or not" checkbox — so filling in more of the extended
+    # preference fields visibly moves the needle.
+    lifestyle_completeness = lifestyle_profile.completeness_fraction if lifestyle_profile else 0.0
+    lifestyle_fields_filled = lifestyle_profile.fields_filled_count if lifestyle_profile else 0
+    lifestyle_fields_total = len(LifestyleProfile.ALL_PREFERENCE_FIELDS)
+    profile_strength = round(100 * (
+        (bool(user.profile_pic) + bool(user.bio) + bool(user.phone_number) + lifestyle_completeness) / 4
+    ))
 
     documents = {d.document_type: d for d in user.verification_documents.all()}
     verification_cards = [
@@ -163,6 +164,9 @@ def profile_view(request):
         'countries': User.COUNTRY_CHOICES,
         'lifestyle_profile': lifestyle_profile,
         'profile_strength': profile_strength,
+        'lifestyle_completeness_pct': round(lifestyle_completeness * 100),
+        'lifestyle_fields_filled': lifestyle_fields_filled,
+        'lifestyle_fields_total': lifestyle_fields_total,
         'sleep_time_choices': LifestyleProfile.SLEEP_TIME_CHOICES,
         'wake_time_choices': LifestyleProfile.WAKE_TIME_CHOICES,
         'noise_level_choices': LifestyleProfile.NOISE_LEVEL_CHOICES,
@@ -172,6 +176,13 @@ def profile_view(request):
         'religion_choices': LifestyleProfile.RELIGION_CHOICES,
         'field_choices': LifestyleProfile.FIELD_CHOICES,
         'smoking_choices': LifestyleProfile.SMOKING_CHOICES,
+        'roommate_gender_pref_choices': LifestyleProfile.ROOMMATE_GENDER_PREF_CHOICES,
+        'dietary_choices': LifestyleProfile.DIETARY_CHOICES,
+        'guest_tolerance_choices': LifestyleProfile.GUEST_TOLERANCE_CHOICES,
+        'tenant_type_choices': LifestyleProfile.TENANT_TYPE_CHOICES,
+        'household_lang_pref_choices': LifestyleProfile.HOUSEHOLD_LANG_PREF_CHOICES,
+        'min_stay_pref_choices': LifestyleProfile.MIN_STAY_PREF_CHOICES,
+        'listing_type_pref_choices': LifestyleProfile.LISTING_TYPE_PREF_CHOICES,
         'user_reviews': Testimonial.objects.filter(user=user).order_by('-created_at'),
         'review_section_heading': 'Write a review',
         'rental_contract_doc': rental_contract_doc,
@@ -181,6 +192,36 @@ def profile_view(request):
         'contract_docs': contract_docs,
     }
     return render(request, 'profile.html', context)
+
+
+@login_required
+def public_profile_view(request, user_id):
+    """
+    Read-only profile page for viewing ANOTHER user — a poster checking
+    out a seeker who applied to their room, or a seeker checking out the
+    poster before applying. No edit forms, no security tab, no email/phone
+    (those stay private to the profile owner).
+    """
+    profile_user = get_object_or_404(User, pk=user_id)
+
+    # Viewing your own public profile link just sends you to the real
+    # (editable) profile page instead of a read-only mirror of it.
+    if profile_user.pk == request.user.pk:
+        return redirect('accounts_app:profile')
+
+    lifestyle_profile = LifestyleProfile.objects.filter(user=profile_user).first()
+    active_listings = profile_user.listings.filter(status='active').prefetch_related('images').order_by('-created_at')
+    listing_count = active_listings.count()
+    shown_listings = active_listings[:4]
+
+    context = {
+        'profile_user': profile_user,
+        'lifestyle_profile': lifestyle_profile,
+        'listing_count': listing_count,
+        'active_listings': shown_listings,
+        'more_listings_count': max(0, listing_count - len(shown_listings)),
+    }
+    return render(request, 'public_profile.html', context)
 
 
 @login_required

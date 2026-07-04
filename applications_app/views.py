@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
@@ -87,13 +88,24 @@ def _build_demo_apps():
     return apps
 
 
+def _application_stats(user):
+    apps = Application.objects.filter(seeker=user)
+    return {
+        'total':    apps.count(),
+        'pending':  apps.filter(status=Application.STATUS_PENDING).count(),
+        'accepted': apps.filter(status=Application.STATUS_ACCEPTED).count(),
+        'rejected': apps.filter(status=Application.STATUS_REJECTED).count(),
+    }
+
+
 def my_applications(request):
     if request.user.is_authenticated:
         apps     = Application.objects.filter(seeker=request.user).select_related('listing', 'listing__poster').prefetch_related('listing__images')
-        total    = apps.count()
-        pending  = apps.filter(status=Application.STATUS_PENDING).count()
-        accepted = apps.filter(status=Application.STATUS_ACCEPTED).count()
-        rejected = apps.filter(status=Application.STATUS_REJECTED).count()
+        stats    = _application_stats(request.user)
+        total    = stats['total']
+        pending  = stats['pending']
+        accepted = stats['accepted']
+        rejected = stats['rejected']
         is_demo  = False
     else:
         apps     = _build_demo_apps()
@@ -114,6 +126,37 @@ def my_applications(request):
 
 
 @require_POST
+def apply_to_listing(request, pk):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Login required'}, status=401)
+
+    listing = get_object_or_404(Listing, pk=pk, status='active')
+
+    if listing.poster_id == request.user.id:
+        return JsonResponse({'error': 'You cannot apply to your own listing'}, status=400)
+
+    if Application.objects.filter(listing=listing, seeker=request.user).exists():
+        return JsonResponse({'error': 'You have already applied to this listing'}, status=400)
+
+    message = request.POST.get('message', '').strip()
+    if not message:
+        return JsonResponse({'error': 'A message is required'}, status=400)
+
+    from compatibility_app.scoring import get_or_compute_score
+
+    profile = getattr(request.user, 'lifestyle_profile', None)
+    compat_row = get_or_compute_score(request.user, profile, listing)
+    # Frozen at creation time, same as message/applied_at — later profile or
+    # listing edits update the live CompatibilityScore cache but never this value.
+    compatibility = compat_row.overall_score if compat_row else None
+
+    application = Application.objects.create(
+        listing=listing, seeker=request.user, message=message, compatibility=compatibility,
+    )
+    return JsonResponse({'ok': True, 'application_id': application.pk})
+
+
+@require_POST
 def withdraw_application(request, pk):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Login required'}, status=401)
@@ -124,4 +167,52 @@ def withdraw_application(request, pk):
         return JsonResponse({'error': 'Only pending applications can be withdrawn'}, status=400)
 
     app.delete()
-    return JsonResponse({'ok': True})
+    return JsonResponse({'ok': True, 'stats': _application_stats(request.user)})
+
+
+# ── Poster-facing: applicants for a listing ──────────────────────────────────
+
+def _listing_application_stats(listing):
+    apps = Application.objects.filter(listing=listing)
+    return {
+        'total':    apps.count(),
+        'pending':  apps.filter(status=Application.STATUS_PENDING).count(),
+        'accepted': apps.filter(status=Application.STATUS_ACCEPTED).count(),
+        'rejected': apps.filter(status=Application.STATUS_REJECTED).count(),
+    }
+
+
+@login_required
+def listing_applicants(request, pk):
+    listing = get_object_or_404(Listing, pk=pk, poster=request.user)
+    apps = (
+        Application.objects
+        .filter(listing=listing)
+        .select_related('seeker')
+        .order_by('-applied_at')
+    )
+    return render(request, 'applications_app/listing_applicants.html', {
+        'listing':      listing,
+        'applications': apps,
+        'stats':        _listing_application_stats(listing),
+    })
+
+
+@login_required
+@require_POST
+def accept_application(request, pk):
+    app = get_object_or_404(Application, pk=pk, listing__poster=request.user)
+    app.status = Application.STATUS_ACCEPTED
+    app.poster_note = request.POST.get('poster_note', '').strip()
+    app.save(update_fields=['status', 'poster_note', 'updated_at'])
+    return JsonResponse({'ok': True, 'stats': _listing_application_stats(app.listing)})
+
+
+@login_required
+@require_POST
+def reject_application(request, pk):
+    app = get_object_or_404(Application, pk=pk, listing__poster=request.user)
+    app.status = Application.STATUS_REJECTED
+    app.poster_note = request.POST.get('poster_note', '').strip()
+    app.save(update_fields=['status', 'poster_note', 'updated_at'])
+    return JsonResponse({'ok': True, 'stats': _listing_application_stats(app.listing)})

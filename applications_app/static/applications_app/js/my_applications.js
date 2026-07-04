@@ -113,6 +113,29 @@ function nmWithdrawDemo(btn, title) {
 }
 
 /* ─────────────────────────────────────────
+   Timeline + stats sync after withdraw
+───────────────────────────────────────── */
+function nmRemoveTimelineEntry(pk) {
+  var row = document.querySelector('[data-timeline-pk="' + pk + '"]');
+  if (row) row.remove();
+
+  var list = document.getElementById('nm-timeline-list');
+  var section = document.getElementById('nm-timeline-section');
+  if (list && section && !list.children.length) section.remove();
+}
+
+function nmUpdateStats(stats) {
+  if (!stats) return;
+  var fields = ['total', 'pending', 'accepted', 'rejected'];
+  fields.forEach(function (key) {
+    var stat = document.getElementById('nm-stat-' + key);
+    var tab  = document.getElementById('nm-tab-' + key);
+    if (stat) stat.textContent = stats[key];
+    if (tab)  tab.textContent  = stats[key];
+  });
+}
+
+/* ─────────────────────────────────────────
    Withdraw — real DB users
 ───────────────────────────────────────── */
 function nmWithdraw(pk, btn) {
@@ -131,14 +154,22 @@ function nmWithdraw(pk, btn) {
       headers: { 'X-CSRFToken': csrf || '' }
     })
       .then(function (r) {
+        return r.json().then(function (data) { return { ok: r.ok, status: r.status, data: data }; });
+      })
+      .then(function (result) {
         nmCloseWithdraw();
-        if (r.ok) {
+        if (result.ok) {
+          if (result.data.stats && result.data.stats.total === 0) {
+            nmToast('Application withdrawn successfully.', 'info');
+            setTimeout(function () { window.location.reload(); }, 500);
+            return;
+          }
           nmRemoveCard(card);
+          nmRemoveTimelineEntry(pk);
+          nmUpdateStats(result.data.stats);
           nmToast('Application withdrawn successfully.', 'info');
         } else {
-          r.text().then(function (body) {
-            console.error('Withdraw failed:', r.status, body);
-          });
+          console.error('Withdraw failed:', result.status, result.data);
           nmToast('Could not withdraw — please try again.', 'error');
         }
       })

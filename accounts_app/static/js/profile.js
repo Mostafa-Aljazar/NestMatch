@@ -7,34 +7,6 @@
 // ===========================================================================
 // 1. TAB NAVIGATION
 // ===========================================================================
-// const tabButtons = document.querySelectorAll('.tab-nav-btn');
-// const tabPanels = {
-//   info:      document.getElementById('tab-info'),
-//   lifestyle: document.getElementById('tab-lifestyle'),
-//   security:  document.getElementById('tab-security'),
-//   reviews:   document.getElementById('tab-reviews'),
-//   verification: document.getElementById('tab-verification'),
-// };
-
-// tabButtons.forEach((button) => {
-//   button.addEventListener('click', () => {
-//     tabButtons.forEach((btn) => btn.classList.remove('active'));
-//     Object.values(tabPanels).forEach((p) => p.classList.add('hidden'));
-//     button.classList.add('active');
-//     const target = button.dataset.tab;
-//     const panel = tabPanels[target];
-//     if (panel) {
-//       panel.classList.remove('hidden');
-//       panel.classList.remove('tab-panel');
-//       void panel.offsetWidth;
-//       panel.classList.add('tab-panel');
-//     }
-//     button.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-//   });
-// });
-// ===========================================================================
-// 1. TAB NAVIGATION
-// ===========================================================================
 const tabButtons = document.querySelectorAll('.tab-nav-btn');
 const tabPanels = {
   info:      document.getElementById('tab-info'),
@@ -118,33 +90,59 @@ let _pendingAvatarSrc = null;
 // ===========================================================================
 // 4. PROFILE STRENGTH
 // ===========================================================================
+const lifestyleFieldsTotal = parseInt(document.getElementById('strength-lifestyle-total')?.dataset.value || '0', 10);
+
 const strengthState = {
-  hasPhone:        document.getElementById('strength-has-phone')?.dataset.value === 'true',
-  hasPhoto:        document.getElementById('strength-has-photo')?.dataset.value === 'true',
-  hasLifestyle:    document.getElementById('strength-has-lifestyle')?.dataset.value === 'true',
+  hasPhone:          document.getElementById('strength-has-phone')?.dataset.value === 'true',
   hasVerification: document.getElementById('strength-has-verification')?.dataset.value === 'true',
+  hasPhoto:          document.getElementById('strength-has-photo')?.dataset.value === 'true',
+  // Fraction (0.0-1.0), not a boolean — a partially-filled lifestyle
+  // questionnaire should move the needle, not just an all-or-nothing check.
+  lifestyleFraction: lifestyleFieldsTotal
+    ? parseInt(document.getElementById('strength-lifestyle-filled')?.dataset.value || '0', 10) / lifestyleFieldsTotal
+    : 0,
 };
 
+// Recomputes strengthState.lifestyleFraction by counting how many of the
+// lifestyle form's own hidden inputs currently hold a non-empty value —
+// mirrors LifestyleProfile.completeness_fraction server-side without
+// duplicating the field list, since the form's hidden inputs already
+// enumerate exactly those fields.
+function recalcLifestyleFraction() {
+  const form = document.getElementById('lifestyle-form');
+  if (!form || !lifestyleFieldsTotal) return;
+  const inputs = form.querySelectorAll('input[type="hidden"]:not([name="csrfmiddlewaretoken"])');
+  const filled = Array.from(inputs).filter((el) => el.value !== '').length;
+  strengthState.lifestyleFraction = Math.min(1, filled / lifestyleFieldsTotal);
+  const fractionLabel = document.getElementById('lifestyle-fields-fraction');
+  if (fractionLabel) fractionLabel.textContent = `(${filled}/${lifestyleFieldsTotal})`;
+}
+
 function recalcStrength() {
-  const filled = Object.values(strengthState).filter(Boolean).length;
-  const pct = Math.round((filled / 4) * 100);
+  const boolItems = [strengthState.hasPhone, strengthState.hasBio, strengthState.hasPhoto].filter(Boolean).length;
+  const pct = Math.round(((boolItems + strengthState.lifestyleFraction) / 4) * 100);
   if (profileStrengthValueHeader) profileStrengthValueHeader.textContent = `${pct}%`;
   if (profileStrengthBarHeader)   profileStrengthBarHeader.style.width   = `${pct}%`;
 
   document.querySelectorAll('.strength-check').forEach((item) => {
-    const key  = item.dataset.key;
-    const done = !!strengthState[key];
+    const key = item.dataset.key;
+    // hasLifestyle is "done" once the fraction is complete (or nearly so);
+    // partial progress still shows a partially-filled ring rather than a
+    // hard on/off state, using the same emerald palette at reduced opacity.
+    const done = key === 'hasLifestyle' ? strengthState.lifestyleFraction >= 1 : !!strengthState[key];
+    const partial = key === 'hasLifestyle' && strengthState.lifestyleFraction > 0 && strengthState.lifestyleFraction < 1;
     const icon = item.querySelector('.check-icon');
-    item.classList.toggle('text-slate-500', !done);
-    item.classList.toggle('text-slate',     done);
+    item.classList.toggle('text-slate-500', !done && !partial);
+    item.classList.toggle('text-slate',     done || partial);
     if (icon) {
-      icon.classList.toggle('border-slate-300',   !done);
-      icon.classList.toggle('bg-white',           !done);
-
+      icon.classList.toggle('border-slate-300',   !done && !partial);
+      icon.classList.toggle('bg-white',           !done && !partial);
       icon.classList.toggle('border-emerald-500',  done);
       icon.classList.toggle('bg-emerald-500',      done);
-      icon.classList.toggle('text-white',          done);
-      icon.textContent = done ? '✓' : '';
+      icon.classList.toggle('border-amber-400',    partial);
+      icon.classList.toggle('bg-amber-400',        partial);
+      icon.classList.toggle('text-white',          done || partial);
+      icon.textContent = done ? '✓' : (partial ? '·' : '');
     }
     // النص لما يكون مكتمل يصير أبهت
     item.classList.toggle('text-white/50', done);
@@ -367,7 +365,7 @@ async function submitAjaxForm(form) {
             strengthState.hasPhoto = true;
           }
         }
-        if (form.id === 'lifestyle-form') strengthState.hasLifestyle = true;
+        if (form.id === 'lifestyle-form') recalcLifestyleFraction();
         recalcStrength();
         showFormFeedback(form, data.message || 'Saved successfully.', false);
         form.querySelectorAll('input[type="password"]').forEach((el) => (el.value = ''));

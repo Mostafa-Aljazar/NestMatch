@@ -239,15 +239,15 @@
                 Member since {{ user_obj.created_at|date:"F Y" }}
               </p>
               <div class="mt-3 flex flex-wrap items-center gap-2">
-                {% if user_obj.is_active %}
-                <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-200">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z"/>
-                    <path d="M9 12l2 2 4-4"/>
-                  </svg>
-                  Verified
-                </span>
-                {% endif %}
+                {% if user_obj.is_id_verified %}
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-200">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z"/>
+                      <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                    Verified
+                  </span>
+                  {% endif %}
                 {% if user_obj.gender %}
                 <span class="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -291,8 +291,8 @@
               </li>
               <li class="strength-check flex items-center gap-2.5 text-xs text-white/90" data-key="hasLifestyle">
                 <span class="check-icon flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-[9px] leading-none text-white"></span>
-                Lifestyle profile
-              </li>          
+                <span>Lifestyle profile <span id="lifestyle-fields-fraction" class="text-white/60">({{ lifestyle_fields_filled }}/{{ lifestyle_fields_total }})</span></span>
+              </li>
             </ul>
           </div>
 
@@ -540,6 +540,17 @@
               <input type="hidden" name="field"               id="input-field"               value="{{ lifestyle_profile.field|default:'' }}" />
               <input type="hidden" name="cooking"             id="input-cooking"             value="{% if lifestyle_profile.cooking %}true{% else %}false{% endif %}" />
               <input type="hidden" name="pets"                id="input-pets"                value="{% if lifestyle_profile.pets %}true{% else %}false{% endif %}" />
+              <input type="hidden" name="roommate_gender_pref"     id="input-roommate_gender_pref"     value="{{ lifestyle_profile.roommate_gender_pref|default:'' }}" />
+              <input type="hidden" name="dietary"                  id="input-dietary"                  value="{{ lifestyle_profile.dietary|default:'' }}" />
+              <input type="hidden" name="guest_tolerance"          id="input-guest_tolerance"          value="{{ lifestyle_profile.guest_tolerance|default:'' }}" />
+              <input type="hidden" name="tenant_type"              id="input-tenant_type"              value="{{ lifestyle_profile.tenant_type|default:'' }}" />
+              <input type="hidden" name="household_lang_pref"      id="input-household_lang_pref"      value="{{ lifestyle_profile.household_lang_pref|default:'' }}" />
+              <input type="hidden" name="min_stay_pref"            id="input-min_stay_pref"            value="{{ lifestyle_profile.min_stay_pref|default:'' }}" />
+              <input type="hidden" name="listing_type_pref"        id="input-listing_type_pref"        value="{{ lifestyle_profile.listing_type_pref|default:'' }}" />
+              <input type="hidden" name="alcohol_ok"               id="input-alcohol_ok"               value="{% if lifestyle_profile.alcohol_ok %}true{% elif lifestyle_profile.alcohol_ok is not None %}false{% endif %}" />
+              <input type="hidden" name="works_from_home"          id="input-works_from_home"          value="{% if lifestyle_profile.works_from_home %}true{% elif lifestyle_profile.works_from_home is not None %}false{% endif %}" />
+              <input type="hidden" name="wants_furnished"          id="input-wants_furnished"          value="{% if lifestyle_profile.wants_furnished %}true{% elif lifestyle_profile.wants_furnished is not None %}false{% endif %}" />
+              <input type="hidden" name="wants_building_amenities" id="input-wants_building_amenities" value="{% if lifestyle_profile.wants_building_amenities %}true{% elif lifestyle_profile.wants_building_amenities is not None %}false{% endif %}" />
 
               <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
                 <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
@@ -684,6 +695,134 @@
                           class="option-card {% if lifestyle_profile.field == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
                       {% endfor %}
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+                <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v10M9 9.5a2.5 2.5 0 012.5-1.5h1a2.5 2.5 0 010 5h-1a2.5 2.5 0 000 5h1a2.5 2.5 0 002.5-1.5" />
+                  </svg>
+                  Room preferences <span class="font-normal text-slate-400">(required)</span>
+                </h3>
+                <div class="mt-5 space-y-5">
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Monthly budget range</p>
+                    <div class="flex items-center gap-3 max-w-xs">
+                      <input type="number" min="0" name="budget_min" id="input-budget_min" placeholder="Min" required
+                        value="{{ lifestyle_profile.budget_min|default:'' }}"
+                        class="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-700 focus:border-brand-500 focus:outline-none" />
+                      <span class="text-slate-400">–</span>
+                      <input type="number" min="0" name="budget_max" id="input-budget_max" placeholder="Max" required
+                        value="{{ lifestyle_profile.budget_max|default:'' }}"
+                        class="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-700 focus:border-brand-500 focus:outline-none" />
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="budget_min"></p>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="budget_max"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Roommate gender preference</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="roommate_gender_pref">
+                      {% for value, label in roommate_gender_pref_choices %}
+                        <button type="button" data-value="{{ value }}"
+                          class="option-card {% if lifestyle_profile.roommate_gender_pref == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
+                      {% endfor %}
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="roommate_gender_pref"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Dietary preference</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="dietary">
+                      {% for value, label in dietary_choices %}
+                        <button type="button" data-value="{{ value }}"
+                          class="option-card {% if lifestyle_profile.dietary == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
+                      {% endfor %}
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="dietary"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Guests tolerance</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="guest_tolerance">
+                      {% for value, label in guest_tolerance_choices %}
+                        <button type="button" data-value="{{ value }}"
+                          class="option-card {% if lifestyle_profile.guest_tolerance == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
+                      {% endfor %}
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="guest_tolerance"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Are you drinking alcohol?</p>
+                    <div class="bool-toggle grid max-w-xs grid-cols-2 gap-2.5" data-target="alcohol_ok" data-bool="true">
+                      <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.alcohol_ok %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
+                      <button type="button" data-value="false" class="option-card {% if lifestyle_profile.alcohol_ok is not None and not lifestyle_profile.alcohol_ok %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="alcohol_ok"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">I am a</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="tenant_type">
+                      {% for value, label in tenant_type_choices %}
+                        <button type="button" data-value="{{ value }}"
+                          class="option-card {% if lifestyle_profile.tenant_type == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
+                      {% endfor %}
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="tenant_type"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Household language / nationality preference</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="household_lang_pref">
+                      {% for value, label in household_lang_pref_choices %}
+                        <button type="button" data-value="{{ value }}"
+                          class="option-card {% if lifestyle_profile.household_lang_pref == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
+                      {% endfor %}
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="household_lang_pref"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Preferred minimum stay</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="min_stay_pref">
+                      {% for value, label in min_stay_pref_choices %}
+                        <button type="button" data-value="{{ value }}"
+                          class="option-card {% if lifestyle_profile.min_stay_pref == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
+                      {% endfor %}
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="min_stay_pref"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Preferred room type</p>
+                    <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3" data-target="listing_type_pref">
+                      {% for value, label in listing_type_pref_choices %}
+                        <button type="button" data-value="{{ value }}"
+                          class="option-card {% if lifestyle_profile.listing_type_pref == value %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">{{ label }}</button>
+                      {% endfor %}
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="listing_type_pref"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Do you work/study from home?</p>
+                    <div class="bool-toggle grid max-w-xs grid-cols-2 gap-2.5" data-target="works_from_home" data-bool="true">
+                      <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.works_from_home %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
+                      <button type="button" data-value="false" class="option-card {% if lifestyle_profile.works_from_home is not None and not lifestyle_profile.works_from_home %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="works_from_home"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Do you want a fully furnished room?</p>
+                    <div class="bool-toggle grid max-w-xs grid-cols-2 gap-2.5" data-target="wants_furnished" data-bool="true">
+                      <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.wants_furnished %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
+                      <button type="button" data-value="false" class="option-card {% if lifestyle_profile.wants_furnished is not None and not lifestyle_profile.wants_furnished %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="wants_furnished"></p>
+                  </div>
+                  <div>
+                    <p class="mb-2.5 text-sm font-medium text-slate-700">Do you want building amenities (pool, gym, rooftop)?</p>
+                    <div class="bool-toggle grid max-w-xs grid-cols-2 gap-2.5" data-target="wants_building_amenities" data-bool="true">
+                      <button type="button" data-value="true"  class="option-card {% if lifestyle_profile.wants_building_amenities %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">Yes</button>
+                      <button type="button" data-value="false" class="option-card {% if lifestyle_profile.wants_building_amenities is not None and not lifestyle_profile.wants_building_amenities %}selected{% endif %} rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:border-slate-300">No</button>
+                    </div>
+                    <p class="field-error mt-2 text-xs text-rose-600" data-field="wants_building_amenities"></p>
                   </div>
                 </div>
               </div>
@@ -982,8 +1121,11 @@
                     {% elif doc.status == 'rejected' %}
                       <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700">Rejected</span>
                     {% elif doc.status == 'pending' %}
-                      <span class="inline-flex items-center gap-1.5 rounded-full bg-yellow-50 px-3 py-1 text-xs font-semibold text-yellow-700">Pending review</span>
-                    {% else %}
+                      <span class="inline-flex items-center gap-1.5 rounded-full bg-yellow-50 px-3 py-1 text-xs font-semibold text-yellow-700">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
+                      Pending review
+                    </span>
+                  {% else %}
                       <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Not submitted</span>
                     {% endif %}
                   </div>
@@ -1046,12 +1188,13 @@
     </div>
 
     <!-- Hidden strength data spans -->
-    <span id="strength-has-phone"     data-value="{{ user_obj.phone_number|yesno:'true,false' }}" class="hidden"></span>
+    <span id="strength-has-phone"        data-value="{{ user_obj.phone_number|yesno:'true,false' }}" class="hidden"></span>
     <span id="strength-has-verification" data-value="{{ user_obj.is_id_verified|yesno:'true,false' }}" class="hidden"></span>
-    <span id="strength-has-photo"     data-value="{{ user_obj.profile_pic|yesno:'true,false' }}"  class="hidden"></span>
-    <span id="strength-has-lifestyle" data-value="{{ lifestyle_profile|yesno:'true,false' }}"     class="hidden"></span>
+    <span id="strength-has-photo"        data-value="{{ user_obj.profile_pic|yesno:'true,false' }}"  class="hidden"></span>
+    <span id="strength-lifestyle-filled" data-value="{{ lifestyle_fields_filled }}"                  class="hidden"></span>
+    <span id="strength-lifestyle-total"  data-value="{{ lifestyle_fields_total }}"                   class="hidden"></span>
 
     {% include "core_app/partials/footer.html" %}
-    <script src="{% static 'js/profile.js' %}"></script>
+    <script src="{% static 'js/profile.js' %}?v={% now 'U' %}"></script>
   </body>
 </html>
