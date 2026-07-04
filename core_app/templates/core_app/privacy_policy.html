@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — NestMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { font-family: 'Inter', sans-serif; }
+.smooth-scroll { scroll-behavior: smooth; }
+.toc-link {
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+.toc-link.active {
+    border-left-color: #7C3AED;
+    background: rgba(124, 58, 237, 0.08);
+    color: #5B21B6;
+    font-weight: 600;
+}
+.toc-link:hover:not(.active) {
+    background: rgba(124, 58, 237, 0.05);
+    border-left-color: #A78BFA;
+}
+.section-anchor {
+    scroll-margin-top: 100px;
+}
+.gradient-text {
+    background: linear-gradient(135deg, #5B21B6, #7C3AED);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.hero-gradient {
+    background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 50%, #9F67FA 100%);
+}
+.card-hover {
+    transition: all 0.3s ease;
+}
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(124, 58, 237, 0.25);
+}
+.icon-circle {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(91, 33, 182, 0.08));
+}
+.sticky-toc {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+.sticky-toc::-webkit-scrollbar {
+    width: 4px;
+}
+.sticky-toc::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.sticky-toc::-webkit-scrollbar-thumb {
+    background: #7C3AED;
+    border-radius: 10px;
+}
+.last-updated-badge {
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+}
+@media (max-width: 1023px) {
+    .sticky-toc {
+        position: relative;
+        top: 0;
+        max-height: none;
+        overflow-y: visible;
+        margin-bottom: 2rem;
+    }
+}
+</style>
+</head>
+<body class="bg-gray-50 smooth-scroll">
+
+{% include "core_app/partials/navbar.html" %}
+
+<!-- Hero section -->
+<section class="relative overflow-hidden hero-gradient pt-32 pb-20">
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle, white 1.5px, transparent 1.5px); background-size: 32px 32px;"></div>
+    <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/5 blur-3xl"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-white/5 blur-3xl"></div>
+    
+    <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-5">
+            Privacy Policy
+        </h1>
+        
+        <p class="text-lg lg:text-base sm:text-xl text-white/80 leading-relaxed max-w-5xl mx-auto">
+            Your privacy matters to us <br> This policy explains what information NestMatch collects, how our AI uses it to find your ideal roommate, and the controls you have over your data.
+        </p>
+        
+    </div>
+</section>
+
+<!-- ===== MAIN CONTENT ===== -->
+<section class="py-12 md:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-10 lg:gap-16">
+            
+            <!-- ===== TOC - Table of Contents ===== -->
+            <aside class="lg:sticky lg:top-24 lg:self-start">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky-toc">
+                    <p class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                        On this page
+                    </p>
+                    <nav class="space-y-1">
+                        {% for section in sections %}
+                        <a href="#{{ section.id }}" 
+                        class="toc-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all"
+                        data-target="{{ section.id }}">
+                            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-gray-100 text-xs font-bold text-gray-500 group-hover:bg-violet-100 group-hover:text-violet-600 transition-colors">
+                                {{ forloop.counter }}
+                            </span>
+                            <span class="leading-tight">{{ section.title }}</span>
+                        </a>
+                        {% endfor %}
+                    </nav>
+                </div>
+            </aside>
+            
+            <!-- ===== CONTENT ===== -->
+            <article class="max-w-3xl">
+                
+                {% for section in sections %}
+                <!-- Section: {{ section.title }} -->
+                <section id="{{ section.id }}" class="section-anchor scroll-mt-24 border-b border-gray-200 py-8 first:pt-0 last:border-b-0">
+                    
+                    <div class="flex items-center gap-4 mb-5">
+                        <div class="flex items-center justify-center w-11 h-11 rounded-xl icon-circle text-violet-600 ring-1 ring-violet-200/50">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                {% if section.id == 'introduction' %}
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                {% elif section.id == 'information-we-collect' %}
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                                {% elif section.id == 'how-we-use' %}
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                {% elif section.id == 'ai-compatibility' %}
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                {% elif section.id == 'third-party' %}
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                {% elif section.id == 'data-security' %}
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                {% elif section.id == 'your-rights' %}
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                                {% elif section.id == 'contact' %}
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                {% endif %}
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900 tracking-tight">
+                            {{ section.title }}
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4 text-[15px] leading-7 text-gray-600 md:text-base md:leading-8">
+                        {{ section.content|safe }}
+                    </div>
+                </section>
+                {% endfor %}
+                
+                <!-- ===== Bottom CTA ===== -->
+                <div class="mt-12 rounded-2xl bg-gradient-to-br from-violet-50 to-indigo-50 border border-violet-100 p-8 md:p-10 card-hover">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Questions about your privacy?</h3>
+            <p class="text-gray-600 text-sm leading-relaxed max-w-md">
+                Our privacy team is here to help. We'll get back to you within two business days.
+            </p>
+        </div>
+        <a href="/contact/" 
+           class="inline-flex items-center gap-2 shrink-0 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold px-6 py-3.5 transition-all shadow-lg hover:shadow-violet-200/50">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            Contact Us
+        </a>
+    </div>
+</div>
+                
+            </article>
+        </div>
+    </div>
+</section>
+
+{% include "core_app/partials/footer.html" %}
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+    // ===== Active TOC Link on Scroll =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const sections = document.querySelectorAll('.section-anchor');
+        const navLinks = document.querySelectorAll('.toc-link');
+        
+        function updateActiveLink() {
+            let current = '';
+            const scrollPos = window.scrollY + 120;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollPos >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            // If near bottom, highlight last section
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10) {
+                const lastSection = sections[sections.length - 1];
+                if (lastSection) {
+                    current = lastSection.getAttribute('id');
+                }
+            }
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-target') === current) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', updateActiveLink);
+        window.addEventListener('resize', updateActiveLink);
+        updateActiveLink();
+        
+        // ===== Smooth scroll for TOC links =====
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-target');
+                const targetEl = document.getElementById(targetId);
+                if (targetEl) {
+                    const top = targetEl.offsetTop - 100;
+                    window.scrollTo({ top, behavior: 'smooth' });
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -5,4 +5,7 @@ app_name = 'core_app'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('faq/', views.faq, name='faq'),
+    path('contact/', views.contact, name='contact'),
+    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
 ]

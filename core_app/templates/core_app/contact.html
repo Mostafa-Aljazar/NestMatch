@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Contact Us — NestMatch</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    * { font-family: 'Inter', sans-serif; }
+    .input-field {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #111827;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    background: white;
+    }
+    .input-field:focus {
+    border-color: #7C3AED;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+    .input-field::placeholder { color: #9CA3AF; }
+</style>
+</head>
+<body class="bg-gray-50">
+
+{% include "core_app/partials/navbar.html" %}
+
+<!-- HERO -->
+<section class="relative pt-24 pb-16 overflow-hidden" style="background:linear-gradient(135deg,#5B21B6 0%,#7C3AED 50%,#9F67FA 100%)">
+    <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(circle,rgba(255,255,255,.1) 1.5px,transparent 1.5px);background-size:32px 32px"></div>
+    <div class="absolute -top-20 -right-20 w-96 h-96 rounded-full pointer-events-none" style="background:rgba(255,255,255,.05)"></div>
+    <div class="max-w-[900px] mx-auto px-6 text-center relative z-10">
+    <div class="inline-flex items-center gap-2 bg-white/15 border border-white/25 text-white text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-wider">
+        Get in Touch
+    </div>
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight mb-4">
+        Contact Us
+    </h1>
+    <p class="text-white/80 text-base mx-auto leading-relaxed max-w-[800px]">
+      We’d love to hear from you. Whether you have a question or need assistance, our team is here to help.
+    </p>
+    </div>
+</section>
+
+<!-- MAIN -->
+<section class="py-16 px-6">
+    <div class="max-w-[1100px] mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- LEFT: Contact Info -->
+        <div class="lg:col-span-1 flex flex-col gap-5">
+
+        <!-- Info cards -->
+        <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h3 class="text-base font-bold text-gray-900 mb-5">Contact Information</h3>
+            <div class="flex flex-col gap-5">
+
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center shrink-0 text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-violet-600">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                    </svg>
+
+                </div>
+                <div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Email</div>
+                <a href="mailto:hello@nestmatch.io" class="text-sm font-semibold text-gray-700 hover:text-violet-600 transition">hello@nestmatch.io</a>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0 text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-green-600">
+<path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+</svg>
+
+                </div>
+                <div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">WhatsApp</div>
+                <a href="https://wa.me/201000000000" target="_blank" class="text-sm font-semibold text-gray-700 hover:text-green-600 transition">+20 100 000 0000</a>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-amber-600">
+<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+</svg>
+
+                </div>
+                <div>
+                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Location</div>
+                <p class="text-sm font-semibold text-gray-700">Cairo, Egypt</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0 text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-blue-600">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+
+                </div>
+                <div>
+                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Response Time</div>
+                    <p class="text-sm font-semibold text-gray-700">Within 24 hours</p>
+                </div>
+                </div>
+
+                </div>
+            </div>
+
+            <!-- FAQ shortcut -->
+            <div class="bg-violet-50 border border-violet-100 rounded-2xl p-5">
+            <h4 class="text-sm font-bold text-gray-800 mb-1">Looking for quick answers?</h4>
+            <p class="text-xs text-gray-500 mb-3 leading-relaxed">Check our FAQ page for instant answers to the most common questions.</p>
+            <a href="/faq/" class="block text-center py-2 bg-violet-600 text-white text-xs font-bold rounded-lg hover:bg-violet-700 transition">
+              Browse FAQ
+            </a>
+          </div>
+        </div>
+
+        <!-- RIGHT: Contact Form -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 sm:p-10">
+
+            <h2 class="text-xl font-extrabold text-gray-900 mb-1">Send us a message</h2>
+            <p class="text-sm text-gray-500 mb-8">Fill out the form below and we'll get back to you shortly.</p>
+
+            <!-- Django messages -->
+            {% if messages %}
+              {% for message in messages %}
+                <div class="mb-6 px-5 py-4 rounded-xl text-sm font-semibold flex items-center gap-3
+                  {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-700
+                  {% else %}bg-red-50 border border-red-200 text-red-700{% endif %}">
+                  {% if message.tags == 'success' %}{% else %}{% endif %}
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="POST" action="/contact/" id="contact-form">
+              {% csrf_token %}
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+                <!-- Name -->
+                <div>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Full Name <span class="text-red-400">*</span></label>
+                  <input type="text" name="name" id="name" placeholder="Your full name" class="input-field"
+                    value="{{ form_data.name|default:'' }}"/>
+                  {% if errors.name %}
+                      <p class="text-xs text-red-500 mt-1">{{ errors.name }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div>
+                  <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Email Address <span class="text-red-400">*</span></label>
+                  <input type="email" name="email" id="email" placeholder="your@email.com" class="input-field"
+                    value="{{ form_data.email|default:'' }}"/>
+                    {% if errors.email %}
+                      <p class="text-xs text-red-500 mt-1">{{ errors.email }}</p>
+                    {% endif %}
+                </div>
+              </div>
+
+              <!-- Message -->
+              <div class="mb-7">
+                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Message <span class="text-red-400">*</span></label>
+                <textarea name="message" id="message" rows="6" placeholder="Write your message here..."
+                  class="input-field resize-none">{{ form_data.message|default:'' }}</textarea>
+                <div class="flex justify-between mt-1.5">
+                {% if errors.message %}
+                  <p class="text-xs text-red-500 mt-1">{{ errors.message }}</p>
+                {% endif %}                 
+                <p class="text-xs text-gray-400 ml-auto"><span id="char-count">0</span> characters</p>
+                </div>
+              </div>
+
+              <!-- Submit -->
+              <button type="submit" id="submit-btn"
+                class="w-full py-4 bg-violet-600 hover:bg-violet-700 text-white font-bold text-base rounded-xl transition flex items-center justify-center gap-2 shadow-lg hover:shadow-violet-200 hover:shadow-xl">
+                <span id="btn-text">Send Message</span>
+                <svg id="btn-icon" width="18" height="18" fill="none" viewBox="0 0 24 24">
+                  <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <svg id="btn-spinner" class="hidden animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </button>
+
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  {% include "core_app/partials/footer.html" %}
+
+  <script>
+  // Char counter
+  var msgField = document.getElementById('message');
+  if (msgField) {
+    msgField.addEventListener('input', function() {
+      document.getElementById('char-count').textContent = this.value.length;
+    });
+  }
+
+  // Form submit with loading state
+  document.getElementById('contact-form').addEventListener('submit', function(e) {
+    var valid = true;
+
+    // Loading state
+    document.getElementById('btn-text').textContent = 'Sending...';
+    document.getElementById('btn-icon').classList.add('hidden');
+    document.getElementById('btn-spinner').classList.remove('hidden');
+    document.getElementById('submit-btn').disabled = true;
+  });
+  </script>
+
+</body>
+</html>
