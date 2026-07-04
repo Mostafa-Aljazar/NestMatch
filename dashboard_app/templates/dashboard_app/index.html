@@ -126,6 +126,10 @@ a{text-decoration:none;cursor:pointer}
         <span style="margin-left:auto;background:rgba(239,68,68,.25);color:#FCA5A5;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ banned_users }}</span>
       </div>
       <div class="adm-nl" id="anl-verification" onclick="admTab('verification')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
          Verification
         <span style="margin-left:auto;background:rgba(245,158,11,.25);color:#FCD34D;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ pending_documents_count }}</span>
       </div>
@@ -474,7 +478,7 @@ a{text-decoration:none;cursor:pointer}
 
         <!-- Pending first -->
         <div class="adm-card">
-          <div class="adm-section-title">⏳ Pending Review</div>
+          <div class="adm-section-title">Pending Review</div>
           <div style="overflow-x:auto">
             <table class="adm-tbl">
               <thead><tr><th>User</th><th>Type</th><th>Listing</th><th>Submitted</th><th>File</th><th>Actions</th></tr></thead>
@@ -501,7 +505,7 @@ a{text-decoration:none;cursor:pointer}
                   </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:20px">No pending documents. 🎉</td></tr>
+                <tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:20px">No pending documents. </td></tr>
                 {% endfor %}
               </tbody>
             </table>

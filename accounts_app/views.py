@@ -57,6 +57,7 @@ def register_create_view(request):
         try:
             # Create the user using the structured postData method in your manager
             user = User.objects.create_user(request.POST)
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
             # Automatically establish a login session for the newly created user
             login(request, user)
             #messages.success(request, "Registration successful! Welcome to NestMatch.")
@@ -68,7 +69,7 @@ def register_create_view(request):
                 'countries': User.COUNTRY_CHOICES,
                 'genders': User.GENDER_CHOICES
             })
-
+        
     return redirect('accounts_app:register_page')
 
 
