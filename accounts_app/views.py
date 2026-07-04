@@ -7,6 +7,8 @@ from django.http import JsonResponse,FileResponse, Http404
 from .models import User, LifestyleProfile, Testimonial ,OTPCode ,VerificationDocument
 from django.core.mail import EmailMultiAlternatives
 from listings_app.models import Listing
+import mimetypes , os
+
 # templatetags/dict_extras.py
 from django import template
 register = template.Library()
@@ -550,6 +552,7 @@ def verification_view(request):
         'updated_at': document.updated_at.strftime('%b %d, %Y').replace(' 0', ' '),
     })
 
+
 @login_required
 def serve_verification_document(request, doc_id):
     """
@@ -561,5 +564,12 @@ def serve_verification_document(request, doc_id):
     if document.user_id != request.user.id and not request.user.is_staff:
         raise Http404
 
-    return FileResponse(document.file.open('rb'), filename=document.file.name)
+    filename = os.path.basename(document.file.name)
+    content_type, _ = mimetypes.guess_type(filename)
 
+    return FileResponse(
+        document.file.open('rb'),
+        filename=filename,
+        content_type=content_type or 'application/octet-stream',
+        as_attachment=False,  # خليها False حتى تنفتح بالمتصفح (PDF/صورة) بدل ما تتحمل
+    )
