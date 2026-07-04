@@ -157,14 +157,14 @@ def privacy_policy(request):
                 <p>To exercise any of these rights, visit your account settings or contact our privacy team.</p>
             '''
         },
-{
-    'id': 'contact',
-    'title': 'Contact Us',
-    'content': '''
-        <p>If you have questions, concerns, or requests regarding this Privacy Policy or your data, we'd love to hear from you. You can reach our privacy team through our <a href="/contact/" class="font-semibold text-violet-600 hover:text-violet-700 underline-offset-4 hover:underline">Contact Us</a> page.</p>
-        <p>We aim to respond to all privacy inquiries within two business days.</p>
-    '''
-},
+        {
+            'id': 'contact',
+            'title': 'Contact Us',
+            'content': '''
+                <p>If you have questions, concerns, or requests regarding this Privacy Policy or your data, we'd love to hear from you. You can reach our privacy team through our <a href="/contact/" class="font-semibold text-violet-600 hover:text-violet-700 underline-offset-4 hover:underline">Contact Us</a> page.</p>
+                <p>We aim to respond to all privacy inquiries within two business days.</p>
+            '''
+        },
     ]
     
     context = {
@@ -172,3 +172,130 @@ def privacy_policy(request):
     }
     
     return render(request, 'core_app/privacy_policy.html', context)
+
+
+def terms_of_use(request):
+    """
+    Terms of Use page view.
+    """
+    sections = [
+        {
+            'id': 'acceptance',
+            'title': 'Acceptance of Terms',
+            'content': '''
+                <p>By accessing or using NestMatch, you agree to be bound by these Terms of Use and our Privacy Policy. If you do not agree to these terms, you may not use the platform.</p>
+                <p>You confirm that you are at least 18 years old and legally able to enter into a binding agreement. These terms apply to every visitor, registered user, and anyone who posts or responds to a listing.</p>
+            '''
+        },
+        {
+            'id': 'accounts',
+            'title': 'User Accounts & Roles',
+            'content': '''
+                <p>To access most features you must create an account with accurate information and keep your login credentials secure. You are responsible for all activity that occurs under your account.</p>
+                <p>NestMatch supports two roles, and a single account can act as both at the same time:</p>
+                <ul>
+                    <li><strong>Room Poster</strong> — you list an available room or space and review applications from interested seekers.</li>
+                    <li><strong>Room Seeker</strong> — you browse listings, submit applications, and connect with potential roommates.</li>
+                </ul>
+                <p>Switching between roles does not require a separate account. You agree not to share, sell, or transfer your account to anyone else.</p>
+            '''
+        },
+        {
+            'id': 'listing-rules',
+            'title': 'Listing Rules',
+            'content': '''
+                <p>When you post a room, you agree to provide honest, current, and accurate information. Listings help others make real decisions about where they will live, so quality matters.</p>
+                <ul>
+                    <li>Provide accurate details about price, location, and availability.</li>
+                    <li>Upload <strong>real photos</strong> of the actual room and shared spaces — no stock images or photos of a different property.</li>
+                    <li>Do not post spam, duplicate listings, or content unrelated to housing.</li>
+                    <li>Remove or update a listing promptly once it is no longer available.</li>
+                </ul>
+                <p>We may remove listings that violate these rules or appear misleading, and repeated violations can result in account suspension.</p>
+            '''
+        },
+        {
+            'id': 'ai-features',
+            'title': 'AI Features & Limitations',
+            'content': '''
+                <p>NestMatch uses Google Gemini to generate listing descriptions, summarize profiles, and draft roommate agreements. These features are designed to save you time and make listings clearer.</p>
+                <div class="my-5 flex gap-3 rounded-lg border border-violet-200 bg-violet-50 p-4">
+                    <svg class="mt-0.5 h-5 w-5 shrink-0 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <p class="m-0 text-sm leading-relaxed text-gray-700">
+                        <strong>Important:</strong> AI-generated content — including roommate agreements — is <strong>not legally binding</strong> and is not a substitute for professional legal advice. Always review, edit, and verify any AI output before relying on it.
+                    </p>
+                </div>
+                <p>AI may occasionally produce inaccurate or incomplete information. You are responsible for confirming that any generated description accurately reflects your listing and that any agreement meets your needs.</p>
+            '''
+        },
+        {
+            'id': 'matching',
+            'title': 'Application & Matching System',
+            'content': '''
+                <p>Our matching system suggests potential roommates based on profile details, preferences, and listing criteria. Matches and compatibility scores are recommendations only and do not guarantee a successful living arrangement.</p>
+                <p>Room Posters decide which applications to accept or decline at their own discretion. NestMatch does not screen, endorse, or vouch for any user, and we encourage you to communicate, meet safely, and perform your own due diligence before making any commitment.</p>
+            '''
+        },
+        {
+            'id': 'prohibited',
+            'title': 'Prohibited Conduct',
+            'content': '''
+                <p>You agree not to use NestMatch to:</p>
+                <ul>
+                    <li>Harass, threaten, discriminate against, or harm other users.</li>
+                    <li>Post false, fraudulent, or misleading listings or applications.</li>
+                    <li>Collect, scrape, or misuse other users' personal information.</li>
+                    <li>Circumvent security measures, disrupt the service, or upload malicious code.</li>
+                    <li>Use the platform for any unlawful or non-housing-related purpose.</li>
+                </ul>
+                <p>Violations may result in immediate suspension or termination of your account without notice.</p>
+            '''
+        },
+        {
+            'id': 'ip',
+            'title': 'Intellectual Property',
+            'content': '''
+                <p>All NestMatch branding, software, design, and content are owned by NestMatch or its licensors and are protected by intellectual property laws. You may not copy, modify, or distribute them without permission.</p>
+                <p>You retain ownership of the content you submit, such as photos and listing text. By posting, you grant NestMatch a non-exclusive, worldwide license to host and display that content for the purpose of operating the platform.</p>
+            '''
+        },
+        {
+            'id': 'warranties',
+            'title': 'Disclaimer of Warranties',
+            'content': '''
+                <p>NestMatch is provided on an "as is" and "as available" basis without warranties of any kind, whether express or implied. We do not guarantee that the service will be uninterrupted, error-free, or secure.</p>
+                <p>We make no warranty regarding the accuracy of listings, the conduct of users, or the outcome of any roommate arrangement made through the platform.</p>
+            '''
+        },
+        {
+            'id': 'liability',
+            'title': 'Limitation of Liability',
+            'content': '''
+                <p>To the fullest extent permitted by law, NestMatch and its affiliates will not be liable for any indirect, incidental, or consequential damages arising from your use of the platform, including disputes between roommates or losses related to any listing or agreement.</p>
+                <p>Our total liability for any claim relating to the service will not exceed the amount you paid us, if any, in the twelve months before the claim.</p>
+            '''
+        },
+        {
+            'id': 'changes',
+            'title': 'Changes to Terms',
+            'content': '''
+                <p>We may update these Terms of Use from time to time. When we make material changes, we will update the effective date and may notify you through the platform or by email.</p>
+                <p>Continuing to use NestMatch after changes take effect means you accept the revised terms.</p>
+            '''
+        },
+        {
+            'id': 'contact',
+            'title': 'Contact',
+            'content': '''
+                <p>If you have questions about these terms, please reach out through our <a href="/contact/" class="font-semibold text-violet-600 hover:text-violet-700 underline-offset-4 hover:underline">Contact Us</a> page and we'll be happy to help.</p>
+            '''
+        }
+    ]
+
+    context = {
+        'sections': sections,
+    }
+
+    return render(request, 'core_app/terms_of_use.html', context)
