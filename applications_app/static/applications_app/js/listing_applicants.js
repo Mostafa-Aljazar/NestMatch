@@ -54,6 +54,9 @@ function nmApplyDecision(card, status, label, badgeClass) {
   var actions = card.querySelector('[data-actions]');
   if (actions) actions.classList.add('hidden');
 
+  var agreementActions = card.querySelector('[data-agreement-actions]');
+  if (agreementActions && status === 'accepted') agreementActions.classList.remove('hidden');
+
   card.dataset.status = status;
 }
 
@@ -105,3 +108,37 @@ function nmDecide(pk, btn, action) {
 
 function nmAccept(pk, btn) { nmDecide(pk, btn, 'accept'); }
 function nmReject(pk, btn) { nmDecide(pk, btn, 'reject'); }
+
+/* ─────────────────────────────────────────
+   Generate Agreement — reload so the server
+   re-renders the card with the real "View
+   Agreement" link, rather than hand-building
+   that markup here.
+───────────────────────────────────────── */
+function nmGenerateAgreement(pk, btn) {
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+  var csrf = getCookie('csrftoken');
+
+  fetch('/agreements/application/' + pk + '/generate/', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrf || '' }
+  })
+    .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+    .then(function (result) {
+      if (result.ok) {
+        window.location.reload();
+      } else {
+        console.error('Agreement generation failed:', result.status, result.data);
+        nmToast('Could not generate agreement — please try again.', 'error');
+        btn.textContent = '✨ Generate Agreement';
+        btn.disabled = false;
+      }
+    })
+    .catch(function (err) {
+      console.error('Agreement network error:', err);
+      nmToast('Network error — check your connection.', 'error');
+      btn.textContent = '✨ Generate Agreement';
+      btn.disabled = false;
+    });
+}

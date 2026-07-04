@@ -1,0 +1,71 @@
+{% load static %}
+{% load icons %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Agreements — NestMatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { jakarta: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            violet: { 50:'#F5F3FF', 100:'#EDE9FE', 200:'#DDD6FE', 600:'#7C3AED', 700:'#6D28D9' },
+            teal: { 600:'#0F766E', 700:'#0E6960' },
+          },
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="font-jakarta bg-gray-50 text-gray-900 overflow-x-hidden">
+
+{% include "core_app/partials/navbar.html" with active_page="my_listings" %}
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+
+  <h1 class="text-xl font-extrabold text-gray-900 mb-6">My Agreements</h1>
+
+  {% if not agreements %}
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm px-6 py-20 text-center">
+    <div class="text-5xl mb-4">📄</div>
+    <div class="text-lg font-extrabold text-gray-900 mb-2">No agreements yet</div>
+    <p class="text-sm text-gray-500 max-w-xs mx-auto">Agreements appear here once a rental agreement has been generated for an accepted application.</p>
+  </div>
+  {% else %}
+  <div class="flex flex-col gap-3">
+    {% for agreement in agreements %}
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+      <div class="w-12 h-12 rounded-xl bg-teal-600 text-white flex items-center justify-center text-xl shrink-0">📄</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-bold text-gray-900">{{ agreement.listing.title }}</div>
+        <div class="text-xs text-gray-500 mt-0.5">
+          {% if request.user.id == agreement.poster_id %}Tenant: {{ agreement.tenant.full_name }}{% else %}Landlord: {{ agreement.poster.full_name }}{% endif %}
+          &middot; {{ agreement.created_at|date:"M j, Y" }} &middot; v{{ agreement.version }}
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <a href="{% url 'agreements_app:view' agreement.pk %}"
+           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-violet-700 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors">
+          View
+        </a>
+        <a href="{% url 'agreements_app:download' agreement.pk %}"
+           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors">
+          Download PDF
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+
+</body>
+</html>

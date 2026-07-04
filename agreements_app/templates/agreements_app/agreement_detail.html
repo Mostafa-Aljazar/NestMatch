@@ -1,0 +1,281 @@
+{% load static %}
+{% load icons %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rental Agreement — {{ agreement.listing.title }} — NestMatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { jakarta: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            violet: { 50:'#F5F3FF', 100:'#EDE9FE', 200:'#DDD6FE', 600:'#7C3AED', 700:'#6D28D9' },
+            teal: { 600:'#0F766E', 700:'#0E6960' },
+          },
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="font-jakarta bg-gray-50 text-gray-900 overflow-x-hidden">
+
+{% include "core_app/partials/navbar.html" with active_page="my_listings" %}
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+
+  <a href="{% url 'agreements_app:my_agreements' %}"
+     class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-violet-600 transition-colors mb-4">
+    {% icon 'chevron-left' size=14 %}
+    Back to Agreements
+  </a>
+
+  <div class="flex items-start justify-between gap-4 mb-6 flex-wrap">
+    <div>
+      <h1 class="text-xl font-extrabold text-gray-900">Rental Agreement</h1>
+      <p class="text-sm text-gray-500 mt-1">{{ agreement.listing.title }} &middot; Version {{ agreement.version }}</p>
+    </div>
+    <div class="flex items-center gap-2">
+      {% if agreement.is_fallback %}
+      <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
+        Standard Template
+      </span>
+      {% else %}
+      <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-violet-100 text-violet-700">
+        AI Generated
+      </span>
+      {% endif %}
+      <a href="{% url 'agreements_app:download' agreement.pk %}"
+         class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 transition-colors">
+        📄 Download PDF
+      </a>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-10">
+
+    <div class="text-center mb-1">
+      <div class="text-2xl font-extrabold text-gray-900 tracking-wide">RENTAL AGREEMENT</div>
+      <div class="text-gray-300 tracking-[6px] mt-1 mb-3">&#9670;&#9670;&#9670;&#9670;&#9670;</div>
+      <p class="text-sm text-gray-600">This Rental Agreement ("Agreement") is made and entered into on {{ agreement.created_at|date:"F j, Y" }}, by and between the following parties:</p>
+    </div>
+
+    <!-- ── Party boxes ── -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+      <div class="border border-gray-400 rounded-md overflow-hidden">
+        <div class="bg-gray-200 text-center text-sm font-bold py-2">PARTY ONE (THE LANDLORD)</div>
+        <div class="divide-y divide-gray-200 text-sm">
+          <div class="flex px-3 py-2"><span class="w-20 font-bold text-gray-600 shrink-0">Name</span><span>{{ agreement.poster.full_name }}</span></div>
+          <div class="flex px-3 py-2"><span class="w-20 font-bold text-gray-600 shrink-0">Email</span><span>{{ agreement.poster.email }}</span></div>
+          <div class="flex px-3 py-2"><span class="w-20 font-bold text-gray-600 shrink-0">Phone</span><span>{{ agreement.poster.phone_number|default:"Not provided" }}</span></div>
+        </div>
+      </div>
+      <div class="border border-gray-400 rounded-md overflow-hidden">
+        <div class="bg-gray-200 text-center text-sm font-bold py-2">PARTY TWO (THE TENANT)</div>
+        <div class="divide-y divide-gray-200 text-sm">
+          <div class="flex px-3 py-2"><span class="w-20 font-bold text-gray-600 shrink-0">Name</span><span>{{ agreement.tenant.full_name }}</span></div>
+          <div class="flex px-3 py-2"><span class="w-20 font-bold text-gray-600 shrink-0">Email</span><span>{{ agreement.tenant.email }}</span></div>
+          <div class="flex px-3 py-2"><span class="w-20 font-bold text-gray-600 shrink-0">Phone</span><span>{{ agreement.tenant.phone_number|default:"Not provided" }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Property strip ── -->
+    <div class="grid grid-cols-3 border border-gray-400 rounded-md overflow-hidden mt-4 text-sm text-center">
+      <div class="bg-gray-200 font-bold py-2 border-r border-b border-gray-400">PROPERTY TYPE</div>
+      <div class="bg-gray-200 font-bold py-2 border-r border-b border-gray-400">LOCATION</div>
+      <div class="bg-gray-200 font-bold py-2 border-b border-gray-400">LISTING</div>
+      <div class="py-2 border-r border-gray-300">{{ agreement.listing.get_listing_type_display }}</div>
+      <div class="py-2 border-r border-gray-300">{{ agreement.listing.district }}, {{ agreement.listing.city }}</div>
+      <div class="py-2">{{ agreement.listing.title }}</div>
+    </div>
+
+    <p class="text-center text-sm font-bold text-gray-900 mt-6 mb-1">The parties, having full legal capacity, hereby agree to the following terms:</p>
+
+    <!-- ── Clauses ── -->
+    <div class="mt-4 bg-gray-900 text-white text-sm font-bold px-3 py-2">CLAUSE 1 — SUBJECT OF LEASE</div>
+    <p class="text-sm text-gray-700 leading-relaxed text-justify mt-2">{{ sections.subject_of_lease }}</p>
+
+    <div class="mt-4 bg-gray-900 text-white text-sm font-bold px-3 py-2">CLAUSE 2 — TERM AND DURATION</div>
+    <p class="text-sm text-gray-700 leading-relaxed text-justify mt-2">{{ sections.term_and_duration }}</p>
+
+    <div class="mt-4 bg-gray-900 text-white text-sm font-bold px-3 py-2">CLAUSE 3 — RENT AND PAYMENT TERMS</div>
+    <p class="text-sm text-gray-700 leading-relaxed text-justify mt-2">{{ sections.rent_and_payment_terms }}</p>
+
+    <div class="mt-4 bg-gray-900 text-white text-sm font-bold px-3 py-2">CLAUSE 4 — OBLIGATIONS OF THE LANDLORD</div>
+    <ul class="mt-2 space-y-1.5">
+      {% for line in sections.landlord_obligations_lines %}
+      <li class="text-sm text-gray-700 leading-relaxed text-justify flex gap-2"><span class="shrink-0">&bull;</span><span>{{ line }}</span></li>
+      {% endfor %}
+    </ul>
+
+    <div class="mt-4 bg-gray-900 text-white text-sm font-bold px-3 py-2">CLAUSE 5 — OBLIGATIONS OF THE TENANT</div>
+    <ul class="mt-2 space-y-1.5">
+      {% for line in sections.tenant_obligations_lines %}
+      <li class="text-sm text-gray-700 leading-relaxed text-justify flex gap-2"><span class="shrink-0">&bull;</span><span>{{ line }}</span></li>
+      {% endfor %}
+    </ul>
+
+    <div class="mt-4 bg-gray-900 text-white text-sm font-bold px-3 py-2">CLAUSE 6 — GENERAL PROVISIONS</div>
+    <ol class="mt-2 space-y-1.5 list-decimal list-inside">
+      {% for line in sections.general_provisions_lines %}
+      <li class="text-sm text-gray-700 leading-relaxed text-justify">{{ line }}</li>
+      {% endfor %}
+    </ol>
+
+    <p class="text-center text-sm text-gray-600 mt-6 mb-2">This Agreement is executed in two (2) original counterparts, one retained by each party, both of equal legal effect.</p>
+    <p class="text-center text-sm font-bold text-gray-900 mb-6">IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.</p>
+
+    <!-- ── Signature boxes ── -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="border border-gray-400 rounded-md overflow-hidden">
+        <div class="bg-gray-200 text-center text-sm font-bold py-2">PARTY ONE (LANDLORD)</div>
+        <div class="divide-y divide-gray-200 text-sm">
+          <div class="px-3 py-2">Name: {{ agreement.poster.full_name }}</div>
+          {% if agreement.poster_signed_at %}
+          <div class="px-3 py-2 text-emerald-700 font-semibold">✅ Signed by {{ agreement.poster_signed_name }}</div>
+          <div class="px-3 py-2 text-gray-500 text-xs">{{ agreement.poster_signed_at|date:"M j, Y, g:i A" }}</div>
+          {% elif request.user.id == agreement.poster_id %}
+          <div class="px-3 py-2">
+            <input type="text" id="sign-input-poster" value="{{ agreement.poster.full_name }}"
+              class="w-full text-sm border border-gray-300 rounded-lg px-2.5 py-1.5 mb-2 focus:outline-none focus:ring-2 focus:ring-violet-300" />
+            <button onclick="nmSignAgreement({{ agreement.pk }}, 'sign-input-poster', this)"
+              class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 transition-colors cursor-pointer font-jakarta">
+              Sign Agreement
+            </button>
+          </div>
+          {% else %}
+          <div class="px-3 py-2 text-gray-400 italic">Awaiting signature</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="border border-gray-400 rounded-md overflow-hidden">
+        <div class="bg-gray-200 text-center text-sm font-bold py-2">PARTY TWO (TENANT)</div>
+        <div class="divide-y divide-gray-200 text-sm">
+          <div class="px-3 py-2">Name: {{ agreement.tenant.full_name }}</div>
+          {% if agreement.tenant_signed_at %}
+          <div class="px-3 py-2 text-emerald-700 font-semibold">✅ Signed by {{ agreement.tenant_signed_name }}</div>
+          <div class="px-3 py-2 text-gray-500 text-xs">{{ agreement.tenant_signed_at|date:"M j, Y, g:i A" }}</div>
+          {% elif request.user.id == agreement.tenant_id %}
+          <div class="px-3 py-2">
+            <input type="text" id="sign-input-tenant" value="{{ agreement.tenant.full_name }}"
+              class="w-full text-sm border border-gray-300 rounded-lg px-2.5 py-1.5 mb-2 focus:outline-none focus:ring-2 focus:ring-violet-300" />
+            <button onclick="nmSignAgreement({{ agreement.pk }}, 'sign-input-tenant', this)"
+              class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 transition-colors cursor-pointer font-jakarta">
+              Sign Agreement
+            </button>
+          </div>
+          {% else %}
+          <div class="px-3 py-2 text-gray-400 italic">Awaiting signature</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center text-[11px] text-gray-400 mt-8">
+      {% if agreement.is_fallback %}Generated from a standard template.{% else %}Generated with AI assistance.{% endif %}
+      &middot; Version {{ agreement.version }} &middot;
+      This document is provided for convenience and does not constitute legal advice.
+    </p>
+
+  </div>
+
+  {% if agreement.is_fully_signed %}
+  <div class="mt-6 flex justify-end">
+    <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200">
+      ✅ Signed by both parties — final
+    </span>
+  </div>
+  {% elif request.user.id == agreement.poster_id %}
+  <div class="mt-6 flex justify-end">
+    <button onclick="nmRegenerateAgreement({{ agreement.pk }}, this)"
+      class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer font-jakarta">
+      ↻ Regenerate Agreement
+    </button>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+function getCookie(name) {
+  var value = '; ' + document.cookie;
+  var parts = value.split('; ' + name + '=');
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return '';
+}
+
+function nmRegenerateAgreement(pk, btn) {
+  if (!confirm('Regenerate this agreement? The current version will be replaced.')) return;
+  btn.disabled = true;
+  btn.textContent = 'Regenerating…';
+  var csrf = getCookie('csrftoken');
+
+  fetch('/agreements/' + pk + '/regenerate/', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrf || '' }
+  })
+    .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+    .then(function (result) {
+      if (result.ok) {
+        window.location.href = '/agreements/' + result.data.agreement_id + '/view/';
+      } else {
+        alert('Could not regenerate agreement — please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Regenerate Agreement';
+      }
+    })
+    .catch(function () {
+      alert('Network error — check your connection.');
+      btn.disabled = false;
+      btn.textContent = 'Regenerate Agreement';
+    });
+}
+
+function nmSignAgreement(pk, inputId, btn) {
+  var input = document.getElementById(inputId);
+  var typedName = input.value.trim();
+  if (!typedName) {
+    alert('Please type your full name to sign.');
+    return;
+  }
+  if (!confirm('Sign this agreement as "' + typedName + '"? This cannot be undone.')) return;
+
+  btn.disabled = true;
+  input.disabled = true;
+  btn.textContent = 'Signing…';
+  var csrf = getCookie('csrftoken');
+
+  fetch('/agreements/' + pk + '/sign/', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrf || '', 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'typed_name=' + encodeURIComponent(typedName)
+  })
+    .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+    .then(function (result) {
+      if (result.ok) {
+        window.location.reload();
+      } else {
+        alert(result.data.error || 'Could not sign agreement — please try again.');
+        btn.disabled = false;
+        input.disabled = false;
+        btn.textContent = 'Sign Agreement';
+      }
+    })
+    .catch(function () {
+      alert('Network error — check your connection.');
+      btn.disabled = false;
+      input.disabled = false;
+      btn.textContent = 'Sign Agreement';
+    });
+}
+</script>
+
+</body>
+</html>
