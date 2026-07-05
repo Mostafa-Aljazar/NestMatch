@@ -17,4 +17,12 @@ urlpatterns = [
 
     # Site content
     path('site-content/', views.update_site_content, name='update_site_content'),
+
+    # verification
+    path('verification/<int:doc_id>/approve/', views.approve_document, name='approve_document'),
+    path('verification/<int:doc_id>/reject/', views.reject_document, name='reject_document'),
+
+    # Reviews
+    path('reviews/<int:review_id>/approve/', views.approve_review, name='approve_review'),
+    path('reviews/<int:review_id>/reject/',  views.reject_review,  name='reject_review'),
 ]

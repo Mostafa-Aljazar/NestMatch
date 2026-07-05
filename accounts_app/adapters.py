@@ -8,8 +8,6 @@ that auto-generated user data will pass our custom User model's
 validation (our username field has a strict regex). This adapter takes
 over username generation BEFORE allauth tries to render that form, so
 it always succeeds automatically and the manual form never appears.
-
-Place this file at: accounts_app/adapters.py
 """
 
 import re

@@ -3,15 +3,23 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q
-from django.http import JsonResponse
+from django.http import JsonResponse ,Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
-
+from django.urls import reverse 
 from .models import Favorite, Listing, ListingImage
 
-
 def listings_page(request):
-    qs = Listing.objects.filter(status='active').prefetch_related('images')
+    qs = Listing.objects.filter(
+        status='active',
+        # Both must be approved before a listing shows publicly:
+        # 1) the listing's own rental contract (proves the room/lease is legit)
+        contract_documents__document_type='rental_contract',
+        contract_documents__status='approved',
+        # 2) the poster's identity (proves the person renting it out is verified)
+        poster__verification_documents__document_type='id_document',
+        poster__verification_documents__status='approved',
+    ).distinct().prefetch_related('images')
 
     # ── Search ────────────────────────────────────────────────────────────────
     q = request.GET.get('q', '').strip()
@@ -119,9 +127,14 @@ def post_room_page(request, pk=None):
         for img in listing.images.all()
     ] if listing else []
 
+    contract_doc = None
+    if listing is not None:
+        contract_doc = listing.contract_documents.filter(document_type='rental_contract').first()
+
     return render(request, 'listings_app/post_room.html', {
         'listing': listing,
         'existing_images_json': existing_images,
+        'contract_doc': contract_doc,
     })
 
 
@@ -129,14 +142,38 @@ def post_room_page(request, pk=None):
 def create_listing(request):
     if request.method == 'GET':
         return render(request, 'listings_app/post_room.html')
+    
+    # The form can now be submitted in two ways:
+    # 1) A traditional form submit (no JS) → we must return plain HTML
+    #    (render/redirect), same as before.
+    # 2) A fetch() call from JS (so we can immediately upload the rental
+    #    contract for this listing right after) → we must return JSON so
+    #    the JS knows whether the save succeeded, and can read the new
+    #    listing_id + redirect_url from the response.
+    # The difference: fetch() automatically sends this header, a normal
+    # form submit does not.
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     try:
         listing = Listing.objects.create_from_post(request.POST, request.FILES, request.user)
     except ValidationError as e:
-        return render(request, 'listings_app/post_room.html', {
-            'errors': e.message_dict,
-        })
+       if is_ajax:
+            return JsonResponse({'success': False, 'errors': e.message_dict})
+       return render(request, 'listings_app/post_room.html', {'errors': e.message_dict})
 
+    if is_ajax:
+        redirect_url = (
+            reverse('listings_app:room_detail', args=[listing.pk])
+            if listing.status == 'active'
+            else reverse('listings_app:my_listings')
+        )
+        return JsonResponse({
+            'success': True,
+            'listing_id': listing.pk,
+            'status': listing.status,
+            'redirect_url': redirect_url,
+        })
+    
     if listing.status == 'active':
         return redirect('listings_app:room_detail', pk=listing.pk)
     return redirect('listings_app:my_listings')
@@ -146,6 +183,7 @@ def create_listing(request):
 @require_POST
 def update_listing(request, pk):
     listing = get_object_or_404(Listing, pk=pk, poster=request.user)
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     try:
         listing = Listing.objects.update_from_post(
@@ -153,6 +191,8 @@ def update_listing(request, pk):
             kept_images_json=request.POST.get('kept_image_ids', '[]'),
         )
     except ValidationError as e:
+        if is_ajax:
+            return JsonResponse({'success': False, 'errors': e.message_dict})
         return render(request, 'listings_app/post_room.html', {
             'errors': e.message_dict,
             'listing': listing,
@@ -161,7 +201,20 @@ def update_listing(request, pk):
                 for img in listing.images.all()
             ],
         })
-
+    
+    if is_ajax:
+        redirect_url = (
+            reverse('listings_app:room_detail', args=[listing.pk])
+            if listing.status == 'active'
+            else reverse('listings_app:my_listings')
+        )
+        return JsonResponse({
+            'success': True,
+            'listing_id': listing.pk,
+            'status': listing.status,
+            'redirect_url': redirect_url,
+        })
+    
     if listing.status == 'active':
         return redirect('listings_app:room_detail', pk=listing.pk)
     return redirect('listings_app:my_listings')
@@ -204,6 +257,26 @@ def room_detail(request, pk):
     from applications_app.models import Application, ListingReview
 
     listing = get_object_or_404(Listing, pk=pk, status='active')
+    is_own_listing = (
+        request.user.is_authenticated and listing.poster_id == request.user.id
+    )
+
+    # A listing counts as "fully verified" only once BOTH its rental
+    # contract AND its poster's identity have been approved by admin.
+    is_fully_verified = listing.contract_documents.filter(
+        document_type='rental_contract', status='approved'
+    ).exists() and listing.poster.verification_documents.filter(
+        document_type='id_document', status='approved'
+    ).exists()
+
+    # Blocks the "direct link" loophole: without this, an unverified
+    # listing wouldn't show up on /listings/ (filtered there already),
+    # but anyone with its direct URL could still open this page and see
+    # full details. Only the poster themself is allowed to view it
+    # while it's still pending/rejected — everyone else gets a 404.
+    if not is_own_listing and not is_fully_verified:
+        raise Http404
+    
     reviews = listing.reviews.select_related('reviewer').all()
     rating_avg = reviews.aggregate(avg=Avg('rating'))['avg']
 
@@ -214,7 +287,6 @@ def room_detail(request, pk):
     has_profile = False
     compatibility = None
     if request.user.is_authenticated:
-        is_own_listing = listing.poster_id == request.user.id
         my_application = Application.objects.filter(listing=listing, seeker=request.user).first()
         can_review = (
             my_application is not None

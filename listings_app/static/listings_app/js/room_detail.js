@@ -183,9 +183,16 @@ document.addEventListener('keydown', function (e) {
   }
 })();
 
-
+ 
 /* ── APPLY MODAL ──────────────────────────────────────── */
 function nmOpenModal() {
+  var banner = document.getElementById('nm-verify-required-banner');
+  var msgBox = document.getElementById('nm-apply-msg');
+  var sendBtn = document.getElementById('nm-apply-btn');
+  if (banner) banner.classList.add('hidden');
+  if (msgBox) msgBox.closest('.mb-4').classList.remove('hidden');
+  if (sendBtn) sendBtn.classList.remove('hidden');
+
   document.getElementById('nm-apply-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -208,10 +215,10 @@ function nmSubmitApply() {
     msg.style.borderColor = '#E11D48';
     msg.focus();
     return;
-  }
+  } 
   var btn = document.getElementById('nm-apply-btn');
   if (btn) {
-    btn.textContent = '⏳ Sending…';
+    btn.textContent = 'Sending…';
     btn.disabled = true;
     btn.style.opacity = '.8';
   }
@@ -250,6 +257,27 @@ function nmSubmitApply() {
           cancelBtn.addEventListener('click', function () { nmCancelApply(appId, cancelBtn); });
           applyNowBtn.replaceWith(cancelBtn);
         }
+       } else if (result.data.code === 'id_not_verified') {
+        var banner = document.getElementById('nm-verify-required-banner');
+        var titleEl = document.getElementById('nm-verify-required-title');
+        var textEl = document.getElementById('nm-verify-required-text');
+        var msgBox = document.getElementById('nm-apply-msg');
+        var sendBtn = document.getElementById('nm-apply-btn');
+
+        if (result.data.id_status === 'pending') {
+          if (titleEl) titleEl.textContent = 'ID verification pending';
+          if (textEl) textEl.textContent = "Your ID is under review by our team. You'll be able to apply once it's approved.";
+        } else if (result.data.id_status === 'rejected') {
+          if (titleEl) titleEl.textContent = 'ID verification rejected';
+          if (textEl) textEl.textContent = 'Your ID submission was rejected. Please resubmit a valid document.';
+        } else {
+          if (titleEl) titleEl.textContent = 'Verify your ID to apply';
+          if (textEl) textEl.textContent = 'You need to verify your identity before applying to a room.';
+        }
+
+        if (banner) banner.classList.remove('hidden');
+        if (msgBox) msgBox.closest('.mb-4').classList.add('hidden');
+        if (sendBtn) sendBtn.classList.add('hidden');
       } else {
         nmShowToast('#E11D48', result.data.error || 'Could not send application.');
       }
@@ -269,7 +297,7 @@ function nmCancelApply(appPk, btn) {
   if (btn) {
     btn.disabled = true;
     btn.style.opacity = '.8';
-    btn.textContent = '⏳ Cancelling…';
+    btn.textContent = 'Cancelling…';
   }
 
   var csrf = nmGetCookie('csrftoken');
@@ -288,7 +316,7 @@ function nmCancelApply(appPk, btn) {
           var applyNowBtn = document.createElement('button');
           applyNowBtn.id = 'nm-apply-now-btn';
           applyNowBtn.className = 'block w-full py-3.5 text-sm font-bold text-white bg-violet-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-violet-800 active:scale-[.98] font-sans mb-2.5';
-          applyNowBtn.textContent = 'Apply Now 🚀';
+          applyNowBtn.textContent = 'Apply Now ';
           applyNowBtn.addEventListener('click', function () { nmOpenModal(); });
           btn.replaceWith(applyNowBtn);
         }
@@ -346,7 +374,7 @@ function nmShare() {
       var origBg   = t.style.background;
       var origText = t.textContent;
       t.style.background = '#374151';
-      t.textContent = '🔗 Link copied to clipboard!';
+      t.textContent = 'Link copied to clipboard!';
       t.classList.add('show');
       setTimeout(function () {
         t.classList.remove('show');

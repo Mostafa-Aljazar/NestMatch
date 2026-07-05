@@ -25,11 +25,16 @@ urlpatterns = [
     path('profile/review/<int:review_id>/delete/', views.delete_review, name='delete_review'),
     path('profile/update/password/', views.change_password_view, name='change_password'),
 
-
+    #OTP
     path('forgot-password/', views.forgot_password_view, name='forgot_password'),
     path('verify-otp/', views.verify_otp_view, name='verify_otp'),
     path('resend-otp/', views.resend_otp_view, name='resend_otp'),
     path('reset-password/', views.reset_password_view, name='reset_password'),
+
+    
+    #verification
+    path('verification/', views.verification_view, name='verification'),
+    path('verification/document/<int:doc_id>/', views.serve_verification_document, name='verification_document'),
 
     path('logout/', views.logout_view, name='logout'),
     path('delete-account/', views.delete_account_view, name='delete_account'),

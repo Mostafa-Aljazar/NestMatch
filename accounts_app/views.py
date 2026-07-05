@@ -3,10 +3,19 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
-from .models import User, LifestyleProfile, Testimonial ,OTPCode
+from django.http import JsonResponse,FileResponse, Http404
+from .models import User, LifestyleProfile, Testimonial ,OTPCode ,VerificationDocument
 from django.core.mail import EmailMultiAlternatives
+from listings_app.models import Listing
+import mimetypes , os
 
+# templatetags/dict_extras.py
+from django import template
+register = template.Library()
+
+@register.filter
+def get_item(d, key):
+    return d.get(key)
 
 def index(request):
     """
@@ -48,6 +57,7 @@ def register_create_view(request):
         try:
             # Create the user using the structured postData method in your manager
             user = User.objects.create_user(request.POST)
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
             # Automatically establish a login session for the newly created user
             login(request, user)
             #messages.success(request, "Registration successful! Welcome to NestMatch.")
@@ -59,7 +69,7 @@ def register_create_view(request):
                 'countries': User.COUNTRY_CHOICES,
                 'genders': User.GENDER_CHOICES
             })
-
+        
     return redirect('accounts_app:register_page')
 
 
@@ -114,6 +124,13 @@ def profile_view(request):
     """
     user = request.user
 
+    # Read ?tab= from URL so the template can set initial active state
+    # even before JS runs (progressive enhancement)
+    active_tab = request.GET.get('tab', 'info')
+    valid_tabs = {'info', 'lifestyle', 'security', 'reviews'}
+    if active_tab not in valid_tabs:
+        active_tab = 'info'
+
     # A user might not have filled out their lifestyle profile yet,
     # so this can legitimately be None — the template handles that case.
     lifestyle_profile = LifestyleProfile.objects.filter(user=user).first()
@@ -130,6 +147,18 @@ def profile_view(request):
         (bool(user.profile_pic) + bool(user.bio) + bool(user.phone_number) + lifestyle_completeness) / 4
     ))
 
+    documents = {d.document_type: d for d in user.verification_documents.all()}
+    verification_cards = [
+        ('id_document', 'ID Document', documents.get('id_document')),
+    ]
+    # جيبي الغرف المنشورة للمستخدم
+    user_listings = Listing.objects.filter(poster=user, status='active')
+
+    rental_contract_doc = documents.get('rental_contract')
+    contract_docs = {
+        d.listing_id: d
+        for d in user.verification_documents.filter(document_type='rental_contract')
+    }
     context = {
         'user_obj': user,  # named user_obj to avoid clashing with request.user in template logic
         'genders': User.GENDER_CHOICES,
@@ -157,6 +186,11 @@ def profile_view(request):
         'listing_type_pref_choices': LifestyleProfile.LISTING_TYPE_PREF_CHOICES,
         'user_reviews': Testimonial.objects.filter(user=user).order_by('-created_at'),
         'review_section_heading': 'Write a review',
+        'rental_contract_doc': rental_contract_doc,
+        'verification_cards': verification_cards,
+        'active_tab': active_tab,
+        'user_listings': user_listings,
+        'contract_docs': contract_docs,
     }
     return render(request, 'profile.html', context)
 
@@ -333,7 +367,7 @@ def delete_account_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('accounts_app:login')
+    return redirect('core_app:index')
 
 
 def _send_otp_email(user, otp):
@@ -524,3 +558,74 @@ def reset_password_view(request):
         return redirect('accounts_app:login')
 
     return render(request, 'reset_password.html')
+
+@login_required
+@require_POST
+def verification_view(request):
+    document_type = request.POST.get('document_type')
+    file = request.FILES.get('file')
+
+    if document_type not in dict(VerificationDocument.DOCUMENT_TYPE_CHOICES):
+        return JsonResponse({'success': False, 'errors': {'document_type': 'Invalid document type.'}})
+
+    if not file:
+        return JsonResponse({'success': False, 'errors': {'file': 'Please choose a file to upload.'}})
+
+    listing = None
+    if document_type == VerificationDocument.RENTAL_CONTRACT:
+        listing_id = request.POST.get('listing_id')
+        listing = get_object_or_404(Listing, id=listing_id, poster=request.user)
+
+    # Block re-upload once a document has already been approved — an
+    # approved ID/contract shouldn't be silently swapped for a different
+    # file after the fact. Resubmission is only allowed while pending or
+    # after a rejection.
+    existing_lookup = {'user': request.user, 'document_type': document_type}
+    if listing is not None:
+        existing_lookup['listing'] = listing
+    existing_doc = VerificationDocument.objects.filter(**existing_lookup).first()
+    if existing_doc and existing_doc.status == VerificationDocument.APPROVED:
+        return JsonResponse({
+            'success': False,
+            'errors': {'file': 'This document has already been approved and cannot be replaced.'},
+        })
+    
+    error = VerificationDocument.objects.validate_upload(file)
+    if error:
+        return JsonResponse({'success': False, 'errors': {'file': error}})
+
+    document = VerificationDocument.objects.submit_document(
+        request.user, document_type, file, listing=listing
+    )
+
+    return JsonResponse({
+        'success': True,
+        'message': 'Document submitted for review.',
+        'document_type': document.document_type,
+        'listing_id': listing.id if listing else None,
+        'status': document.status,
+        'status_display': document.get_status_display(),
+        'updated_at': document.updated_at.strftime('%b %d, %Y').replace(' 0', ' '),
+    })
+
+
+@login_required
+def serve_verification_document(request, doc_id):
+    """
+    Protected file access — serves the actual ID/contract file ONLY to its
+    owner or to staff. This is why we don't link directly to document.file.url
+    in templates; always link to this view instead (see urls.py note).
+    """
+    document = get_object_or_404(VerificationDocument, id=doc_id)
+    if document.user_id != request.user.id and not request.user.is_staff:
+        raise Http404
+
+    filename = os.path.basename(document.file.name)
+    content_type, _ = mimetypes.guess_type(filename)
+
+    return FileResponse(
+        document.file.open('rb'),
+        filename=filename,
+        content_type=content_type or 'application/octet-stream',
+        as_attachment=False,  # خليها False حتى تنفتح بالمتصفح (PDF/صورة) بدل ما تتحمل
+    )

@@ -141,6 +141,7 @@ tailwind.config = {
 <input type="hidden" name="max_occupants" id="par-max-occupants" value="{{ listing.max_occupants|default:3 }}">
 <input type="hidden" name="custom_requirements" id="par-custom-json" value="{{ listing.custom_requirements_json|default:'[]' }}">
 <input type="hidden" name="kept_image_ids" id="par-kept-image-ids" value="">
+<input type="hidden" name="listing_id_placeholder" id="par-listing-id" value="{{ listing.pk|default:'' }}">
 {% if listing %}{{ existing_images_json|json_script:"nm-existing-images-data" }}{% endif %}
 
 {% if errors %}
@@ -772,6 +773,49 @@ tailwind.config = {
       <div id="nm-review-requirements" class="flex gap-2 flex-wrap"></div>
     </div>
 
+    <!-- Rental Contract -->
+    <div class="bg-white rounded-2xl p-7 shadow-card mb-5">
+      <div class="flex items-center gap-2.5 mb-4">
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[17px] shrink-0" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
+        </div>
+        <div>
+          <div class="text-[15px] font-bold text-gray-900">Rental Contract <span class="text-rose-600">*</span></div>
+          <div class="text-xs text-gray-400">Required for your listing to appear publicly. PDF, JPG, or PNG — max 8MB.</div>
+        </div>
+      </div>
+
+      {% if contract_doc %}
+        <span id="nm-contract-existing-status" class="hidden" data-status="{{ contract_doc.status }}"></span>
+      {% endif %}
+
+      {% if contract_doc.status == 'approved' %}
+        <div class="flex items-center gap-2 rounded-lg bg-emerald-50 border border-emerald-200 px-3.5 py-2.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+          <span class="text-[13px] font-semibold text-emerald-700">Contract approved — no need to re-upload.</span>
+        </div>
+      {% else %}
+        {% if contract_doc.status == 'pending' %}
+          <div class="mb-3 flex items-center gap-2 rounded-lg bg-yellow-50 border border-yellow-200 px-3.5 py-2.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            <span class="text-[13px] font-semibold text-yellow-700">Pending review — your room won't be public yet, but you don't need to re-upload.</span>
+          </div>
+        {% elif contract_doc.status == 'rejected' %}
+          <div class="mb-3 rounded-lg bg-rose-50 border border-rose-200 px-3.5 py-2.5">
+            <p class="text-[13px] font-semibold text-rose-700">Rejected{% if contract_doc.rejection_reason %} — {{ contract_doc.rejection_reason }}{% endif %}. Please re-upload — your room will not be visible until this is approved.</p>
+          </div>
+        {% else %}
+          <div class="mb-3 flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3.5 py-2.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+            <span class="text-[13px] font-semibold text-amber-700">Without a rental contract, your room will NOT appear to seekers.</span>
+          </div>
+        {% endif %}
+        <input type="file" id="nm-contract-file" accept=".pdf,.jpg,.jpeg,.png"
+          class="text-xs text-gray-500 file:mr-3 file:rounded-lg file:border-0 file:bg-violet-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-violet-700 hover:file:bg-violet-100" />
+        <p id="nm-contract-error" class="mt-2 text-xs text-rose-600"></p>
+      {% endif %}
+    </div>
+
     <!-- Publish banner -->
     <div class="rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4" style="background:linear-gradient(135deg,#4C1D95,#7C3AED)">
       <div>
@@ -791,7 +835,7 @@ tailwind.config = {
 
 <script>
 /* post_room.js — Post a Room wizard logic */
-
+parSubmit 
 window._parStep = 1;
 var PAR_TOTAL_STEPS = 5;
 var PAR_CHEVRON_RIGHT_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
@@ -1735,6 +1779,38 @@ function parRenderReview() {
   }
 }
 
+var VERIFICATION_UPLOAD_URL = "{% url 'accounts_app:verification' %}";
+
+function parUploadContract(listingId, csrfToken, onDone) {
+  var fileInput = document.getElementById('nm-contract-file');
+  var errorEl   = document.getElementById('nm-contract-error');
+  var file = fileInput && fileInput.files[0];
+
+  if (!file) { onDone(); return; }
+
+  var fd = new FormData();
+  fd.append('document_type', 'rental_contract');
+  fd.append('listing_id', listingId);
+  fd.append('file', file);
+
+  fetch(VERIFICATION_UPLOAD_URL, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
+    body: fd,
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if (!data.success && errorEl) {
+      errorEl.textContent = Object.values(data.errors || {})[0] || 'Contract upload failed — you can retry from your profile.';
+    }
+    onDone();
+  })
+  .catch(function(){
+    if (errorEl) errorEl.textContent = 'Contract upload failed — you can retry from your profile.';
+    onDone();
+  });
+}
+
 function parSubmit(action) {
   // Publishing requires every step (1-4) to pass its validator
   if (action === 'publish') {
@@ -1743,33 +1819,73 @@ function parSubmit(action) {
       if (errs.length) {
         parStep(s);
         parShowStepErrors(s, errs);
-        // The inline banner alone is easy to miss — make the block impossible
-        // to overlook, since a silently-failed publish looks identical to a
-        // successful one at a glance (same page, no navigation).
-        alert('Your listing was NOT published:\n\n' + errs.map(function(e){ return '• ' + e.msg; }).join('\n'));
         return;
       }
     }
+
+    // ── Rental contract check ──────────────────────────────────
+    var contractInput = document.getElementById('nm-contract-file');
+    var hasNewFile     = contractInput && contractInput.files.length > 0;
+    var hasExistingDoc = document.getElementById('nm-contract-existing-status') !== null;
+
+    if (!hasNewFile && !hasExistingDoc) {
+      parStep(5);
+      parShowStepErrors(5, [{
+        msg: 'You must upload a rental contract. Without it, your room will be saved but will NOT appear to seekers until the contract is submitted and approved.',
+        focusEl: null,
+      }]);
+      var contractSection = contractInput ? contractInput.closest('.bg-white.rounded-2xl') : null;
+      if (contractSection) contractSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
   }
 
-  // Sync action (publish / draft)
   var actionInput = document.getElementById('par-action');
   if (actionInput) actionInput.value = action;
 
-  // Sync max_occupants from stepper display
   var occInput = document.getElementById('par-max-occupants');
   if (occInput) occInput.value = _parOcc;
 
-  // Sync custom requirements as JSON
   var items = parCollectCustomRequirements();
   var jsonInput = document.getElementById('par-custom-json');
   if (jsonInput) jsonInput.value = JSON.stringify(items);
 
   parSyncFileInput();
 
-  try { localStorage.removeItem('nestmatch_post_room_draft_v1'); } catch (e) {}
+  var form = document.getElementById('par-form');
+  var csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]').value;
+  var formData = new FormData(form);
 
-  document.getElementById('par-form').submit();
+  var submitBtns = document.querySelectorAll('#par-form button[onclick^="parSubmit"]');
+  submitBtns.forEach(function(b){ b.disabled = true; });
+
+  fetch(form.getAttribute('action'), {  
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    body: formData,
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if (!data.success) {
+      submitBtns.forEach(function(b){ b.disabled = false; });
+      var msgs = Object.values(data.errors || {}).flat().map(function(m){ return { msg: m, focusEl: null }; });
+      parShowStepErrors(window._parStep, msgs);
+      return;
+    }
+
+    try { localStorage.removeItem(PAR_DRAFT_KEY); } catch (e) {}
+
+    var listingIdEl = document.getElementById('par-listing-id');
+    var listingId = data.listing_id || (listingIdEl ? listingIdEl.value : null);
+
+    parUploadContract(listingId, csrfToken, function(){
+      window.location.href = data.redirect_url;
+    });
+  })
+  .catch(function(){
+    submitBtns.forEach(function(b){ b.disabled = false; });
+    parShowStepErrors(window._parStep, [{ msg: 'Something went wrong. Please try again.', focusEl: null }]);
+  });
 }
 
 // ── Autosave / Resume Draft ─────────────────────────────────────────────

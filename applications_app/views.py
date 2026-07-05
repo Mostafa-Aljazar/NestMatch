@@ -135,6 +135,27 @@ def apply_to_listing(request, pk):
     if listing.poster_id == request.user.id:
         return JsonResponse({'error': 'You cannot apply to your own listing'}, status=400)
 
+    # The listing itself must be fully verified (contract + poster's ID),
+    # otherwise it shouldn't be applicable to at all — mirrors the same
+    # check used in room_detail.
+    is_fully_verified = listing.contract_documents.filter(
+        document_type='rental_contract', status='approved'
+    ).exists() and listing.poster.verification_documents.filter(
+        document_type='id_document', status='approved'
+    ).exists()
+    if not is_fully_verified:
+        return JsonResponse({'error': 'This listing is not available yet'}, status=400)
+
+    # The applicant (seeker) must have their own ID verified before they
+    # can apply — protects posters from unverified applicants.
+    id_status = request.user.verification_status['id_document']
+    if id_status != 'approved':
+        return JsonResponse(
+            {'error': 'Please verify your ID before applying to a listing',
+             'code': 'id_not_verified', 'id_status': id_status},
+            status=403,
+        )
+    
     if Application.objects.filter(listing=listing, seeker=request.user).exists():
         return JsonResponse({'error': 'You have already applied to this listing'}, status=400)
 

@@ -6,8 +6,8 @@ from django.db.models.functions import TruncDate
 from django.utils import timezone
 from datetime import timedelta
 import json
-
-from accounts_app.models import User
+from django.utils import timezone
+from accounts_app.models import User, VerificationDocument, Testimonial
 from listings_app.models import Listing
 from applications_app.models import Application
 from core_app.models import SiteContent
@@ -106,6 +106,35 @@ def index(request):
     # ── Site content (for Site Content tab) ──────────────────────────────────
     site_content = SiteContent.load()
 
+    # ── Verification documents (for Verification tab) ────────────────────────
+    pending_documents = (
+        VerificationDocument.objects
+        .filter(status='pending')
+        .select_related('user', 'listing')
+        .order_by('created_at')
+    )
+    all_documents = (
+        VerificationDocument.objects
+        .select_related('user', 'listing')
+        .order_by('-updated_at')
+    )
+    pending_documents_count = pending_documents.count()
+
+    # ── Reviews / testimonials moderation ─────────────────────────────────────
+    pending_reviews = (
+        Testimonial.objects
+        .filter(approved=False)
+        .select_related('user')
+        .order_by('created_at')
+    )
+    approved_reviews = (
+        Testimonial.objects
+        .filter(approved=True)
+        .select_related('user')
+        .order_by('-created_at')
+    )
+    pending_reviews_count = pending_reviews.count()
+
     context = {
         # cards
         'total_users':        total_users,
@@ -124,6 +153,14 @@ def index(request):
         'all_listings':       all_listings,
         'banned_list':        banned_list,
         'site_content':       site_content,
+
+        'pending_documents':       pending_documents,
+        'all_documents':           all_documents,
+        'pending_documents_count': pending_documents_count,
+
+        'pending_reviews':       pending_reviews,
+        'approved_reviews':      approved_reviews,
+        'pending_reviews_count': pending_reviews_count,
     }
     return render(request, 'dashboard_app/index.html', context)
 
@@ -196,3 +233,47 @@ def update_site_content(request):
         content.save()
 
     return redirect(f"{reverse('dashboard_app:index')}#site-content")
+
+# ── Verification document moderation ──────────────────────────────────────────
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def approve_document(request, doc_id):
+    if request.method == 'POST':
+        doc = get_object_or_404(VerificationDocument, id=doc_id)
+        doc.status = VerificationDocument.APPROVED
+        doc.rejection_reason = ''
+        doc.reviewed_by = request.user
+        doc.reviewed_at = timezone.now()
+        doc.save()
+    return redirect(f"{reverse('dashboard_app:index')}#verification")
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def reject_document(request, doc_id):
+    if request.method == 'POST':
+        doc = get_object_or_404(VerificationDocument, id=doc_id)
+        doc.status = VerificationDocument.REJECTED
+        doc.rejection_reason = request.POST.get('reason', '').strip()
+        doc.reviewed_by = request.user
+        doc.reviewed_at = timezone.now()
+        doc.save()
+    return redirect(f"{reverse('dashboard_app:index')}#verification")
+
+
+# ── Review moderation ──────────────────────────────────────────────────────
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def approve_review(request, review_id):
+    if request.method == 'POST':
+        review = get_object_or_404(Testimonial, id=review_id)
+        review.approved = True
+        review.save()
+    return redirect(f"{reverse('dashboard_app:index')}#reviews")
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def reject_review(request, review_id):
+    if request.method == 'POST':
+        review = get_object_or_404(Testimonial, id=review_id)
+        review.delete()
+    return redirect(f"{reverse('dashboard_app:index')}#reviews")
