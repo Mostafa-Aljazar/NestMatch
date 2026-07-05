@@ -7,9 +7,7 @@ from django.utils import timezone
 from datetime import timedelta
 import json
 from django.utils import timezone
-from accounts_app.models import VerificationDocument
-
-from accounts_app.models import User
+from accounts_app.models import User, VerificationDocument, Testimonial
 from listings_app.models import Listing
 from applications_app.models import Application
 from core_app.models import SiteContent
@@ -122,6 +120,21 @@ def index(request):
     )
     pending_documents_count = pending_documents.count()
 
+    # ── Reviews / testimonials moderation ─────────────────────────────────────
+    pending_reviews = (
+        Testimonial.objects
+        .filter(approved=False)
+        .select_related('user')
+        .order_by('created_at')
+    )
+    approved_reviews = (
+        Testimonial.objects
+        .filter(approved=True)
+        .select_related('user')
+        .order_by('-created_at')
+    )
+    pending_reviews_count = pending_reviews.count()
+
     context = {
         # cards
         'total_users':        total_users,
@@ -144,6 +157,10 @@ def index(request):
         'pending_documents':       pending_documents,
         'all_documents':           all_documents,
         'pending_documents_count': pending_documents_count,
+
+        'pending_reviews':       pending_reviews,
+        'approved_reviews':      approved_reviews,
+        'pending_reviews_count': pending_reviews_count,
     }
     return render(request, 'dashboard_app/index.html', context)
 
@@ -241,3 +258,22 @@ def reject_document(request, doc_id):
         doc.reviewed_at = timezone.now()
         doc.save()
     return redirect(f"{reverse('dashboard_app:index')}#verification")
+
+
+# ── Review moderation ──────────────────────────────────────────────────────
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def approve_review(request, review_id):
+    if request.method == 'POST':
+        review = get_object_or_404(Testimonial, id=review_id)
+        review.approved = True
+        review.save()
+    return redirect(f"{reverse('dashboard_app:index')}#reviews")
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def reject_review(request, review_id):
+    if request.method == 'POST':
+        review = get_object_or_404(Testimonial, id=review_id)
+        review.delete()
+    return redirect(f"{reverse('dashboard_app:index')}#reviews")

@@ -6,7 +6,7 @@ from django.db.models import Avg, Count, Q
 from django.http import JsonResponse ,Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
-
+from django.urls import reverse 
 from .models import Favorite, Listing, ListingImage
 
 def listings_page(request):
@@ -127,9 +127,14 @@ def post_room_page(request, pk=None):
         for img in listing.images.all()
     ] if listing else []
 
+    contract_doc = None
+    if listing is not None:
+        contract_doc = listing.contract_documents.filter(document_type='rental_contract').first()
+
     return render(request, 'listings_app/post_room.html', {
         'listing': listing,
         'existing_images_json': existing_images,
+        'contract_doc': contract_doc,
     })
 
 
@@ -137,14 +142,38 @@ def post_room_page(request, pk=None):
 def create_listing(request):
     if request.method == 'GET':
         return render(request, 'listings_app/post_room.html')
+    
+    # The form can now be submitted in two ways:
+    # 1) A traditional form submit (no JS) → we must return plain HTML
+    #    (render/redirect), same as before.
+    # 2) A fetch() call from JS (so we can immediately upload the rental
+    #    contract for this listing right after) → we must return JSON so
+    #    the JS knows whether the save succeeded, and can read the new
+    #    listing_id + redirect_url from the response.
+    # The difference: fetch() automatically sends this header, a normal
+    # form submit does not.
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     try:
         listing = Listing.objects.create_from_post(request.POST, request.FILES, request.user)
     except ValidationError as e:
-        return render(request, 'listings_app/post_room.html', {
-            'errors': e.message_dict,
-        })
+       if is_ajax:
+            return JsonResponse({'success': False, 'errors': e.message_dict})
+       return render(request, 'listings_app/post_room.html', {'errors': e.message_dict})
 
+    if is_ajax:
+        redirect_url = (
+            reverse('listings_app:room_detail', args=[listing.pk])
+            if listing.status == 'active'
+            else reverse('listings_app:my_listings')
+        )
+        return JsonResponse({
+            'success': True,
+            'listing_id': listing.pk,
+            'status': listing.status,
+            'redirect_url': redirect_url,
+        })
+    
     if listing.status == 'active':
         return redirect('listings_app:room_detail', pk=listing.pk)
     return redirect('listings_app:my_listings')
@@ -154,6 +183,7 @@ def create_listing(request):
 @require_POST
 def update_listing(request, pk):
     listing = get_object_or_404(Listing, pk=pk, poster=request.user)
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     try:
         listing = Listing.objects.update_from_post(
@@ -161,6 +191,8 @@ def update_listing(request, pk):
             kept_images_json=request.POST.get('kept_image_ids', '[]'),
         )
     except ValidationError as e:
+        if is_ajax:
+            return JsonResponse({'success': False, 'errors': e.message_dict})
         return render(request, 'listings_app/post_room.html', {
             'errors': e.message_dict,
             'listing': listing,
@@ -169,7 +201,20 @@ def update_listing(request, pk):
                 for img in listing.images.all()
             ],
         })
-
+    
+    if is_ajax:
+        redirect_url = (
+            reverse('listings_app:room_detail', args=[listing.pk])
+            if listing.status == 'active'
+            else reverse('listings_app:my_listings')
+        )
+        return JsonResponse({
+            'success': True,
+            'listing_id': listing.pk,
+            'status': listing.status,
+            'redirect_url': redirect_url,
+        })
+    
     if listing.status == 'active':
         return redirect('listings_app:room_detail', pk=listing.pk)
     return redirect('listings_app:my_listings')

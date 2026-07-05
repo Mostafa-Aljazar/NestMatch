@@ -183,7 +183,7 @@ document.addEventListener('keydown', function (e) {
   }
 })();
 
-
+ 
 /* ── APPLY MODAL ──────────────────────────────────────── */
 function nmOpenModal() {
   var banner = document.getElementById('nm-verify-required-banner');

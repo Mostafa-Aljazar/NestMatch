@@ -133,6 +133,10 @@ a{text-decoration:none;cursor:pointer}
          Verification
         <span style="margin-left:auto;background:rgba(245,158,11,.25);color:#FCD34D;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ pending_documents_count }}</span>
       </div>
+      <div class="adm-nl" id="anl-reviews" onclick="admTab('reviews')">
+        <span style="font-size:16px">⭐</span> Reviews
+        <span style="margin-left:auto;background:rgba(245,158,11,.25);color:#FCD34D;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px">{{ pending_reviews_count }}</span>
+      </div>
       <div class="adm-nl" id="anl-site-content" onclick="admTab('site-content')"><span style="font-size:16px">🖋️</span> Site Content</div>
       <div style="height:1px;background:rgba(255,255,255,.08);margin:12px 0"></div>
       <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1.2px;text-transform:uppercase;padding:0 4px;margin-bottom:6px">SYSTEM</div>
@@ -545,6 +549,73 @@ a{text-decoration:none;cursor:pointer}
         </div>
       </div>
 
+      <!-- ═══ REVIEWS ═══ -->
+      <div id="av-reviews" style="display:none;animation:fadeIn .35s ease both">
+        <div style="margin-bottom:20px">
+          <h2 style="font-size:20px;font-weight:800;color:#111827">Reviews</h2>
+          <p style="font-size:13px;color:#6B7280;margin-top:2px">{{ pending_reviews_count }} review{{ pending_reviews_count|pluralize }} awaiting approval</p>
+        </div>
+
+        <!-- Pending first -->
+        <div class="adm-card">
+          <div class="adm-section-title">Pending Review</div>
+          <div style="overflow-x:auto">
+            <table class="adm-tbl">
+              <thead><tr><th>Reviewer</th><th>Role</th><th>Location</th><th>Review</th><th>Submitted</th><th>Actions</th></tr></thead>
+              <tbody>
+                {% for review in pending_reviews %}
+                <tr>
+                  <td style="font-weight:600">{{ review.reviewer_name }}</td>
+                  <td>{{ review.get_role_display }}</td>
+                  <td style="color:#6B7280">{{ review.location|default:"—" }}</td>
+                  <td style="color:#374151;max-width:280px">{{ review.quote|truncatechars:100 }}</td>
+                  <td style="color:#6B7280;white-space:nowrap">{{ review.created_at|date:"M d, Y" }}</td>
+                  <td>
+                    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                      <form method="post" action="{% url 'dashboard_app:approve_review' review.id %}" style="display:inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-unban">Approve</button>
+                      </form>
+                      <form method="post" action="{% url 'dashboard_app:reject_review' review.id %}" style="display:inline"
+                            onsubmit="return confirm('Delete this review permanently?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-ban">Reject</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:20px">No pending reviews.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Approved history -->
+        <div class="adm-card">
+          <div class="adm-section-title">Approved Reviews</div>
+          <div style="overflow-x:auto">
+            <table class="adm-tbl">
+              <thead><tr><th>Reviewer</th><th>Role</th><th>Location</th><th>Review</th><th>Date</th></tr></thead>
+              <tbody>
+                {% for review in approved_reviews %}
+                <tr>
+                  <td style="font-weight:600">{{ review.reviewer_name }}</td>
+                  <td>{{ review.get_role_display }}</td>
+                  <td style="color:#6B7280">{{ review.location|default:"—" }}</td>
+                  <td style="color:#374151;max-width:280px">{{ review.quote|truncatechars:100 }}</td>
+                  <td style="color:#6B7280;white-space:nowrap">{{ review.created_at|date:"M d, Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align:center;color:#9CA3AF;padding:20px">No approved reviews yet.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- ═══ SITE CONTENT (Landing Page Editor) ═══ -->
       <div id="av-site-content" style="display:none;animation:fadeIn .35s ease both">
         <div style="margin-bottom:20px">
@@ -783,8 +854,8 @@ function drawChart() {
 drawChart();
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
-const tabs   = ['overview','users','listings','banned','verification','site-content','settings'];
-const labels = { overview:'📊 Overview', users:'👥 Users', listings:'🏠 Listings', banned:'🚫 Banned Users',verification:' Verification', 'site-content':'🖋️ Site Content', settings:'⚙️ Settings' };
+const tabs   = ['overview','users','listings','banned','verification','reviews','site-content','settings'];
+const labels = { overview:'📊 Overview', users:'👥 Users', listings:'🏠 Listings', banned:'🚫 Banned Users',verification:' Verification', reviews:'⭐ Reviews', 'site-content':'🖋️ Site Content', settings:'⚙️ Settings' };
 
 window.admTab = (tab) => {
   tabs.forEach(t => {
