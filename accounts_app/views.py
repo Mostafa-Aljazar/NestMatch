@@ -367,7 +367,7 @@ def delete_account_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('accounts_app:login')
+    return redirect('core_app:index')
 
 
 def _send_otp_email(user, otp):
@@ -576,6 +576,20 @@ def verification_view(request):
         listing_id = request.POST.get('listing_id')
         listing = get_object_or_404(Listing, id=listing_id, poster=request.user)
 
+    # Block re-upload once a document has already been approved — an
+    # approved ID/contract shouldn't be silently swapped for a different
+    # file after the fact. Resubmission is only allowed while pending or
+    # after a rejection.
+    existing_lookup = {'user': request.user, 'document_type': document_type}
+    if listing is not None:
+        existing_lookup['listing'] = listing
+    existing_doc = VerificationDocument.objects.filter(**existing_lookup).first()
+    if existing_doc and existing_doc.status == VerificationDocument.APPROVED:
+        return JsonResponse({
+            'success': False,
+            'errors': {'file': 'This document has already been approved and cannot be replaced.'},
+        })
+    
     error = VerificationDocument.objects.validate_upload(file)
     if error:
         return JsonResponse({'success': False, 'errors': {'file': error}})

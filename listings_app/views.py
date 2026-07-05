@@ -3,15 +3,23 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q
-from django.http import JsonResponse
+from django.http import JsonResponse ,Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from .models import Favorite, Listing, ListingImage
 
-
 def listings_page(request):
-    qs = Listing.objects.filter(status='active').prefetch_related('images')
+    qs = Listing.objects.filter(
+        status='active',
+        # Both must be approved before a listing shows publicly:
+        # 1) the listing's own rental contract (proves the room/lease is legit)
+        contract_documents__document_type='rental_contract',
+        contract_documents__status='approved',
+        # 2) the poster's identity (proves the person renting it out is verified)
+        poster__verification_documents__document_type='id_document',
+        poster__verification_documents__status='approved',
+    ).distinct().prefetch_related('images')
 
     # ── Search ────────────────────────────────────────────────────────────────
     q = request.GET.get('q', '').strip()
@@ -204,6 +212,26 @@ def room_detail(request, pk):
     from applications_app.models import Application, ListingReview
 
     listing = get_object_or_404(Listing, pk=pk, status='active')
+    is_own_listing = (
+        request.user.is_authenticated and listing.poster_id == request.user.id
+    )
+
+    # A listing counts as "fully verified" only once BOTH its rental
+    # contract AND its poster's identity have been approved by admin.
+    is_fully_verified = listing.contract_documents.filter(
+        document_type='rental_contract', status='approved'
+    ).exists() and listing.poster.verification_documents.filter(
+        document_type='id_document', status='approved'
+    ).exists()
+
+    # Blocks the "direct link" loophole: without this, an unverified
+    # listing wouldn't show up on /listings/ (filtered there already),
+    # but anyone with its direct URL could still open this page and see
+    # full details. Only the poster themself is allowed to view it
+    # while it's still pending/rejected — everyone else gets a 404.
+    if not is_own_listing and not is_fully_verified:
+        raise Http404
+    
     reviews = listing.reviews.select_related('reviewer').all()
     rating_avg = reviews.aggregate(avg=Avg('rating'))['avg']
 
@@ -214,7 +242,6 @@ def room_detail(request, pk):
     has_profile = False
     compatibility = None
     if request.user.is_authenticated:
-        is_own_listing = listing.poster_id == request.user.id
         my_application = Application.objects.filter(listing=listing, seeker=request.user).first()
         can_review = (
             my_application is not None
