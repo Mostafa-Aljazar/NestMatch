@@ -100,7 +100,7 @@ def _application_stats(user):
 
 def my_applications(request):
     if request.user.is_authenticated:
-        apps     = Application.objects.filter(seeker=request.user).select_related('listing', 'listing__poster').prefetch_related('listing__images')
+        apps     = Application.objects.filter(seeker=request.user).select_related('listing', 'listing__poster', 'agreement').prefetch_related('listing__images')
         stats    = _application_stats(request.user)
         total    = stats['total']
         pending  = stats['pending']
@@ -209,7 +209,7 @@ def listing_applicants(request, pk):
     apps = (
         Application.objects
         .filter(listing=listing)
-        .select_related('seeker')
+        .select_related('seeker', 'agreement')
         .order_by('-applied_at')
     )
     return render(request, 'applications_app/listing_applicants.html', {

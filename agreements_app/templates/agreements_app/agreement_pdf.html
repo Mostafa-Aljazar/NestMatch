@@ -1,0 +1,161 @@
+<html>
+<head>
+<style>
+  @page { size: A4; margin: 1.2cm 1.6cm; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 8.5pt; color: #111827; line-height: 1.25; }
+
+  .title { text-align: center; font-size: 17pt; font-weight: bold; color: #111827; letter-spacing: 1px; margin-bottom: 2px; }
+  .title-rule { text-align: center; font-size: 9pt; color: #9CA3AF; margin-bottom: 8px; }
+  .intro { text-align: center; font-size: 8.5pt; color: #374151; margin-bottom: 10px; }
+
+  /* ── Party info boxes (two-column, bordered field rows) ── */
+  table.parties { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+  table.parties td.col { width: 48%; vertical-align: top; padding: 0; }
+  table.parties td.gap { width: 4%; }
+
+  table.party-box { width: 100%; border-collapse: collapse; border: 1px solid #6B7280; }
+  table.party-box th { background-color: #E5E7EB; color: #111827; font-size: 9pt; font-weight: bold; text-align: center; padding: 4px; border-bottom: 1px solid #6B7280; }
+  table.party-box td { padding: 2px 8px; font-size: 8pt; border-top: 1px solid #D1D5DB; }
+  table.party-box td.field-label { color: #374151; font-weight: bold; width: 34%; }
+  table.party-box td.field-value { color: #111827; }
+
+  /* ── Property details strip (type / address / description) ── */
+  table.property-box { width: 100%; border-collapse: collapse; border: 1px solid #6B7280; margin-bottom: 8px; }
+  table.property-box th { background-color: #E5E7EB; font-size: 8pt; font-weight: bold; text-align: center; padding: 3px; border: 1px solid #6B7280; width: 33.33%; }
+  table.property-box td { font-size: 8pt; text-align: center; padding: 3px; border: 1px solid #D1D5DB; }
+
+  .agreed-line { text-align: center; font-size: 8.5pt; font-weight: bold; color: #111827; margin: 8px 0 6px 0; }
+
+  /* ── Section headers (solid black bar) ── */
+  .clause-header { background-color: #111827; color: #FFFFFF; font-size: 8.5pt; font-weight: bold; padding: 3px 8px; margin-top: 7px; }
+  p.clause-body { white-space: pre-wrap; text-align: justify; margin: 4px 2px 0 2px; }
+  ul.clause-list { margin: 4px 2px 0 2px; padding-left: 14px; list-style: none; }
+  ul.clause-list li { text-align: justify; margin-bottom: 2px; padding-left: 4px; }
+  ul.clause-list li:before { content: "\2022"; margin-right: 6px; color: #111827; }
+  ol.clause-list-num { margin: 4px 2px 0 2px; padding-left: 16px; }
+  ol.clause-list-num li { text-align: justify; margin-bottom: 2px; padding-left: 4px; }
+
+  .copies-note { text-align: center; font-size: 8pt; color: #374151; margin: 8px 0 6px 0; }
+
+  /* ── Signature / witness boxes ── */
+  table.signatures { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  table.signatures td.col { width: 48%; vertical-align: top; padding: 0; }
+  table.signatures td.gap { width: 4%; }
+  table.sig-box { width: 100%; border-collapse: collapse; border: 1px solid #6B7280; }
+  table.sig-box th { background-color: #E5E7EB; font-size: 8.5pt; font-weight: bold; text-align: center; padding: 4px; border-bottom: 1px solid #6B7280; }
+  table.sig-box td { padding: 3px 8px; font-size: 8pt; border-top: 1px solid #D1D5DB; }
+
+  .footer { margin-top: 10px; font-size: 7pt; color: #9CA3AF; text-align: center; }
+</style>
+</head>
+<body>
+
+  <div class="title">RENTAL AGREEMENT</div>
+  <div class="title-rule">&#9670;&#9670;&#9670;&#9670;&#9670;</div>
+  <div class="intro">This Rental Agreement ("Agreement") is made and entered into on {{ agreement.created_at|date:"F j, Y" }}, by and between the following parties:</div>
+
+  <table class="parties">
+    <tr>
+      <td class="col">
+        <table class="party-box">
+          <tr><th colspan="2">PARTY ONE (THE LANDLORD)</th></tr>
+          <tr><td class="field-label">Name</td><td class="field-value">{{ agreement.poster.full_name }}</td></tr>
+          <tr><td class="field-label">Email</td><td class="field-value">{{ agreement.poster.email }}</td></tr>
+          <tr><td class="field-label">Phone</td><td class="field-value">{{ agreement.poster.phone_number|default:"Not provided" }}</td></tr>
+        </table>
+      </td>
+      <td class="gap"></td>
+      <td class="col">
+        <table class="party-box">
+          <tr><th colspan="2">PARTY TWO (THE TENANT)</th></tr>
+          <tr><td class="field-label">Name</td><td class="field-value">{{ agreement.tenant.full_name }}</td></tr>
+          <tr><td class="field-label">Email</td><td class="field-value">{{ agreement.tenant.email }}</td></tr>
+          <tr><td class="field-label">Phone</td><td class="field-value">{{ agreement.tenant.phone_number|default:"Not provided" }}</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <table class="property-box">
+    <tr>
+      <th>PROPERTY TYPE</th>
+      <th>LOCATION</th>
+      <th>LISTING</th>
+    </tr>
+    <tr>
+      <td>{{ agreement.listing.get_listing_type_display }}</td>
+      <td>{{ agreement.listing.district }}, {{ agreement.listing.city }}</td>
+      <td>{{ agreement.listing.title }}</td>
+    </tr>
+  </table>
+
+  <div class="agreed-line">The parties, having full legal capacity, hereby agree to the following terms:</div>
+
+  <div class="clause-header">CLAUSE 1 &mdash; SUBJECT OF LEASE</div>
+  <p class="clause-body">{{ sections.subject_of_lease }}</p>
+
+  <div class="clause-header">CLAUSE 2 &mdash; TERM AND DURATION</div>
+  <p class="clause-body">{{ sections.term_and_duration }}</p>
+
+  <div class="clause-header">CLAUSE 3 &mdash; RENT AND PAYMENT TERMS</div>
+  <p class="clause-body">{{ sections.rent_and_payment_terms }}</p>
+
+  <div class="clause-header">CLAUSE 4 &mdash; OBLIGATIONS OF THE LANDLORD</div>
+  <ul class="clause-list">
+    {% for line in sections.landlord_obligations_lines %}<li>{{ line }}</li>{% endfor %}
+  </ul>
+
+  <div class="clause-header">CLAUSE 5 &mdash; OBLIGATIONS OF THE TENANT</div>
+  <ul class="clause-list">
+    {% for line in sections.tenant_obligations_lines %}<li>{{ line }}</li>{% endfor %}
+  </ul>
+
+  <div class="clause-header">CLAUSE 6 &mdash; GENERAL PROVISIONS</div>
+  <ol class="clause-list-num">
+    {% for line in sections.general_provisions_lines %}<li>{{ line }}</li>{% endfor %}
+  </ol>
+
+  <div class="copies-note">This Agreement is executed in two (2) original counterparts, one retained by each party, both of equal legal effect.</div>
+
+  <div class="agreed-line">IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.</div>
+
+  <table class="signatures">
+    <tr>
+      <td class="col">
+        <table class="sig-box">
+          <tr><th>PARTY ONE (LANDLORD)</th></tr>
+          <tr><td>Name: {{ agreement.poster.full_name }}</td></tr>
+          {% if agreement.poster_signed_at %}
+          <tr><td>Signature: {{ agreement.poster_signed_name }} (signed)</td></tr>
+          <tr><td>Date: {{ agreement.poster_signed_at|date:"F j, Y, g:i A" }}</td></tr>
+          {% else %}
+          <tr><td>Signature: ________________________</td></tr>
+          <tr><td>Date: ________________________</td></tr>
+          {% endif %}
+        </table>
+      </td>
+      <td class="gap"></td>
+      <td class="col">
+        <table class="sig-box">
+          <tr><th>PARTY TWO (TENANT)</th></tr>
+          <tr><td>Name: {{ agreement.tenant.full_name }}</td></tr>
+          {% if agreement.tenant_signed_at %}
+          <tr><td>Signature: {{ agreement.tenant_signed_name }} (signed)</td></tr>
+          <tr><td>Date: {{ agreement.tenant_signed_at|date:"F j, Y, g:i A" }}</td></tr>
+          {% else %}
+          <tr><td>Signature: ________________________</td></tr>
+          <tr><td>Date: ________________________</td></tr>
+          {% endif %}
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <div class="footer">
+    {% if agreement.is_fallback %}Generated from a standard template.{% else %}Generated with AI assistance.{% endif %}
+    &nbsp;&middot;&nbsp; Version {{ agreement.version }} &nbsp;&middot;&nbsp;
+    This document is provided for convenience and does not constitute legal advice.
+  </div>
+
+</body>
+</html>

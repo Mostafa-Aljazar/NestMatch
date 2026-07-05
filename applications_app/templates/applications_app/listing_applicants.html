@@ -158,6 +158,21 @@
             </button>
           </div>
 
+          <!-- agreement action, shown only once accepted -->
+          <div data-agreement-actions class="flex flex-col sm:flex-row gap-2 mt-3 {% if app.status != 'accepted' %}hidden{% endif %}">
+            {% if app.agreement %}
+            <a href="{% url 'agreements_app:view' app.agreement.pk %}"
+               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-violet-700 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors">
+              📄 View Agreement
+            </a>
+            {% else %}
+            <button onclick="nmGenerateAgreement({{ app.pk }}, this)"
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-violet-700 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors cursor-pointer font-jakarta">
+              ✨ Generate Agreement
+            </button>
+            {% endif %}
+          </div>
+
         </div>
       </div>
     </div>

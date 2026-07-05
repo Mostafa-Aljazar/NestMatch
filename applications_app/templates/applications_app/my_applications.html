@@ -130,7 +130,7 @@
           <div class="text-sm font-bold text-white">Congratulations! You've been accepted.</div>
           <div class="text-xs text-emerald-100 mt-0.5">Download your rental agreement below</div>
         </div>
-        <button onclick="nmDownloadAgreement(this,'{{ l.title }}')"
+        <button onclick="nmDownloadAgreementDemo(this,'{{ l.title }}')"
           class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-white hover:bg-emerald-50 transition-colors border-0 cursor-pointer font-jakarta">
           📄 Download Agreement
         </button>
@@ -316,12 +316,19 @@
         <span class="text-xl shrink-0">🎉</span>
         <div class="flex-1 min-w-0">
           <div class="text-sm font-bold text-white">Congratulations! You've been accepted.</div>
-          <div class="text-xs text-emerald-100 mt-0.5">Download your rental agreement below</div>
+          <div class="text-xs text-emerald-100 mt-0.5">View, sign, and download your rental agreement below</div>
         </div>
-        <button onclick="nmDownloadAgreement(this,'{{ app.listing.title }}')"
+        {% if app.agreement %}
+        <a href="{% url 'agreements_app:view' app.agreement.pk %}"
           class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-white hover:bg-emerald-50 transition-colors border-0 cursor-pointer font-jakarta">
-          📄 Download Agreement
+          📄 View & Sign Agreement
+        </a>
+        {% else %}
+        <button onclick="nmDownloadAgreement(this, '{{ app.listing.title }}', {{ app.pk }})"
+          class="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-white hover:bg-emerald-50 transition-colors border-0 cursor-pointer font-jakarta">
+          📄 Generate Agreement
         </button>
+        {% endif %}
       </div>
 
       <div class="flex flex-col sm:flex-row gap-3 p-4">
