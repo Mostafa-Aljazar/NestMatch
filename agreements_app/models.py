@@ -1,3 +1,4 @@
+# agreements_app models.py file
 from django.conf import settings
 from django.db import models
 

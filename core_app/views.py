@@ -1,3 +1,4 @@
+# core_app views.py file
 from django.shortcuts import render, redirect
 
 from .models import SiteContent
