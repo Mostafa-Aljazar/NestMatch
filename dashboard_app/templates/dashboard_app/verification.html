@@ -1,0 +1,78 @@
+{% extends "dashboard_app/base.html" %}
+
+{% block title %}Verification - NestMatch Admin{% endblock %}
+
+{% block page_icon %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>{% endblock %}
+
+{% block page_title %}Verification{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:20px">
+  <h2 style="font-size:20px;font-weight:800;color:#111827">Verification Documents</h2>
+  <p style="font-size:13px;color:#6B7280;margin-top:2px">{{ pending_documents|length }} document{{ pending_documents|pluralize }} awaiting review</p>
+</div>
+
+<!-- Pending first -->
+<div class="adm-card">
+  <div class="adm-section-title">Pending Review</div>
+  <div style="overflow-x:auto">
+    <table class="adm-tbl">
+      <thead><tr><th>User</th><th>Type</th><th>Listing</th><th>Submitted</th><th>File</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for doc in pending_documents %}
+        <tr>
+          <td style="font-weight:600">{{ doc.user.full_name }}</td>
+          <td>{{ doc.get_document_type_display }}</td>
+          <td style="color:#6B7280">{{ doc.listing.title|default:"—" }}</td>
+          <td style="color:#6B7280;white-space:nowrap">{{ doc.created_at|date:"M d, Y" }}</td>
+          <td><a href="{% url 'accounts_app:verification_document' doc.id %}" target="_blank" style="color:#7C3AED;font-weight:600;font-size:12px">View file</a></td>
+          <td>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              <form method="post" action="{% url 'dashboard_app:approve_document' doc.id %}" style="display:inline">
+                {% csrf_token %}
+                <button type="submit" class="btn-unban">Approve</button>
+              </form>
+              <form method="post" action="{% url 'dashboard_app:reject_document' doc.id %}" style="display:flex;gap:5px;align-items:center">
+                {% csrf_token %}
+                <input type="text" name="reason" placeholder="Rejection reason" class="adm-input" style="padding:5px 8px;font-size:11px;width:140px">
+                <button type="submit" class="btn-ban">Reject</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:20px">No pending documents. </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- All documents history -->
+<div class="adm-card">
+  <div class="adm-section-title">All Documents</div>
+  <div style="overflow-x:auto">
+    <table class="adm-tbl">
+      <thead><tr><th>User</th><th>Type</th><th>Listing</th><th>Status</th><th>Reviewed</th><th>File</th></tr></thead>
+      <tbody>
+        {% for doc in all_documents %}
+        <tr>
+          <td style="font-weight:600">{{ doc.user.full_name }}</td>
+          <td>{{ doc.get_document_type_display }}</td>
+          <td style="color:#6B7280">{{ doc.listing.title|default:"—" }}</td>
+          <td>
+            {% if doc.status == 'approved' %}<span class="badge badge-green">Approved</span>
+            {% elif doc.status == 'rejected' %}<span class="badge badge-red" title="{{ doc.rejection_reason }}">Rejected</span>
+            {% else %}<span class="badge badge-yellow">Pending</span>{% endif %}
+          </td>
+          <td style="color:#6B7280;white-space:nowrap">{% if doc.reviewed_at %}{{ doc.reviewed_at|date:"M d, Y" }}{% else %}—{% endif %}</td>
+          <td><a href="{% url 'accounts_app:verification_document' doc.id %}" target="_blank" style="color:#7C3AED;font-weight:600;font-size:12px">View</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:20px">No documents yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

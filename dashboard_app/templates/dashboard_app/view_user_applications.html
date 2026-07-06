@@ -1,0 +1,48 @@
+{% extends "dashboard_app/base.html" %}
+
+{% block title %}{{ user.full_name }}'s Applications - NestMatch Admin{% endblock %}
+
+{% block page_icon %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>{% endblock %}
+
+{% block page_title %}{{ user.full_name }}'s Applications{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:20px">
+  <a href="{% url 'dashboard_app:users' %}" style="font-size:12px;color:#7C3AED;text-decoration:none;font-weight:600">← Back to Users</a>
+  <h2 style="font-size:20px;font-weight:800;color:#111827;margin-top:8px">{{ user.full_name }}'s Applications</h2>
+  <p style="font-size:13px;color:#6B7280;margin-top:2px">{{ applications|length }} application{{ applications|pluralize }}</p>
+</div>
+<div class="adm-card">
+  <div style="overflow-x:auto">
+    <table class="adm-tbl">
+      <thead><tr><th>Listing</th><th>Poster</th><th>Applied</th><th>Match</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td>
+            <div style="font-size:12px;font-weight:600;color:#374151;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ app.listing.title }}</div>
+            <div style="font-size:11px;color:#9CA3AF">{{ app.listing.city }}</div>
+          </td>
+          <td style="color:#6B7280;white-space:nowrap;font-size:12px">{{ app.listing.poster.full_name }}</td>
+          <td style="color:#6B7280;white-space:nowrap;font-size:11px">{{ app.applied_at|date:"M d, Y" }}</td>
+          <td style="padding:13px 14px;vertical-align:middle">
+            {% if app.compatibility %}<span style="font-size:12px;font-weight:700;color:{% if app.compatibility >= 80 %}#7C3AED{% elif app.compatibility >= 60 %}#D97706{% else %}#E11D48{% endif %}">{{ app.compatibility }}%</span>
+            {% else %}<span style="font-size:12px;color:#9CA3AF">&mdash;</span>{% endif %}
+          </td>
+          <td>
+            {% if app.status == "pending" %}<span class="badge badge-yellow">Pending</span>
+            {% elif app.status == "accepted" %}<span class="badge badge-green">Accepted</span>
+            {% else %}<span class="badge badge-red">Rejected</span>{% endif %}
+          </td>
+          <td>
+            <a href="{% url 'dashboard_app:listing_detail' app.listing.id %}" style="font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:6px;padding:4px 9px">View Room</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:20px">No applications yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

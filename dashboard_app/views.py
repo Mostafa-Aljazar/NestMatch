@@ -22,19 +22,16 @@ def is_admin(user):
 
 
 # ─────────────────────────────────────────────
-# DASHBOARD INDEX
+# OVERVIEW PAGE
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
-def index(request):
-
-    # ── Basic metrics ─────────────────────────
+def overview(request):
     total_users = User.objects.count()
     active_listings = Listing.objects.filter(status='active').count()
     total_applications = Application.objects.count()
     banned_users = User.objects.filter(is_active=False).count()
     unread_messages = ContactMessage.objects.filter(is_read=False).count()
 
-    # ── Activity chart (last 30 days) ─────────
     thirty_days_ago = timezone.now() - timedelta(days=30)
 
     users_per_day = (
@@ -61,7 +58,6 @@ def index(request):
         {'day': str(r['day']), 'count': r['count']} for r in listings_per_day
     ])
 
-    # ── Top cities ────────────────────────────
     top_cities_qs = (
         Listing.objects.filter(status='active', city__isnull=False)
         .exclude(city='')
@@ -81,14 +77,36 @@ def index(request):
         for row in top_cities_qs
     ]
 
-    # ── Top listings ──────────────────────────
     top_listings = (
         Listing.objects.annotate(app_count=Count('applications'))
         .order_by('-app_count')[:5]
     )
 
-    # ── Users ────────────────────────────────
     recent_users = User.objects.order_by('-created_at')[:10]
+
+    context = {
+        'current_tab': 'overview',
+        'total_users': total_users,
+        'active_listings': active_listings,
+        'total_applications': total_applications,
+        'banned_users': banned_users,
+        'unread_messages': unread_messages,
+        'chart_users': chart_users,
+        'chart_listings': chart_listings,
+        'top_cities': top_cities,
+        'top_listings': top_listings,
+        'recent_users': recent_users,
+    }
+
+    return render(request, 'dashboard_app/overview.html', context)
+
+
+# ─────────────────────────────────────────────
+# USERS PAGE
+# ─────────────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def users_list(request):
+    from django.core.paginator import Paginator
 
     all_users = (
         User.objects.annotate(
@@ -98,16 +116,73 @@ def index(request):
         .order_by('-created_at')
     )
 
-    banned_list = User.objects.filter(is_active=False).order_by('-updated_at')
+    paginator = Paginator(all_users, 10)  # 10 users per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
-    # ── Listings ──────────────────────────────
+    context = {
+        'current_tab': 'users',
+        'page_obj': page_obj,
+        'all_users': page_obj.object_list,
+    }
+
+    return render(request, 'dashboard_app/users.html', context)
+
+
+# ─────────────────────────────────────────────
+# LISTINGS PAGE
+# ─────────────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def listings_list(request):
     all_listings = (
         Listing.objects.select_related('poster')
         .annotate(app_count=Count('applications'))
         .order_by('-created_at')
     )
 
-    # ── Applications stats ────────────────────
+    context = {
+        'current_tab': 'listings',
+        'all_listings': all_listings,
+    }
+
+    return render(request, 'dashboard_app/listings.html', context)
+
+
+# ─────────────────────────────────────────────
+# BANNED USERS PAGE
+# ─────────────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def banned_users_list(request):
+    banned_list = User.objects.filter(is_active=False).order_by('-updated_at')
+
+    context = {
+        'current_tab': 'banned',
+        'banned_list': banned_list,
+    }
+
+    return render(request, 'dashboard_app/banned_users.html', context)
+
+
+# ─────────────────────────────────────────────
+# MESSAGES PAGE
+# ─────────────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def messages_list(request):
+    all_messages = ContactMessage.objects.all().order_by('-created_at')
+
+    context = {
+        'current_tab': 'messages',
+        'all_messages': all_messages,
+    }
+
+    return render(request, 'dashboard_app/messages.html', context)
+
+
+# ─────────────────────────────────────────────
+# APPLICATIONS PAGE
+# ─────────────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def applications_list(request):
     total_applications = Application.objects.count()
 
     app_stats = {
@@ -126,13 +201,20 @@ def index(request):
         .order_by('-applied_at')
     )
 
-    # ── Messages ─────────────────────────────
-    all_messages = ContactMessage.objects.all()
+    context = {
+        'current_tab': 'applications',
+        'all_applications': all_applications,
+        'app_stats': app_stats,
+    }
 
-    # ── Site content ─────────────────────────
-    site_content = SiteContent.load()
+    return render(request, 'dashboard_app/applications.html', context)
 
-    # ── Verification ─────────────────────────
+
+# ─────────────────────────────────────────────
+# VERIFICATION PAGE
+# ─────────────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def verification_list(request):
     pending_documents = (
         VerificationDocument.objects.filter(status='pending')
         .select_related('user', 'listing')
@@ -144,54 +226,63 @@ def index(request):
         .order_by('-updated_at')
     )
 
-    # ── Reviews ──────────────────────────────
+    context = {
+        'current_tab': 'verification',
+        'pending_documents': pending_documents,
+        'all_documents': all_documents,
+    }
+
+    return render(request, 'dashboard_app/verification.html', context)
+
+
+# ─────────────────────────────────────────────
+# REVIEWS PAGE
+# ─────────────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def reviews_list(request):
     pending_reviews = Testimonial.objects.filter(approved=False).select_related('user')
     approved_reviews = Testimonial.objects.filter(approved=True).select_related('user')
 
     context = {
-        # metrics
-        'total_users': total_users,
-        'active_listings': active_listings,
-        'total_applications': total_applications,
-        'banned_users': banned_users,
-        'unread_messages': unread_messages,
-
-        # charts
-        'chart_users': chart_users,
-        'chart_listings': chart_listings,
-
-        # dashboard blocks
-        'top_cities': top_cities,
-        'top_listings': top_listings,
-        'recent_users': recent_users,
-
-        # users
-        'all_users': all_users,
-        'banned_list': banned_list,
-
-        # listings
-        'all_listings': all_listings,
-
-        # applications
-        'all_applications': all_applications,
-        'app_stats': app_stats,
-
-        # messages
-        'all_messages': all_messages,
-
-        # content
-        'site_content': site_content,
-
-        # verification
-        'pending_documents': pending_documents,
-        'all_documents': all_documents,
-
-        # reviews
+        'current_tab': 'reviews',
         'pending_reviews': pending_reviews,
         'approved_reviews': approved_reviews,
     }
 
-    return render(request, 'dashboard_app/index.html', context)
+    return render(request, 'dashboard_app/reviews.html', context)
+
+
+# ─────────────────────────────────────────────
+# SITE CONTENT PAGE
+# ─────────────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def site_content_page(request):
+    site_content = SiteContent.load()
+
+    context = {
+        'current_tab': 'site-content',
+        'site_content': site_content,
+    }
+
+    return render(request, 'dashboard_app/site_content.html', context)
+
+
+# ─────────────────────────────────────────────
+# SETTINGS PAGE
+# ─────────────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def settings_page(request):
+    context = {
+        'current_tab': 'settings',
+    }
+
+    return render(request, 'dashboard_app/settings.html', context)
+
+
+# Redirect old index to overview
+@user_passes_test(is_admin, login_url='/auth/login/')
+def index(request):
+    return redirect('dashboard_app:overview')
 
 
 # ─────────────────────────────────────────────
@@ -340,6 +431,55 @@ def reject_review(request, review_id):
     if request.method == 'POST':
         get_object_or_404(Testimonial, id=review_id).delete()
     return redirect(f"{reverse('dashboard_app:index')}#reviews")
+
+# ── View user listings (admin only) ──────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def view_user_listings(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    listings = (
+        Listing.objects.filter(poster=user)
+        .annotate(app_count=Count('applications'))
+        .order_by('-created_at')
+    )
+
+    return render(request, 'dashboard_app/view_user_listings.html', {
+        'user': user,
+        'listings': listings,
+        'current_tab': 'users',
+    })
+
+
+# ── View user applications (admin only) ──────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def view_user_applications(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    applications = (
+        Application.objects.filter(seeker=user)
+        .select_related('listing', 'listing__poster')
+        .order_by('-applied_at')
+    )
+
+    return render(request, 'dashboard_app/view_user_applications.html', {
+        'user': user,
+        'applications': applications,
+        'current_tab': 'users',
+    })
+
+
+# ── Delete user ───────────────────────────────────────────────────────────
+@user_passes_test(is_admin, login_url='/auth/login/')
+def delete_user(request, user_id):
+    if request.method == 'POST':
+        user = get_object_or_404(User, id=user_id)
+        user.delete()
+        return redirect('dashboard_app:users')
+
+    user = get_object_or_404(User, id=user_id)
+    return render(request, 'dashboard_app/confirm_delete_user.html', {
+        'user': user,
+        'current_tab': 'users',
+    })
+
 
 # ── Listing detail (admin view — all applications for a room) ─────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
