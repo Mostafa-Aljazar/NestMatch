@@ -15,14 +15,13 @@ urlpatterns = [
     path('listing/restore/<int:listing_id>/', views.restore_listing, name='restore_listing'),
     path('listing/delete/<int:listing_id>/',  views.delete_listing,  name='delete_listing'),
 
+    # Listing detail (admin — all applications for a room)
+    path('listing/<int:listing_id>/', views.listing_detail, name='listing_detail'),
+
+    # Contact messages
+    path('messages/read/<int:message_id>/',   views.mark_message_read, name='mark_message_read'),
+    path('messages/delete/<int:message_id>/', views.delete_message,    name='delete_message'),
+
     # Site content
     path('site-content/', views.update_site_content, name='update_site_content'),
-
-    # verification
-    path('verification/<int:doc_id>/approve/', views.approve_document, name='approve_document'),
-    path('verification/<int:doc_id>/reject/', views.reject_document, name='reject_document'),
-
-    # Reviews
-    path('reviews/<int:review_id>/approve/', views.approve_review, name='approve_review'),
-    path('reviews/<int:review_id>/reject/',  views.reject_review,  name='reject_review'),
 ]
