@@ -5,7 +5,6 @@ from PIL import Image, UnidentifiedImageError
 from django.utils import timezone
 import uuid ,random , re
 from pathlib import Path
-from django.utils import timezone
 
 class UserManager(BaseUserManager):
     # Regex patterns for validating username and email formats

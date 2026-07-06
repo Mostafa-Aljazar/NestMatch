@@ -57,6 +57,7 @@ tailwind.config = {
 .nm-step-bar::-webkit-scrollbar{display:none}
 /* Animations */
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes parToastIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .fade-up{animation:fadeUp .4s ease both}
 </style>
@@ -158,20 +159,6 @@ tailwind.config = {
 </div>
 {% endif %}
 
-{% if errors %}
-<div class="bg-rose-50 border border-rose-200 rounded-lg px-4 py-3 mb-5 flex flex-col gap-1.5" id="par-server-errors">
-  <div class="text-sm font-extrabold text-rose-700">Your listing was NOT saved — please fix the following:</div>
-  {% for field, msgs in errors.items %}
-    {% for msg in msgs %}
-    <div class="text-[13px] text-rose-700 font-semibold flex items-center gap-2">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>
-      <span>{{ msg }}</span>
-    </div>
-    {% endfor %}
-  {% endfor %}
-</div>
-{% endif %}
-
   <!-- STEP 1: Basic Info -->
   <div id="par-s1" class="fade-up">
 
@@ -230,6 +217,7 @@ tailwind.config = {
             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-500">$</span>
             <input type="number" id="par-rent" name="price" placeholder="250" value="{{ listing.price|default:'' }}" class="nm-input pl-7" min="0">
           </div>
+          <p id="par-rent-error" class="mt-2 text-xs text-rose-600 hidden"></p>
           <div id="par-rent-hint" class="text-[11px] text-gray-400 mt-1">Per person / per month</div>
         </div>
         <div>
@@ -350,6 +338,7 @@ tailwind.config = {
         <span class="text-xs text-gray-400">Be specific — mention area, university, or nearby landmark</span>
         <span id="par-title-count" class="text-xs text-gray-400">0 / 80</span>
       </div>
+      <p id="par-title-error" class="mt-2 text-xs text-rose-600 hidden"></p>
     </div>
 
     <div class="bg-white rounded-2xl p-7 shadow-card">
@@ -383,6 +372,8 @@ tailwind.config = {
           <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Full Address <span class="text-[11px] font-normal text-gray-400">— auto-filled from map</span></label>
           <input type="text" id="nm-field-address" name="address" placeholder="Pin on the map below to auto-fill" value="{{ listing.address|default:'' }}" class="nm-input bg-gray-50">
         </div>
+
+        <p id="par-location-error" class="mt-2 text-xs text-rose-600 hidden"></p>
 
         <div class="relative">
           <label class="text-[13px] font-semibold text-gray-700 block mb-1.5">Nearest Landmark</label>
@@ -435,6 +426,7 @@ tailwind.config = {
         <p class="text-xs text-gray-400 mt-3.5">Tag each photo below so seekers can browse by room in the photo tour.</p>
         <!-- Uploaded preview chips -->
         <div id="nm-preview-list" class="flex flex-col gap-2.5 mt-2"></div>
+        <p id="par-photos-error" class="mt-2 text-xs text-rose-600 hidden"></p>
       </div>
 
       <div class="bg-white rounded-2xl p-7 shadow-card">
@@ -714,13 +706,14 @@ tailwind.config = {
           <h3 class="text-base font-bold text-gray-900 flex items-center gap-2"><span class="shrink-0">{% icon 'edit' size=16 %}</span>Custom Requirements</h3>
           <p class="text-xs text-gray-400 mt-0.5">Add your own rules that don't fit the categories above</p>
         </div>
-        <button onclick="parAddCustom()" class="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold text-violet-600 bg-violet-50 border border-violet-200 rounded-lg cursor-pointer font-sans hover:bg-violet-100 transition-colors">
+        <button type="button" onclick="parAddCustom()" class="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold text-violet-600 bg-violet-50 border border-violet-200 rounded-lg cursor-pointer font-sans hover:bg-violet-100 transition-colors">
           + Add Custom Item
         </button>
       </div>
       <div id="nm-custom-list" class="flex flex-col gap-2.5">
         <!-- custom items injected here -->
       </div>
+      <p id="par-custom-error" class="mt-2 text-xs text-rose-600 hidden"></p>
       <div id="nm-custom-empty" class="text-center py-6 text-gray-400 text-[13px]">
         No custom requirements yet. Click <strong class="text-violet-600">+ Add Custom Item</strong> to create one.
       </div>
@@ -866,7 +859,7 @@ var PAR_STEP_VALIDATORS = {
   1: function() {
     var errors = [];
     var price = parseFloat((document.getElementById('par-rent') || {}).value);
-    if (!price || price <= 0) errors.push({ msg: 'Enter a monthly rent greater than 0.', focusEl: 'par-rent' });
+    if (!price || price <= 0) errors.push({ field: 'par-rent', msg: 'Enter a monthly rent greater than 0.', focusEl: 'par-rent' });
     var listingType = (document.getElementById('par-listing-type') || {}).value;
     if (!listingType) errors.push({ msg: 'Select a listing type.', focusEl: null });
     return errors;
@@ -874,7 +867,10 @@ var PAR_STEP_VALIDATORS = {
   2: function() {
     var errors = [];
     var title = (document.getElementById('par-title') || {}).value.trim();
-    if (title.length < 10) errors.push({ msg: 'Title must be at least 10 characters.', focusEl: 'par-title' });
+    if (title.length < 10) errors.push({ field: 'par-title', msg: 'Title must be at least 10 characters.', focusEl: 'par-title' });
+    var lat = (document.getElementById('nm-lat') || {}).value;
+    var lng = (document.getElementById('nm-lng') || {}).value;
+    if (!lat || !lng) errors.push({ field: 'par-location', msg: 'Pin the room on the map so seekers can find it.', focusEl: 'nm-map-search' });
     return errors;
   },
   3: function() {
@@ -896,26 +892,85 @@ function parIsStepValid(s) {
   return parValidateStep(s).length === 0;
 }
 
+function parShowToast(message, isError) {
+  if (!message) return;
+  var existing = document.getElementById('par-toast');
+  if (existing) existing.remove();
+  var toast = document.createElement('div');
+  toast.id = 'par-toast';
+  toast.className = 'fixed right-4 top-24 z-[999] pointer-events-auto animate-[parToastIn_0.25s_ease]';
+  toast.style.width = '360px';
+  toast.style.maxWidth = '360px';
+  toast.style.background   = isError ? '#fff1f2' : '#f0fdf4';
+  toast.style.border       = '1px solid ' + (isError ? '#fecdd3' : '#bbf7d0');
+  toast.style.borderRadius = '14px';
+  toast.style.padding      = '14px 16px';
+  toast.style.boxShadow    = isError
+    ? '0 4px 24px rgba(239,68,68,.10)'
+    : '0 4px 24px rgba(16,185,129,.10)';
+  toast.style.fontFamily   = "'Plus Jakarta Sans', sans-serif";
+
+  var textColor   = isError ? '#b91c1c' : '#15803d';
+  var accentColor = isError ? '#dc2626' : '#16a34a';
+
+  var icon = isError
+    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="' + accentColor + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>'
+    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="' + accentColor + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>';
+
+  toast.innerHTML =
+    '<div style="display:flex;align-items:flex-start;gap:12px">' +
+      icon +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:13px;font-weight:700;color:' + textColor + ';margin-bottom:3px">' + (isError ? 'Error' : 'Success') + '</div>' +
+        '<div style="font-size:13px;font-weight:500;color:' + textColor + ';line-height:1.5">' + message + '</div>' +
+      '</div>' +
+      '<button type="button" onclick="document.getElementById(\'par-toast\')?.remove()" ' +
+        'style="background:transparent;border:none;color:' + textColor + ';cursor:pointer;font-size:16px;line-height:1;padding:0;flex-shrink:0;margin-top:1px;opacity:.6">✕</button>' +
+    '</div>';
+
+  document.body.appendChild(toast);
+  setTimeout(function(){ toast.remove(); }, 5000);
+}
+
+
+
+function parSetFieldError(fieldId, message) {
+  var errorEl = document.getElementById(fieldId + '-error');
+  if (!errorEl) return;
+  if (message) {
+    errorEl.textContent = message;
+    errorEl.classList.remove('hidden');
+  } else {
+    errorEl.textContent = '';
+    errorEl.classList.add('hidden');
+  }
+}
+
+function parClearFieldErrors() {
+  parSetFieldError('par-rent', '');
+  parSetFieldError('par-title', '');
+  parSetFieldError('par-location', '');
+  parSetFieldError('par-photos', '');
+  parSetFieldError('par-custom', '');
+}
+
+
 function parShowStepErrors(stepNum, errors) {
+  parClearFieldErrors();
   var container = document.getElementById('par-s' + stepNum);
   if (!container) return;
   var existing = container.querySelector('.nm-step-error-banner');
   if (existing) existing.remove();
-  var banner = document.createElement('div');
-  banner.className = 'nm-step-error-banner bg-rose-50 border border-rose-200 rounded-lg px-4 py-3 mb-5 flex flex-col gap-1.5';
-  errors.forEach(function(err) {
-    var line = document.createElement('div');
-    line.className = 'text-[13px] text-rose-700 font-semibold flex items-center gap-2';
-    line.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg><span></span>';
-    line.querySelector('span').textContent = err.msg;
-    banner.appendChild(line);
-  });
-  container.insertBefore(banner, container.firstChild);
-  banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  var focusId = errors[0] && errors[0].focusEl;
-  if (focusId) {
-    var el = document.getElementById(focusId);
-    if (el) setTimeout(function(){ el.focus(); }, 300);
+  // Map server/client field errors to inline elements, but surface as a toast
+  if (errors && errors.length) {
+    errors.forEach(function(err) { if (err.field) parSetFieldError(err.field, err.msg); });
+    parShowToast(errors[0].msg, true);
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var focusId = errors[0] && errors[0].focusEl;
+    if (focusId) {
+      var el = document.getElementById(focusId);
+      if (el) setTimeout(function(){ el.focus(); }, 300);
+    }
   }
 }
 
@@ -1411,20 +1466,20 @@ function parMapSearch() {
     .then(function(r){ return r.json(); })
     .then(function(results){
       if (btn) { btn.textContent = 'Search'; btn.disabled = false; }
-      if (!results || !results.length) { alert('Location not found. Try a more specific address.'); return; }
+      if (!results || !results.length) { parShowToast('Location not found. Try a more specific address.', true); return; }
       parSetPin(parseFloat(results[0].lat), parseFloat(results[0].lon), results[0].display_name);
     })
     .catch(function(){
       if (btn) { btn.textContent = 'Search'; btn.disabled = false; }
-      alert('Search failed. Check your connection.');
+      parShowToast('Search failed. Check your connection.', true);
     });
 }
 
 function parMapLocate() {
-  if (!navigator.geolocation) { alert('Geolocation is not supported by your browser.'); return; }
+  if (!navigator.geolocation) { parShowToast('Geolocation is not supported by your browser.', true); return; }
   navigator.geolocation.getCurrentPosition(
     function(pos) { parSetPin(pos.coords.latitude, pos.coords.longitude, null); },
-    function()    { alert('Could not get your location. Please allow location access.'); }
+    function()    { parShowToast('Could not get your location. Please allow location access.', true); }
   );
 }
 
@@ -1461,10 +1516,10 @@ var _ROOM_LABELS = [
 
 function parHandleFiles(files) {
   for (var i = 0; i < files.length; i++) {
-    if (_photos.length >= 10) { alert('Maximum 10 photos allowed.'); break; }
+    if (_photos.length >= 10) { parShowToast('Maximum 10 photos allowed.', true); break; }
     var file = files[i];
     if (!file.type.match('image.*')) continue;
-    if (file.size > 10 * 1024 * 1024) { alert(file.name + ' exceeds 10MB limit.'); continue; }
+    if (file.size > 10 * 1024 * 1024) { parShowToast(file.name + ' exceeds 10MB limit.', true); continue; }
     (function(f) {
       parCompressImage(f, function(outputFile) {
         var reader = new FileReader();
@@ -1679,11 +1734,11 @@ function parAddCustom() {
   row.id  = id;
   row.className = 'nm-custom-item';
   row.style.cssText = 'display:flex;align-items:center;gap:10px;background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:8px;padding:12px 14px;animation:fadeUp .3s ease both';
-  row.innerHTML = '<select onchange="parCustomEmoji(this)" style="font-size:18px;border:none;background:transparent;cursor:pointer;padding:2px;outline:none;flex-shrink:0">'
+  row.innerHTML = '<select style="font-size:18px;border:none;background:transparent;cursor:pointer;padding:2px;outline:none;flex-shrink:0">'
     + _emojiOptions.map(function(e){ return '<option value="'+e+'">'+e+'</option>'; }).join('')
     + '</select>'
     + '<input type="text" class="nm-custom-text-input" placeholder="e.g. Must water the plants on Fridays" style="flex:1;border:none;background:transparent;font-size:14px;font-weight:500;color:#111827;outline:none;font-family:inherit" />'
-    + '<label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;cursor:pointer;inset:0;background:#7C3AED;border-radius:24px;transition:.3s" onclick="this.style.background=this.previousElementSibling.checked?\'#E5E7EB\':\'#7C3AED\'"><span style="position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;transform:translateX(20px);box-shadow:0 1px 4px rgba(0,0,0,.2)"></span></span></label>'
+    + '<label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0"><input type="checkbox" checked style="opacity:0;width:0;height:0" onchange="parUpdateCustomToggle(this)"><span onclick="this.previousElementSibling.checked=!this.previousElementSibling.checked;parUpdateCustomToggle(this.previousElementSibling)" style="position:absolute;cursor:pointer;inset:0;background:#7C3AED;border-radius:24px;transition:.3s;display:flex;align-items:center;padding-left:3px;box-sizing:border-box"><span style="height:18px;width:18px;background:#fff;border-radius:50%;transition:.3s;transform:translateX(20px);box-shadow:0 1px 4px rgba(0,0,0,.2)"></span></span></label>'
     + '<button onclick="parRemoveCustom(\''+id+'\')" style="width:26px;height:26px;border-radius:50%;background:#FEE2E2;border:none;cursor:pointer;color:#EF4444;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:inherit">'+PAR_CLOSE_SVG+'</button>';
   list.appendChild(row);
   return row;
@@ -1703,9 +1758,27 @@ function parCollectCustomRequirements() {
     var cb    = row.querySelector('input[type="checkbox"]');
     var input = row.querySelector('.nm-custom-text-input');
     var text  = input ? input.value.trim() : '';
-    if (text) items.push({ text: text, enabled: cb ? cb.checked : true });
+    var sel   = row.querySelector('select');
+    var emoji = sel ? sel.value : '✅';
+    if (text) items.push({ text: text, enabled: cb ? cb.checked : true, emoji: emoji });
   });
   return items;
+}
+
+function parUpdateCustomToggle(el) {
+  if (!el) return;
+  var wrapper = el.nextElementSibling;
+  if (!wrapper) return;
+  wrapper.style.background = el.checked ? '#7C3AED' : '#E5E7EB';
+  var thumb = wrapper.querySelector('span');
+  if (thumb) thumb.style.transform = el.checked ? 'translateX(20px)' : 'translateX(0)';
+}
+
+function parCustomEmoji(select) {
+  var row = select.closest('.nm-custom-item');
+  if (!row) return;
+  var input = row.querySelector('.nm-custom-text-input');
+  if (input) input.focus();
 }
 
 // Form submission — syncs hidden inputs then submits
@@ -1859,17 +1932,39 @@ function parSubmit(action) {
   var submitBtns = document.querySelectorAll('#par-form button[onclick^="parSubmit"]');
   submitBtns.forEach(function(b){ b.disabled = true; });
 
-  fetch(form.getAttribute('action'), {  
+  fetch(form.getAttribute('action'), {
     method: 'POST',
-    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
     body: formData,
+    credentials: 'same-origin'
   })
-  .then(function(r){ return r.json(); })
+  .then(function(r){
+    var ct = (r.headers.get('content-type') || '').toLowerCase();
+    if (!ct.includes('application/json')) {
+      return r.text().then(function(t){ throw new Error('non-json'); });
+    }
+    return r.json();
+  })
   .then(function(data){
     if (!data.success) {
       submitBtns.forEach(function(b){ b.disabled = false; });
-      var msgs = Object.values(data.errors || {}).flat().map(function(m){ return { msg: m, focusEl: null }; });
-      parShowStepErrors(window._parStep, msgs);
+      var errs = [];
+      Object.entries(data.errors || {}).forEach(function(pair){
+        var key = pair[0];
+        var arr = pair[1] || [];
+        arr.forEach(function(m){
+          if (!m) return;
+          // Map server field keys to UI field ids
+          if (key === 'price' || key === 'rent') errs.push({ field: 'par-rent', msg: m, focusEl: 'par-rent' });
+          else if (key === 'title') errs.push({ field: 'par-title', msg: m, focusEl: 'par-title' });
+          else if (key === 'custom_requirements' || key === 'custom_requirements_json') errs.push({ field: 'par-custom', msg: m, focusEl: null });
+          else if (key === 'images' || key.indexOf('image') !== -1) errs.push({ field: 'par-photos', msg: m, focusEl: null });
+          else if (key === '__all__' || key === 'non_field_errors') { parShowToast(m, true); }
+          else errs.push({ msg: m, focusEl: null });
+        });
+      });
+      if (errs.length === 0) { parShowToast(data.message || 'Could not save listing.', true); return; }
+      parShowStepErrors(window._parStep, errs);
       return;
     }
 
@@ -1882,9 +1977,9 @@ function parSubmit(action) {
       window.location.href = data.redirect_url;
     });
   })
-  .catch(function(){
+  .catch(function(e){
     submitBtns.forEach(function(b){ b.disabled = false; });
-    parShowStepErrors(window._parStep, [{ msg: 'Something went wrong. Please try again.', focusEl: null }]);
+    parShowToast('Something went wrong. Please try again.', true);
   });
 }
 
@@ -1944,7 +2039,6 @@ function parShowResumeBanner(draft) {
       '<button type="button" onclick="parRestoreDraft()" class="px-4 py-2 text-[12px] font-bold text-white bg-violet-600 rounded-lg cursor-pointer">Restore</button>' +
       '<button type="button" onclick="parDiscardDraft()" class="px-4 py-2 text-[12px] font-bold text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer">Discard</button>' +
     '</div>';
-  form.insertBefore(banner, form.firstChild);
   window._parPendingDraft = draft;
 }
 
@@ -1953,6 +2047,7 @@ function parDiscardDraft() {
   var banner = document.getElementById('nm-resume-banner');
   if (banner) banner.remove();
 }
+    
 
 function parRestoreDraft() {
   var draft = window._parPendingDraft;
@@ -1993,10 +2088,12 @@ function parRestoreDraft() {
   (draft.customRequirements || []).forEach(function(item) {
     var row = parAddCustom();
     if (!row) return;
-    var input = row.querySelector('.nm-custom-text-input');
-    var cb    = row.querySelector('input[type="checkbox"]');
+    var input  = row.querySelector('.nm-custom-text-input');
+    var cb     = row.querySelector('input[type="checkbox"]');
+    var select = row.querySelector('select');
     if (input) input.value = item.text;
     if (cb) cb.checked = !!item.enabled;
+    if (select && item.emoji) select.value = item.emoji;
   });
 
   var titleEl = document.getElementById('par-title');
@@ -2088,10 +2185,12 @@ function parRestoreDraft() {
         JSON.parse(jsonInput.value).forEach(function(item) {
           var row = parAddCustom();
           if (!row) return;
-          var input = row.querySelector('.nm-custom-text-input');
-          var cb    = row.querySelector('input[type="checkbox"]');
+          var input  = row.querySelector('.nm-custom-text-input');
+          var cb     = row.querySelector('input[type="checkbox"]');
+          var select = row.querySelector('select');
           if (input) input.value = item.text;
           if (cb) cb.checked = !!item.enabled;
+          if (select && item.emoji) select.value = item.emoji;
         });
       } catch (e) {}
     }
@@ -2104,8 +2203,7 @@ function parRestoreDraft() {
   var serverErrors = document.getElementById('par-server-errors');
   if (serverErrors) {
     serverErrors.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    var msgs = Array.from(serverErrors.querySelectorAll('span')).map(function(s){ return s.textContent; });
-    alert('Your listing was NOT saved:\n\n' + msgs.map(function(m){ return '• ' + m; }).join('\n'));
+    parShowToast('Your listing was NOT saved — please fix the highlighted fields.', true);
   }
 })();
 

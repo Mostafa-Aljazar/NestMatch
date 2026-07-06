@@ -1,6 +1,6 @@
 # core_app views.py file
 from django.shortcuts import render, redirect
-
+from django.contrib.auth import get_user_model
 from .models import SiteContent
 from listings_app.models import Listing
 from accounts_app.models import Testimonial
@@ -11,14 +11,21 @@ import re
 
 def index(request):
     content = SiteContent.load()
+    # Use get_user_model() instead of importing User directly, so this
+    # still works correctly if the project switches to a custom user model
+    User = get_user_model()
 
-    latest_listings = (
-        Listing.objects
-        .filter(status='active')
-        .select_related('poster')
-        .prefetch_related('images')
-        .order_by('-created_at')[:6]
-    )
+
+    latest_listings = Listing.objects.filter(
+        status='active',
+        # Both must be approved before a listing shows publicly:
+        # 1) the listing's own rental contract (proves the room/lease is legit)
+        contract_documents__document_type='rental_contract',
+        contract_documents__status='approved',
+        # 2) the poster's identity (proves the person renting it out is verified)
+        poster__verification_documents__document_type='id_document',
+        poster__verification_documents__status='approved',
+    ).select_related('poster').prefetch_related('images').distinct().order_by('-created_at')[:6]
 
     reviews = (
         Testimonial.objects
@@ -26,10 +33,31 @@ def index(request):
         .order_by('-created_at')[:6]
     )
 
+    # Live platform stats, computed from real data
+    active_listings_count = Listing.objects.filter(status='active').count()
+    registered_users_count = User.objects.count()
+    cities_count = (
+        Listing.objects
+        .filter(status='active')
+        .exclude(city='')
+        .values('city')
+        .distinct()
+        .count()
+    )
+    happy_matches_count = Testimonial.objects.filter(approved=True).count()
+
+    stats = [
+        {'value': f'{active_listings_count}+', 'label': 'Active Listings'},
+        {'value': f'{registered_users_count}+', 'label': 'Registered Users'},
+        {'value': f'{cities_count}+', 'label': 'Cities Covered'},
+        {'value': f'{happy_matches_count}+', 'label': 'Happy Matches'},
+    ]
+
     context = {
         'content':         content,
         'latest_listings': latest_listings,
         'reviews':         reviews,
+        'stats':           stats,   
     }
     return render(request, 'core_app/landing.html', context)
 

@@ -146,7 +146,9 @@
               {% icon 'people' size=13 %} Applicants
             </a>
             <form method="POST" action="{% url 'listings_app:delete_listing' listing.pk %}"
-                  onsubmit="return confirm('Delete this listing? This cannot be undone.');" class="inline">
+                  data-delete-form
+                  data-delete-title="{{ listing.title|escapejs }}"
+                  class="inline">
               {% csrf_token %}
               <button type="submit"
                 class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors cursor-pointer font-jakarta">
@@ -165,7 +167,68 @@
 
 </div>
 
+  <div id="delete-confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4 py-6">
+    <div class="w-full max-w-md rounded-[28px] border border-gray-200 bg-white p-6 shadow-2xl">
+      <div class="flex items-start gap-3">
+        <div class="mt-1 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-100 text-rose-700">
+          {% icon 'warning' size=18 %}
+        </div>
+        <div class="min-w-0">
+          <h2 class="text-xl font-semibold text-gray-900">Confirm delete</h2>
+          <p class="mt-2 text-sm text-gray-600">Are you sure you want to delete <span id="delete-confirm-title" class="font-semibold text-gray-900"></span>? This action cannot be undone.</p>
+        </div>
+      </div>
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+        <button id="delete-confirm-cancel" type="button" class="inline-flex justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">Cancel</button>
+        <button id="delete-confirm-submit" type="button" class="inline-flex justify-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Delete listing</button>
+      </div>
+    </div>
+  </div>
+
 {% include "core_app/partials/footer.html" %}
+
+<script>
+  (function() {
+    const modal = document.getElementById('delete-confirm-modal');
+    const confirmTitle = document.getElementById('delete-confirm-title');
+    const cancelButton = document.getElementById('delete-confirm-cancel');
+    const submitButton = document.getElementById('delete-confirm-submit');
+    let pendingForm = null;
+
+    function openModal(form) {
+      const title = form.dataset.deleteTitle || 'this listing';
+      pendingForm = form;
+      confirmTitle.textContent = title;
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      pendingForm = null;
+      modal.classList.add('hidden');
+    }
+
+    document.querySelectorAll('form[data-delete-form]').forEach((form) => {
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        openModal(form);
+      });
+    });
+
+    cancelButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(event) {
+      if (event.target === modal) closeModal();
+    });
+    submitButton.addEventListener('click', function() {
+      if (pendingForm) pendingForm.submit();
+    });
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+  })();
+</script>
 
 </body>
 </html>

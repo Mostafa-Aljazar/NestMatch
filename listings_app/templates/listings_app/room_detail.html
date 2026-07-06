@@ -776,36 +776,7 @@ tailwind.config = {
       </a>
     </div>
 
-    <!-- ─── 9. Things to Know ─── -->
-    {% if listing.check_in_time or listing.check_out_time or listing.smoke_alarm or listing.carbon_monoxide_alarm or listing.first_aid_kit %}
-    <div class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100 mb-4 last:mb-0 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-[18px] sm:mb-2.5" style="animation-delay:.2s">
-      <h3 class="text-[17px] font-extrabold text-gray-900 mb-[18px] tracking-tight sm:text-[15px] sm:mb-3.5">Things to Know</h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        {% if listing.check_in_time or listing.check_out_time %}
-        <div>
-          <div class="text-[13px] font-extrabold text-gray-900 mb-2 flex items-center gap-1.5">{% icon 'clock' size=13 %} House Rules</div>
-          <div class="flex flex-col gap-1.5 text-[13px] text-gray-500">
-            {% if listing.check_in_time %}<div>Check-in after {{ listing.check_in_time|time:"g:i A" }}</div>{% endif %}
-            {% if listing.check_out_time %}<div>Checkout before {{ listing.check_out_time|time:"g:i A" }}</div>{% endif %}
-            <div>{{ listing.max_occupants }} occupant{{ listing.max_occupants|pluralize }} max</div>
-          </div>
-        </div>
-        {% endif %}
-        {% if listing.smoke_alarm or listing.carbon_monoxide_alarm or listing.first_aid_kit %}
-        <div>
-          <div class="text-[13px] font-extrabold text-gray-900 mb-2 flex items-center gap-1.5">{% icon 'shield' size=13 %} Safety & Property</div>
-          <div class="flex flex-col gap-1.5 text-[13px] text-gray-500">
-            {% if listing.smoke_alarm %}<div>{% icon 'flame' size=13 %} Smoke alarm installed</div>{% endif %}
-            {% if listing.carbon_monoxide_alarm %}<div>{% icon 'cloud' size=13 %} Carbon monoxide alarm installed</div>{% endif %}
-            {% if listing.first_aid_kit %}<div>{% icon 'first-aid' size=13 %} First aid kit available</div>{% endif %}
-          </div>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-    {% endif %}
-
-    <!-- ─── 10. Reviews ─── -->
+    <!-- ─── 9. Reviews ─── -->
     <div class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100 mb-4 last:mb-0 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-[18px] sm:mb-2.5" style="animation-delay:.22s">
       <div class="flex items-center gap-2 mb-[18px] sm:mb-3.5">
         <h3 class="text-[17px] font-extrabold text-gray-900 tracking-tight sm:text-[15px]">Reviews</h3>
@@ -996,11 +967,8 @@ tailwind.config = {
       </div>
     </div>
 
-    <!-- Save / Share -->
+    <!--  Share -->
     <div class="flex gap-2.5 mt-2.5">
-      <button class="flex-1 py-[11px] text-[13px] font-semibold text-gray-700 bg-white border-[1.5px] border-gray-200 rounded-xl cursor-pointer transition-all hover:border-violet-700 hover:text-violet-700 font-sans">
-        {% icon 'bookmark' size=13 %} Save
-      </button>
       <button onclick="nmShare()" class="flex-1 py-[11px] text-[13px] font-semibold text-gray-700 bg-white border-[1.5px] border-gray-200 rounded-xl cursor-pointer transition-all hover:border-violet-700 hover:text-violet-700 font-sans">
         {% icon 'link' size=13 %} Share
       </button>

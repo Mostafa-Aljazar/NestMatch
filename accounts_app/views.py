@@ -9,13 +9,6 @@ from django.core.mail import EmailMultiAlternatives
 from listings_app.models import Listing
 import mimetypes , os
 
-# templatetags/dict_extras.py
-from django import template
-register = template.Library()
-
-@register.filter
-def get_item(d, key):
-    return d.get(key)
 
 def index(request):
     """

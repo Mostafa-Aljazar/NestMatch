@@ -44,3 +44,31 @@ class NestMatchSocialAccountAdapter(DefaultSocialAccountAdapter):
             candidate = f'{cleaned}{suffix}'[:30]
 
         return candidate
+
+    def pre_social_login(self, request, sociallogin):
+        """
+        Called right before a social login is processed, but after the
+        provider (Google) has been contacted successfully.
+
+        If someone already has an account with this exact email (registered
+        normally with email/password), we link this Google login to that
+        existing account instead of blocking it as an error -- this is the
+        standard "account linking by verified email" pattern.
+        """
+        if sociallogin.is_existing:
+            # Already linked to a social account before — nothing to do.
+            return
+
+        email = sociallogin.account.extra_data.get('email', '').strip().lower()
+        if not email:
+            return
+
+        from .models import User
+
+        try:
+            existing_user = User.objects.get(email__iexact=email)
+        except User.DoesNotExist:
+            return
+
+        # Connect this Google login to the existing account.
+        sociallogin.connect(request, existing_user)

@@ -1,16 +1,38 @@
+<style>
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .footer-brand    { grid-column: 1; grid-row: 1; }
+  .footer-platform { grid-column: 1; grid-row: 2; }
+  .footer-support  { grid-column: 2; grid-row: 1; }
+  .footer-contact  { grid-column: 2; grid-row: 2; }
+
+  @media (min-width: 768px) {
+    .footer-grid {
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+    }
+    .footer-brand    { grid-column: 1; grid-row: 1; }
+    .footer-platform { grid-column: 2; grid-row: 1; }
+    .footer-support  { grid-column: 3; grid-row: 1; }
+    .footer-contact  { grid-column: 4; grid-row: 1; }
+  }
+</style>
+
 <footer style="background:#0f0f1a;font-family:'Plus Jakarta Sans',sans-serif">
 
   <!-- Top gradient line -->
   <div style="height:2px;background:linear-gradient(90deg,#7c3aed,#a78bfa,#7c3aed)"></div>
 
   <!-- Main footer body -->
-  <div style="max-width:1200px;margin:0 auto;padding:60px 40px 0">
+  <div style="max-width:1200px;margin:0 auto;padding:40px 20px 0" class="lg:pt-16 sm:px-8 lg:px-10">
 
     <!-- 4-column grid -->
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;border-bottom:1px solid #1e1e30">
-
+    <div class="footer-grid pb-8 md:pb-10" style="border-bottom:1px solid #1e1e30">
       <!-- Col 1 — Brand -->
-      <div>
+      <div class="footer-brand">
         <!-- Logo -->
         <a href="/" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:16px">
           <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(124,58,237,.4)">
@@ -65,18 +87,20 @@
       </div>
 
       <!-- Col 2 — Platform -->
-      <div>
+      <div class="footer-platform">
         <p style="font-size:10px;font-weight:800;color:#f9fafb;letter-spacing:1.4px;text-transform:uppercase;margin:0 0 18px">Platform</p>
         <div style="display:flex;flex-direction:column;gap:12px">
           <a href="/"           style="font-size:13px;color:#6b7280;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#6b7280'">Home</a>
           <a href="/rooms/"     style="font-size:13px;color:#6b7280;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#6b7280'">Browse Listings</a>
           <a href="/rooms/new/" style="font-size:13px;color:#6b7280;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#6b7280'">Post a Room</a>
-          <a href="/dashboard/" style="font-size:13px;color:#6b7280;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#6b7280'">Dashboard</a>
+          {% if user.is_authenticated and user.is_staff %}
+             <a href="/dashboard/" style="font-size:13px;color:#6b7280;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#6b7280'">Dashboard</a>
+          {% endif %}
         </div>
       </div>
 
       <!-- Col 3 — Support -->
-      <div>
+      <div class="footer-support">
         <p style="font-size:10px;font-weight:800;color:#f9fafb;letter-spacing:1.4px;text-transform:uppercase;margin:0 0 18px">Support</p>
         <div style="display:flex;flex-direction:column;gap:12px">
           <a href="/contact/" style="font-size:13px;color:#6b7280;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#6b7280'">Contact Us</a>
@@ -87,11 +111,11 @@
       </div>
 
       <!-- Col 4 — Contact -->
-      <div>
+      <div class="footer-contact">
         <p style="font-size:10px;font-weight:800;color:#f9fafb;letter-spacing:1.4px;text-transform:uppercase;margin:0 0 18px">Contact</p>
         <div style="display:flex;flex-direction:column;gap:14px">
           <a href="mailto:hello@nestmatch.io" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-            <span style="width:30px;height:30px;border-radius:7px;background:#1e1e30;border:1px solid #2d2d45;display:flex;align-items:center;justify-content:center;shrink:0">
+            <span style="width:30px;height:30px;border-radius:7px;background:#1e1e30;border:1px solid #2d2d45;display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
               </svg>
@@ -99,7 +123,7 @@
             <span style="font-size:13px;color:#6b7280">hello@nestmatch.io</span>
           </a>
           <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-            <span style="width:30px;height:30px;border-radius:7px;background:#1e1e30;border:1px solid #2d2d45;display:flex;align-items:center;justify-content:center">
+            <span style="width:30px;height:30px;border-radius:7px;background:#1e1e30;border:1px solid #2d2d45;display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
               </svg>
@@ -113,7 +137,7 @@
     </div>
 
     <!-- Bottom bar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:20px 0 24px">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2" style="padding:20px 0 24px">
       <span style="font-size:12px;color:#4b5563">© {% now "Y" %} NestMatch. All rights reserved.</span>
       <span style="font-size:12px;color:#4b5563">Built with 💜 by <span style="color:#a78bfa;font-weight:600">AXSOS Trainers</span></span>
     </div>
@@ -121,26 +145,3 @@
   </div>
 
 </footer>
-
-<style>
-  @media (max-width: 900px) {
-    footer > div > div:first-of-type {
-      grid-template-columns: 1fr 1fr !important;
-      gap: 32px !important;
-    }
-  }
-  @media (max-width: 560px) {
-    footer > div > div:first-of-type {
-      grid-template-columns: 1fr !important;
-    }
-    footer > div {
-      padding-left: 20px !important;
-      padding-right: 20px !important;
-    }
-    footer > div > div:last-of-type {
-      flex-direction: column !important;
-      align-items: flex-start !important;
-      gap: 8px !important;
-    }
-  }
-</style>

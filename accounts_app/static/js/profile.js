@@ -406,10 +406,21 @@ if (reviewForm) {
     try {
       const response = await fetch(reviewForm.action, {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
         body: formData,
       });
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (err) {
+        const text = await response.text();
+        throw new Error(text || 'Server returned an invalid response.');
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'Server error.');
+      }
 
       if (data.success) {
         const reviewerName = formData.get('reviewer_name') || '';
@@ -458,13 +469,61 @@ if (reviewForm) {
         });
         if (data.message) _showToast(data.message, true);
       }
-    } catch {
-      _showToast('Something went wrong. Please try again.', true);
+    } catch (error) {
+      const message = error?.message || 'Something went wrong. Please try again.';
+      _showToast(message, true);
     } finally {
       if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalText; }
     }
   });
 }
+
+const deleteReviewForms = document.querySelectorAll('form[data-ajax-review-delete]');
+
+deleteReviewForms.forEach((form) => {
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]')?.value || '';
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn?.textContent;
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Deleting...'; }
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
+        body: new FormData(form),
+      });
+
+      let data;
+      try {
+        data = await response.json();
+      } catch (err) {
+        const text = await response.text();
+        throw new Error(text || 'Server returned an invalid response.');
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'Server error.');
+      }
+
+      if (data.success) {
+        const card = form.closest('.bg-slate-50');
+        if (card) card.remove();
+        _showToast(data.message || 'Review deleted.', false);
+      } else {
+        throw new Error(data.message || 'Could not delete review.');
+      }
+    } catch (error) {
+      const message = error?.message || 'Something went wrong. Please try again.';
+      _showToast(message, true);
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalText; }
+    }
+  });
+});
 
 function _showToast(message, isError = false) {
   const existing = document.getElementById('_global-toast');
