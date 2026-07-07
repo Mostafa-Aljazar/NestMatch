@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.http import JsonResponse
 from django.db.models import Count, Avg
@@ -43,7 +44,9 @@ def overview(request):
     )
 
     listings_per_day = (
-        Listing.objects.filter(created_at__gte=thirty_days_ago)
+        Listing.objects
+        .filter(created_at__gte=thirty_days_ago)
+        .exclude(price__isnull=True)
         .annotate(day=TruncDate('created_at'))
         .values('day')
         .annotate(count=Count('id'))
@@ -61,6 +64,7 @@ def overview(request):
     top_cities_qs = (
         Listing.objects.filter(status='active', city__isnull=False)
         .exclude(city='')
+        .exclude(price__isnull=True)
         .values('city')
         .annotate(count=Count('id'))
         .order_by('-count')[:5]
@@ -78,7 +82,9 @@ def overview(request):
     ]
 
     top_listings = (
-        Listing.objects.annotate(app_count=Count('applications'))
+        Listing.objects
+        .exclude(price__isnull=True)
+        .annotate(app_count=Count('applications'))
         .order_by('-app_count')[:5]
     )
 
@@ -134,15 +140,22 @@ def users_list(request):
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
 def listings_list(request):
+    from django.core.paginator import Paginator
+
     all_listings = (
         Listing.objects.select_related('poster')
         .annotate(app_count=Count('applications'))
         .order_by('-created_at')
     )
 
+    paginator = Paginator(all_listings, 10)  # 10 listings per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
     context = {
         'current_tab': 'listings',
-        'all_listings': all_listings,
+        'page_obj': page_obj,
+        'all_listings': page_obj.object_list,
     }
 
     return render(request, 'dashboard_app/listings.html', context)
@@ -310,28 +323,78 @@ def unban_user(request, user_id):
 # LISTING MODERATION
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
+@user_passes_test(is_admin, login_url='/auth/login/')
 def hide_listing(request, listing_id):
     if request.method == 'POST':
         listing = get_object_or_404(Listing, id=listing_id)
         listing.status = 'closed'
         listing.save()
-    return redirect('dashboard_app:index')
+    return redirect('dashboard_app:listings')
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def activate_listing(request, listing_id):
+    if request.method == 'POST':
+        listing = get_object_or_404(Listing, id=listing_id)
+        if listing.status == 'inactive' or listing.status == 'draft':
+            listing.status = 'pending'
+        listing.save()
+    return redirect('dashboard_app:listings')
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def approve_listing(request, listing_id):
+    if request.method == 'POST':
+        listing = get_object_or_404(Listing, id=listing_id)
+        if listing.status == 'pending':
+            contract_approved = listing.contract_documents.filter(
+                document_type='rental_contract', status='approved'
+            ).exists()
+            if not contract_approved:
+                messages.error(
+                    request,
+                    f'Cannot approve "{listing.title}" — its rental contract has not been approved yet.'
+                )
+            else:
+                listing.status = 'active'
+                listing.save()
+    return redirect('dashboard_app:listings')
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def reject_listing(request, listing_id):
+    if request.method == 'POST':
+        listing = get_object_or_404(Listing, id=listing_id)
+        if listing.status == 'pending':
+            listing.status = 'inactive'
+            listing.save()
+    return redirect('dashboard_app:listings')
 
 
 @user_passes_test(is_admin, login_url='/auth/login/')
 def restore_listing(request, listing_id):
     if request.method == 'POST':
         listing = get_object_or_404(Listing, id=listing_id)
-        listing.status = 'active'
+        contract_approved = listing.contract_documents.filter(
+            document_type='rental_contract', status='approved'
+        ).exists()
+        if not contract_approved:
+            listing.status = 'pending'
+            messages.warning(
+                request,
+                f'"{listing.title}" was restored to Pending — its rental contract still needs approval before it can go Active.'
+            )
+        else:
+            listing.status = 'active'
         listing.save()
-    return redirect('dashboard_app:index')
+    return redirect('dashboard_app:listings')
 
 
 @user_passes_test(is_admin, login_url='/auth/login/')
 def delete_listing(request, listing_id):
     if request.method == 'POST':
         get_object_or_404(Listing, id=listing_id).delete()
-    return redirect('dashboard_app:index')
+    return redirect('dashboard_app:listings')
 
 
 # ─────────────────────────────────────────────
@@ -396,6 +459,10 @@ def approve_document(request, doc_id):
         doc.reviewed_by = request.user
         doc.reviewed_at = timezone.now()
         doc.save()
+        # Rental contract approved while its listing is waiting on review — activate it.
+        if doc.listing and doc.document_type == 'rental_contract' and doc.listing.status in ['pending', 'draft']:
+            doc.listing.status = 'active'
+            doc.listing.save()
 
     return redirect(f"{reverse('dashboard_app:index')}#verification")
 
@@ -409,6 +476,10 @@ def reject_document(request, doc_id):
         doc.reviewed_by = request.user
         doc.reviewed_at = timezone.now()
         doc.save()
+        # Rental contract rejected — the listing can't stay Active without an approved contract.
+        if doc.listing and doc.document_type == 'rental_contract' and doc.listing.status not in ['pending', 'closed', 'draft']:
+            doc.listing.status = 'pending'
+            doc.listing.save()
 
     return redirect(f"{reverse('dashboard_app:index')}#verification")
 
@@ -481,6 +552,43 @@ def delete_user(request, user_id):
     })
 
 
+@user_passes_test(is_admin, login_url='/auth/login/')
+def user_documents(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    documents = VerificationDocument.objects.filter(user=user).select_related('reviewed_by').order_by('-created_at')
+
+    if request.method == 'POST':
+        doc_id = request.POST.get('doc_id')
+        action = request.POST.get('action')
+        doc = get_object_or_404(VerificationDocument, id=doc_id, user=user)
+
+        if action == 'approve':
+            doc.status = VerificationDocument.APPROVED
+            doc.reviewed_by = request.user
+            doc.reviewed_at = timezone.now()
+            doc.rejection_reason = ''
+            doc.save()
+        elif action == 'reject':
+            doc.status = VerificationDocument.REJECTED
+            doc.rejection_reason = request.POST.get('rejection_reason', '')
+            doc.reviewed_by = request.user
+            doc.reviewed_at = timezone.now()
+            doc.save()
+        elif action == 'cancel':
+            doc.status = VerificationDocument.PENDING
+            doc.reviewed_by = None
+            doc.reviewed_at = None
+            doc.rejection_reason = ''
+            doc.save()
+
+        return redirect('dashboard_app:user_documents', user_id=user_id)
+
+    return render(request, 'dashboard_app/user_documents.html', {
+        'user': user,
+        'documents': documents,
+    })
+
+
 # ── Listing detail (admin view — all applications for a room) ─────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
 def listing_detail(request, listing_id):
@@ -496,6 +604,11 @@ def listing_detail(request, listing_id):
         .order_by('-applied_at')
     )
 
+    documents = VerificationDocument.objects.filter(
+        listing=listing,
+        document_type=VerificationDocument.RENTAL_CONTRACT
+    ).select_related('user', 'reviewed_by')
+
     stats = {
         'total': applications.count(),
         'pending': applications.filter(status=Application.STATUS_PENDING).count(),
@@ -506,5 +619,56 @@ def listing_detail(request, listing_id):
     return render(request, 'dashboard_app/listing_detail.html', {
         'listing': listing,
         'applications': applications,
+        'documents': documents,
         'stats': stats,
     })
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+@user_passes_test(is_admin, login_url='/auth/login/')
+def document_action(request, doc_id):
+    if request.method == 'POST':
+        doc = get_object_or_404(VerificationDocument, id=doc_id)
+        action = request.POST.get('action')
+
+        if action == 'approve':
+            doc.status = VerificationDocument.APPROVED
+            doc.reviewed_by = request.user
+            doc.reviewed_at = timezone.now()
+            doc.rejection_reason = ''
+            doc.save()
+            # Set listing back to active when contract is approved (from pending status)
+            if doc.listing and doc.listing.status in ['pending', 'draft']:
+                doc.listing.status = 'active'
+                doc.listing.save()
+        elif action == 'reject':
+            doc.status = VerificationDocument.REJECTED
+            doc.rejection_reason = request.POST.get('rejection_reason', '')
+            doc.reviewed_by = request.user
+            doc.reviewed_at = timezone.now()
+            doc.save()
+            # Set listing to pending when contract is rejected (if not already pending/closed)
+            if doc.listing and doc.listing.status not in ['pending', 'closed', 'draft']:
+                doc.listing.status = 'pending'
+                doc.listing.save()
+        elif action == 'cancel':
+            doc.status = VerificationDocument.PENDING
+            cancellation_reason = request.POST.get('cancellation_reason', '')
+            if cancellation_reason:
+                doc.rejection_reason = f"[CANCELLED] {cancellation_reason}"
+            else:
+                doc.rejection_reason = ''
+            doc.reviewed_by = None
+            doc.reviewed_at = None
+            doc.save()
+            # Contract is back to pending review, so the room can't stay active.
+            if doc.listing and doc.listing.status == 'active':
+                doc.listing.status = 'pending'
+                doc.listing.save()
+
+        if doc.listing:
+            return redirect('dashboard_app:listing_detail', listing_id=doc.listing.id)
+        else:
+            return redirect('dashboard_app:users')
+
+    return redirect('dashboard_app:listings')

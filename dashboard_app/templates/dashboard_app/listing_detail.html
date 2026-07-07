@@ -46,8 +46,12 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
         <h1 style="font-size:20px;font-weight:800;color:#111827">{{ listing.title }}</h1>
         {% if listing.status == 'active' %}
           <span class="badge badge-green">Active</span>
+        {% elif listing.status == 'pending' %}
+          <span class="badge badge-yellow">Pending Review</span>
         {% elif listing.status == 'draft' %}
           <span class="badge badge-yellow">Draft</span>
+        {% elif listing.status == 'inactive' %}
+          <span class="badge badge-red">Inactive</span>
         {% else %}
           <span class="badge badge-gray">Closed</span>
         {% endif %}
@@ -113,6 +117,68 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
       <div style="font-size:26px;font-weight:800;color:#E11D48">{{ stats.rejected }}</div>
       <div style="font-size:12px;color:#6B7280;margin-top:3px">Rejected</div>
     </div>
+  </div>
+
+  <!-- Rental Contracts section -->
+  <div class="card">
+    <div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:16px">Rental Contract Documents</div>
+    {% if documents %}
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Document Type</th>
+            <th>Uploaded By</th>
+            <th>Status</th>
+            <th>Uploaded</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for doc in documents %}
+          <tr>
+            <td>
+              <span style="font-weight:600;font-size:12px">{{ doc.get_document_type_display }}</span>
+            </td>
+            <td style="color:#6B7280;font-size:12px">{{ doc.user.full_name }}</td>
+            <td>
+              {% if doc.status == 'approved' %}<span class="badge badge-green">Approved</span>
+              {% elif doc.status == 'rejected' %}<span class="badge badge-red">Rejected</span>
+              {% else %}<span class="badge badge-yellow">Pending</span>{% endif %}
+            </td>
+            <td style="color:#6B7280;font-size:12px">{{ doc.created_at|date:"M d, Y" }}</td>
+            <td style="display:flex;gap:6px;align-items:center">
+              <a href="{{ doc.file.url }}" target="_blank" style="display:inline-block;padding:6px 12px;background:#7C3AED;color:#fff;border-radius:4px;font-size:11px;font-weight:600;text-decoration:none">
+                View
+              </a>
+              {% if doc.status == 'pending' %}
+              <button type="button" onclick="openApproveModal({{ doc.id }})" style="padding:6px 12px;background:#10B981;color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:600;text-decoration:none;cursor:pointer">
+                Approve
+              </button>
+              <button type="button" onclick="openRejectModal({{ doc.id }})" style="padding:6px 12px;background:#EF4444;color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:600;text-decoration:none;cursor:pointer">
+                Reject
+              </button>
+              {% elif doc.status == 'approved' %}
+              <button type="button" onclick="openCancelModal({{ doc.id }})" style="padding:6px 12px;background:#F59E0B;color:#fff;border:none;border-radius:4px;font-size:11px;font-weight:600;text-decoration:none;cursor:pointer">
+                Cancel Verification
+              </button>
+              {% elif doc.status == 'rejected' and doc.rejection_reason %}
+              <button type="button" onclick="openViewReasonModal('{{ doc.rejection_reason|escapejs }}')" style="padding:6px 12px;background:#FCA5A5;color:#991B1B;border:1px solid #FCA5A5;border-radius:4px;font-size:11px;font-weight:600;text-decoration:none;cursor:pointer">
+                View Reason
+              </button>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:40px;color:#9CA3AF">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <p style="font-weight:600">No rental contract documents yet.</p>
+    </div>
+    {% endif %}
   </div>
 
   <!-- Applications table -->
@@ -185,6 +251,172 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
     {% endif %}
   </div>
 
+  <!-- Approve Modal -->
+  <div id="approveModal" style="display:none !important;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)" onclick="if(event.target.id==='approveModal') closeApproveModal()">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 25px 50px rgba(0,0,0,.15);max-width:480px;width:90%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <div style="padding:32px;text-align:center">
+        <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#D1FAE5,#A7F3D0);display:flex;align-items:center;justify-content:center;margin:0 auto 24px">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 style="font-size:20px;font-weight:800;color:#111827;margin:0 0 8px 0">Approve Rental Contract?</h2>
+        <p style="font-size:13px;color:#6B7280;margin:0 0 28px 0">This contract will be marked as verified and approved</p>
+        <form method="post" id="approveForm" action="/dashboard/document/0/action/" style="display:flex;gap:12px">
+          {% csrf_token %}
+          <input type="hidden" name="doc_id" id="approveDocId" value="">
+          <input type="hidden" name="action" value="approve">
+          <button type="button" onclick="closeApproveModal()" style="flex:1;padding:12px 16px;font-size:13px;font-weight:600;color:#6B7280;background:#F3F4F6;border:none;border-radius:8px;cursor:pointer;font-family:inherit">
+            Cancel
+          </button>
+          <button type="submit" style="flex:1;padding:12px 16px;font-size:13px;font-weight:600;color:#fff;background:#10B981;border:none;border-radius:8px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Approve
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject Modal -->
+  <div id="rejectModal" style="display:none !important;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)" onclick="if(event.target.id==='rejectModal') closeRejectModal()">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 25px 50px rgba(0,0,0,.15);max-width:480px;width:90%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <div style="padding:32px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:40px;height:40px;border-radius:10px;background:#FEE2E2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </div>
+          <h3 style="font-size:16px;font-weight:800;color:#111827;margin:0">Reject Contract</h3>
+        </div>
+        <p style="font-size:13px;color:#6B7280;margin-bottom:20px">Tell the user why this contract was rejected so they can fix it.</p>
+        <form method="post" id="rejectForm" style="position:relative">
+          {% csrf_token %}
+          <input type="hidden" name="doc_id" id="rejectDocId" value="">
+          <input type="hidden" name="action" value="reject">
+          <textarea name="rejection_reason" placeholder="Example: Contract image is blurry, missing signatures, etc." style="width:100%;padding:12px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;resize:none;min-height:100px;color:#111827" required></textarea>
+          <div style="display:flex;gap:10px;margin-top:20px">
+            <button type="button" onclick="closeRejectModal()" style="flex:1;padding:12px 16px;font-size:13px;font-weight:600;color:#6B7280;background:#F3F4F6;border:none;border-radius:8px;cursor:pointer;font-family:inherit">
+              Cancel
+            </button>
+            <button type="submit" style="flex:1;padding:12px 16px;font-size:13px;font-weight:600;color:#fff;background:#DC2626;border:none;border-radius:8px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Send Rejection
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Reason Modal -->
+  <div id="viewReasonModal" style="display:none !important;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)" onclick="if(event.target.id==='viewReasonModal') closeViewReasonModal()">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 25px 50px rgba(0,0,0,.15);max-width:480px;width:90%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <div style="padding:32px">
+        <h2 style="font-size:18px;font-weight:800;color:#111827;margin:0 0 16px 0">Rejection Reason</h2>
+        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:16px;margin-bottom:20px">
+          <p style="font-size:13px;color:#991B1B;margin:0;line-height:1.6" id="reasonText"></p>
+        </div>
+        <button type="button" onclick="closeViewReasonModal()" style="width:100%;padding:12px 16px;font-size:13px;font-weight:600;color:#fff;background:#7C3AED;border:none;border-radius:8px;cursor:pointer;font-family:inherit">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel Verification Modal -->
+  <div id="cancelModal" style="display:none !important;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)" onclick="if(event.target.id==='cancelModal') closeCancelModal()">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 25px 50px rgba(0,0,0,.15);max-width:480px;width:90%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <div style="padding:32px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:40px;height:40px;border-radius:10px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <h3 style="font-size:16px;font-weight:800;color:#111827;margin:0">Cancel Verification</h3>
+        </div>
+        <p style="font-size:13px;color:#6B7280;margin-bottom:20px">Revert this contract back to pending status. Optionally provide a reason for the cancellation.</p>
+        <form method="post" id="cancelForm" style="position:relative">
+          {% csrf_token %}
+          <input type="hidden" name="doc_id" id="cancelDocId" value="">
+          <input type="hidden" name="action" value="cancel">
+          <textarea name="cancellation_reason" placeholder="Example: Need to verify signatures, Document quality concerns, etc." style="width:100%;padding:12px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;resize:none;min-height:100px;color:#111827"></textarea>
+          <div style="display:flex;gap:10px;margin-top:20px">
+            <button type="button" onclick="closeCancelModal()" style="flex:1;padding:12px 16px;font-size:13px;font-weight:600;color:#6B7280;background:#F3F4F6;border:none;border-radius:8px;cursor:pointer;font-family:inherit">
+              Keep Approved
+            </button>
+            <button type="submit" style="flex:1;padding:12px 16px;font-size:13px;font-weight:600;color:#fff;background:#F59E0B;border:none;border-radius:8px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Cancel Verification
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+<script>
+function openApproveModal(docId) {
+  document.getElementById('approveDocId').value = docId;
+  const form = document.getElementById('approveForm');
+  form.action = '/dashboard/document/' + docId + '/action/';
+  document.getElementById('approveModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeApproveModal() {
+  document.getElementById('approveModal').style.display = 'none';
+  document.getElementById('approveDocId').value = '';
+  document.body.style.overflow = '';
+}
+
+function openRejectModal(docId) {
+  document.getElementById('rejectDocId').value = docId;
+  const form = document.getElementById('rejectForm');
+  form.action = '/dashboard/document/' + docId + '/action/';
+  document.getElementById('rejectModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeRejectModal() {
+  document.getElementById('rejectModal').style.display = 'none';
+  document.getElementById('rejectDocId').value = '';
+  document.getElementById('rejectForm').reset();
+  document.body.style.overflow = '';
+}
+
+function openViewReasonModal(reason) {
+  document.getElementById('reasonText').textContent = reason;
+  document.getElementById('viewReasonModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeViewReasonModal() {
+  document.getElementById('viewReasonModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function openCancelModal(docId) {
+  document.getElementById('cancelDocId').value = docId;
+  const form = document.getElementById('cancelForm');
+  form.action = '/dashboard/document/' + docId + '/action/';
+  document.getElementById('cancelModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCancelModal() {
+  document.getElementById('cancelModal').style.display = 'none';
+  document.getElementById('cancelDocId').value = '';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeApproveModal();
+    closeRejectModal();
+    closeViewReasonModal();
+    closeCancelModal();
+  }
+});
+</script>
+
 </body>
 </html>

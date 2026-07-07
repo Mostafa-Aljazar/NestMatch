@@ -51,10 +51,18 @@
     {% if user.is_authenticated %}
 
       <!-- Post a Room CTA -->
+      {% if user.is_id_verified %}
       <a href="/rooms/new/"
          class="hover:bg-violet-50 hover:shadow-sm px-4 py-2 border border-violet-200 hover:border-violet-300 rounded-lg font-semibold text-violet-600 text-sm active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">
         + Post Room
       </a>
+      {% else %}
+      <button onclick="nmShowVerificationAlert()"
+         class="opacity-60 cursor-not-allowed px-4 py-2 border border-gray-300 rounded-lg font-semibold text-gray-500 text-sm bg-gray-50 transition-all duration-200 ease-out"
+         title="Verify your ID to post a room">
+        + Post Room
+      </button>
+      {% endif %}
 
       <!-- Avatar dropdown trigger -->
       <div class="relative" id="nm-user-menu">
@@ -249,6 +257,7 @@
     {% if user.is_authenticated %}
     <p class="mt-4 mb-1 px-3 font-bold text-[10px] text-gray-400 uppercase tracking-widest">Account</p>
 
+    {% if user.is_id_verified %}
     <a href="/rooms/new/" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
       {% if active_page == 'post_room' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
       <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'post_room' %}bg-violet-100{% else %}bg-violet-100{% endif %}">
@@ -256,6 +265,14 @@
       </span>
       Post a Room
     </a>
+    {% else %}
+    <button onclick="nmShowVerificationAlert()" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1 opacity-60 cursor-not-allowed text-gray-400 bg-gray-50">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 bg-gray-100">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      </span>
+      Post a Room
+    </button>
+    {% endif %}
 
     <a href="/auth/profile/" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
       {% if active_page == 'profile' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
@@ -405,4 +422,40 @@ document.addEventListener('click', function (e) {
     setTimeout(function () { dd.classList.add('hidden'); }, 200);
   }
 });
+
+function nmShowVerificationAlert() {
+  var modal = document.getElementById('nm-verification-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'nm-verification-modal';
+    modal.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:10000;backdrop-filter:blur(3px)';
+    modal.innerHTML = `
+      <div style="background:white;border-radius:16px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+        <div style="display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:12px;background:#FEF3C7;margin-bottom:20px">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2zm0-4h-2V7h2z"/>
+          </svg>
+        </div>
+        <h3 style="font-size:18px;font-weight:700;color:#111827;margin-bottom:8px">ID Verification Required</h3>
+        <p style="font-size:14px;color:#6B7280;line-height:1.6;margin-bottom:24px">
+          Before you can post a room, you need to verify your identity. Visit your profile to upload and verify your ID document.
+        </p>
+        <div style="display:flex;gap:12px">
+          <button onclick="document.getElementById('nm-verification-modal').style.display='none'" style="flex:1;padding:10px 16px;background:#E5E7EB;border:none;border-radius:8px;font-size:14px;font-weight:600;color:#374151;cursor:pointer;transition:background 0.2s">
+            Cancel
+          </button>
+          <a href="/auth/profile/?tab=verification" style="flex:1;padding:10px 16px;background:#7C3AED;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;transition:background 0.2s;cursor:pointer" onmouseover="this.style.background='#6D28D9'" onmouseout="this.style.background='#7C3AED'">
+            Go to Profile
+          </a>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  } else {
+    modal.style.display = 'flex';
+  }
+}
 </script>

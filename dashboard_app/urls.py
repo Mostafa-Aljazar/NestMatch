@@ -22,9 +22,13 @@ urlpatterns = [
     path('unban/<int:user_id>/', views.unban_user, name='unban_user'),
     path('user/<int:user_id>/listings/', views.view_user_listings, name='view_user_listings'),
     path('user/<int:user_id>/applications/', views.view_user_applications, name='view_user_applications'),
+    path('user/<int:user_id>/documents/', views.user_documents, name='user_documents'),
     path('user/<int:user_id>/delete/', views.delete_user, name='delete_user'),
 
     # Listing moderation
+    path('listing/activate/<int:listing_id>/', views.activate_listing, name='activate_listing'),
+    path('listing/approve/<int:listing_id>/', views.approve_listing, name='approve_listing'),
+    path('listing/reject/<int:listing_id>/', views.reject_listing, name='reject_listing'),
     path('listing/hide/<int:listing_id>/', views.hide_listing, name='hide_listing'),
     path('listing/restore/<int:listing_id>/', views.restore_listing, name='restore_listing'),
     path('listing/delete/<int:listing_id>/', views.delete_listing, name='delete_listing'),
@@ -42,6 +46,7 @@ urlpatterns = [
     # Verification
     path('verification/<int:doc_id>/approve/', views.approve_document, name='approve_document'),
     path('verification/<int:doc_id>/reject/', views.reject_document, name='reject_document'),
+    path('document/<int:doc_id>/action/', views.document_action, name='document_action'),
 
     # Reviews
     path('reviews/<int:review_id>/approve/', views.approve_review, name='approve_review'),

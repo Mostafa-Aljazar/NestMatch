@@ -2,7 +2,7 @@
 {% load icons %}
 {% load listing_extras %}
 <!DOCTYPE html>
-<html>
+<html data-user-verified="{% if request.user.is_id_verified %}true{% else %}false{% endif %}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1887,6 +1887,13 @@ function parUploadContract(listingId, csrfToken, onDone) {
 function parSubmit(action) {
   // Publishing requires every step (1-4) to pass its validator
   if (action === 'publish') {
+    // Check if user is verified
+    var isVerified = document.documentElement.getAttribute('data-user-verified') === 'true';
+    if (!isVerified) {
+      parShowToast('Your ID must be verified before you can publish a listing. Please verify your identity first.', true);
+      return;
+    }
+
     for (var s = 1; s <= 4; s++) {
       var errs = parValidateStep(s);
       if (errs.length) {
