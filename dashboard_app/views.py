@@ -166,11 +166,18 @@ def listings_list(request):
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
 def banned_users_list(request):
-    banned_list = User.objects.filter(is_active=False).order_by('-updated_at')
+    from django.core.paginator import Paginator
+
+    all_banned = User.objects.filter(is_active=False).order_by('-updated_at')
+
+    paginator = Paginator(all_banned, 10)  # 10 banned users per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     context = {
         'current_tab': 'banned',
-        'banned_list': banned_list,
+        'page_obj': page_obj,
+        'banned_list': page_obj.object_list,
     }
 
     return render(request, 'dashboard_app/banned_users.html', context)

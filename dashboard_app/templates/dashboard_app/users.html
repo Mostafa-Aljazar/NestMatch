@@ -23,13 +23,14 @@
           <td>
             <div style="display:flex;align-items:center;gap:8px">
               {% if u.profile_pic %}
-                <img src="{{ u.profile_pic.url }}" alt="{{ u.full_name }}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:center;flex-shrink:0" />
+                <img src="{{ u.profile_pic.url }}" alt="{% if u.first_name %}{{ u.full_name }}{% else %}{{ u.email }}{% endif %}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:center;flex-shrink:0" />
               {% else %}
                 <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#A78BFA);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">
-                  {{ u.first_name|first|upper }}{% if u.last_name %}{{ u.last_name|first|upper }}{% endif %}
+                  {% if u.first_name %}{{ u.first_name|first|upper }}{% if u.last_name %}{{ u.last_name|first|upper }}{% endif %}{% else %}{{ u.email|first|upper }}{% endif %}
                 </div>
               {% endif %}
-              <span style="font-weight:600;white-space:nowrap">{{ u.full_name }}</span>
+              <span style="font-weight:600;white-space:nowrap">{% if u.first_name %}{{ u.full_name }}{% else %}{{ u.email }}{% endif %}</span>
+              {% if u.is_staff %}<span class="badge badge-purple">Admin</span>{% endif %}
             </div>
           </td>
           <td style="color:#6B7280;white-space:nowrap">{{ u.email }}</td>
@@ -66,13 +67,10 @@
                   Verify Documents
                 </a>
                 {% if u.is_active %}
-                  <form method="post" action="{% url 'dashboard_app:ban_user' u.id %}" style="margin:0" onsubmit="return confirm('Ban this user?');">
-                    {% csrf_token %}
-                    <button type="submit" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#E11D48;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                      Ban
-                    </button>
-                  </form>
+                  <button type="button" onclick="openBanModal({{ u.id }}, '{{ u.full_name|escapejs }}')" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#E11D48;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit;text-align:left">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                    Ban
+                  </button>
                 {% else %}
                   <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="margin:0">
                     {% csrf_token %}
@@ -129,6 +127,24 @@
   {% endif %}
 </div>
 
+<!-- BAN USER MODAL -->
+<div id="banModal" style="display:none !important;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center" onclick="if(event.target.id==='banModal') closeBanModal()">
+  <div style="background:#fff;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,.15);max-width:400px;width:90%" onclick="event.stopPropagation()">
+    <div style="padding:20px">
+      <h3 style="font-size:16px;font-weight:800;color:#111827">Ban User?</h3>
+      <p style="font-size:13px;color:#6B7280;margin-top:8px">Are you sure you want to ban <strong id="banModalUserName"></strong>? They will lose access to the platform until unbanned.</p>
+
+      <form id="banForm" method="post" action="">
+        {% csrf_token %}
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <button type="button" onclick="closeBanModal()" style="flex:1;padding:10px;font-size:13px;font-weight:600;color:#374151;background:#F3F4F6;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Cancel</button>
+          <button type="submit" style="flex:1;padding:10px;font-size:13px;font-weight:600;color:#fff;background:#E11D48;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Ban</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- DELETE USER MODAL -->
 <div id="deleteModal" style="display:none !important;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center" onclick="if(event.target.id==='deleteModal') closeDeleteModal()">
   <div style="background:#fff;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,.15);max-width:400px;width:90%" onclick="event.stopPropagation()">
@@ -141,16 +157,27 @@
         <div id="alertContent" style="font-size:12px;color:#B42D1C;margin-top:6px"></div>
       </div>
 
-      <div style="display:flex;gap:10px;margin-top:20px">
-        <button onclick="closeDeleteModal()" style="flex:1;padding:10px;font-size:13px;font-weight:600;color:#374151;background:#F3F4F6;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Cancel</button>
-        <button id="deleteBtn" onclick="submitDelete()" style="flex:1;padding:10px;font-size:13px;font-weight:600;color:#fff;background:#EF4444;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Delete</button>
-      </div>
+      <form id="deleteForm" method="post" action="">
+        {% csrf_token %}
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <button type="button" onclick="closeDeleteModal()" style="flex:1;padding:10px;font-size:13px;font-weight:600;color:#374151;background:#F3F4F6;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Cancel</button>
+          <button id="deleteBtn" type="submit" style="flex:1;padding:10px;font-size:13px;font-weight:600;color:#fff;background:#EF4444;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Delete</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
 <script>
-let deleteUserId = null;
+function openBanModal(userId, userName) {
+  document.getElementById('banModalUserName').textContent = userName;
+  document.getElementById('banForm').action = `/dashboard/ban/${userId}/`;
+  document.getElementById('banModal').style.display = 'flex';
+}
+
+function closeBanModal() {
+  document.getElementById('banModal').style.display = 'none';
+}
 
 function toggleMenu(btn) {
   const menu = btn.nextElementSibling;
@@ -176,8 +203,8 @@ document.addEventListener('click', function(e) {
 });
 
 function openDeleteModal(userId, userName, listingCount, appCount) {
-  deleteUserId = userId;
   document.getElementById('modalUserName').textContent = userName;
+  document.getElementById('deleteForm').action = `/dashboard/user/${userId}/delete/`;
 
   const currentUserId = {{ request.user.id }};
   const deleteBtn = document.getElementById('deleteBtn');
@@ -216,29 +243,13 @@ function openDeleteModal(userId, userName, listingCount, appCount) {
 function closeDeleteModal() {
   const modal = document.getElementById('deleteModal');
   modal.style.display = 'none';
-  deleteUserId = null;
-}
-
-function submitDelete() {
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = `/dashboard/user/${deleteUserId}/delete/`;
-
-  const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]')?.value;
-  if (csrfToken) {
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = 'csrfmiddlewaretoken';
-    csrfInput.value = csrfToken;
-    form.appendChild(csrfInput);
-  }
-
-  document.body.appendChild(form);
-  form.submit();
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeDeleteModal();
+  if (e.key === 'Escape') {
+    closeDeleteModal();
+    closeBanModal();
+  }
 });
 </script>
 {% endblock %}
