@@ -25,18 +25,81 @@
           <td style="text-align:center">{{ listing.app_count }}</td>
           <td>
             {% if listing.status == 'active' %}<span class="badge badge-green">Active</span>
+            {% elif listing.status == 'pending' %}<span class="badge badge-yellow">Pending</span>
             {% elif listing.status == 'draft' %}<span class="badge badge-yellow">Draft</span>
+            {% elif listing.status == 'inactive' %}<span class="badge badge-red">Inactive</span>
             {% else %}<span class="badge badge-gray">Closed</span>{% endif %}
           </td>
           <td>
-            <div style="display:flex;gap:5px">
-              <a href="{% url 'dashboard_app:listing_detail' listing.id %}" style="font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:6px;padding:4px 9px;display:inline-block;margin-right:5px">View</a>
-              {% if listing.status == 'active' or listing.status == 'draft' %}
-                <form method="post" action="{% url 'dashboard_app:hide_listing' listing.id %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn-hide">Hide</button></form>
-              {% else %}
-                <form method="post" action="{% url 'dashboard_app:restore_listing' listing.id %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn-restore">Restore</button></form>
-                <form method="post" action="{% url 'dashboard_app:delete_listing' listing.id %}" style="display:inline" onsubmit="return confirm('Delete this listing permanently?')">{% csrf_token %}<button type="submit" class="btn-delete">Delete</button></form>
-              {% endif %}
+            <div style="position:relative;display:inline-block">
+              <button onclick="toggleMenu(this)" style="background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;color:#6B7280;font-size:18px;font-weight:bold;line-height:1" title="Actions">⋮</button>
+              <div class="action-menu" style="display:none;position:fixed;background:#fff;border:1px solid #E5E7EB;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:1000;min-width:140px">
+                <a href="{% url 'dashboard_app:listing_detail' listing.id %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  View Details
+                </a>
+                {% if listing.status == 'pending' %}
+                  <form method="post" action="{% url 'dashboard_app:approve_listing' listing.id %}" style="margin:0" data-confirm-form data-confirm-tone="green" data-confirm-title="Approve listing?" data-confirm-message="&quot;{{ listing.title|escapejs }}&quot; will go live and become visible to everyone.">
+                    {% csrf_token %}
+                    <button type="submit" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#059669;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit;text-align:left">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+                      Approve
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'dashboard_app:reject_listing' listing.id %}" style="margin:0" data-confirm-form data-confirm-tone="red" data-confirm-title="Reject listing?" data-confirm-message="&quot;{{ listing.title|escapejs }}&quot; will stay hidden from seekers until it's fixed and resubmitted.">
+                    {% csrf_token %}
+                    <button type="submit" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#E11D48;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit;text-align:left">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                      Reject
+                    </button>
+                  </form>
+                {% endif %}
+                {% if listing.status == 'draft' %}
+                  <form method="post" action="{% url 'dashboard_app:activate_listing' listing.id %}" style="margin:0" data-confirm-form data-confirm-tone="green" data-confirm-title="Submit for review?" data-confirm-message="&quot;{{ listing.title|escapejs }}&quot; will move to Pending and wait for admin approval.">
+                    {% csrf_token %}
+                    <button type="submit" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#059669;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit;text-align:left">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+                      Submit for Review
+                    </button>
+                  </form>
+                {% endif %}
+                {% if listing.status == 'active' %}
+                  <form method="post" action="{% url 'dashboard_app:hide_listing' listing.id %}" style="margin:0" data-confirm-form data-confirm-tone="amber" data-confirm-title="Hide listing?" data-confirm-message="&quot;{{ listing.title|escapejs }}&quot; will be marked Inactive and removed from public view.">
+                    {% csrf_token %}
+                    <button type="submit" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#F59E0B;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit;text-align:left">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10"/><path d="M1 1l22 22"/></svg>
+                      Hide
+                    </button>
+                  </form>
+                {% endif %}
+                {% if listing.status == 'inactive' %}
+                  <form method="post" action="{% url 'dashboard_app:activate_listing' listing.id %}" style="margin:0" data-confirm-form data-confirm-tone="green" data-confirm-title="Reactivate listing?" data-confirm-message="&quot;{{ listing.title|escapejs }}&quot; will become Active and visible to everyone again.">
+                    {% csrf_token %}
+                    <button type="submit" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#059669;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit;text-align:left">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+                      Reactivate
+                    </button>
+                  </form>
+                {% endif %}
+                {% if listing.status == 'closed' %}
+                  <form method="post" action="{% url 'dashboard_app:restore_listing' listing.id %}" style="margin:0">
+                    {% csrf_token %}
+                    <button type="submit" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#059669;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit;text-align:left">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64M3.51 15A9 9 0 0 0 18.36 18.36"/></svg>
+                      Restore
+                    </button>
+                  </form>
+                {% endif %}
+                {% if listing.status != 'active' %}
+                  <form method="post" action="{% url 'dashboard_app:delete_listing' listing.id %}" style="margin:0" data-confirm-form data-confirm-tone="red" data-confirm-title="Delete listing permanently?" data-confirm-message="&quot;{{ listing.title|escapejs }}&quot; and all of its data will be permanently removed. This can't be undone.">
+                    {% csrf_token %}
+                    <button type="submit" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#E11D48;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      Delete
+                    </button>
+                  </form>
+                {% endif %}
+              </div>
             </div>
           </td>
         </tr>
@@ -46,5 +109,139 @@
       </tbody>
     </table>
   </div>
+
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;flex-wrap:wrap;gap:10px">
+    <div style="font-size:12px;color:#6B7280">
+      Showing <strong>{{ page_obj.start_index }}</strong> to <strong>{{ page_obj.end_index }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> listings
+    </div>
+
+    <div style="display:flex;align-items:center;gap:6px">
+      {% if page_obj.has_previous %}
+        <a href="?page=1" style="padding:6px 10px;font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">« First</a>
+        <a href="?page={{ page_obj.previous_page_number }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">‹ Previous</a>
+      {% else %}
+        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">« First</span>
+        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">‹ Previous</span>
+      {% endif %}
+
+      <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#111827;background:#E5E7EB;border-radius:4px">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">Next ›</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">Last »</a>
+      {% else %}
+        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">Next ›</span>
+        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">Last »</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
 </div>
+
+<!-- Confirm Action Modal -->
+<div id="confirm-modal" class="hidden" style="position:fixed;inset:0;z-index:1100;display:none;align-items:center;justify-content:center;background:rgba(17,24,39,.45);padding:16px">
+  <div style="width:100%;max-width:400px;background:#fff;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,.35);padding:24px">
+    <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:18px">
+      <div id="confirm-modal-icon" style="flex-shrink:0;width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div style="min-width:0">
+        <h2 id="confirm-modal-title" style="font-size:17px;font-weight:800;color:#111827;margin:0"></h2>
+        <p id="confirm-modal-message" style="font-size:13px;color:#6B7280;margin:6px 0 0;line-height:1.5"></p>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button type="button" id="confirm-modal-cancel" style="flex:1;padding:10px 14px;border-radius:10px;border:1px solid #E5E7EB;background:#fff;color:#374151;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Cancel</button>
+      <button type="button" id="confirm-modal-submit" style="flex:1;padding:10px 14px;border-radius:10px;border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const TONES = {
+    green: { bg: '#D1FAE5', fg: '#059669', btn: '#059669' },
+    red:   { bg: '#FEE2E2', fg: '#E11D48', btn: '#E11D48' },
+    amber: { bg: '#FEF3C7', fg: '#D97706', btn: '#D97706' },
+  };
+
+  const modal       = document.getElementById('confirm-modal');
+  const iconBox      = document.getElementById('confirm-modal-icon');
+  const titleEl       = document.getElementById('confirm-modal-title');
+  const messageEl     = document.getElementById('confirm-modal-message');
+  const cancelBtn     = document.getElementById('confirm-modal-cancel');
+  const submitBtn     = document.getElementById('confirm-modal-submit');
+  let pendingForm     = null;
+
+  function openConfirm(form) {
+    const tone = TONES[form.dataset.confirmTone] || TONES.amber;
+    titleEl.textContent = form.dataset.confirmTitle || 'Are you sure?';
+    messageEl.textContent = form.dataset.confirmMessage || '';
+    iconBox.style.background = tone.bg;
+    iconBox.style.color = tone.fg;
+    submitBtn.style.background = tone.btn;
+    pendingForm = form;
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+  }
+
+  function closeConfirm() {
+    pendingForm = null;
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+  }
+
+  document.querySelectorAll('form[data-confirm-form]').forEach((form) => {
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      openConfirm(form);
+    });
+  });
+
+  cancelBtn.addEventListener('click', closeConfirm);
+  modal.addEventListener('click', function(event) {
+    if (event.target === modal) closeConfirm();
+  });
+  submitBtn.addEventListener('click', function() {
+    if (pendingForm) pendingForm.submit();
+  });
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && modal.style.display === 'flex') {
+      closeConfirm();
+    }
+  });
+})();
+
+function toggleMenu(btn) {
+  const menu = btn.nextElementSibling;
+  const allMenus = document.querySelectorAll('.action-menu');
+  allMenus.forEach(m => {
+    if (m !== menu) m.style.display = 'none';
+  });
+
+  if (menu.style.display === 'none' || menu.style.display === '') {
+    const rect = btn.getBoundingClientRect();
+    menu.style.display = 'block';
+    menu.style.top = (rect.bottom + 4) + 'px';
+    menu.style.left = (rect.left - 140 + rect.width) + 'px';
+  } else {
+    menu.style.display = 'none';
+  }
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.matches('button[title="Actions"]')) {
+    document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
+  }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
+  }
+});
+</script>
 {% endblock %}

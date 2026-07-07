@@ -71,10 +71,10 @@ class ListingManager(models.Manager):
 
         try:
             price = float(post_data.get('price', '') or 0)
-            if price <= 0:
+            if price <= 0 or price > 999999.99:
                 raise ValueError
         except ValueError:
-            errors['price'] = ['Price is required and must be greater than 0.']
+            errors['price'] = ['Price is required and must be between 0 and 999,999.99.']
 
         try:
             max_occupants = int(post_data.get('max_occupants', 1) or 1)
@@ -276,7 +276,7 @@ class ListingManager(models.Manager):
             raise ValidationError(errors)
 
         fields = self._extract_fields(post_data)
-        status = 'active' if post_data.get('action') == 'publish' else 'draft'
+        status = 'pending' if post_data.get('action') == 'publish' else 'draft'
 
         listing = self.create(poster=poster, status=status, **fields)
 
@@ -299,7 +299,7 @@ class ListingManager(models.Manager):
             raise ValidationError(errors)
 
         fields = self._extract_fields(post_data)
-        status = 'active' if post_data.get('action') == 'publish' else 'draft'
+        status = 'pending' if post_data.get('action') == 'publish' else 'draft'
 
         for field, value in fields.items():
             setattr(listing, field, value)
@@ -367,7 +367,7 @@ class Listing(models.Model):
     poster          = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='listings')
     listing_type    = models.CharField(max_length=20, choices=LISTING_TYPE_CHOICES, default='private_room')
     tenant_types    = models.JSONField(default=list, blank=True)
-    price           = models.DecimalField(max_digits=8, decimal_places=2)
+    price           = models.DecimalField(max_digits=8, decimal_places=2, default='0.00')
     available_from  = models.DateField(default=date.today)
     max_occupants   = models.PositiveSmallIntegerField(default=1)
     min_stay_months = models.PositiveSmallIntegerField(choices=MIN_STAY_CHOICES, default=3)
@@ -546,9 +546,11 @@ class Listing(models.Model):
     # ── Meta ──────────────────────────────────────────────────────────────────
 
     STATUS_CHOICES = [
-        ('draft',  'Draft'),
-        ('active', 'Active'),
-        ('closed', 'Closed'),
+        ('draft',    'Draft'),
+        ('pending',  'Pending'),
+        ('active',   'Active'),
+        ('inactive', 'Inactive'),
+        ('closed',   'Closed'),
     ]
     status     = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     created_at = models.DateTimeField(auto_now_add=True)

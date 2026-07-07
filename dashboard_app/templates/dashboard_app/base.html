@@ -90,8 +90,53 @@ a{text-decoration:none;cursor:pointer}
   </div>
 </div>
 
+<!-- ── Toast container ── -->
+<div id="adm-toast-wrap" style="position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none"></div>
+
+<style>
+@keyframes admToastIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes admToastOut{from{opacity:1}to{opacity:0;transform:translateX(24px)}}
+.adm-toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 10px 28px rgba(0,0,0,.18);min-width:260px;max-width:360px;animation:admToastIn .3s ease}
+.adm-toast-error{background:#FEE2E2;color:#B91C1C;border:1px solid #FECACA}
+.adm-toast-success{background:#D1FAE5;color:#047857;border:1px solid #A7F3D0}
+.adm-toast-warning{background:#FEF3C7;color:#B45309;border:1px solid #FDE68A}
+.adm-toast-info{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+@media(max-width:480px){.adm-toast{min-width:0;width:calc(100vw - 40px)}}
+</style>
+
 <script>
 function admToggle(){document.getElementById('adm-sb').classList.toggle('open');document.getElementById('adm-ov').classList.toggle('open')}
+
+function admToast(msg, type, duration) {
+  type = type || 'info';
+  duration = duration || 4500;
+  var wrap = document.getElementById('adm-toast-wrap');
+  var t = document.createElement('div');
+  t.className = 'adm-toast adm-toast-' + type;
+
+  var icons = {
+    error:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    success: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>',
+    warning: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>',
+    info:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+  };
+
+  t.innerHTML =
+    '<span style="flex-shrink:0;display:flex">' + (icons[type] || icons.info) + '</span>' +
+    '<span style="flex:1">' + msg + '</span>';
+
+  wrap.appendChild(t);
+  setTimeout(function () {
+    t.style.animation = 'admToastOut .3s ease forwards';
+    setTimeout(function () { t.remove(); }, 300);
+  }, duration);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  {% for message in messages %}
+  admToast('{{ message|escapejs }}', '{{ message.tags|default:"info" }}');
+  {% endfor %}
+});
 </script>
 {% block extra_js %}{% endblock %}
 </body>

@@ -142,16 +142,7 @@ def post_room_page(request, pk=None):
 def create_listing(request):
     if request.method == 'GET':
         return render(request, 'listings_app/post_room.html')
-    
-    # The form can now be submitted in two ways:
-    # 1) A traditional form submit (no JS) → we must return plain HTML
-    #    (render/redirect), same as before.
-    # 2) A fetch() call from JS (so we can immediately upload the rental
-    #    contract for this listing right after) → we must return JSON so
-    #    the JS knows whether the save succeeded, and can read the new
-    #    listing_id + redirect_url from the response.
-    # The difference: fetch() automatically sends this header, a normal
-    # form submit does not.
+
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     try:
@@ -173,7 +164,7 @@ def create_listing(request):
             'status': listing.status,
             'redirect_url': redirect_url,
         })
-    
+
     if listing.status == 'active':
         return redirect('listings_app:room_detail', pk=listing.pk)
     return redirect('listings_app:my_listings')
@@ -222,10 +213,12 @@ def update_listing(request, pk):
 
 @login_required
 def my_listings(request):
+    # Exclude listings with invalid prices (NULL)
     listings = (
         Listing.objects
         .filter(poster=request.user)
-        .prefetch_related('images')
+        .exclude(price__isnull=True)
+        .prefetch_related('images', 'contract_documents')
         .annotate(
             app_count=Count('applications'),
             pending_count=Count('applications', filter=Q(applications__status='pending')),
@@ -233,11 +226,16 @@ def my_listings(request):
         )
         .order_by('-created_at')
     )
+
+    # Calculate stats using database queries instead of Python iteration
+    user_listings = Listing.objects.filter(poster=request.user)
     stats = {
-        'total':  listings.count(),
-        'active': sum(1 for l in listings if l.status == 'active'),
-        'draft':  sum(1 for l in listings if l.status == 'draft'),
-        'closed': sum(1 for l in listings if l.status == 'closed'),
+        'total':    user_listings.count(),
+        'draft':    user_listings.filter(status='draft').count(),
+        'pending':  user_listings.filter(status='pending').count(),
+        'active':   user_listings.filter(status='active').count(),
+        'inactive': user_listings.filter(status='inactive').count(),
+        'closed':   user_listings.filter(status='closed').count(),
     }
     return render(request, 'listings_app/my_listings.html', {
         'listings': listings,
