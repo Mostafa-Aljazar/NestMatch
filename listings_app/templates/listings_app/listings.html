@@ -1,26 +1,16 @@
 {% load static %}
-{% load icons %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listings — NestMatch</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: { sans: ["'Plus Jakarta Sans'", 'sans-serif'] }
-    }
-  }
-}
-</script>
+<link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
+{% include "core_app/partials/tailwind_config.html" %}
 <style>
 * { box-sizing: border-box }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: #F9FAFB; color: #111827 }
+body {  color: #111827 }
 a { text-decoration: none }
 
 .nm-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px }
@@ -35,8 +25,8 @@ input[type=range] {
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 16px; height: 16px; border-radius: 50%;
-  background: #7C3AED; cursor: pointer;
-  box-shadow: 0 1px 4px rgba(124,58,237,.35);
+  background: var(--brand-600); cursor: pointer;
+  box-shadow: 0 1px 4px rgba(204, 102, 0,.35);
   border: 2px solid #fff;
 }
 
@@ -46,15 +36,15 @@ input[type=range]::-webkit-slider-thumb {
   background: #fff; cursor: pointer; font-family: inherit;
   color: #6B7280; transition: all .15s ease;
 }
-.nm-pill:hover { border-color: #C4B5FD; color: #7C3AED }
-.nm-pill.sel { border-color: #7C3AED; background: #EDE9FE; color: #7C3AED }
+.nm-pill:hover { border-color: #C4B5FD; color: var(--brand-600) }
+.nm-pill.sel { border-color: var(--brand-600); background: var(--brand-100); color: var(--brand-600) }
 
 .nm-input {
   width: 100%; padding: 9px 14px; font-size: 14px;
   border: 1.5px solid #E5E7EB; border-radius: 10px;
   font-family: inherit; color: #111827; outline: none; background: #fff;
 }
-.nm-input:focus { border-color: #7C3AED; box-shadow: 0 0 0 3px rgba(124,58,237,.1) }
+.nm-input:focus { border-color: var(--brand-600); box-shadow: 0 0 0 3px rgba(124,58,237,.1) }
 
 .nm-page-body { max-width:1440px;margin:0 auto;display:grid;grid-template-columns:248px 1fr;gap:28px;padding:28px 28px 60px;align-items:start }
 
@@ -70,12 +60,12 @@ input[type=range]::-webkit-slider-thumb {
 }
 </style>
 </head>
-<body>
+<body class="bg-brand-50">
 
 {% include "core_app/partials/navbar.html" with active_page="listings" %}
 
 <!-- SEARCH BAR -->
-<div style="background:#fff;border-bottom:1px solid #E5E7EB;margin-top:64px">
+<div style="border-bottom:1px solid #E5E7EB;margin-top:64px">
   <div style="max-width:1440px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
     <div style="position:relative;flex:1;min-width:200px">
       <!-- search icon left -->
@@ -85,27 +75,27 @@ input[type=range]::-webkit-slider-thumb {
             <!-- input -->
             <input type="text" id="nm-search" placeholder="Search by city, area, or university..."
              style="width:100%;padding:9px 56px 9px 38px;font-size:14px;border:1.5px solid #E5E7EB;border-radius:10px;font-family:inherit;outline:none;background:#fff;transition:border-color .15s"
-             onfocus="this.style.borderColor='#7C3AED'" onblur="this.style.borderColor='#E5E7EB'"
+             onfocus="this.style.borderColor='var(--brand-600)'" onblur="this.style.borderColor='#E5E7EB'"
              oninput="nmToggleClear(this.value)"
              onkeydown="if(event.key==='Enter') nmSearch()">
             <!-- clear × button (appears when input has value) -->
             <button id="nm-clear-btn" onclick="nmClearSearch()" title="Clear"
               style="display:none;position:absolute;right:48px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:999px;background:#F3F4F6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6B7280;line-height:1;padding:0">
-        {% icon 'close' size=12 %}
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
             <!-- compact search icon button inside input -->
             <button onclick="nmSearch()" title="Search"
-              style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:9px;background:#7C3AED;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
-        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
-            </button>
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:999px;background:var(--brand-600);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+          </button>
     </div>
     <select id="nm-sort" onchange="nmApplyFilters()" class="nm-input" style="width:auto;cursor:pointer">
       <option value="match">Best Match</option>
       <option value="price_asc">Lowest Price</option>
       <option value="newest" selected>Newest First</option>
     </select>
-    <button id="nm-filter-btn" onclick="nmOpenFilters()" style="display:none;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid #7C3AED;border-radius:10px;background:#fff;color:#7C3AED;cursor:pointer;font-family:inherit">
-      {% icon 'sliders' size=14 %} Filters
+    <button id="nm-filter-btn" onclick="nmOpenFilters()" style="display:none;align-items:center;gap:6px;padding:9px 16px;font-size:13px;font-weight:700;border:1.5px solid var(--brand-600);border-radius:10px;background:#fff;color:var(--brand-600);cursor:pointer;font-family:inherit">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h6M4 18h12"/><circle cx="17" cy="6" r="2"/><circle cx="13" cy="12" r="2"/><circle cx="19" cy="18" r="2"/></svg> Filters
     </button>
   </div>
 </div>
@@ -123,8 +113,10 @@ input[type=range]::-webkit-slider-thumb {
   <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 12px;border-bottom:1px solid #F3F4F6">
     <span style="font-size:15px;font-weight:700;color:#111827">Filters</span>
     <div style="display:flex;align-items:center;gap:12px">
-      <button onclick="nmResetFilters()" style="font-size:12px;font-weight:600;color:#7C3AED;background:none;border:none;cursor:pointer;font-family:inherit">Reset all</button>
-      <button onclick="nmCloseFilters()" style="width:26px;height:26px;border-radius:50%;background:#F3F4F6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">{% icon 'close' size=12 %}</button>
+      <button onclick="nmResetFilters()" style="font-size:12px;font-weight:600;color:var(--brand-600);background:none;border:none;cursor:pointer;font-family:inherit">Reset all</button>
+      <button onclick="nmCloseFilters()" style="width:26px;height:26px;border-radius:50%;background:#F3F4F6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
     </div>
   </div>
 
@@ -135,9 +127,9 @@ input[type=range]::-webkit-slider-thumb {
     <div style="grid-column:1/-1;padding:12px 16px;border-bottom:1px solid #F3F4F6">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <span style="display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF">
-          {% icon 'dollar' size=12 %} Price / month
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 6.5c0-1.9-2.2-3.5-5-3.5S7 4.4 7 6.3c0 1.6 1.3 2.6 3 3.1l4 1.2c1.7.5 3 1.5 3 3.1 0 1.9-2.2 3.3-5 3.3s-5-1.4-5-3.3"/></svg> Price / month
         </span>
-        <span id="nm-price-lbl-d" style="font-size:11px;font-weight:700;color:#7C3AED">Up to $2000</span>
+        <span id="nm-price-lbl-d" style="font-size:11px;font-weight:700;color:var(--brand-600)">Up to $2000</span>
       </div>
       <input type="range" id="nm-price-d" min="50" max="2000" value="2000"
              oninput="document.getElementById('nm-price-lbl-d').textContent='Up to $'+this.value">
@@ -146,12 +138,14 @@ input[type=range]::-webkit-slider-thumb {
 
     <!-- Room Type -->
     <div style="padding:12px 16px;border-bottom:1px solid #F3F4F6;border-right:1px solid #F3F4F6">
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:8px;display:flex;align-items:center;gap:5px">{% icon 'home' size=12 %} Room Type</div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
+        Room Type</div>
       <div style="display:flex;flex-direction:column;gap:6px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="private_room" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">Private Room</label>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="full_apartment" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">Full Apartment</label>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="shared_bed" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">Shared Room</label>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="roommate_wanted" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">Roommate Wanted</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="private_room" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:var(--brand-600);cursor:pointer;flex-shrink:0">Private Room</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="full_apartment" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:var(--brand-600);cursor:pointer;flex-shrink:0">Full Apartment</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="shared_bed" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:var(--brand-600);cursor:pointer;flex-shrink:0">Shared Room</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:#374151"><input type="checkbox" value="roommate_wanted" class="nm-type-chk-d" checked style="width:13px;height:13px;accent-color:var(--brand-600);cursor:pointer;flex-shrink:0">Roommate Wanted</label>
       </div>
     </div>
 
@@ -159,7 +153,9 @@ input[type=range]::-webkit-slider-thumb {
     <div style="display:flex;flex-direction:column;border-bottom:1px solid #F3F4F6">
       <!-- Smoking -->
       <div style="padding:12px 16px;border-bottom:1px solid #F3F4F6">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:7px;display:flex;align-items:center;gap:5px">{% icon 'cigarette-ban' size=12 %} Smoking</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:7px;display:flex;align-items:center;gap:5px">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="10" width="14" height="4" rx="1"/><path d="M16 10v4M20 10v4"/><path d="M6 7c0-1.5 1-1.5 1-3M9 7c0-1.5 1-1.5 1-3"/><path d="M3 3l18 18"/></svg>
+           Smoking</div>
         <div style="display:flex;flex-direction:column;gap:5px">
           <button class="nm-pill sel" data-group="smoking-d" data-val="" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Any</button>
           <button class="nm-pill" data-group="smoking-d" data-val="no_smoking" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">No smoking</button>
@@ -168,7 +164,9 @@ input[type=range]::-webkit-slider-thumb {
       </div>
       <!-- Pets -->
       <div style="padding:12px 16px;border-bottom:1px solid #F3F4F6">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:7px;display:flex;align-items:center;gap:5px">{% icon 'paw' size=12 %} Pets</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:7px;display:flex;align-items:center;gap:5px">
+         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="9" r="1.6"/><circle cx="11" cy="6.5" r="1.6"/><circle cx="15" cy="6.5" r="1.6"/><circle cx="18" cy="9.5" r="1.6"/><ellipse cx="12" cy="16" rx="5" ry="4"/></svg>
+          Pets</div>
         <div style="display:flex;flex-direction:column;gap:5px">
           <button class="nm-pill sel" data-group="pets-d" data-val="" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Any</button>
           <button class="nm-pill" data-group="pets-d" data-val="pets_allowed" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Accepted</button>
@@ -177,7 +175,8 @@ input[type=range]::-webkit-slider-thumb {
       </div>
       <!-- Gender -->
       <div style="padding:12px 16px">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:7px;display:flex;align-items:center;gap:5px">{% icon 'person' size=12 %} Gender</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:7px;display:flex;align-items:center;gap:5px">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg> Gender</div>
         <div style="display:flex;flex-direction:column;gap:5px">
           <button class="nm-pill sel" data-group="gender-d" data-val="" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Any</button>
           <button class="nm-pill" data-group="gender-d" data-val="males_only" onclick="nmToggleTag(this)" style="text-align:left;border-radius:6px;padding:4px 10px">Males only</button>
@@ -190,7 +189,7 @@ input[type=range]::-webkit-slider-thumb {
 
   <!-- Apply -->
   <div style="padding:12px 16px 24px">
-    <button onclick="nmApplyFilters(true)" style="width:100%;padding:12px;background:#7C3AED;color:#fff;font-size:14px;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-family:inherit">
+    <button onclick="nmApplyFilters(true)" style="width:100%;padding:12px;background:var(--brand-600);color:#fff;font-size:14px;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-family:inherit">
       Show Results
     </button>
   </div>
@@ -206,14 +205,15 @@ input[type=range]::-webkit-slider-thumb {
       <!-- Header row -->
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #F3F4F6">
         <span style="font-size:14px;font-weight:700;color:#111827">Filters</span>
-        <button onclick="nmResetFilters()" style="font-size:12px;font-weight:600;color:#7C3AED;background:none;border:none;cursor:pointer;font-family:inherit;padding:0">Reset all</button>
+        <button onclick="nmResetFilters()" style="font-size:12px;font-weight:600;color:var(--brand-600);background:none;border:none;cursor:pointer;font-family:inherit;padding:0">Reset all</button>
       </div>
 
       <!-- Price Range -->
       <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;display:flex;align-items:center;gap:5px">{% icon 'dollar' size=13 %} Price / month</span>
-          <span id="nm-price-lbl" style="font-size:12px;font-weight:700;color:#7C3AED">Up to $2000</span>
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;display:flex;align-items:center;gap:5px">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h6M4 18h12"/><circle cx="17" cy="6" r="2"/><circle cx="13" cy="12" r="2"/><circle cx="19" cy="18" r="2"/></svg> Price / month</span>
+          <span id="nm-price-lbl" style="font-size:12px;font-weight:700;color:var(--brand-600)">Up to $2000</span>
         </div>
         <input type="range" id="nm-price" min="50" max="2000" value="2000"
                oninput="document.getElementById('nm-price-lbl').textContent='Up to $'+this.value">
@@ -224,22 +224,24 @@ input[type=range]::-webkit-slider-thumb {
 
       <!-- Room Type -->
       <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:12px;display:flex;align-items:center;gap:5px">{% icon 'home' size=13 %} Room Type</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:12px;display:flex;align-items:center;gap:5px">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
+          Room Type</div>
         <div style="display:flex;flex-direction:column;gap:9px">
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#374151">
-            <input type="checkbox" value="private_room" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">
+            <input type="checkbox" value="private_room" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:var(--brand-600);cursor:pointer;flex-shrink:0">
             Private Room
           </label>
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#374151">
-            <input type="checkbox" value="full_apartment" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">
+            <input type="checkbox" value="full_apartment" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:var(--brand-600);cursor:pointer;flex-shrink:0">
             Full Apartment
           </label>
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#374151">
-            <input type="checkbox" value="shared_bed" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">
+            <input type="checkbox" value="shared_bed" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:var(--brand-600);cursor:pointer;flex-shrink:0">
             Shared Room
           </label>
           <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#374151">
-            <input type="checkbox" value="roommate_wanted" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:#7C3AED;cursor:pointer;flex-shrink:0">
+            <input type="checkbox" value="roommate_wanted" class="nm-type-chk" checked style="width:15px;height:15px;accent-color:var(--brand-600);cursor:pointer;flex-shrink:0">
             Roommate Wanted
           </label>
         </div>
@@ -249,8 +251,10 @@ input[type=range]::-webkit-slider-thumb {
       <!-- Min Compatibility -->
       <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;display:flex;align-items:center;gap:5px">{% icon 'sparkle' size=13 %} Min Match</span>
-          <span id="nm-compat-lbl" style="font-size:12px;font-weight:700;color:#7C3AED">Any</span>
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;display:flex;align-items:center;gap:5px">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg>
+             Min Match</span>
+          <span id="nm-compat-lbl" style="font-size:12px;font-weight:700;color:var(--brand-600)">Any</span>
         </div>
         <input type="range" id="nm-compat" min="0" max="100" value="0"
                oninput="document.getElementById('nm-compat-lbl').textContent=this.value>0?this.value+'%+':'Any'">
@@ -262,7 +266,9 @@ input[type=range]::-webkit-slider-thumb {
 
       <!-- Smoking -->
       <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:10px;display:flex;align-items:center;gap:5px">{% icon 'cigarette-ban' size=13 %} Smoking</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:10px;display:flex;align-items:center;gap:5px">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="10" width="14" height="4" rx="1"/><path d="M16 10v4M20 10v4"/><path d="M6 7c0-1.5 1-1.5 1-3M9 7c0-1.5 1-1.5 1-3"/><path d="M3 3l18 18"/></svg>
+           Smoking</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           <button class="nm-pill sel" data-group="smoking" data-val="" onclick="nmToggleTag(this)">Any</button>
           <button class="nm-pill" data-group="smoking" data-val="no_smoking" onclick="nmToggleTag(this)">No smoking</button>
@@ -272,7 +278,9 @@ input[type=range]::-webkit-slider-thumb {
 
       <!-- Pets -->
       <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:10px;display:flex;align-items:center;gap:5px">{% icon 'paw' size=13 %} Pets</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:10px;display:flex;align-items:center;gap:5px">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="9" r="1.6"/><circle cx="11" cy="6.5" r="1.6"/><circle cx="15" cy="6.5" r="1.6"/><circle cx="18" cy="9.5" r="1.6"/><ellipse cx="12" cy="16" rx="5" ry="4"/></svg>
+          Pets</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           <button class="nm-pill sel" data-group="pets" data-val="" onclick="nmToggleTag(this)">Any</button>
           <button class="nm-pill" data-group="pets" data-val="pets_allowed" onclick="nmToggleTag(this)">Accepted</button>
@@ -282,7 +290,9 @@ input[type=range]::-webkit-slider-thumb {
 
       <!-- Gender -->
       <div style="padding:18px 20px;border-bottom:1px solid #F3F4F6">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:10px;display:flex;align-items:center;gap:5px">{% icon 'person' size=13 %} Gender preference</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:10px;display:flex;align-items:center;gap:5px">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+          Gender preference</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           <button class="nm-pill sel" data-group="gender" data-val="" onclick="nmToggleTag(this)">Any</button>
           <button class="nm-pill" data-group="gender" data-val="males_only" onclick="nmToggleTag(this)">Males only</button>
@@ -292,7 +302,7 @@ input[type=range]::-webkit-slider-thumb {
 
       <!-- Apply -->
       <div style="padding:16px 20px">
-        <button onclick="nmApplyFilters()" style="width:100%;padding:11px;background:#7C3AED;color:#fff;font-size:13px;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='#6D28D9'" onmouseout="this.style.background='#7C3AED'">
+        <button onclick="nmApplyFilters()" style="width:100%;padding:11px;background:var(--brand-600);color:#fff;font-size:13px;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='var(--brand-700)'" onmouseout="this.style.background='var(--brand-600)'">
           Apply Filters
         </button>
       </div>
@@ -306,7 +316,7 @@ input[type=range]::-webkit-slider-thumb {
     <!-- Results header -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
       <div>
-        <span style="font-size:15px;font-weight:700;color:#111827">{{ listings.paginator.count }} room{{ listings.paginator.count|pluralize }} found</span>
+        <span class="text-black-500" style="font-size:15px;font-weight:600;">{{ listings.paginator.count }} room{{ listings.paginator.count|pluralize }} found</span>
         {% if search_query %}
         <span style="font-size:14px;color:#6B7280;margin-left:8px">for "{{ search_query }}"</span>
         {% endif %}
@@ -315,7 +325,9 @@ input[type=range]::-webkit-slider-thumb {
         {% if search_query %}
         <span style="background:#F0FDF4;color:#059669;font-size:12px;font-weight:600;padding:5px 12px;border-radius:99px;display:flex;align-items:center;gap:6px">
           {{ search_query }}
-          <a href="{% url 'listings_app:listings' %}" style="color:#059669;font-weight:700;display:inline-flex">{% icon 'close' size=11 %}</a>
+          <a href="{% url 'listings_app:listings' %}" style="color:#059669;font-weight:700;display:inline-flex">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </a>
         </span>
         {% endif %}
       </div>
@@ -327,10 +339,11 @@ input[type=range]::-webkit-slider-thumb {
         {% include "listings_app/partials/listing_card.html" with listing=listing %}
       {% empty %}
         <div style="grid-column:1/-1;text-align:center;padding:80px 20px">
-          <div style="margin-bottom:16px;display:flex;justify-content:center;color:#D1D5DB">{% icon 'home' size=48 %}</div>
+          <div style="margin-bottom:16px;display:flex;justify-content:center;color:#D1D5DB">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg></div>
           <div style="font-size:18px;font-weight:700;color:#111827;margin-bottom:8px">No listings found</div>
           <div style="font-size:14px;color:#6B7280;margin-bottom:24px">Try adjusting your search or filters</div>
-          <a href="{% url 'listings_app:listings' %}" style="padding:10px 24px;background:#7C3AED;color:#fff;border-radius:8px;font-size:14px;font-weight:600">Clear filters</a>
+          <a href="{% url 'listings_app:listings' %}" style="padding:10px 24px;background:var(--brand-600);color:#fff;border-radius:8px;font-size:14px;font-weight:600">Clear filters</a>
         </div>
       {% endfor %}
     </div>
@@ -346,7 +359,7 @@ input[type=range]::-webkit-slider-thumb {
       {% endif %}
       {% for num in listings.paginator.page_range %}
         {% if listings.number == num %}
-        <span style="width:36px;height:36px;border-radius:8px;border:1.5px solid #7C3AED;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff">{{ num }}</span>
+        <span style="width:36px;height:36px;border-radius:8px;border:1.5px solid var(--brand-600);background:var(--brand-600);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff">{{ num }}</span>
         {% elif num > listings.number|add:"-3" and num < listings.number|add:"3" %}
         <a href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}"
            style="width:36px;height:36px;border-radius:8px;border:1.5px solid #E5E7EB;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#374151">{{ num }}</a>

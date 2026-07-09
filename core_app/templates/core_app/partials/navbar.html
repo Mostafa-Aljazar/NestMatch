@@ -5,43 +5,43 @@
   active_page values: "home" | "listings" | "post_room" | "profile" | "dashboard" | "my_listings" | "favorites" | "faq" | "contact"
 {% endcomment %}
 
-<nav id="nm-nav" class="top-0 right-0 left-0 fixed flex items-center bg-white px-5 border-gray-100 border-b h-16 transition-all duration-300" style="z-index:9998">
+<nav id="nm-nav" class="top-0 right-0 left-0 fixed flex items-center bg-white px-5 border-brand-100 border-b h-16 transition-all duration-300" style="z-index:9998">
   <!-- Logo -->
   <a href="/" class="group flex items-center gap-2 mr-8 no-underline shrink-0">
-    <div class="flex justify-center items-center bg-violet-600 shadow-sm group-hover:shadow-md group-hover:shadow-violet-300 rounded-lg w-8 h-8 group-hover:-rotate-6 group-hover:scale-105 transition-all duration-300 ease-out">
+    <div class="flex justify-center items-center bg-brand-600 shadow-sm group-hover:shadow-md group-hover:shadow-brand-300 rounded-lg w-8 h-8 group-hover:-rotate-6 group-hover:scale-105 transition-all duration-300 ease-out">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
         <path d="M3 12L12 3L21 12V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V12Z" fill="white"/>
       </svg>
     </div>
-    <span class="font-extrabold text-[18px] leading-none tracking-tight" style="font-family:'Plus Jakarta Sans',sans-serif">
-      <span class="text-gray-900">Nest</span><span class="text-violet-600 group-hover:text-violet-700 transition-colors duration-300">Match</span>
+    <span class="font-extrabold text-brand-500 text-[18px] leading-none tracking-tight" >
+      <span class="">Nest</span><span class="text-brand-700  group-hover:text-brand-700 transition-colors duration-300">Match</span>
     </span>
   </a>
 
   <!-- Desktop nav links (centered) -->
   <div class="hidden md:flex flex-1 justify-center items-center gap-1">
     <a href="/" class="relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ease-out
-      {% if active_page == 'home' %}text-violet-600 bg-violet-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-gray-50 hover:-translate-y-0.5{% endif %}">
+      {% if active_page == 'home' %}hover:bg-brand-50 bg-brand-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-brand-50 hover:-translate-y-0.5{% endif %}">
       Home
-      <span class="pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 rounded-full bg-violet-500 origin-left transition-transform duration-300 ease-out
+      <span class="pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 rounded-full bg-brand-500 origin-left transition-transform duration-300 ease-out
         {% if active_page == 'home' %}scale-x-100{% else %}scale-x-0{% endif %}"></span>
     </a>
     <a href="/rooms/" class="relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ease-out
-      {% if active_page == 'listings' %}text-violet-600 bg-violet-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-gray-50 hover:-translate-y-0.5{% endif %}">
+      {% if active_page == 'listings' %}hover:bg-brand-50 bg-brand-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-brand-50 hover:-translate-y-0.5{% endif %}">
       Rooms
-      <span class="pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 rounded-full bg-violet-500 origin-left transition-transform duration-300 ease-out
+      <span class="pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 rounded-full bg-brand-500 origin-left transition-transform duration-300 ease-out
         {% if active_page == 'listings' %}scale-x-100{% else %}scale-x-0{% endif %}"></span>
     </a>
     <a href="{% url 'core_app:faq' %}" class="relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ease-out
-      {% if active_page == 'faq' %}text-violet-600 bg-violet-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-gray-50 hover:-translate-y-0.5{% endif %}">
+      {% if active_page == 'faq' %}hover:bg-brand-50 bg-brand-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-brand-50 hover:-translate-y-0.5{% endif %}">
       FAQ
-      <span class="pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 rounded-full bg-violet-500 origin-left transition-transform duration-300 ease-out
+      <span class="pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 rounded-full bg-brand-500 origin-left transition-transform duration-300 ease-out
         {% if active_page == 'faq' %}scale-x-100{% else %}scale-x-0{% endif %}"></span>
     </a>
     <a href="{% url 'core_app:contact' %}" class="relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ease-out
-      {% if active_page == 'contact' %}text-violet-600 bg-violet-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-gray-50 hover:-translate-y-0.5{% endif %}">
+      {% if active_page == 'contact' %}hover:bg-brand-50 bg-brand-50 font-semibold{% else %}text-gray-500 hover:text-gray-900 hover:bg-brand-50 hover:-translate-y-0.5{% endif %}">
       Contact Us
-      <span class="pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 rounded-full bg-violet-500 origin-left transition-transform duration-300 ease-out
+      <span class="pointer-events-none absolute left-3 right-3 -bottom-0.5 h-0.5 rounded-full bg-brand-500 origin-left transition-transform duration-300 ease-out
         {% if active_page == 'contact' %}scale-x-100{% else %}scale-x-0{% endif %}"></span>
     </a>
   </div>
@@ -53,12 +53,12 @@
       <!-- Post a Room CTA -->
       {% if user.is_id_verified %}
       <a href="/rooms/new/"
-         class="hover:bg-violet-50 hover:shadow-sm px-4 py-2 border border-violet-200 hover:border-violet-300 rounded-lg font-semibold text-violet-600 text-sm active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">
+         class="hover:bg-brand-50 text-brand-500 hover:shadow-sm px-4 py-2 border border-brand-200 hover:border-brand-300 rounded-lg font-semibold hover:bg-brand-50 text-sm active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">
         + Post Room
       </a>
       {% else %}
       <button onclick="nmShowVerificationAlert()"
-         class="opacity-60 cursor-not-allowed px-4 py-2 border border-gray-300 rounded-lg font-semibold text-gray-500 text-sm bg-gray-50 transition-all duration-200 ease-out"
+         class="opacity-60 cursor-not-allowed px-4 py-2 border border-gray-300 rounded-lg font-semibold text-gray-500 text-sm bg-brand-50 transition-all duration-200 ease-out"
          title="Verify your ID to post a room">
         + Post Room
       </button>
@@ -67,8 +67,8 @@
       <!-- Avatar dropdown trigger -->
       <div class="relative" id="nm-user-menu">
         <button onclick="nmToggleUserMenu()"
-                class="flex items-center gap-2 bg-white hover:bg-violet-50 hover:shadow-sm py-1.5 pr-3 pl-2 border border-gray-200 hover:border-violet-300 rounded-xl font-medium text-gray-700 text-sm active:scale-95 transition-all duration-200 ease-out">
-         <span class="flex justify-center items-center bg-gradient-to-br from-violet-500 to-violet-700 rounded-full ring-2 ring-transparent w-7 h-7 font-extrabold text-white text-xs transition-all duration-200 shrink-0">
+                class="flex items-center gap-2 bg-white hover:bg-brand-50 hover:shadow-sm py-1.5 pr-3 pl-2 border border-gray-200 hover:border-brand-300 rounded-xl font-medium text-gray-700 text-sm active:scale-95 transition-all duration-200 ease-out">
+         <span class="flex justify-center items-center bg-gradient-to-br from-brand-500 to-brand-700 rounded-full ring-2 ring-transparent w-7 h-7 font-extrabold text-white text-xs transition-all duration-200 shrink-0">
           {% if user.profile_pic %}
             <img id="nav-avatar-img" src="{{ user.profile_pic.url }}" class="rounded-full w-7 h-7 object-cover" alt="nav-avatar-img">
           {% else %}
@@ -76,53 +76,52 @@
           {% endif %}
         </span>
           <span class="max-w-[90px] truncate">{{ user.first_name }}</span>
-          <svg id="nm-user-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 transition-transform duration-300 ease-out shrink-0">
+          <svg id="nm-user-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-brand-400 transition-transform duration-300 ease-out shrink-0">
             <path d="M6 9l6 6 6-6"/>
           </svg>
         </button>
 
         <!-- Dropdown -->
         <div id="nm-user-dropdown"
-             class="hidden top-full right-0 absolute bg-white opacity-0 shadow-xl mt-2 py-1.5 border border-gray-100 rounded-2xl w-56 scale-95 origin-top-right transition-all -translate-y-1 duration-200 ease-out"
+             class="hidden top-full right-0 absolute bg-white opacity-0 shadow-xl mt-2 py-1.5 border border-brand-100 rounded-2xl w-56 scale-95 origin-top-right transition-all -translate-y-1 duration-200 ease-out"
              style="z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.12)">
 
           <!-- User info header -->
-          <div class="px-4 py-3 border-gray-100 border-b">
+          <div class="px-4 py-3 border-brand-100 border-b">
             <p class="font-semibold text-[13px] text-gray-900 truncate">{{ user.full_name }}</p>
-            <p class="mt-0.5 text-[11px] text-gray-400 truncate">{{ user.email }}</p>
+            <p class="mt-0.5 text-[11px] text-brand-400 truncate">{{ user.email }}</p>
           </div>
 
           <div class="py-1">
-            <a href="/auth/profile/" class="group flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 hover:pl-5 transition-all duration-200 ease-out
-              {% if active_page == 'profile' %}bg-violet-50 text-violet-600{% endif %}">
+            <a href="/auth/profile/" class="group flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-brand-50 hover:hover:bg-brand-50 hover:pl-5 transition-all duration-200 ease-out
+              {% if active_page == 'profile' %}bg-brand-50 hover:bg-brand-50{% endif %}">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform duration-200 ease-out">
                 <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
               </svg>
               My Profile
             </a>
-            <a href="{% url 'listings_app:my_listings' %}" class="group flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 hover:pl-5 transition-all duration-200 ease-out
-              {% if active_page == 'my_listings' %}bg-violet-50 text-violet-600{% endif %}">
+            <a href="{% url 'listings_app:my_listings' %}" class="group flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-brand-50 hover:hover:bg-brand-50 hover:pl-5 transition-all duration-200 ease-out
+              {% if active_page == 'my_listings' %}bg-brand-50 hover:bg-brand-50{% endif %}">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform duration-200 ease-out">
                 <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
               </svg>
               My Rooms
             </a>
-            <a href="{% url 'listings_app:favorites' %}" class="group flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 hover:pl-5 transition-all duration-200 ease-out
-              {% if active_page == 'favorites' %}bg-violet-50 text-violet-600{% endif %}">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform duration-200 ease-out">
-                <path d="M12 21s-7.5-4.6-10-9.3C.5 8.4 2.2 5 5.6 5c2 0 3.4 1 4.4 2.5C11 6 12.4 5 14.4 5c3.4 0 5.1 3.4 3.6 6.7C19.5 16.4 12 21 12 21z"/>
-              </svg>
+            <a href="{% url 'listings_app:favorites' %}" class="group flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-brand-50 hover:hover:bg-brand-50 hover:pl-5 transition-all duration-200 ease-out
+              {% if active_page == 'favorites' %}bg-brand-50 hover:bg-brand-50{% endif %}">
+             <svg width="15" height="15" viewBox="0 0 24 24" fill="{% if is_fav %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.25c-.3 0-.6-.1-.85-.28C7.14 17.24 3 13.94 3 9.83 3 7.16 5.16 5 7.83 5c1.53 0 2.98.72 3.89 1.9L12 7.24l.28-.34C13.19 5.72 14.64 5 16.17 5 18.84 5 21 7.16 21 9.83c0 4.11-4.14 7.41-8.15 10.14-.25.18-.55.28-.85.28z"/></svg>
+      
               Favorites
             </a>
-            <a href="/applications/" class="group flex items-center gap-2.5 hover:bg-violet-50 px-4 py-2.5 hover:pl-5 font-medium text-[13px] text-gray-700 hover:text-violet-600 transition-all duration-200 ease-out">
+            <a href="/applications/" class="group flex items-center gap-2.5 hover:bg-brand-50 px-4 py-2.5 hover:pl-5 font-medium text-[13px] text-gray-700 hover:hover:bg-brand-50 transition-all duration-200 ease-out">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform duration-200 ease-out">
                 <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/>
               </svg>
               My Applications
             </a>
             {% if user.is_staff %}
-            <a href="/dashboard/" class="group flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-violet-50 hover:text-violet-600 hover:pl-5 transition-all duration-200 ease-out
-              {% if active_page == 'dashboard' %}bg-violet-50 text-violet-600{% endif %}">
+            <a href="/dashboard/" class="group flex items-center gap-2.5 px-4 py-2.5 text-[13px] font-medium text-gray-700 hover:bg-brand-50 hover:hover:bg-brand-50 hover:pl-5 transition-all duration-200 ease-out
+              {% if active_page == 'dashboard' %}bg-brand-50 hover:bg-brand-50{% endif %}">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform duration-200 ease-out">
                 <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
               </svg>
@@ -131,7 +130,7 @@
             {% endif %}
           </div>
 
-          <div class="py-1 border-gray-100 border-t">
+          <div class="py-1 border-brand-100 border-t">
             <a href="/auth/logout/" class="group flex items-center gap-2.5 hover:bg-red-50 px-4 py-2.5 hover:pl-5 font-medium text-[13px] text-red-500 transition-all duration-200 ease-out">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:scale-110 transition-transform duration-200 ease-out">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
@@ -143,10 +142,10 @@
       </div>
 
     {% else %}
-      <a href="/auth/login/" class="hover:bg-violet-50 hover:shadow-sm px-4 py-2 border border-violet-200 hover:border-violet-300 rounded-lg font-semibold text-violet-600 text-sm active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">
+      <a href="/auth/login/" class="hover:bg-brand-50 hover:shadow-sm px-4 py-2 border border-brand-200 hover:border-brand-300 rounded-lg font-semibold hover:bg-brand-50 text-sm active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">
         Login
       </a>
-      <a href="/auth/register/" class="bg-violet-600 hover:bg-violet-700 shadow-sm hover:shadow-lg hover:shadow-violet-200 px-4 py-2 rounded-lg font-semibold text-white text-sm active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">
+      <a href="/auth/register/" class="bg-brand-600 hover:bg-brand-700 shadow-sm hover:shadow-lg hover:shadow-brand-200 px-4 py-2 rounded-lg font-semibold text-white text-sm active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">
         Register
       </a>
     {% endif %}
@@ -173,15 +172,15 @@
      style="z-index:9997;box-shadow:-8px 0 40px rgba(0,0,0,0.12)">
 
   <!-- Drawer header -->
-  <div class="flex justify-between items-center px-5 border-gray-100 border-b h-16 shrink-0">
+  <div class="flex justify-between items-center px-5 border-brand-100 border-b h-16 shrink-0">
     <div class="flex items-center gap-2">
-      <div class="flex justify-center items-center bg-violet-600 rounded-lg w-7 h-7">
+      <div class="flex justify-center items-center bg-brand-600 rounded-lg w-7 h-7">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
           <path d="M3 12L12 3L21 12V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V12Z" fill="white"/>
         </svg>
       </div>
       <span class="font-extrabold text-[16px] tracking-tight" style="font-family:'Plus Jakarta Sans',sans-serif">
-        <span class="text-gray-900">Nest</span><span class="text-violet-600">Match</span>
+        <span class="text-gray-900">Nest</span><span class="hover:bg-brand-50">Match</span>
       </span>
     </div>
     <button onclick="nmCloseMenu()" class="flex justify-center items-center bg-gray-100 hover:bg-gray-200 border-none rounded-lg w-8 h-8 hover:rotate-90 active:scale-90 transition-all duration-300 ease-out cursor-pointer">
@@ -193,9 +192,9 @@
 
   <!-- User card (logged in) or guest banner -->
   {% if user.is_authenticated %}
-  <div class="mx-4 mt-4 mb-1 p-4 rounded-2xl shrink-0" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #ddd6fe">
+  <div class="mx-4 mt-4 mb-1 p-4 rounded-2xl shrink-0" style="background:linear-gradient(135deg,var(--brand-50),var(--brand-100));border:1px solid #ddd6fe">
     <div class="flex items-center gap-3">
-      <div class="flex justify-center items-center bg-gradient-to-br from-violet-500 to-violet-700 rounded-full w-11 h-11 font-extrabold text-white text-sm shrink-0">
+      <div class="flex justify-center items-center bg-gradient-to-br from-brand-500 to-brand-700 rounded-full w-11 h-11 font-extrabold text-white text-sm shrink-0">
         {% if user.profile_pic %}
           <img id="nav-avatar-img-mobile" src="{{ user.profile_pic.url }}" class="rounded-full w-11 h-11 object-cover" alt="nav-avatar-img-mobile">
         {% else %}
@@ -204,69 +203,69 @@
       </div>
       <div class="min-w-0">
         <p class="font-bold text-[14px] text-gray-900 truncate">{{ user.full_name }}</p>
-        <p class="font-medium text-[11px] text-violet-500 truncate">{{ user.email }}</p>
+        <p class="font-medium text-[11px] text-brand-500 truncate">{{ user.email }}</p>
       </div>
     </div>
   </div>
   {% else %}
-  <div class="mx-4 mt-4 mb-1 p-4 rounded-2xl shrink-0" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #ddd6fe">
-    <p class="mb-3 font-semibold text-[13px] text-violet-700">Join NestMatch today</p>
+  <div class="mx-4 mt-4 mb-1 p-4 rounded-2xl shrink-0" style="background:linear-gradient(135deg,var(--brand-50),var(--brand-100));border:1px solid #ddd6fe">
+    <p class="mb-3 font-semibold text-[13px] text-brand-700">Join NestMatch today</p>
     <div class="flex gap-2">
-      <a href="/auth/login/" class="flex-1 bg-white hover:shadow-sm py-2 border border-violet-200 rounded-xl font-semibold text-[13px] text-violet-600 text-center active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">Login</a>
-      <a href="/auth/register/" class="flex-1 bg-violet-600 hover:shadow-md hover:shadow-violet-200 py-2 rounded-xl font-semibold text-[13px] text-white text-center active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">Register</a>
+      <a href="/auth/login/" class="flex-1 bg-white hover:shadow-sm py-2 border border-brand-200 rounded-xl font-semibold text-[13px] hover:bg-brand-50 text-center active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">Login</a>
+      <a href="/auth/register/" class="flex-1 bg-brand-600 hover:shadow-md hover:shadow-brand-200 py-2 rounded-xl font-semibold text-[13px] text-white text-center active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">Register</a>
     </div>
   </div>
   {% endif %}
 
   <!-- Nav links -->
   <nav class="flex-1 px-3 py-2 overflow-y-auto">
-    <p class="mt-2 mb-1 px-3 font-bold text-[10px] text-gray-400 uppercase tracking-widest">Navigation</p>
+    <p class="mt-2 mb-1 px-3 font-bold text-[10px] text-brand-400 uppercase tracking-widest">Navigation</p>
 
     <a href="/" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
-      {% if active_page == 'home' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'home' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+      {% if active_page == 'home' %}hover:bg-brand-50 bg-brand-50{% else %}text-gray-700 hover:bg-brand-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'home' %}bg-brand-100{% else %}bg-gray-100{% endif %}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V12Z"/></svg>
       </span>
       Home
     </a>
 
     <a href="/rooms/" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
-      {% if active_page == 'listings' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'listings' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+      {% if active_page == 'listings' %}hover:bg-brand-50 bg-brand-50{% else %}text-gray-700 hover:bg-brand-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'listings' %}bg-brand-100{% else %}bg-gray-100{% endif %}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       </span>
       Rooms
     </a>
 
     <a href="{% url 'core_app:faq' %}" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
-      {% if active_page == 'faq' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'faq' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+      {% if active_page == 'faq' %}hover:bg-brand-50 bg-brand-50{% else %}text-gray-700 hover:bg-brand-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'faq' %}bg-brand-100{% else %}bg-gray-100{% endif %}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 9a3 3 0 1 1 3 3H9"/><path d="M12 17h.01"/></svg>
       </span>
       FAQ
     </a>
 
     <a href="{% url 'core_app:contact' %}" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
-      {% if active_page == 'contact' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'contact' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+      {% if active_page == 'contact' %}hover:bg-brand-50 bg-brand-50{% else %}text-gray-700 hover:bg-brand-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'contact' %}bg-brand-100{% else %}bg-gray-100{% endif %}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="M4 7l8 6 8-6"/></svg>
       </span>
       Contact Us
     </a>
 
     {% if user.is_authenticated %}
-    <p class="mt-4 mb-1 px-3 font-bold text-[10px] text-gray-400 uppercase tracking-widest">Account</p>
+    <p class="mt-4 mb-1 px-3 font-bold text-[10px] text-brand-400 uppercase tracking-widest">Account</p>
 
     {% if user.is_id_verified %}
     <a href="/rooms/new/" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
-      {% if active_page == 'post_room' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'post_room' %}bg-violet-100{% else %}bg-violet-100{% endif %}">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      {% if active_page == 'post_room' %}hover:bg-brand-50 bg-brand-50{% else %}text-gray-700 hover:bg-brand-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'post_room' %}bg-brand-100{% else %}bg-brand-100{% endif %}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
       </span>
       Post a Room
     </a>
     {% else %}
-    <button onclick="nmShowVerificationAlert()" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1 opacity-60 cursor-not-allowed text-gray-400 bg-gray-50">
+    <button onclick="nmShowVerificationAlert()" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1 opacity-60 cursor-not-allowed text-brand-400 bg-brand-50">
       <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 bg-gray-100">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
       </span>
@@ -275,30 +274,30 @@
     {% endif %}
 
     <a href="/auth/profile/" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
-      {% if active_page == 'profile' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'profile' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+      {% if active_page == 'profile' %}hover:bg-brand-50 bg-brand-50{% else %}text-gray-700 hover:bg-brand-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'profile' %}bg-brand-100{% else %}bg-gray-100{% endif %}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       </span>
       My Profile
     </a>
 
     <a href="{% url 'listings_app:my_listings' %}" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
-      {% if active_page == 'my_listings' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'my_listings' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+      {% if active_page == 'my_listings' %}hover:bg-brand-50 bg-brand-50{% else %}text-gray-700 hover:bg-brand-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'my_listings' %}bg-brand-100{% else %}bg-gray-100{% endif %}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       </span>
       My Rooms
     </a>
 
     <a href="{% url 'listings_app:favorites' %}" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
-      {% if active_page == 'favorites' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'favorites' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+      {% if active_page == 'favorites' %}hover:bg-brand-50 bg-brand-50{% else %}text-gray-700 hover:bg-brand-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'favorites' %}bg-brand-100{% else %}bg-gray-100{% endif %}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-10-9.3C.5 8.4 2.2 5 5.6 5c2 0 3.4 1 4.4 2.5C11 6 12.4 5 14.4 5c3.4 0 5.1 3.4 3.6 6.7C19.5 16.4 12 21 12 21z"/></svg>
       </span>
       Favorites
     </a>
 
-    <a href="/applications/" class="group flex items-center gap-3 hover:bg-gray-50 mb-0.5 px-3 py-3 rounded-xl font-semibold text-[14px] text-gray-700 transition-all hover:translate-x-1 duration-200 ease-out nm-mlink">
+    <a href="/applications/" class="group flex items-center gap-3 hover:bg-brand-50 mb-0.5 px-3 py-3 rounded-xl font-semibold text-[14px] text-gray-700 transition-all hover:translate-x-1 duration-200 ease-out nm-mlink">
       <span class="flex justify-center items-center bg-gray-100 rounded-lg w-8 h-8 group-hover:scale-110 transition-transform duration-200 ease-out shrink-0">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
       </span>
@@ -307,8 +306,8 @@
 
     {% if user.is_staff %}
     <a href="/dashboard/" class="nm-mlink group flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-semibold transition-all duration-200 ease-out mb-0.5 hover:translate-x-1
-      {% if active_page == 'dashboard' %}text-violet-600 bg-violet-50{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'dashboard' %}bg-violet-100{% else %}bg-gray-100{% endif %}">
+      {% if active_page == 'dashboard' %}hover:bg-brand-50 bg-brand-50{% else %}text-gray-700 hover:bg-brand-50{% endif %}">
+      <span class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 {% if active_page == 'dashboard' %}bg-brand-100{% else %}bg-gray-100{% endif %}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </span>
       Admin Dashboard
@@ -319,7 +318,7 @@
 
   <!-- Bottom sign out -->
   {% if user.is_authenticated %}
-  <div class="px-4 pt-2 pb-6 border-gray-100 border-t shrink-0">
+  <div class="px-4 pt-2 pb-6 border-brand-100 border-t shrink-0">
     <a href="/auth/logout/" class="group flex justify-center items-center gap-2 bg-red-50 hover:bg-red-100 py-3 rounded-xl w-full font-semibold text-[14px] text-red-500 active:scale-[0.98] transition-all duration-200 ease-out">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-0.5 duration-200 ease-out">
         <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
@@ -444,7 +443,7 @@ function nmShowVerificationAlert() {
           <button onclick="document.getElementById('nm-verification-modal').style.display='none'" style="flex:1;padding:10px 16px;background:#E5E7EB;border:none;border-radius:8px;font-size:14px;font-weight:600;color:#374151;cursor:pointer;transition:background 0.2s">
             Cancel
           </button>
-          <a href="/auth/profile/?tab=verification" style="flex:1;padding:10px 16px;background:#7C3AED;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;transition:background 0.2s;cursor:pointer" onmouseover="this.style.background='#6D28D9'" onmouseout="this.style.background='#7C3AED'">
+          <a href="/auth/profile/?tab=verification" style="flex:1;padding:10px 16px;background:var(--brand-600);color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;transition:background 0.2s;cursor:pointer" onmouseover="this.style.background='var(--brand-700)'" onmouseout="this.style.background='var(--brand-600)'">
             Go to Profile
           </a>
         </div>

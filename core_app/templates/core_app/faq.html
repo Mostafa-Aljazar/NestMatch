@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,43 +6,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FAQ — NestMatch</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
+  {% include "core_app/partials/tailwind_config.html" %}
   <style>
-    * { font-family: 'Inter', sans-serif; }
     .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
     .faq-answer.open { max-height: 500px; }
     .faq-icon { transition: transform 0.3s ease; }
     .faq-item.open .faq-icon { transform: rotate(180deg); }
-    .faq-item.open { border-color: #7C3AED; }
-    .faq-item.open .faq-question { color: #7C3AED; }
+    .faq-item.open { border-color: var(--brand-600); }
+    .faq-item.open .faq-question { color: var(--brand-600); }
     #cat-sidebar::-webkit-scrollbar { display: none;}
   </style>
 </head>
-<body class="bg-white">
+<body class="bg-brand-50">
 
-  {% include "core_app/partials/navbar.html" %}
+ {% include "core_app/partials/navbar.html" with active_page="faq" %}
 
   <!-- Hero -->
-  <section class="relative pt-24 pb-20 overflow-hidden" style="background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 50%, #9F67FA 100%);">
+  <section class="relative pt-24 pb-20 overflow-hidden" style="background: linear-gradient(135deg, var(--brand-800) 0%, var(--brand-600) 100%, #FFFAF2 100%);">
     <!-- Dots -->
     <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(circle,rgba(255,255,255,.1) 1.5px,transparent 1.5px);background-size:32px 32px"></div>
     <!-- Blobs -->
     <div class="absolute -top-20 -right-20 w-96 h-96 rounded-full pointer-events-none" style="background:rgba(255,255,255,.06)"></div>
     <div class="absolute -bottom-10 -left-10 w-64 h-64 rounded-full pointer-events-none" style="background:rgba(255,255,255,.04)"></div>
 
-    <div class="max-w-[900px] mx-[8rem] px-6 text-left relative z-10">
+    <div class="max-w-[900px] mx-auto px-6 text-center relative z-10">
       <div class="inline-flex items-center gap-2 bg-white/15 border border-white/25 text-white text-xs font-bold px-4 py-2 rounded-full mb-6 uppercase tracking-wider">
           Help Center
       </div>
       <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-5">
         Frequently Asked Questions
       </h1>
-      <p class="text-white/80 text-lg mb-10 max-w-[520px] leading-relaxed">
+      <p class="text-white/80 text-lg mb-10 max-w-[520px] mx-auto leading-relaxed">
         Find answers to the most common questions about NestMatch your AI-powered roommate matching platform.
       </p>
 
       <!-- Stats row -->
-      <div class="flex items-center justify-start gap-8 mb-10 flex-wrap">
+      <div class="flex items-center justify-center gap-8 mb-10 flex-wrap">
         <div class="text-center">
           <div class="text-2xl font-extrabold text-white">10+</div>
           <div class="text-white/60 text-xs font-medium mt-0.5">Questions</div>
@@ -59,7 +60,7 @@
       </div>
 
       <!-- Search -->
-      <div class="relative max-w-[600px]">
+      <div class="relative max-w-[600px] mx-auto">
         <svg class="absolute left-5 top-1/2 -translate-y-1/2" width="18" height="18" fill="none" viewBox="0 0 24 24">
           <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="#9CA3AF" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
@@ -71,27 +72,27 @@
 
   <!-- FAQ body -->
   <section class="py-16 px-6">
-    <div class="max-w-[1100px] mx-[7rem]">
+    <div class="max-w-[1100px] mx-auto">
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
       <!-- Left: Categories sidebar -->
 <div class="hidden lg:block col-span-1">
   <div class="lg:top-20">
-    <h3 class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Browse by Topic</h3>
+    <h3 class="block text-xs font-bold text-brand-400 uppercase tracking-widest mb-4">Browse by Topic</h3>
 
     <!-- Mobile: hidden / Desktop: vertical -->
 <div class="flex flex-col gap-1 w-full" id="cat-sidebar" style="-ms-overflow-style:none; scrollbar-width:none;">
 
   <button onclick="filterFaq('all')" data-cat="all"
-    class="cat-btn flex w-full items-center justify-between gap-2.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-left transition-all border-l-[3px] border-violet-600 bg-violet-100 text-violet-600">
+    class="cat-btn flex w-full items-center justify-between gap-2.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-left transition-all border-l-[3px] border-brand-600 bg-brand-100 hover:bg-brand-50">
     <span class="flex items-center gap-2 whitespace-nowrap">
       <svg class="w-[18px] h-[18px] flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
       </svg>
       All
     </span>
-    <span class="cat-count text-xs font-bold px-2 py-0.5 rounded-full bg-white text-violet-600">10</span>
+    <span class="cat-count text-xs font-bold px-2 py-0.5 rounded-full bg-white hover:bg-brand-50">10</span>
   </button>
 
   <button onclick="filterFaq('general')" data-cat="general"
@@ -149,174 +150,137 @@
           <div id="faq-list" class="flex flex-col gap-3">
 
             <!-- Q1 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="compatibility">
+            <div class="faq-item border-2 border-brand-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="compatibility">
               <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
                 <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How does the AI compatibility score work?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="faq-icon shrink-0 text-brand-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
               <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-brand-100 pt-4">
                   NestMatch uses Google Gemini AI to compare your lifestyle profile with the room poster's. It analyzes sleep schedule, noise tolerance, cleanliness, smoking habits, pet preferences, and social behavior returning a compatibility percentage with strengths and differences highlighted.
                 </div>
               </div>
             </div>
 
             <!-- Q2 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="general">
+            <div class="faq-item border-2 border-brand-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="general">
               <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
                 <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">Is NestMatch free to use?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="faq-icon shrink-0 text-brand-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
               <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-brand-100 pt-4">
                   Yes! NestMatch is completely free. You can browse listings, view compatibility scores, apply to rooms, and post listings at no cost. We believe finding the right roommate should be accessible to everyone.
                 </div>
               </div>
             </div>
 
             <!-- Q3 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="listings">
+            <div class="faq-item border-2 border-brand-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="listings">
               <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
                 <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How do I post a room listing?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="faq-icon shrink-0 text-brand-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
               <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-brand-100 pt-4">
                   After completing your lifestyle questionnaire, click "Post a Room" in the navbar. Fill in the title, price, location, available date, and upload photos. Use the AI button to auto-generate a professional description using Google Gemini.
                 </div>
               </div>
             </div>
 
             <!-- Q4 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="applications">
+            <div class="faq-item border-2 border-brand-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="applications">
               <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
                 <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">Can I apply to multiple rooms at the same time?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="faq-icon shrink-0 text-brand-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
               <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-brand-100 pt-4">
                   Yes! You can apply to as many rooms as you like. Each application is tracked in your "My Applications" dashboard where you can monitor the status — Pending, Accepted, or Rejected.
                 </div>
               </div>
             </div>
 
             <!-- Q5 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="applications">
+            <div class="faq-item border-2 border-brand-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="applications">
               <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
                 <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How is the rental agreement generated by AI?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="faq-icon shrink-0 text-brand-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
               <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-brand-100 pt-4">
                   Once accepted, both parties can generate a rental agreement. NestMatch sends room details and both profiles to Google Gemini, which returns a structured ready-to-use agreement you can view and download as PDF.
                 </div>
               </div>
             </div>
 
             <!-- Q6 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="listings">
+            <div class="faq-item border-2 border-brand-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="listings">
               <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
                 <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How do I contact a room poster?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="faq-icon shrink-0 text-brand-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
               <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-brand-100 pt-4">
                   On the Room Detail page, click the green "Chat on WhatsApp" button. This opens a direct WhatsApp conversation with the poster using their registered phone number.
                 </div>
               </div>
             </div>
 
             <!-- Q7 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="compatibility">
+            <div class="faq-item border-2 border-brand-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="compatibility">
               <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
                 <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">Can I edit my lifestyle questionnaire later?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="faq-icon shrink-0 text-brand-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
               <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-brand-100 pt-4">
                   Yes! Update your lifestyle preferences anytime from your Profile page. Changes immediately affect new compatibility scores for future applications and room views.
                 </div>
               </div>
             </div>
 
             <!-- Q8 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="listings">
+            <div class="faq-item border-2 border-brand-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="listings">
               <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
                 <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">What listing types are supported?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="faq-icon shrink-0 text-brand-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
               <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
-                  Four types: <strong class="text-gray-700">Private Room</strong> (single room in shared apartment), <strong class="text-gray-700">Shared Room</strong> (a room you'll share with another roommate), <strong class="text-gray-700">Full Apartment</strong> (entire unit for a group), and <strong class="text-gray-700">Roommate Wanted</strong> (you live there and need a roommate).
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-brand-100 pt-4">
+                  Three types: <strong class="text-gray-700">Private Room</strong> (single room in shared apartment), <strong class="text-gray-700">Full Apartment</strong> (entire unit for a group), and <strong class="text-gray-700">Roommate Wanted</strong> (you live there and need a roommate).
                 </div>
               </div>
             </div>
 
             <!-- Q9 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="general">
+            <div class="faq-item border-2 border-brand-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="general">
               <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
                 <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">Is my personal data safe on NestMatch?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="faq-icon shrink-0 text-brand-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
               <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-brand-100 pt-4">
                   Absolutely. All passwords are hashed with bcrypt, sessions use JWT tokens, and all data is transmitted over HTTPS. We never sell your data to third parties.
                 </div>
               </div>
             </div>
 
             <!-- Q10 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="account">
-              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
-                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How do I sign up and log in to NestMatch?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
-                  Click "Sign Up" in the navbar and fill in your name, email, and password. Your password is securely hashed with bcrypt. Once registered, you can log in anytime using your email and password from the "Login" page.
-                </div>
-              </div>
-            </div>
-
-            <!-- Q11 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="account">
+            <div class="faq-item border-2 border-brand-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="account">
               <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
                 <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">How do I delete my account?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg class="faq-icon shrink-0 text-brand-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </button>
               <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
+                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-brand-100 pt-4">
                   Go to your Profile page, scroll to the bottom, and click "Delete Account". Confirm the action to permanently remove your profile, listings, and applications. This cannot be undone.
                 </div>
               </div>
             </div>
 
-            <!-- Q12 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="general">
-              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
-                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">What makes NestMatch different from traditional apartment rental apps?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
-                  Unlike traditional rental apps that only list properties, NestMatch focuses on the roommate relationship itself. Our AI compares lifestyle habits and personality traits between you and the poster, so you know how well you'll actually get along before moving in together — not just whether the room fits your budget.
-                </div>
-              </div>
-            </div>
-            <!-- Q13 -->
-            <div class="faq-item border-2 border-gray-100 rounded-2xl overflow-hidden bg-white transition-all duration-200" data-cat="account">
-              <button onclick="toggleFaq(this)" class="w-full flex items-center gap-4 px-6 py-5 text-left">
-                <span class="flex-1 text-sm font-semibold text-gray-800 faq-question">I forgot my password, how do I reset it?</span>
-                <svg class="faq-icon shrink-0 text-gray-400" width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="faq-answer">
-                <div class="px-6 pb-5 text-sm text-gray-500 leading-relaxed text-justify border-t border-gray-100 pt-4">
-                  Click "Forgot Password" on the login page and enter your registered email. We'll send you a secure reset link generated using Python's secrets module. Click the link, set a new password, and you're back in your account.
-                </div>
-              </div>
-            </div>
             <!-- No results -->
-            <div id="no-results" class="hidden text-center py-20 text-gray-400">
+            <div id="no-results" class="hidden text-center py-20 text-brand-400">
               <p class="font-bold text-gray-600 text-lg">No questions found</p>
               <p class="text-sm mt-2">Try a different keyword or browse by category</p>
             </div>
@@ -324,14 +288,14 @@
           </div>
 
           <!-- PAGINATION -->
-          <div id="pagination" class="flex items-center justify-between mt-10 pt-6 border-t border-gray-100">
+          <div id="pagination" class="flex items-center justify-between mt-10 pt-6 border-t border-brand-100">
             <button id="prev-btn" onclick="changePage(-1)"
-              class="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-500 hover:border-violet-400 hover:text-violet-600 transition disabled:opacity-30 disabled:cursor-not-allowed">
+              class="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:border-brand-400 hover:hover:bg-brand-50 transition disabled:opacity-30 disabled:cursor-not-allowed">
               ← Previous
             </button>
             <div id="page-numbers" class="flex items-center gap-2"></div>
             <button id="next-btn" onclick="changePage(1)"
-              class="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-500 hover:border-violet-400 hover:text-violet-600 transition">
+              class="flex items-center gap-2 px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-500 hover:border-brand-400 hover:hover:bg-brand-50 transition">
               Next →
             </button>
           </div>
@@ -344,15 +308,15 @@
   <!-- cta banner -->
   <section class="py-12 px-6">
     <div class="max-w-[1100px] mx-auto">
-      <div class="rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden" style="background:linear-gradient(135deg,#5B21B6,#7C3AED 50%,#9F67FA)">
+      <div class="rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden" style="background:linear-gradient(135deg,var(--brand-800),var(--brand-600) 100%)">
         <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(circle,rgba(255,255,255,.08) 1.5px,transparent 1.5px);background-size:28px 28px"></div>
         <div class="relative z-10">
           <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">Still have questions?</h2>
           <p class="text-white/75 text-base mb-8  mx-auto leading-relaxed">
             Can't find the answer you're looking for? Our support team is here to help you find your perfect nest.
           </p>
-          <a href="/contact/" class="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-violet-700 font-bold text-sm rounded-xl hover:bg-violet-50 transition shadow-lg hover:scale-[1.03]">
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="#7C3AED" stroke-width="2" stroke-linecap="round"/></svg>
+          <a href="/contact/" class="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-brand-700 font-bold text-sm rounded-xl hover:bg-brand-50 transition shadow-lg hover:scale-[1.03]">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="var(--brand-600)" stroke-width="2" stroke-linecap="round"/></svg>
             Contact Support
           </a>
         </div>
@@ -366,25 +330,6 @@
   var ITEMS_PER_PAGE = 5;
   var currentPage = 1;
   var currentCat = 'all';
-
-
-  function updateCategoryCounts() {
-  var items = document.querySelectorAll('.faq-item');
-  var counts = { all: items.length };
-
-  items.forEach(function(item) {
-    var cat = item.dataset.cat;
-    counts[cat] = (counts[cat] || 0) + 1;
-  });
-
-  document.querySelectorAll('.cat-btn').forEach(function(btn) {
-    var cat = btn.dataset.cat;
-    var countEl = btn.querySelector('.cat-count');
-    if (countEl) {
-      countEl.textContent = counts[cat] || 0;
-    }
-  });
-}
 
   function getVisibleItems() {
     return Array.from(document.querySelectorAll('.faq-item')).filter(function(item) {
@@ -427,7 +372,7 @@
       var btn = document.createElement('button');
       btn.textContent = p;
       btn.className = 'w-9 h-9 rounded-lg text-sm font-bold transition ' +
-        (p === page ? 'bg-violet-600 text-white' : 'text-gray-500 hover:bg-gray-100 border border-gray-200');
+        (p === page ? 'bg-brand-600 text-white' : 'text-gray-500 hover:bg-gray-100 border border-gray-200');
       btn.onclick = (function(pp){ return function(){ renderPage(pp); }; })(p);
       pn.appendChild(btn);
     }
@@ -446,23 +391,24 @@
   }
 
 function filterFaq(cat) {
-  currentCat = cat;  
+  currentCat = cat;   // ← أضيفي هذا السطر (الأهم)
+
   document.querySelectorAll('.cat-btn').forEach(btn => {
-    btn.classList.remove('border-violet-600', 'bg-violet-100', 'text-violet-600');
+    btn.classList.remove('border-brand-600', 'bg-brand-100', 'hover:bg-brand-50');
     btn.classList.add('border-transparent', 'text-gray-500');
 
     const count = btn.querySelector('.cat-count');
-    count.classList.remove('bg-white', 'text-violet-600');
+    count.classList.remove('bg-white', 'hover:bg-brand-50');
     count.classList.add('bg-gray-100', 'text-gray-500');
   });
 
   const activeBtn = document.querySelector(`.cat-btn[data-cat="${cat}"]`);
   activeBtn.classList.remove('border-transparent', 'text-gray-500');
-  activeBtn.classList.add('border-violet-600', 'bg-violet-100', 'text-violet-600');
+  activeBtn.classList.add('border-brand-600', 'bg-brand-100', 'hover:bg-brand-50');
 
   const activeCount = activeBtn.querySelector('.cat-count');
   activeCount.classList.remove('bg-gray-100', 'text-gray-500');
-  activeCount.classList.add('bg-white', 'text-violet-600');
+  activeCount.classList.add('bg-white', 'hover:bg-brand-50');
 
   renderPage(1);   // ← أضيفي هذا السطر (الأهم) — بيعمل الفلترة الفعلية
 }
@@ -485,20 +431,20 @@ function filterFaq(cat) {
   // Live search
 function setActiveCatButton(cat) {
   document.querySelectorAll('.cat-btn').forEach(function(btn) {
-    btn.classList.remove('border-violet-600', 'bg-violet-100', 'text-violet-600');
+    btn.classList.remove('border-brand-600', 'bg-brand-100', 'hover:bg-brand-50');
     btn.classList.add('border-transparent', 'text-gray-500');
     var count = btn.querySelector('.cat-count');
-    count.classList.remove('bg-white', 'text-violet-600');
+    count.classList.remove('bg-white', 'hover:bg-brand-50');
     count.classList.add('bg-gray-100', 'text-gray-500');
   });
 
   var activeBtn = document.querySelector('.cat-btn[data-cat="' + cat + '"]');
   if (!activeBtn) return;
   activeBtn.classList.remove('border-transparent', 'text-gray-500');
-  activeBtn.classList.add('border-violet-600', 'bg-violet-100', 'text-violet-600');
+  activeBtn.classList.add('border-brand-600', 'bg-brand-100', 'hover:bg-brand-50');
   var activeCount = activeBtn.querySelector('.cat-count');
   activeCount.classList.remove('bg-gray-100', 'text-gray-500');
-  activeCount.classList.add('bg-white', 'text-violet-600');
+  activeCount.classList.add('bg-white', 'hover:bg-brand-50');
 }
 
 document.getElementById('faq-search').addEventListener('input', function() {
@@ -525,7 +471,6 @@ document.getElementById('faq-search').addEventListener('input', function() {
 });
 
   // Init
-  updateCategoryCounts();
   renderPage(1);
   </script>
 

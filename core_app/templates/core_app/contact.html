@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,9 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Contact Us — NestMatch</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
+{% include "core_app/partials/tailwind_config.html" %}
 <style>
-    * { font-family: 'Inter', sans-serif; }
     .input-field {
     width: 100%;
     padding: 12px 16px;
@@ -20,18 +21,18 @@
     background: white;
     }
     .input-field:focus {
-    border-color: #7C3AED;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        border-color: var(--brand-600);
+        box-shadow: 0 0 0 3px rgba(204, 102, 0, 0.1);
     }
     .input-field::placeholder { color: #9CA3AF; }
 </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-brand-50">
 
-{% include "core_app/partials/navbar.html" %}
+{% include "core_app/partials/navbar.html" with active_page="contact" %}
 
 <!-- HERO -->
-<section class="relative pt-24 pb-16 overflow-hidden" style="background:linear-gradient(135deg,#5B21B6 0%,#7C3AED 50%,#9F67FA 100%)">
+<section class="relative pt-24 pb-16 overflow-hidden" style="background:linear-gradient(135deg,var(--brand-800) 0%,var(--brand-600) 100%)">>
     <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(circle,rgba(255,255,255,.1) 1.5px,transparent 1.5px);background-size:32px 32px"></div>
     <div class="absolute -top-20 -right-20 w-96 h-96 rounded-full pointer-events-none" style="background:rgba(255,255,255,.05)"></div>
     <div class="max-w-[900px] mx-auto px-6 text-center relative z-10">
@@ -56,20 +57,20 @@
         <div class="lg:col-span-1 flex flex-col gap-5">
 
         <!-- Info cards -->
-        <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <div class="bg-white rounded-2xl p-6 border border-brand-100 shadow-sm">
             <h3 class="text-base font-bold text-gray-900 mb-5">Contact Information</h3>
             <div class="flex flex-col gap-5">
 
             <div class="flex items-start gap-4">
-                <div class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center shrink-0 text-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-violet-600">
+                <div class="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center shrink-0 text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 hover:bg-brand-50">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                     </svg>
 
                 </div>
                 <div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Email</div>
-                <a href="mailto:hello@nestmatch.io" class="text-sm font-semibold text-gray-700 hover:text-violet-600 transition">hello@nestmatch.io</a>
+                <div class="text-xs font-bold text-brand-400 uppercase tracking-wider mb-0.5">Email</div>
+                <a href="mailto:hello@nestmatch.io" class="text-sm font-semibold text-gray-700 hover:hover:bg-brand-50 transition">hello@nestmatch.io</a>
                 </div>
             </div>
 
@@ -81,8 +82,8 @@
 
                 </div>
                 <div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">WhatsApp</div>
-                <a href="https://wa.me/201000000000" target="_blank" class="text-sm font-semibold text-gray-700 hover:text-green-600 transition">+970 59 000 0000</a>
+                <div class="text-xs font-bold text-brand-400 uppercase tracking-wider mb-0.5">WhatsApp</div>
+                <a href="https://wa.me/201000000000" target="_blank" class="text-sm font-semibold text-gray-700 hover:text-green-600 transition">+20 100 000 0000</a>
                 </div>
             </div>
 
@@ -95,8 +96,8 @@
 
                 </div>
                 <div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Location</div>
-                <p class="text-sm font-semibold text-gray-700">Gaza, Palestine</p>
+                <div class="text-xs font-bold text-brand-400 uppercase tracking-wider mb-0.5">Location</div>
+                <p class="text-sm font-semibold text-gray-700">Palestine, Gaza</p>
                 </div>
             </div>
 
@@ -108,7 +109,7 @@
 
                 </div>
                 <div>
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Response Time</div>
+                    <div class="text-xs font-bold text-brand-400 uppercase tracking-wider mb-0.5">Response Time</div>
                     <p class="text-sm font-semibold text-gray-700">Within 24 hours</p>
                 </div>
                 </div>
@@ -117,10 +118,10 @@
             </div>
 
             <!-- FAQ shortcut -->
-            <div class="bg-violet-50 border border-violet-100 rounded-2xl p-5">
+            <div class="bg-brand-50 border border-brand-100 rounded-2xl p-5">
             <h4 class="text-sm font-bold text-gray-800 mb-1">Looking for quick answers?</h4>
             <p class="text-xs text-gray-500 mb-3 leading-relaxed">Check our FAQ page for instant answers to the most common questions.</p>
-            <a href="/faq/" class="block text-center py-2 bg-violet-600 text-white text-xs font-bold rounded-lg hover:bg-violet-700 transition">
+            <a href="/faq/" class="block text-center py-2 bg-brand-600 text-white text-xs font-bold rounded-lg hover:bg-brand-700 transition">
               Browse FAQ
             </a>
           </div>
@@ -128,72 +129,22 @@
 
         <!-- RIGHT: Contact Form -->
         <div class="lg:col-span-2">
-          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 sm:p-10">
+          <div class="bg-white rounded-2xl border border-brand-100 shadow-sm p-8 sm:p-10">
 
             <h2 class="text-xl font-extrabold text-gray-900 mb-1">Send us a message</h2>
             <p class="text-sm text-gray-500 mb-8">Fill out the form below and we'll get back to you shortly.</p>
 
-          <!-- Django messages - Toast notification (top-right) -->
-          {% if messages %}
-            <div id="toast-container" class="fixed top-24 right-6 z-[100] flex flex-col gap-3 w-full max-w-sm px-4 sm:px-0">
+            <!-- Django messages -->
+            {% if messages %}
               {% for message in messages %}
-                <div class="toast-item flex items-start gap-3 px-5 py-4 rounded-2xl shadow-2xl border bg-white
-                  {% if message.tags == 'success' %}border-green-200
-                  {% else %}border-red-200{% endif %}"
-                  style="animation: slideInRight 0.3s ease-out;">
-
-                  <!-- Icon -->
-                  <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5
-                    {% if message.tags == 'success' %}bg-green-100{% else %}bg-red-100{% endif %}">
-                    {% if message.tags == 'success' %}
-                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                        <path d="M20 6L9 17l-5-5" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    {% else %}
-                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
-                        <path d="M18 6L6 18M6 6l12 12" stroke="#DC2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    {% endif %}
-                  </div>
-
-                  <!-- Text -->
-                  <div class="flex-1">
-                    <p class="text-sm font-bold {% if message.tags == 'success' %}text-green-700{% else %}text-red-700{% endif %}">
-                      {% if message.tags == 'success' %}Success{% else %}Error{% endif %}
-                    </p>
-                    <p class="text-sm mt-0.5 text-gray-500">
-                      {{ message }}
-                    </p>
-                  </div>
-
-                  <!-- Close button -->
-                  <button onclick="this.closest('.toast-item').remove()" class="shrink-0 text-gray-400 hover:text-gray-600 transition">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </button>
+                <div class="mb-6 px-5 py-4 rounded-xl text-sm font-semibold flex items-center gap-3
+                  {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-700
+                  {% else %}bg-red-50 border border-red-200 text-red-700{% endif %}">
+                  {% if message.tags == 'success' %}{% else %}{% endif %}
+                  {{ message }}
                 </div>
               {% endfor %}
-            </div>
-
-  <style>
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-  </style>
-
-  <script>
-    setTimeout(function() {
-      document.querySelectorAll('.toast-item').forEach(function(el) {
-        el.style.transition = 'opacity 0.3s, transform 0.3s';
-        el.style.opacity = '0';
-        el.style.transform = 'translateX(100%)';
-        setTimeout(function() { el.remove(); }, 300);
-      });
-    }, 5000);
-  </script>
-{% endif %}
+            {% endif %}
 
             <form method="POST" action="/contact/" id="contact-form">
               {% csrf_token %}
@@ -229,18 +180,18 @@
                 {% if errors.message %}
                   <p class="text-xs text-red-500 mt-1">{{ errors.message }}</p>
                 {% endif %}                 
-                <p class="text-xs text-gray-400 ml-auto"><span id="char-count">0</span> characters</p>
+                <p class="text-xs text-brand-400 ml-auto"><span id="char-count">0</span> characters</p>
                 </div>
               </div>
 
               <!-- Submit -->
               <button type="submit" id="submit-btn"
-                class="w-full py-4 bg-violet-600 hover:bg-violet-700 text-white font-bold text-base rounded-xl transition flex items-center justify-center gap-2 shadow-lg hover:shadow-violet-200 hover:shadow-xl">
+                class="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold text-base rounded-xl transition flex items-center justify-center gap-2 shadow-lg hover:shadow-brand-200 hover:shadow-xl">
                 <span id="btn-text">Send Message</span>
                 <svg id="btn-icon" width="18" height="18" fill="none" viewBox="0 0 24 24">
                   <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <svg id="btn-spinner" class="hidden animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <svg id="btn-spinner" class="hidden animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" stroke-width="3"/>
                   <path d="M12 2a10 10 0 0 1 10 10" stroke="white" stroke-width="3" stroke-linecap="round"/>
                 </svg>

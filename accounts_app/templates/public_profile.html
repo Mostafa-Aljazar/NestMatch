@@ -1,35 +1,38 @@
 {% load static %}
-{% load icons %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ profile_user.full_name }} — NestMatch</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: { extend: { fontFamily: { sans: ["'Plus Jakarta Sans'", 'sans-serif'] } } }
-}
-</script>
+{% include "core_app/partials/tailwind_config.html" %}
+<link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
+
+
 <style>
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+#lifestyle-grid > div{background:#fff7ed!important;border-color:#f4d6bc!important}
+#lifestyle-grid > div > svg{color:#7c2d12!important}
+#lifestyle-grid .text-brand-600{color:#7c2d12!important;font-weight:800!important;letter-spacing:.18em!important}
+#lifestyle-grid .text-gray-800{color:#111827!important}
+#lifestyle-empty{background:#fff7ed!important;border-color:#f4d6bc!important}
+#lifestyle-empty .text-brand-500{color:#7c2d12!important}
+#lifestyle-empty .text-gray-400{color:#6b7280!important}
 </style>
 </head>
-<body class="font-sans text-gray-900 bg-gray-50 overflow-x-hidden">
+<body class=" text-brand-900 bg-brand-50 overflow-x-hidden">
 
 {% include "core_app/partials/navbar.html" with active_page="" %}
 
 <div class="max-w-3xl mx-auto px-5 pt-24 pb-16">
 
   <!-- ─── Header card ─── -->
-  <div class="relative bg-white rounded-2xl shadow-sm border border-gray-100 mb-4 overflow-hidden animate-[fadeUp_.4s_ease_both] sm:rounded-xl">
-    <div class="h-24 bg-gradient-to-r from-violet-700 via-violet-500 to-fuchsia-500 sm:h-16"></div>
+  <div class="relative bg-white rounded-2xl shadow-sm border border-brand-100 mb-4 overflow-hidden animate-[fadeUp_.4s_ease_both] sm:rounded-xl">
+    <div class="h-24 bg-gradient-to-r from-brand-700 via-brand-500 to-brand-500 sm:h-16"></div>
     <div class="px-7 pb-7 sm:px-5 sm:pb-5">
       <div class="flex items-end gap-4 -mt-10 sm:-mt-8">
-        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-violet-700 to-violet-400 flex items-center justify-center text-2xl font-extrabold text-white shrink-0 overflow-hidden ring-4 ring-white sm:w-16 sm:h-16 sm:text-lg">
+        <div class="w-20 h-22 rounded-full bg-gradient-to-br from-brand-700 to-brand-400 flex items-center justify-center text-2xl font-extrabold text-white shrink-0 overflow-hidden ring-4 ring-white sm:w-16 sm:h-16 sm:text-lg">
           {% if profile_user.profile_pic %}
             <img src="{{ profile_user.profile_pic.url }}" class="w-full h-full object-cover" alt="">
           {% else %}
@@ -38,253 +41,262 @@ tailwind.config = {
         </div>
         <div class="flex-1 min-w-0 pb-1">
           <div class="text-xl font-extrabold text-gray-900 sm:text-lg">{{ profile_user.full_name }}</div>
-          <div class="text-xs text-gray-400 mt-0.5">@{{ profile_user.username }}{% if profile_user.age %} · {{ profile_user.age }} years old{% endif %}</div>
+          <div class="text-xs font-semibold text-gray-700 mt-0.5">@{{ profile_user.username }}{% if profile_user.age %} · {{ profile_user.age }} years old{% endif %}</div>
         </div>
       </div>
 
       <div class="flex gap-[7px] mt-4 flex-wrap">
-        <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 text-[11px] font-bold px-[10px] py-[4px] rounded-full">{% icon 'check' size=12 %} Verified</span>
-        <span class="inline-flex items-center gap-1 bg-violet-100 text-violet-700 text-[11px] font-bold px-[10px] py-[4px] rounded-full">
-          {% icon 'home' size=12 %} {{ listing_count }} active listing{{ listing_count|pluralize }}
+        <span class="inline-flex  gap-1 bg-emerald-100 text-emerald-700 text-[11px] font-bold px-[10px] py-[4px] rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg> 
+          Verified
+        </span>
+        <span class="inline-flex  gap-1 bg-brand-100 text-brand-700 text-[11px] font-bold px-[10px] py-[4px] rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
+          {{ listing_count }} active listing{{ listing_count|pluralize }}
         </span>
         {% if lifestyle_profile %}
         <span class="inline-flex items-center gap-1 bg-amber-100 text-amber-700 text-[11px] font-bold px-[10px] py-[4px] rounded-full">
-          {% icon 'sparkle' size=12 %} Lifestyle profile complete
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg>
+          Lifestyle profile complete
         </span>
         {% endif %}
       </div>
 
       {% if profile_user.bio %}
-      <p class="text-sm text-gray-600 leading-relaxed mt-5 pt-5 border-t border-gray-100">{{ profile_user.bio }}</p>
+      <p class="text-sm text-gray-600 leading-relaxed mt-5 pt-5 border-t border-brand-100">{{ profile_user.bio }}</p>
       {% else %}
-      <p class="text-sm text-gray-400 italic leading-relaxed mt-5 pt-5 border-t border-gray-100">{{ profile_user.first_name }} hasn't written a bio yet.</p>
+      <p class="text-sm text-gray-400 italic leading-relaxed mt-5 pt-5 border-t border-brand-100">{{ profile_user.first_name }} hasn't written a bio yet.</p>
       {% endif %}
 
       <div class="flex flex-wrap gap-2 mt-4">
         {% if profile_user.country %}
-        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-50 text-gray-600 border border-gray-100">
-          {% icon 'globe' size=13 %} {{ profile_user.get_country_display }}
+        <span class="inline-flex  gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-50 text-gray-600 border border-brand-100">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg>
+          {{ profile_user.get_country_display }}
         </span>
         {% endif %}
         {% if profile_user.gender %}
-        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-50 text-gray-600 border border-gray-100">
-          {% icon 'person' size=13 %} {{ profile_user.get_gender_display }}
+        <span class="inline-flex  gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-50 text-gray-600 border border-brand-100">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg> 
+          {{ profile_user.get_gender_display }}
         </span>
         {% endif %}
         {% if lifestyle_profile.field %}
-        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-50 text-gray-600 border border-gray-100">
-          {% icon 'graduation-cap' size=13 %} {{ lifestyle_profile.get_field_display }}
+        <span class="inline-flex  gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-50 text-gray-600 border border-brand-100">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2 8l10 5 10-5-10-5z"/><path d="M6 10.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-5.5"/><path d="M22 8v6"/></svg>
+           {{ lifestyle_profile.get_field_display }}
         </span>
         {% endif %}
-        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-50 text-gray-600 border border-gray-100">
-          {% icon 'calendar' size=13 %} Member since {{ profile_user.created_at|date:"F Y" }}
+        <span class="inline-flex  gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-50 text-gray-600 border border-brand-100">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+           Member since {{ profile_user.created_at|date:"F Y" }}
         </span>
       </div>
     </div>
   </div>
 
   <!-- ─── Lifestyle profile ─── -->
-  <div class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100 mb-4 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-5" style="animation-delay:.08s">
+  <div class="bg-white rounded-2xl p-7 shadow-sm border border-brand-100 mb-4 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-5" style="animation-delay:.08s">
     <h3 class="text-[17px] font-extrabold text-gray-900 mb-[18px] tracking-tight sm:text-[15px] sm:mb-3.5">Lifestyle &amp; Habits</h3>
 
     {% if lifestyle_profile %}
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'moon' size=16 %}
+    <div id="lifestyle-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5A9 9 0 1 1 11.5 3a7 7 0 0 0 9.5 9.5z"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Sleep time</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Sleep time</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_sleep_time_display }}</div>
         </div>
       </div>
       {% if lifestyle_profile.wake_time %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'sunrise' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v5M5.6 9.6l1.4 1.4M18.4 9.6l-1.4 1.4M3 16h2M19 16h2M5 21h14M8 16a4 4 0 0 1 8 0"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Wake time</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Wake time</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_wake_time_display }}</div>
         </div>
       </div>
       {% endif %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'speaker-mute' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l4 6M21 9l-4 6"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Noise level</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Noise level</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_noise_level_display }}</div>
         </div>
       </div>
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'broom' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4L10 14"/><path d="M4 21l4-1 1-4-4 1-1 4z"/><path d="M9 15l2 2M11 13l2 2"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Cleanliness</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Cleanliness</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_cleanliness_display }}</div>
         </div>
       </div>
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'people' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14c2.9.3 5.5 2.4 5.5 6"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Social type</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Social type</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_social_type_display }}</div>
         </div>
       </div>
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'cigarette' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="10" width="14" height="4" rx="1"/><path d="M16 10v4M20 10v4"/><path d="M6 7c0-1.5 1-1.5 1-3M9 7c0-1.5 1-1.5 1-3"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Smoking</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Smoking</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_smoking_display }}</div>
         </div>
       </div>
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'chef-hat' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21h10v-6a5 5 0 0 0 2-9 4 4 0 0 0-7-1.5A4 4 0 0 0 5 8a5 5 0 0 0 2 7v6z"/><path d="M7 18h10"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Cooking</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Cooking</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.cooking|yesno:"Yes,No" }}</div>
         </div>
       </div>
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'paw' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="9" r="1.6"/><circle cx="11" cy="6.5" r="1.6"/><circle cx="15" cy="6.5" r="1.6"/><circle cx="18" cy="9.5" r="1.6"/><ellipse cx="12" cy="16" rx="5" ry="4"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Pets</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Pets</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.pets|yesno:"Yes,No" }}</div>
         </div>
       </div>
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'person' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Preferred roommates</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Preferred roommates</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_preferred_roommates_display }}</div>
         </div>
       </div>
       {% if lifestyle_profile.religion %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'lotus' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-6-6-6-9 3 0 5 2 6 5 1-3 3-5 6-5 0 3-2 7-6 9z"/><path d="M12 12V4"/><path d="M8 8c1 1 2 2 4 2"/><path d="M16 8c-1 1-2 2-4 2"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Religion</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Religion</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_religion_display }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.field %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'graduation-cap' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2 8l10 5 10-5-10-5z"/><path d="M6 10.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-5.5"/><path d="M22 8v6"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Field</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Field</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_field_display }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.budget_min or lifestyle_profile.budget_max %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'dollar' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 6.5c0-1.9-2.2-3.5-5-3.5S7 4.4 7 6.3c0 1.6 1.3 2.6 3 3.1l4 1.2c1.7.5 3 1.5 3 3.1 0 1.9-2.2 3.3-5 3.3s-5-1.4-5-3.3"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Budget</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Budget</div>
           <div class="text-sm font-bold text-gray-800">{% if lifestyle_profile.budget_min %}${{ lifestyle_profile.budget_min }}{% else %}$0{% endif %}–{% if lifestyle_profile.budget_max %}${{ lifestyle_profile.budget_max }}{% else %}?{% endif %}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.roommate_gender_pref %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'people' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14c2.9.3 5.5 2.4 5.5 6"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Roommate gender</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Roommate gender</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_roommate_gender_pref_display }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.dietary %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'salad' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 18 0z"/><path d="M3 12h18"/><path d="M12 3v3M7 4l1.5 2.5M17 4l-1.5 2.5"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Dietary</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Dietary</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_dietary_display }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.guest_tolerance %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'bell' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Guest tolerance</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Guest tolerance</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_guest_tolerance_display }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.alcohol_ok is not None %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'wine-ban' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l-1 6a3 3 0 0 1-6 0L8 3z"/><path d="M12 12v6M9 21h6"/><path d="M4 4l16 16"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Alcohol</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Alcohol</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.alcohol_ok|yesno:"Yes,No" }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.tenant_type %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'briefcase' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">I am a</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">I am a</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_tenant_type_display }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.household_lang_pref %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'globe' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Household</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Household</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_household_lang_pref_display }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.min_stay_pref is not None %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'calendar' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Min stay</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Min stay</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_min_stay_pref_display }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.listing_type_pref %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'home' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Room type</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Room type</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.get_listing_type_pref_display }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.works_from_home is not None %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'monitor' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Works from home</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Works from home</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.works_from_home|yesno:"Yes,No" }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.wants_furnished is not None %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'sofa' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M3 13h18v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4z"/><path d="M4 17v2M20 17v2"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Wants furnished</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Wants furnished</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.wants_furnished|yesno:"Yes,No" }}</div>
         </div>
       </div>
       {% endif %}
       {% if lifestyle_profile.wants_building_amenities is not None %}
-      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
-        {% icon 'dumbbell' size=16 %}
+      <div class="flex items-start gap-2.5 p-3 rounded-xl bg-brand-50 border border-brand-100">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6M2 10v4M20 9v6M22 10v4"/><path d="M7 12h10"/><rect x="6" y="8" width="2" height="8" rx="1"/><rect x="16" y="8" width="2" height="8" rx="1"/></svg>
         <div>
-          <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Wants amenities</div>
+          <div class="text-[11px] font-bold text-brand-600 uppercase tracking-wide">Wants amenities</div>
           <div class="text-sm font-bold text-gray-800">{{ lifestyle_profile.wants_building_amenities|yesno:"Yes,No" }}</div>
         </div>
       </div>
       {% endif %}
     </div>
     {% else %}
-    <div class="flex flex-col items-center text-center py-8 px-4 rounded-xl bg-gray-50 border border-dashed border-gray-200">
-      <div class="text-gray-300 mb-2">{% icon 'sliders' size=32 %}</div>
-      <div class="text-sm font-bold text-gray-500">No lifestyle profile yet</div>
+    <div id="lifestyle-empty" class="flex flex-col items-center text-center py-8 px-4 rounded-xl bg-brand-50 border border-dashed border-gray-200">
+      <div class="text-brand-500 mb-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h6M4 18h12"/><circle cx="17" cy="6" r="2"/><circle cx="13" cy="12" r="2"/><circle cx="19" cy="18" r="2"/></svg></div>
+      <div class="text-sm font-bold text-brand-500">No lifestyle profile yet</div>
       <p class="text-xs text-gray-400 mt-1 max-w-xs">{{ profile_user.first_name }} hasn't filled in their sleep, cleanliness, and roommate preferences yet.</p>
     </div>
     {% endif %}
@@ -292,34 +304,34 @@ tailwind.config = {
 
   <!-- ─── Active listings ─── -->
   {% if active_listings %}
-  <div class="bg-white rounded-2xl p-7 shadow-sm border border-gray-100 mb-4 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-5" style="animation-delay:.12s">
+  <div class="bg-white rounded-2xl p-7 shadow-sm border border-brand-100 mb-4 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-5" style="animation-delay:.12s">
     <h3 class="text-[17px] font-extrabold text-gray-900 mb-[18px] tracking-tight sm:text-[15px] sm:mb-3.5">
       Listings by {{ profile_user.first_name }}
     </h3>
     <div class="grid grid-cols-2 sm:grid-cols-1 gap-3">
       {% for listing in active_listings %}
-      <a href="{% url 'listings_app:room_detail' listing.pk %}" class="group flex flex-col sm:flex-row gap-3 rounded-xl border border-gray-100 overflow-hidden hover:border-violet-200 hover:shadow-sm transition-all">
+      <a href="{% url 'listings_app:room_detail' listing.pk %}" class="group flex flex-col sm:flex-row gap-3 rounded-xl border border-brand-100 overflow-hidden hover:border-brand-200 hover:shadow-sm transition-all">
         <div class="h-28 sm:h-20 sm:w-28 shrink-0 bg-gradient-to-br from-violet-100 to-violet-200 overflow-hidden">
           {% with img=listing.images.first %}
           {% if img %}<img src="{{ img.image.url }}" class="w-full h-full object-cover" alt="">{% endif %}
           {% endwith %}
         </div>
         <div class="flex-1 min-w-0 p-3 sm:p-0 sm:py-2 sm:pr-3">
-          <div class="text-sm font-bold text-gray-900 truncate group-hover:text-violet-600 transition-colors">{{ listing.title }}</div>
+          <div class="text-sm font-bold text-gray-900 truncate">{{ listing.title }}</div>
           <div class="text-xs text-gray-500 mt-0.5">{{ listing.district }}{% if listing.district and listing.city %}, {% endif %}{{ listing.city }}</div>
-          <div class="text-sm font-extrabold text-violet-600 mt-1.5">${{ listing.price }}<span class="text-xs font-semibold text-gray-400">/mo</span></div>
+          <div class="text-sm font-extrabold mt-1.5">${{ listing.price }}<span class="text-xs font-semibold text-gray-400">/mo</span></div>
         </div>
       </a>
       {% endfor %}
     </div>
     {% if more_listings_count %}
-    <div class="text-xs text-gray-400 mt-3 text-center">+ {{ more_listings_count }} more listing{{ more_listings_count|pluralize }}</div>
+    <div class="text-xs text-brand-600 mt-3 text-center">+ {{ more_listings_count }} more listing{{ more_listings_count|pluralize }}</div>
     {% endif %}
   </div>
   {% endif %}
 
-  <a href="javascript:history.back()" class="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-600 hover:text-violet-700">
-    {% icon 'chevron-left' size=14 %} Back
+  <a href="javascript:history.back()" class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-brand-700 transition-colors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> Back
   </a>
 
 </div>

@@ -8,7 +8,7 @@
 
 {% block content %}
 <div style="margin-bottom:20px">
-  <a href="{% url 'dashboard_app:users' %}" style="font-size:12px;color:#7C3AED;text-decoration:none;font-weight:600">← Back to Users</a>
+  <a href="{% url 'dashboard_app:users' %}" style="font-size:12px;color:var(--brand-600);text-decoration:none;font-weight:600">← Back to Users</a>
   <h2 style="font-size:20px;font-weight:800;color:#111827;margin-top:8px">{{ user.full_name }}'s Applications</h2>
   <p style="font-size:13px;color:#6B7280;margin-top:2px">{{ applications|length }} application{{ applications|pluralize }}</p>
 </div>
@@ -26,7 +26,7 @@
           <td style="color:#6B7280;white-space:nowrap;font-size:12px">{{ app.listing.poster.full_name }}</td>
           <td style="color:#6B7280;white-space:nowrap;font-size:11px">{{ app.applied_at|date:"M d, Y" }}</td>
           <td style="padding:13px 14px;vertical-align:middle">
-            {% if app.compatibility %}<span style="font-size:12px;font-weight:700;color:{% if app.compatibility >= 80 %}#7C3AED{% elif app.compatibility >= 60 %}#D97706{% else %}#E11D48{% endif %}">{{ app.compatibility }}%</span>
+            {% if app.compatibility %}<span style="font-size:12px;font-weight:700;color:{% if app.compatibility >= 80 %}var(--brand-600){% elif app.compatibility >= 60 %}#D97706{% else %}#E11D48{% endif %}">{{ app.compatibility }}%</span>
             {% else %}<span style="font-size:12px;color:#9CA3AF">&mdash;</span>{% endif %}
           </td>
           <td>
@@ -35,7 +35,7 @@
             {% else %}<span class="badge badge-red">Rejected</span>{% endif %}
           </td>
           <td>
-            <a href="{% url 'dashboard_app:listing_detail' app.listing.id %}" style="font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:6px;padding:4px 9px">View Room</a>
+            <a href="{% url 'dashboard_app:listing_detail' app.listing.id %}" style="font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:6px;padding:4px 9px">View Room</a>
           </td>
         </tr>
         {% empty %}
