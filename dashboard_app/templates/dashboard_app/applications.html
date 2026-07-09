@@ -29,7 +29,7 @@
     <div style="font-size:11px;color:#6B7280;margin-top:3px">Rejected</div>
   </div>
   <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);text-align:center">
-    <div style="font-size:24px;font-weight:800;color:#7C3AED">{% if app_stats.avg_compatibility %}{{ app_stats.avg_compatibility|floatformat:0 }}%{% else %}&mdash;{% endif %}</div>
+    <div style="font-size:24px;font-weight:800;color:var(--brand-600)">{% if app_stats.avg_compatibility %}{{ app_stats.avg_compatibility|floatformat:0 }}%{% else %}&mdash;{% endif %}</div>
     <div style="font-size:11px;color:#6B7280;margin-top:3px">Avg Match</div>
   </div>
 </div>
@@ -51,7 +51,7 @@
         <tr style="border-bottom:1px solid #F3F4F6">
           <td style="padding:13px 14px;vertical-align:middle">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#A78BFA);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">{{ app.seeker.first_name|first|upper }}</div>
+              <div style="width:30px;height:30px;border-radius:50%;background:inear-gradient(135deg,var(--brand-600),var(--brand-400));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">{{ app.seeker.first_name|first|upper }}</div>
               <div>
                 <div style="font-size:13px;font-weight:600;color:#111827;white-space:nowrap">{{ app.seeker.full_name }}</div>
                 <div style="font-size:11px;color:#9CA3AF">{{ app.seeker.email }}</div>
@@ -64,7 +64,7 @@
           </td>
           <td style="padding:13px 14px;vertical-align:middle;font-size:12px;color:#6B7280;white-space:nowrap">{{ app.applied_at|date:"M d, Y" }}</td>
           <td style="padding:13px 14px;vertical-align:middle">
-            {% if app.compatibility %}<span style="font-size:12px;font-weight:700;color:{% if app.compatibility >= 80 %}#7C3AED{% elif app.compatibility >= 60 %}#D97706{% else %}#E11D48{% endif %}">{{ app.compatibility }}%</span>
+            {% if app.compatibility %}<span style="font-size:12px;font-weight:700;color:{% if app.compatibility >= 80 %}var(--brand-600){% elif app.compatibility >= 60 %}#D97706{% else %}#E11D48{% endif %}">{{ app.compatibility }}%</span>
             {% else %}<span style="font-size:12px;color:#9CA3AF">&mdash;</span>{% endif %}
           </td>
           <td style="padding:13px 14px;vertical-align:middle">
@@ -73,7 +73,7 @@
             {% else %}<span style="display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#FFE4E6;color:#E11D48">Rejected</span>{% endif %}
           </td>
           <td style="padding:13px 14px;vertical-align:middle">
-            <a href="{% url 'dashboard_app:listing_detail' app.listing.id %}" style="font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:6px;padding:4px 9px">View Room</a>
+            <a href="{% url 'dashboard_app:listing_detail' app.listing.id %}" style="font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:6px;padding:4px 9px">View Room</a>
           </td>
         </tr>
         {% empty %}

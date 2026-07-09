@@ -1,26 +1,16 @@
 {% load static %}
-{% load icons %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Favorites — NestMatch</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: { sans: ["'Plus Jakarta Sans'", 'sans-serif'] }
-    }
-  }
-}
-</script>
+  <link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
+  {% include "core_app/partials/tailwind_config.html" %}
+
 <style>
 * { box-sizing: border-box }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: #F9FAFB; color: #111827 }
 a { text-decoration: none }
 
 .nm-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px }
@@ -28,7 +18,7 @@ a { text-decoration: none }
 @media (max-width: 640px)  { .nm-cards-grid { grid-template-columns: 1fr } }
 </style>
 </head>
-<body>
+<body class="bg-brand-50">
 
 {% include "core_app/partials/navbar.html" with active_page="favorites" %}
 
@@ -36,14 +26,17 @@ a { text-decoration: none }
 
   <div class="flex items-center justify-between gap-3 mb-7 flex-wrap">
     <div>
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight leading-tight flex items-center gap-2.5">
-        {% icon 'heart' size=26 color='#f43f5e' filled=True %} Your Favorites
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-brand-900 tracking-tight leading-tight flex items-center gap-2.5">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#f43f5e">
+        <path d="M12 20.25c-.3 0-.6-.1-.85-.28C7.14 17.24 3 13.94 3 9.83 3 7.16 5.16 5 7.83 5c1.53 0 2.98.72 3.89 1.9L12 7.24l.28-.34C13.19 5.72 14.64 5 16.17 5 18.84 5 21 7.16 21 9.83c0 4.11-4.14 7.41-8.15 10.14-.25.18-.55.28-.85.28z"/>
+      </svg>
+      Your Favorites
       </h1>
       <p class="text-sm text-gray-500 mt-1">{{ listings|length }} room{{ listings|length|pluralize }} saved for later</p>
     </div>
     <a href="{% url 'listings_app:listings' %}"
-       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold text-violet-600 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors">
-      {% icon 'home' size=14 %} Browse Listings
+       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-brand-500 text-sm font-bold hover:bg-brand-600 bg-brand-50 border border-brand-200 hover:text-brand-50 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg> Browse Rooms
     </a>
   </div>
 
@@ -52,10 +45,14 @@ a { text-decoration: none }
       {% include "listings_app/partials/listing_card.html" with listing=listing %}
     {% empty %}
       <div style="grid-column:1/-1;text-align:center;padding:90px 20px">
-        <div style="margin-bottom:16px;display:flex;justify-content:center;color:#FCA5A5">{% icon 'heart' size=52 %}</div>
-        <div style="font-size:18px;font-weight:700;color:#111827;margin-bottom:8px">No favorites yet</div>
+        <div style="margin-bottom:16px;display:flex;justify-content:center;color:#FCA5A5">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 20.25c-.3 0-.6-.1-.85-.28C7.14 17.24 3 13.94 3 9.83 3 7.16 5.16 5 7.83 5c1.53 0 2.98.72 3.89 1.9L12 7.24l.28-.34C13.19 5.72 14.64 5 16.17 5 18.84 5 21 7.16 21 9.83c0 4.11-4.14 7.41-8.15 10.14-.25.18-.55.28-.85.28z"/>
+        </svg>
+        </div>
+        <div style="font-size:18px;font-weight:700;color:#DD7826;margin-bottom:8px">No favorites yet</div>
         <div style="font-size:14px;color:#6B7280;margin-bottom:24px">Tap the heart on any listing to save it here.</div>
-        <a href="{% url 'listings_app:listings' %}" style="padding:10px 24px;background:#7C3AED;color:#fff;border-radius:8px;font-size:14px;font-weight:600">Browse Listings</a>
+        <a href="{% url 'listings_app:listings' %}" style="padding:10px 24px;background:var(--brand-600);color:#fff;border-radius:8px;font-size:14px;font-weight:600">Browse Listings</a>
       </div>
     {% endfor %}
   </div>

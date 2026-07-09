@@ -11,21 +11,31 @@ import re
 
 def index(request):
     content = SiteContent.load()
-    # Use get_user_model() instead of importing User directly, so this
-    # still works correctly if the project switches to a custom user model
     User = get_user_model()
 
-
-    latest_listings = Listing.objects.filter(
+    latest_listings = list(Listing.objects.filter(
         status='active',
-        # Both must be approved before a listing shows publicly:
-        # 1) the listing's own rental contract (proves the room/lease is legit)
         contract_documents__document_type='rental_contract',
         contract_documents__status='approved',
-        # 2) the poster's identity (proves the person renting it out is verified)
         poster__verification_documents__document_type='id_document',
         poster__verification_documents__status='approved',
-    ).select_related('poster').prefetch_related('images').distinct().order_by('-created_at')[:6]
+    ).select_related('poster').prefetch_related('images').distinct().order_by('-created_at')[:6])
+
+    # ── AI compatibility scoring (same logic as listings_app) ─────────────
+    if request.user.is_authenticated:
+        profile = getattr(request.user, 'lifestyle_profile', None)
+        if profile is not None and latest_listings:
+            from compatibility_app.scoring import get_or_compute_scores_bulk
+            scores = get_or_compute_scores_bulk(request.user, profile, latest_listings)
+            for listing in latest_listings:
+                score_row = scores.get(listing.pk)
+                listing.compat_score = score_row.overall_score if score_row else None
+        else:
+            for listing in latest_listings:
+                listing.compat_score = None
+    else:
+        for listing in latest_listings:
+            listing.compat_score = None
 
     reviews = (
         Testimonial.objects
@@ -33,7 +43,6 @@ def index(request):
         .order_by('-created_at')[:6]
     )
 
-    # Live platform stats, computed from real data
     active_listings_count = Listing.objects.filter(status='active').count()
     registered_users_count = User.objects.count()
     cities_count = (
@@ -57,7 +66,7 @@ def index(request):
         'content':         content,
         'latest_listings': latest_listings,
         'reviews':         reviews,
-        'stats':           stats,   
+        'stats':           stats,
     }
     return render(request, 'core_app/landing.html', context)
 
@@ -118,10 +127,10 @@ def privacy_policy(request):
             'content': '''
                 <p>To match you effectively, we collect the following categories of information:</p>
                 <ul class="space-y-3">
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">Name.</strong> Your full name, used to personalize your profile and introductions.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">Email address.</strong> Used for account access, verification, and important notifications.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">Lifestyle preferences.</strong> Sleep schedule, cleanliness, social habits, pets, and other compatibility signals.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">Location.</strong> Your city and preferred neighborhoods so we can match you with nearby roommates.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">Name.</strong> Your full name, used to personalize your profile and introductions.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">Email address.</strong> Used for account access, verification, and important notifications.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">Lifestyle preferences.</strong> Sleep schedule, cleanliness, social habits, pets, and other compatibility signals.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">Location.</strong> Your city and preferred neighborhoods so we can match you with nearby roommates.</span></li>
                 </ul>
             '''
         },
@@ -131,11 +140,11 @@ def privacy_policy(request):
             'content': '''
                 <p>We use the information we collect to:</p>
                 <ul class="space-y-3">
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span>Generate compatibility scores and surface your best-fit roommate matches.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span>Create, maintain, and secure your NestMatch account.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span>Send relevant updates, match notifications, and service announcements.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span>Improve our matching algorithms and overall platform experience.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span>Detect, prevent, and respond to fraud, abuse, or security incidents.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Generate compatibility scores and surface your best-fit roommate matches.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Create, maintain, and secure your NestMatch account.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Send relevant updates, match notifications, and service announcements.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Improve our matching algorithms and overall platform experience.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span>Detect, prevent, and respond to fraud, abuse, or security incidents.</span></li>
                 </ul>
             '''
         },
@@ -153,9 +162,9 @@ def privacy_policy(request):
             'content': '''
                 <p>We rely on trusted third-party services to deliver core features:</p>
                 <ul class="space-y-3">
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">Google Maps.</strong> Powers location search, neighborhood data, and distance-based matching.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">WhatsApp.</strong> Enables matched users to connect and chat once both parties opt in.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">Google Gemini AI.</strong> Processes lifestyle data to generate compatibility scores.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">Google Maps.</strong> Powers location search, neighborhood data, and distance-based matching.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">WhatsApp.</strong> Enables matched users to connect and chat once both parties opt in.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">Google Gemini AI.</strong> Processes lifestyle data to generate compatibility scores.</span></li>
                 </ul>
                 <p>Each provider has its own privacy practices. We encourage you to review their policies to understand how they handle data.</p>
             '''
@@ -166,9 +175,9 @@ def privacy_policy(request):
             'content': '''
                 <p>We apply industry-standard safeguards to protect your information:</p>
                 <ul class="space-y-3">
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">bcrypt.</strong> All passwords are hashed with bcrypt — we never store them in plain text.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">HTTPS.</strong> Data in transit is encrypted end-to-end using TLS over HTTPS.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">JWT.</strong> Sessions are authenticated with signed JSON Web Tokens to protect your account.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">bcrypt.</strong> All passwords are hashed with bcrypt — we never store them in plain text.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">HTTPS.</strong> Data in transit is encrypted end-to-end using TLS over HTTPS.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">JWT.</strong> Sessions are authenticated with signed JSON Web Tokens to protect your account.</span></li>
                 </ul>
                 <p>While no system is ever completely impenetrable, we continuously review our practices to keep your data safe.</p>
             '''
@@ -179,9 +188,9 @@ def privacy_policy(request):
             'content': '''
                 <p>You remain in control of your personal data. At any time you can:</p>
                 <ul class="space-y-3">
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">Access.</strong> Request a copy of the personal information we hold about you.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">Edit.</strong> Update or correct your profile, preferences, and account details.</span></li>
-                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500"></span><span><strong class="font-semibold text-gray-900">Delete.</strong> Permanently delete your account and associated data from NestMatch.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">Access.</strong> Request a copy of the personal information we hold about you.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">Edit.</strong> Update or correct your profile, preferences, and account details.</span></li>
+                    <li class="flex gap-3"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"></span><span><strong class="font-semibold text-gray-900">Delete.</strong> Permanently delete your account and associated data from NestMatch.</span></li>
                 </ul>
                 <p>To exercise any of these rights, visit your account settings or contact our privacy team.</p>
             '''
@@ -190,7 +199,7 @@ def privacy_policy(request):
             'id': 'contact',
             'title': 'Contact Us',
             'content': '''
-                <p>If you have questions, concerns, or requests regarding this Privacy Policy or your data, we'd love to hear from you. You can reach our privacy team through our <a href="/contact/" class="font-semibold text-violet-600 hover:text-violet-700 underline-offset-4 hover:underline">Contact Us</a> page.</p>
+                <p>If you have questions, concerns, or requests regarding this Privacy Policy or your data, we'd love to hear from you. You can reach our privacy team through our <a href="/contact/" class="font-semibold hover:bg-brand-50 hover:text-brand-700 underline-offset-4 hover:underline">Contact Us</a> page.</p>
                 <p>We aim to respond to all privacy inquiries within two business days.</p>
             '''
         },
@@ -248,8 +257,8 @@ def terms_of_use(request):
             'title': 'AI Features & Limitations',
             'content': '''
                 <p>NestMatch uses Google Gemini to generate listing descriptions, summarize profiles, and draft roommate agreements. These features are designed to save you time and make listings clearer.</p>
-                <div class="my-5 flex gap-3 rounded-lg border border-violet-200 bg-violet-50 p-4">
-                    <svg class="mt-0.5 h-5 w-5 shrink-0 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="my-5 flex gap-3 rounded-lg border border-brand-200 bg-brand-50 p-4">
+                    <svg class="mt-0.5 h-5 w-5 shrink-0 hover:bg-brand-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                     <p class="m-0 text-sm leading-relaxed text-gray-700">
@@ -318,7 +327,7 @@ def terms_of_use(request):
             'id': 'contact',
             'title': 'Contact',
             'content': '''
-                <p>If you have questions about these terms, please reach out through our <a href="/contact/" class="font-semibold text-violet-600 hover:text-violet-700 underline-offset-4 hover:underline">Contact Us</a> page and we'll be happy to help.</p>
+                <p>If you have questions about these terms, please reach out through our <a href="/contact/" class="font-semibold hover:bg-brand-50 hover:text-brand-700 underline-offset-4 hover:underline">Contact Us</a> page and we'll be happy to help.</p>
             '''
         }
     ]

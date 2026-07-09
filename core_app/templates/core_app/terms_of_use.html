@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,27 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Use — NestMatch</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
+    {% include "core_app/partials/tailwind_config.html" %}
     <style>
-        * { font-family: 'Inter', sans-serif; }
         .smooth-scroll { scroll-behavior: smooth; }
         .section-anchor { scroll-margin-top: 100px; }
-        .hero-gradient {
-            background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 50%, #9F67FA 100%);
+       .hero-gradient { 
+            background: linear-gradient(135deg, var(--brand-800) 0%, var(--brand-600) 50%, var(--brand-400) 100%); 
         }
         .toc-link {
             transition: all 0.2s ease;
             border-left: 3px solid transparent;
         }
         .toc-link.active {
-            border-left-color: #7C3AED;
-            background: rgba(124, 58, 237, 0.08);
-            color: #5B21B6;
+            border-left-color: var(--brand-600);
+            background: rgba(204, 102, 0, 0.08);
+            color: var(--brand-800);
             font-weight: 600;
         }
         .toc-link:hover:not(.active) {
-            background: rgba(124, 58, 237, 0.05);
-            border-left-color: #A78BFA;
+             background: rgba(204, 102, 0, 0.05);
+            border-left-color: var(--brand-400);
         }
         .sticky-toc {
             position: sticky;
@@ -42,18 +43,18 @@
             border-radius: 10px;
         }
         .sticky-toc::-webkit-scrollbar-thumb {
-            background: #7C3AED;
+            background: var(--brand-600);
             border-radius: 10px;
         }
         .icon-circle {
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(91, 33, 182, 0.08));
+            background: linear-gradient(135deg, rgba(204, 102, 0, 0.12), rgba(91, 33, 182, 0.08));
         }
         .card-hover {
             transition: all 0.3s ease;
         }
         .card-hover:hover {
             transform: translateY(-4px);
-            box-shadow: 0 20px 40px -12px rgba(124, 58, 237, 0.25);
+            box-shadow: 0 20px 40px -12px rgba(204, 102, 0, 0.12),;
         }
         @media (max-width: 1023px) {
             .sticky-toc {
@@ -65,12 +66,12 @@
             }
         }
         .ai-warning {
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.06), rgba(91, 33, 182, 0.04));
-            border: 1px solid rgba(124, 58, 237, 0.15);
+            background: linear-gradient(135deg, rgba(204, 102, 0, 0.06), rgba(168, 83, 0, 0.04));
+            border: 1px solid rgba(204, 102, 0, 0.15);
         }
     </style>
 </head>
-<body class="bg-gray-50 smooth-scroll">
+<body class="bg-brand-50 smooth-scroll">
 
 {% include "core_app/partials/navbar.html" %}
 
@@ -102,8 +103,8 @@
             
             <!-- =====  Table of Contents ===== -->
             <aside class="lg:sticky w-80 shrink-0 top-24 self-start">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky-toc max-w-[800px]">
-                    <p class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
+                <div class="bg-white rounded-2xl shadow-sm border border-brand-100 p-6 sticky-toc max-w-[800px]">
+                    <p class="text-xs font-bold uppercase tracking-wider text-brand-400 mb-4 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
@@ -114,7 +115,7 @@
                         <a href="#{{ section.id }}" 
                            class="toc-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 transition-all"
                            data-target="{{ section.id }}">
-                            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-gray-100 text-xs font-bold text-gray-500 group-hover:bg-violet-100 group-hover:text-violet-600 transition-colors shrink-0">
+                            <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-gray-100 text-xs font-bold text-gray-500 group-hover:bg-brand-100 group-hover:hover:bg-brand-50 transition-colors shrink-0">
                                 {{ forloop.counter }}
                             </span>
                             <span class="leading-tight">{{ section.title }}</span>
@@ -132,20 +133,20 @@
                 <section id="{{ section.id }}" class="section-anchor border-b border-gray-200 py-8 first:pt-0 last:border-b-0">
                     
                     <h2 class="flex items-center gap-3 text-xl font-semibold tracking-tight text-gray-900">
-                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-violet-100 text-sm font-bold tabular-nums text-violet-600">
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-brand-100 text-sm font-bold tabular-nums hover:bg-brand-50">
                             {{ forloop.counter }}
                         </span>
                         {{ section.title }}
                     </h2>
                     
-                    <div class="mt-4 space-y-4 leading-relaxed text-gray-600 [&_a]:font-medium [&_a]:text-violet-600 [&_a:hover]:text-violet-700 [&_a]:underline-offset-4 [&_a]:hover:underline [&_li]:leading-relaxed [&_strong]:font-semibold [&_strong]:text-gray-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5 [&_ul]:marker:text-violet-500">
+                    <div class="mt-4 space-y-4 leading-relaxed text-gray-600 [&_a]:font-medium [&_a]:hover:bg-brand-50 [&_a:hover]:text-brand-700 [&_a]:underline-offset-4 [&_a]:hover:underline [&_li]:leading-relaxed [&_strong]:font-semibold [&_strong]:text-gray-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5 [&_ul]:marker:text-brand-500">
                         {{ section.content|safe }}
                     </div>
                 </section>
                 {% endfor %}
                 
                 <!-- ===== BOTTOM CTA ===== -->
-                <div class="mt-12 rounded-2xl bg-gradient-to-br from-violet-50 to-indigo-50 border border-violet-100 p-8 md:p-10 card-hover">
+                <div class="mt-12 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-100 p-8 md:p-10 card-hover">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                         <div>
                             <h3 class="text-xl font-bold text-gray-900 mb-2">Questions about these terms?</h3>
@@ -154,7 +155,7 @@
                             </p>
                         </div>
                         <a href="/contact/" 
-                        class="inline-flex items-center gap-2 shrink-0 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold px-6 py-3.5 transition-all shadow-lg hover:shadow-violet-200/50">
+                        class="inline-flex items-center gap-2 shrink-0 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3.5 transition-all shadow-lg hover:shadow-brand-200/50">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                             </svg>

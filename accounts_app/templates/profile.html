@@ -1,5 +1,5 @@
 {% load dict_extras %}
-{% load icons %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,43 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Account Settings | NestMatch</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    {% load static %}
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              display: ['"Plus Jakarta Sans"', 'sans-serif'],
-              sans: ['Inter', 'sans-serif'],
-            },
-            colors: {
-              brand: {
-                50: '#f5f3ff',
-                100: '#ede9fe',
-                200: '#ddd6fe',
-                400: '#a78bfa',
-                500: '#7c3aed',
-                600: '#6d28d9',
-                700: '#5b21b6',
-                900: '#4c1d95',
-              },
-            },
-            boxShadow: {
-              soft: '0 16px 45px rgba(124, 58, 237, 0.16)',
-            },
-          },
-        },
-      };
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    {% include "core_app/partials/tailwind_config.html" %}
+    <link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
     <style>
       body {
-        font-family: 'Inter', sans-serif;
         background-color: #f9fafb;
         color: #1e293b;
       }
@@ -61,7 +28,7 @@
           height: 0;
           width: 3px;
           border-radius: 999px;
-          background-color: #6d28d9;
+          background-color: var(--brand-700);
           transform: translateY(-50%);
           transition: height 0.18s ease;
         }
@@ -70,11 +37,11 @@
         }
       }
       .tab-nav-btn.active {
-        background-color: #ede9fe;
-        color: #5b21b6;
+        background-color: var(--brand-100);
+        color: var(--brand-800);
       }
       .tab-nav-btn.active svg {
-        color: #6d28d9;
+        color: var(--brand-700);
       }
       .tab-panel {
         animation: tabFadeIn 0.22s ease;
@@ -90,8 +57,8 @@
         transform: translateY(-1px);
       }
       .option-card.selected {
-        border-color: #7c3aed;
-        background-color: #f5f3ff;
+        border-color: var(--brand-600);
+        background-color: var(--brand-50);
         box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
       }
       .bool-toggle .option-card {
@@ -113,7 +80,7 @@
         transition: color 0.15s ease;
       }
       .field-icon-wrap:focus-within .field-icon {
-        color: #7c3aed;
+        color: var(--brand-600);
       }
       .strength-check {
         transition: color 0.15s ease;
@@ -139,7 +106,7 @@
         100% { transform: translate(0, 0) scale(1); }
       }
       .header-title-gradient {
-        background: linear-gradient(100deg, #4c1d95, #7c3aed 35%, #a78bfa 50%, #6d28d9 70%, #4c1d95);
+        background: linear-gradient(100deg, var(--brand-900), var(--brand-600) 35%, var(--brand-400) 50%, var(--brand-700) 70%, var(--brand-900));
         background-size: 250% 100%;
         -webkit-background-clip: text;
         background-clip: text;
@@ -197,7 +164,7 @@
     <!-- ================================================================== -->
     <!-- Page header                                                         -->
     <!-- ================================================================== -->
-    <header class="relative mt-[65px] overflow-hidden bg-gradient-to-br from-brand-900 via-brand-600 to-violet-500">
+    <header class="relative mt-[65px] overflow-hidden bg-gradient-to-br from-brand-900 via-brand-700 to-brand-500">
 
       <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,_rgba(255,255,255,0.12)_1.5px,_transparent_1.5px)] bg-[length:28px_28px]"></div>
       <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/5"></div>
@@ -366,7 +333,7 @@
               <input type="file" id="profile_pic_input" name="profile_pic" accept="image/png, image/jpeg, image/webp, image/gif" class="hidden" />
 
               <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-                <h2 class="font-display text-lg font-bold text-slate-900">Personal information</h2>
+                <h2 class="font-display text-lg font-bold text-gray-900">Personal information</h2>
                 <p class="mt-1 text-sm text-slate-500">This information is visible to people you match with.</p>
 
                 <!-- -------------------------------------------------- -->
@@ -381,7 +348,7 @@
                       <div class="flex items-center gap-3">
                         <button type="button"
                                 onclick="document.getElementById('profile_pic_input').click()"
-                                class="inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700 hover:bg-brand-100 transition-colors">
+                                class="inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-brand-100 transition-colors">
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M4 17.5L3 21l3.5-1L17.8 8.7a1.5 1.5 0 000-2.1l-1.4-1.4a1.5 1.5 0 00-2.1 0L4 17.5z" />
                           </svg>
@@ -406,7 +373,7 @@
                     <div class="field-icon-wrap">
                       <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5.5 19c1-3.2 3.6-5 6.5-5s5.5 1.8 6.5 5" /></svg>
                       <input type="text" name="first_name" value="{{ user_obj.first_name }}" required minlength="2"
-                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                     </div>
                     <p class="field-error mt-1 text-xs text-rose-600" data-field="first_name"></p>
                   </div>
@@ -415,7 +382,7 @@
                     <div class="field-icon-wrap">
                       <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5.5 19c1-3.2 3.6-5 6.5-5s5.5 1.8 6.5 5" /></svg>
                       <input type="text" name="last_name" value="{{ user_obj.last_name }}" required minlength="2"
-                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                     </div>
                     <p class="field-error mt-1 text-xs text-rose-600" data-field="last_name"></p>
                   </div>
@@ -424,7 +391,7 @@
                     <div class="field-icon-wrap">
                       <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /><path d="M16 12v1.5a2.5 2.5 0 005 0V12a9 9 0 10-3.5 7.1" /></svg>
                       <input type="text" name="username" value="{{ user_obj.username }}" required pattern="[a-zA-Z0-9_.]{3,30}"
-                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                     </div>
                     <p class="field-error mt-1 text-xs text-rose-600" data-field="username"></p>
                   </div>
@@ -437,7 +404,7 @@
                     <div class="field-icon-wrap">
                       <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2" /><path d="M4 6.5l8 6 8-6" /></svg>
                       <input type="email" name="email" value="{{ user_obj.email }}" required
-                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                     </div>
                     <p class="field-error mt-1 text-xs text-rose-600" data-field="email"></p>
                   </div>
@@ -446,7 +413,7 @@
                     <div class="field-icon-wrap">
                       <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h3.5l1.5 4-2 1.5a11 11 0 005.5 5.5l1.5-2 4 1.5V18a1.5 1.5 0 01-1.6 1.5A15.5 15.5 0 015 6.1 1.5 1.5 0 015 4.5z" /></svg>
                       <input type="tel" name="phone_number" value="{{ user_obj.phone_number|default:'' }}"
-                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                     </div>
                     <p class="field-error mt-1 text-xs text-rose-600" data-field="phone_number"></p>
                   </div>
@@ -454,7 +421,7 @@
                     <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Gender</label>
                     <div class="field-icon-wrap">
                       <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5.5 19c1-3.2 3.6-5 6.5-5s5.5 1.8 6.5 5" /></svg>
-                      <select name="gender" class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                      <select name="gender" class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
                         {% for value, label in genders %}
                           <option value="{{ value }}" {% if user_obj.gender == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
@@ -466,7 +433,7 @@
                     <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nationality</label>
                     <div class="field-icon-wrap">
                       <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" /><path d="M3.5 12h17M12 3.5c2.2 2.3 3.3 5.4 3.3 8.5s-1.1 6.2-3.3 8.5c-2.2-2.3-3.3-5.4-3.3-8.5S9.8 5.8 12 3.5z" /></svg>
-                      <select name="country" class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                      <select name="country" class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
                         {% for value, label in countries %}
                           <option value="{{ value }}" {% if user_obj.country == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
@@ -479,7 +446,7 @@
                     <div class="field-icon-wrap">
                       <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2" /><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" /></svg>
                       <input type="date" name="date_of_birth" value="{{ user_obj.date_of_birth|date:'Y-m-d' }}" required
-                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                        class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                     </div>
                     <p class="field-error mt-1 text-xs text-rose-600" data-field="date_of_birth"></p>
                   </div>
@@ -488,7 +455,7 @@
                     <div class="field-icon-wrap">
                       <svg class="field-icon" style="top: 0.95rem; transform: none;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17.5L3 21l3.5-1L17.8 8.7a1.5 1.5 0 000-2.1l-1.4-1.4a1.5 1.5 0 00-2.1 0L4 17.5z" /></svg>
                       <textarea name="bio" maxlength="1000"
-                           class="field-icon-input min-h-28 w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">{{ user_obj.bio|default:'' }}</textarea>
+                           class="field-icon-input min-h-28 w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100">{{ user_obj.bio|default:'' }}</textarea>
                     </div>
                     <p class="field-error mt-1 text-xs text-rose-600" data-field="bio"></p>
                   </div>
@@ -504,7 +471,7 @@
 
             <div class="rounded-2xl border border-rose-200 bg-white p-6 sm:p-8">
               <p class="text-xs font-semibold uppercase tracking-wide text-rose-600">Danger zone</p>
-              <h3 class="mt-1 font-display text-base font-bold text-slate-900">Delete account</h3>
+              <h3 class="mt-1 font-display text-base font-bold text-brand-900">Delete account</h3>
               <p class="mt-2 text-sm text-slate-500">Permanently deletes your NestMatch account and all associated data. This action cannot be undone.</p>
               <button type="button" onclick="openDeleteModal()" class="mt-4 rounded-lg border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-50">
                 Delete account
@@ -517,13 +484,13 @@
           <!-- ============================================================ -->
           <div id="tab-lifestyle" class="tab-panel hidden space-y-6">
             <div class="flex items-start gap-3 bg-brand-50 p-4 border border-brand-200 rounded-xl">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="1.8" class="flex-shrink-0 mt-0.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-700)" stroke-width="1.8" class="flex-shrink-0 mt-0.5">
                 <circle cx="12" cy="12" r="8" />
                 <circle cx="12" cy="12" r="4" />
-                <circle cx="12" cy="12" r="0.7" fill="#6d28d9" stroke="none" />
+                <circle cx="12" cy="12" r="0.7" fill="var(--brand-700)" stroke="none" />
               </svg>
               <div>
-                <p class="font-semibold text-slate-900 text-sm">Compatibility profile</p>
+                <p class="font-semibold text-brand-900 text-sm">Compatibility profile</p>
                 <p class="text-slate-600 text-sm">Keep this updated — it directly affects who gets recommended to you.</p>
               </div>
             </div>
@@ -554,8 +521,8 @@
               <input type="hidden" name="wants_building_amenities" id="input-wants_building_amenities" value="{% if lifestyle_profile.wants_building_amenities %}true{% elif lifestyle_profile.wants_building_amenities is not None %}false{% endif %}" />
 
               <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-                <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <h3 class="flex items-center gap-2 font-display text-base font-bold text-brand-900">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M13 3a8 8 0 109 9 7 7 0 01-9-9z" />
                   </svg>
                   Sleep & schedule
@@ -584,8 +551,8 @@
               </div>
 
               <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-                <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linecap="round">
+                <h3 class="flex items-center gap-2 font-display text-base font-bold text-brand-900">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2.2" stroke-linecap="round">
                     <line x1="6" y1="14" x2="6" y2="18" />
                     <line x1="12" y1="9" x2="12" y2="18" />
                     <line x1="18" y1="12" x2="18" y2="18" />
@@ -626,8 +593,8 @@
               </div>
 
               <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-                <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <h3 class="flex items-center gap-2 font-display text-base font-bold text-brand-900">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="4" y="4" width="16" height="16" rx="2" />
                     <path d="M8 12l2.5 2.5L16 9" />
                   </svg>
@@ -672,8 +639,8 @@
               </div>
 
               <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-                <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <h3 class="flex items-center gap-2 font-display text-base font-bold text-brand-900">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z" />
                   </svg>
                   Background
@@ -701,8 +668,8 @@
               </div>
 
               <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-                <h3 class="flex items-center gap-2 font-display text-base font-bold text-slate-900">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <h3 class="flex items-center gap-2 font-display text-base font-bold text-brand-900">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="9" />
                     <path d="M12 7v10M9 9.5a2.5 2.5 0 012.5-1.5h1a2.5 2.5 0 010 5h-1a2.5 2.5 0 000 5h1a2.5 2.5 0 002.5-1.5" />
                   </svg>
@@ -847,8 +814,8 @@
                     <svg class="mt-0.5 shrink-0 text-blue-500" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                     <p class="text-sm text-blue-700">You signed in with Google. Set a password below to also enable email/password login.</p>
                   </div>
-                  <h2 class="flex items-center gap-2 font-display text-lg font-bold text-slate-900">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+                  <h2 class="flex items-center gap-2 font-display text-lg font-bold text-brand-900">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
                     Add a password
                   </h2>
                   <div class="mt-5 space-y-4">
@@ -857,7 +824,7 @@
                       <div class="field-icon-wrap">
                         <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
                         <input type="password" name="new_password" required minlength="8" placeholder="••••••••"
-                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                       </div>
                       <p class="field-error mt-1 text-xs text-rose-600" data-field="new_password"></p>
                     </div>
@@ -866,7 +833,7 @@
                       <div class="field-icon-wrap">
                         <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
                         <input type="password" name="confirm_password" required minlength="8" placeholder="••••••••"
-                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                       </div>
                       <p class="field-error mt-1 text-xs text-rose-600" data-field="confirm_password"></p>
                     </div>
@@ -876,9 +843,8 @@
 
                   {% else %}
                   <!-- Normal user: must verify current password -->
-                  <h2 class="flex items-center gap-2 font-display text-lg font-bold text-slate-900">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
-                    Change password
+                  <h2 class="flex items-center gap-2 font-display text-lg font-bold text-gray-900">
+                     Change password
                   </h2>
                   <div class="mt-5 space-y-4">
                     <div>
@@ -886,7 +852,7 @@
                       <div class="field-icon-wrap">
                         <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
                         <input type="password" name="current_password" required placeholder="••••••••"
-                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                       </div>
                       <p class="field-error mt-1 text-xs text-rose-600" data-field="current_password"></p>
                     </div>
@@ -895,7 +861,7 @@
                       <div class="field-icon-wrap">
                         <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
                         <input type="password" name="new_password" required minlength="8" placeholder="••••••••"
-                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                       </div>
                       <p class="field-error mt-1 text-xs text-rose-600" data-field="new_password"></p>
                     </div>
@@ -904,7 +870,7 @@
                       <div class="field-icon-wrap">
                         <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
                         <input type="password" name="confirm_password" required minlength="8" placeholder="••••••••"
-                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-slate-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-brand-800 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                       </div>
                       <p class="field-error mt-1 text-xs text-rose-600" data-field="confirm_password"></p>
                     </div>
@@ -924,13 +890,13 @@
 
                 <!-- Form -->
                 <div class="bg-white shadow-sm p-8 border border-slate-100 rounded-2xl">
-                  <h3 class="mb-5 font-display font-bold text-slate-900 text-xl">{{ review_section_heading }}</h3>
+                  <h3 class="mb-5 font-display font-bold text-gray-900 text-xl">{{ review_section_heading }}</h3>
                   <form id="review-form" action="{% url 'accounts_app:submit_review' %}" method="POST" class="space-y-5">
                     {% csrf_token %}
                     <div>
                       <label for="reviewer_name" class="block mb-2 font-semibold text-slate-600 text-sm">Your name</label>
                       <input id="reviewer_name" name="reviewer_name" type="text" required placeholder="e.g. Sara Ahmed"
-                        class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm" />
+                        class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-gray-600 text-sm" />
                       <p class="mt-2 text-rose-600 text-xs field-error" data-field="reviewer_name"></p>
                     </div>
 
@@ -938,7 +904,7 @@
                       <div>
                         <label for="role" class="block mb-2 font-semibold text-slate-600 text-sm">I am a</label>
                         <select id="role" name="role" required
-                          class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm">
+                          class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-gray-600 text-sm">
                           <option value="">Select role</option>
                           <option value="seeker">Room Seeker</option>
                           <option value="poster">Room Poster</option>
@@ -948,14 +914,14 @@
                       <div>
                         <label for="location" class="block mb-2 font-semibold text-slate-600 text-sm">Location</label>
                         <input id="location" name="location" type="text" placeholder="e.g. Cairo, Heliopolis"
-                          class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm" />
+                          class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-gray-600 text-sm" />
                       </div>
                     </div>
 
                     <div>
                       <label for="review_text" class="block mb-2 font-semibold text-slate-600 text-sm">Your review</label>
                       <textarea id="review_text" name="review_text" rows="6" required placeholder="Tell us about your experience with NestMatch"
-                        class="bg-slate-50 focus:bg-white px-4 py-4 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-slate-900 text-sm leading-6"></textarea>
+                        class="bg-slate-50 focus:bg-white px-4 py-4 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-gray-600 text-sm leading-6"></textarea>
                       <p class="mt-2 text-rose-600 text-xs field-error" data-field="review_text"></p>
                     </div>
 
@@ -968,14 +934,14 @@
                 <!-- My submitted reviews -->
                 <div class="space-y-6">
                   <div class="bg-white shadow-sm p-8 border border-slate-100 rounded-2xl">
-                    <h3 class="mb-4 font-display font-bold text-slate-900 text-lg">My submitted reviews</h3>
+                    <h3 class="mb-4 font-display font-bold text-gray-900 text-lg">My submitted reviews</h3>
                     {% if user_reviews %}
                       <div class="space-y-4">
                         {% for review in user_reviews %}
                           <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl">
                             <div class="flex justify-between items-center gap-3">
                               <div>
-                                <p class="font-semibold text-slate-900">{{ review.reviewer_name }}</p>
+                                <p class="font-semibold text-brand-900">{{ review.reviewer_name }}</p>
                                 <p class="text-slate-500 text-xs">{{ review.get_role_display }}</p>
                               </div>
                               <div class="flex items-center gap-2">
@@ -1014,12 +980,12 @@
 
             <!-- INFO BANNER -->
             <div class="flex items-start gap-3 rounded-xl border border-brand-200 bg-brand-50 p-4">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="1.8" class="mt-0.5 flex-shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-700)" stroke-width="1.8" class="mt-0.5 flex-shrink-0">
                 <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z" />
                 <path d="M9 12l2 2 4-4" />
               </svg>
               <div>
-                <p class="text-sm font-semibold text-slate-900">Identity verification</p>
+                <p class="text-sm font-semibold text-brand-900">Identity verification</p>
                 <p class="text-sm text-slate-600">Verified accounts get a trust badge and appear higher in matches. PDF, JPG, or PNG — max 8MB.</p>
               </div>
             </div>
@@ -1030,7 +996,7 @@
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                   <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                       <rect x="4" y="3" width="16" height="18" rx="2" />
                       <line x1="8" y1="8" x2="16" y2="8" />
                       <line x1="8" y1="12" x2="16" y2="12" />
@@ -1038,7 +1004,7 @@
                     </svg>
                   </div>
                   <div>
-                    <p class="font-display text-base font-bold text-slate-900">{{ doc_label }}</p>
+                    <p class="font-display text-base font-bold text-brand-900">{{ doc_label }}</p>
                     {% if doc %}
                       <p class="text-xs text-slate-500">Last submitted {{ doc.updated_at|date:"M j, Y" }}</p>
                     {% else %}
@@ -1115,7 +1081,7 @@
                   <div class="flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
                       <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                           <rect x="4" y="3" width="16" height="18" rx="2" />
                           <line x1="8" y1="8" x2="16" y2="8" />
                           <line x1="8" y1="12" x2="16" y2="12" />
@@ -1123,7 +1089,7 @@
                         </svg>
                       </div>
                       <div class="min-w-0">
-                        <p class="truncate font-display text-base font-bold text-slate-900">{{ listing.title }}</p>
+                        <p class="truncate font-display text-base font-bold text-brand-900">{{ listing.title }}</p>
                         <p class="text-xs text-slate-500">
                           {{ listing.city }}{% if listing.district %}, {{ listing.district }}{% endif %}
                           {% if doc %} · Last submitted {{ doc.updated_at|date:"M j, Y" }}{% endif %}
@@ -1195,7 +1161,7 @@
             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
           </svg>
         </div>
-        <h3 class="mt-4 font-display text-lg font-bold text-slate-900">Delete account</h3>
+        <h3 class="mt-4 font-display text-lg font-bold text-brand-900">Delete account</h3>
         <p class="mt-2 text-sm text-slate-500">Are you sure you want to delete your account? All your data will be permanently removed. This action cannot be undone.</p>
         <div class="mt-6 flex gap-3">
           <button type="button" onclick="closeDeleteModal()" class="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">

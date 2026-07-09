@@ -12,19 +12,27 @@ function getCookie(name) {
    Toast
 ───────────────────────────────────────── */
 function nmToast(msg, type, duration) {
-  type     = type     || 'success';
+  type = type || 'success';
   duration = duration || 3500;
 
   var wrap = document.getElementById('nm-toast-wrap');
-  var t    = document.createElement('div');
+  var t = document.createElement('div');
   t.className = 'nm-toast nm-toast-' + type;
 
-  var icons = { success: '✅', error: '❌', info: '💜', warning: '⚠️' };
-  t.innerHTML =
-    '<span style="font-size:15px;flex-shrink:0">' + (icons[type] || '') + '</span>' +
-    '<span style="flex:1">' + msg + '</span>';
+ 
+  var svgs = {
+    success: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+    error: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
+    info: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
+    warning: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>'
+  };
+
+  t.innerHTML = 
+    '<div class="nm-toast-icon">' + (svgs[type] || '') + '</div>' +
+    '<div class="nm-toast-msg">' + msg + '</div>';
 
   wrap.appendChild(t);
+  
   setTimeout(function () {
     t.style.animation = 'nmToastOut .3s ease forwards';
     setTimeout(function () { t.remove(); }, 300);
@@ -36,11 +44,11 @@ function nmToast(msg, type, duration) {
 ───────────────────────────────────────── */
 window.nmAppTab = function (btn, filter) {
   document.querySelectorAll('#nm-tabs .nm-tab').forEach(function (b) {
-    b.classList.remove('bg-violet-600', 'text-white', 'border-violet-600');
+    b.classList.remove('bg-brand-600', 'text-white', 'border-brand-600');
     b.classList.add('text-gray-500', 'bg-transparent');
   });
   btn.classList.remove('text-gray-500', 'bg-transparent');
-  btn.classList.add('bg-violet-600', 'text-white', 'border-violet-600');
+  btn.classList.add('bg-brand-600', 'text-white', 'border-brand-600');
 
   document.querySelectorAll('#nm-app-list [data-status]').forEach(function (card) {
     card.style.display =

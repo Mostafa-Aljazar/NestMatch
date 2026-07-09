@@ -128,14 +128,14 @@ document.addEventListener('keydown', function (e) {
 
   var pinIcon = L.divIcon({
     className: '',
-    html: '<div style="width:36px;height:36px;background:#7C3AED;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(124,58,237,.5)"></div>',
+    html: '<div style="width:36px;height:36px;background:var(--brand-600);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(124,58,237,.5)"></div>',
     iconSize: [36, 36],
     iconAnchor: [18, 36]
   });
 
   var approxIcon = L.divIcon({
     className: '',
-    html: '<div style="width:44px;height:44px;background:rgba(124,58,237,.18);border:2.5px dashed #7C3AED;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px">📍</div>',
+    html: '<div style="width:44px;height:44px;background:rgba(124,58,237,.18);border:2.5px dashed var(--brand-600);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px">📍</div>',
     iconSize: [44, 44],
     iconAnchor: [22, 22]
   });

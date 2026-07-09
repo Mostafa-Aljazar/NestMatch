@@ -21,7 +21,7 @@
           <td><span style="font-weight:600;font-size:12px">{{ listing.title }}</span></td>
           <td style="color:#6B7280;white-space:nowrap">{{ listing.city }}</td>
           <td style="color:#6B7280;white-space:nowrap">{{ listing.poster.full_name }}</td>
-          <td style="font-weight:700;color:#7C3AED">${{ listing.price }}</td>
+          <td style="font-weight:700;color:var(--brand-600)">${{ listing.price }}</td>
           <td style="text-align:center">{{ listing.app_count }}</td>
           <td>
             {% if listing.status == 'active' %}<span class="badge badge-green">Active</span>
@@ -119,8 +119,8 @@
 
     <div style="display:flex;align-items:center;gap:6px">
       {% if page_obj.has_previous %}
-        <a href="?page=1" style="padding:6px 10px;font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">« First</a>
-        <a href="?page={{ page_obj.previous_page_number }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">‹ Previous</a>
+        <a href="?page=1" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">« First</a>
+        <a href="?page={{ page_obj.previous_page_number }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">‹ Previous</a>
       {% else %}
         <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">« First</span>
         <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">‹ Previous</span>
@@ -129,8 +129,8 @@
       <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#111827;background:#E5E7EB;border-radius:4px">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
 
       {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">Next ›</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:#7C3AED;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">Last »</a>
+        <a href="?page={{ page_obj.next_page_number }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">Next ›</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">Last »</a>
       {% else %}
         <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">Next ›</span>
         <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">Last »</span>

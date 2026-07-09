@@ -5,41 +5,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Photo Tour — {{ listing.title }} — NestMatch</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: { violet: { 50:'#F5F3FF', 100:'#EDE9FE', 200:'#DDD6FE', 400:'#A78BFA', 600:'#7C3AED', 800:'#5B21B6' } },
-      fontFamily: { sans: ["'Plus Jakarta Sans'", 'sans-serif'] }
-    }
-  }
-}
-</script>
+<link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
+{% include "core_app/partials/tailwind_config.html" %}
+
 <style>
 .nm-tour-tabs{scrollbar-width:none}
 .nm-tour-tabs::-webkit-scrollbar{display:none}
 .nm-tour-tab{cursor:pointer;flex-shrink:0;text-align:center;padding-bottom:8px;border-bottom:2px solid transparent}
-.nm-tour-tab.active{border-bottom-color:#7C3AED}
+.nm-tour-tab.active{border-bottom-color:var(--brand-600)}
 .nm-tour-tab img{border-radius:10px;object-fit:cover;width:64px;height:64px;transition:opacity .2s}
 .nm-tour-tab:not(.active) img{opacity:.6}
-.nm-tour-tab span{display:block;font-size:11px;font-weight:600;color:#6B7280;margin-top:4px;max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nm-tour-tab.active span{color:#7C3AED}
+.nm-tour-tab span{display:block;font-size:11px;font-weight:600;color:#FDDCC7;margin-top:4px;max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nm-tour-tab.active span{color:var(--brand-600)}
 </style>
 </head>
-<body class="font-sans bg-white text-gray-900">
+<body class="font-sans bg-brand-50 text-gray-900">
 
 <!-- HEADER -->
-<div class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100">
+<div class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-brand-100">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-4">
     <a href="{% url 'listings_app:room_detail' listing.id %}" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shrink-0" aria-label="Back">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     </a>
     <div class="flex-1 min-w-0">
       <div class="text-sm font-extrabold text-gray-900 truncate">{{ listing.title }}</div>
-      <div class="text-xs text-gray-400">{{ total }} photo{{ total|pluralize }}</div>
+      <div class="text-xs text-brand-400">{{ total }} photo{{ total|pluralize }}</div>
     </div>
   </div>
   {% if groups|length > 1 %}
@@ -60,7 +51,7 @@ tailwind.config = {
     {% for group in groups %}
     <section id="tour-{{ group.slug }}" class="mb-14 scroll-mt-32">
       <h2 class="text-xl font-extrabold text-gray-900 mb-1">{{ group.name }}</h2>
-      <p class="text-xs text-gray-400 mb-4">{{ group.images|length }} photo{{ group.images|length|pluralize }}</p>
+      <p class="text-xs text-brand-400 mb-4">{{ group.images|length }} photo{{ group.images|length|pluralize }}</p>
       <div class="grid grid-cols-2 gap-2">
         {% for img in group.images %}
         <div class="rounded-xl overflow-hidden bg-gray-100 {% if forloop.counter0|divisibleby:5 %}col-span-2{% endif %}">
@@ -71,8 +62,8 @@ tailwind.config = {
     </section>
     {% endfor %}
   {% else %}
-    <div class="text-center py-24 text-gray-400">
-      <div class="text-5xl mb-3">🏠</div>
+    <div class="text-center py-24 text-brand-400">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-3"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/></svg>
       <div class="text-sm font-semibold">No photos have been added to this listing yet.</div>
     </div>
   {% endif %}
