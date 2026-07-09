@@ -464,14 +464,14 @@
                 <div id="personal-info-form-message" class="mt-4 hidden"></div>
                 <div class="mt-6 flex flex-wrap gap-3">
                   <button type="submit" class="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">Save changes</button>
-                  <button type="reset" class="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">Discard</button>
+                  <button type="reset" class="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-medium text-red-600 bg-red-50">Discard</button>
                 </div>
               </div>
             </form>
 
             <div class="rounded-2xl border border-rose-200 bg-white p-6 sm:p-8">
               <p class="text-xs font-semibold uppercase tracking-wide text-rose-600">Danger zone</p>
-              <h3 class="mt-1 font-display text-base font-bold text-brand-900">Delete account</h3>
+              <h3 class="mt-1 font-display text-base font-bold text-gray-900">Delete account</h3>
               <p class="mt-2 text-sm text-slate-500">Permanently deletes your NestMatch account and all associated data. This action cannot be undone.</p>
               <button type="button" onclick="openDeleteModal()" class="mt-4 rounded-lg border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-50">
                 Delete account
@@ -1004,7 +1004,7 @@
                     </svg>
                   </div>
                   <div>
-                    <p class="font-display text-base font-bold text-brand-900">{{ doc_label }}</p>
+                    <p class="font-display text-base font-bold text-gray-900">{{ doc_label }}</p>
                     {% if doc %}
                       <p class="text-xs text-slate-500">Last submitted {{ doc.updated_at|date:"M j, Y" }}</p>
                     {% else %}
@@ -1071,7 +1071,7 @@
             <!-- ================= RENTAL CONTRACTS (one per listing) ================= -->
             {% if user_listings %}
               <div class="pt-2">
-                <h3 class="font-display text-sm font-bold uppercase tracking-wide text-slate-400">Rental contracts</h3>
+                <h3 class="font-display text-sm font-bold uppercase tracking-wide text-gray-400">Rental contracts</h3>
                 <p class="mt-1 text-xs text-slate-500">Each room you post needs its own contract, since they're separate rental agreements.</p>
               </div>
 
@@ -1089,7 +1089,7 @@
                         </svg>
                       </div>
                       <div class="min-w-0">
-                        <p class="truncate font-display text-base font-bold text-brand-900">{{ listing.title }}</p>
+                        <p class="truncate font-display text-base font-bold text-gray-900">{{ listing.title }}</p>
                         <p class="text-xs text-slate-500">
                           {{ listing.city }}{% if listing.district %}, {{ listing.district }}{% endif %}
                           {% if doc %} · Last submitted {{ doc.updated_at|date:"M j, Y" }}{% endif %}

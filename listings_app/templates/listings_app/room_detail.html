@@ -39,7 +39,7 @@
 .nm-ic{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;line-height:0}
 </style>
 </head>
-<body class="font-sans text-gray-900 bg-brand-50 overflow-x-hidden">
+<body class="text-gray-900 bg-brand-50 overflow-x-hidden">
 
 {% include "core_app/partials/navbar.html" with active_page="listings" %}
 
@@ -1077,18 +1077,18 @@
 
       <!-- Apply / Cancel / Own-listing button -->
       {% if is_own_listing %}
-      <a href="{% url 'applications_app:listing_applicants' listing.pk %}" class="nm-ic gap-1.5 w-full py-3.5 text-sm font-bold text-brand-700 bg-brand-50 border border-brand-200 rounded-xl text-center transition-all hover:bg-brand-100 active:scale-[.98] font-sans mb-2.5 no-underline">
+      <a href="{% url 'applications_app:listing_applicants' listing.pk %}" class="nm-ic gap-1.5 w-full py-3.5 text-sm font-bold text-brand-700 bg-brand-50 border border-brand-200 rounded-xl text-center transition-all hover:bg-brand-100 active:scale-[.98]  mb-2.5 no-underline">
         This is your listing — View Applicants
          </a>
       {% elif my_application and my_application.status == 'pending' %}
-      <button id="nm-cancel-apply-btn" onclick="nmCancelApply({{ my_application.pk }}, this)" class="nm-ic gap-1.5 w-full py-3.5 text-sm font-bold text-white bg-rose-600 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-rose-700 active:scale-[.98] font-sans mb-2.5">
+      <button id="nm-cancel-apply-btn" onclick="nmCancelApply({{ my_application.pk }}, this)" class="nm-ic gap-1.5 w-full py-3.5 text-sm font-bold text-white bg-rose-600 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-rose-700 active:scale-[.98]  mb-2.5">
         Cancel Application
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
       {% elif my_application %}
-      <button disabled class="block w-full py-3.5 text-sm font-bold text-gray-500 bg-gray-100 border-none rounded-xl text-center cursor-default font-sans mb-2.5">Application {{ my_application.get_status_display }}</button>
+      <button disabled class="block w-full py-3.5 text-sm font-bold text-gray-500 bg-gray-100 border-none rounded-xl text-center cursor-default  mb-2.5">Application {{ my_application.get_status_display }}</button>
       {% else %}
-      <button id="nm-apply-now-btn" onclick="nmOpenModal()" class="nm-ic gap-1.5 w-full py-3.5 text-sm font-bold text-white bg-brand-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-brand-800 active:scale-[.98] font-sans mb-2.5">
+      <button id="nm-apply-now-btn" onclick="nmOpenModal()" class="nm-ic gap-1.5 w-full py-3.5 text-sm font-bold text-white bg-brand-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-brand-800 active:scale-[.98]  mb-2.5">
         Apply Now
        </button>
       {% endif %}
@@ -1114,7 +1114,7 @@
     </div>
 
     <div class="flex gap-2.5 mt-2.5">
-      <button onclick="nmShare()" class="nm-ic gap-1.5 flex-1 py-[11px] text-[13px] font-semibold text-gray-700 bg-white border-[1.5px] border-gray-200 rounded-xl cursor-pointer transition-all hover:border-brand-700 hover:text-brand-700 font-sans">
+      <button onclick="nmShare()" class="nm-ic gap-1.5 flex-1 py-[11px] text-[13px] font-semibold text-gray-700 bg-white border-[1.5px] border-gray-200 rounded-xl cursor-pointer transition-all hover:border-brand-700 hover:text-brand-700 ">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1.5-1.5"/></svg>
         Share
       </button>
@@ -1167,10 +1167,10 @@
         <label class="text-[13px] font-bold text-gray-700 block mb-2">Your Message</label>
         <textarea id="nm-apply-msg"
           placeholder="Hi! I'm interested in this room. Tell the poster a bit about yourself — your lifestyle, why you're looking, and when you'd like to move in…"
-          class="w-full px-3.5 py-3 text-sm border-[1.5px] border-gray-200 rounded-xl font-sans text-gray-900 outline-none resize-y min-h-[130px] leading-relaxed transition-colors focus:border-brand-700 focus:ring-2 focus:ring-brand-700/10"></textarea>
+          class="w-full px-3.5 py-3 text-sm border-[1.5px] border-gray-200 rounded-xl  text-gray-900 outline-none resize-y min-h-[130px] leading-relaxed transition-colors focus:border-brand-700 focus:ring-2 focus:ring-brand-700/10"></textarea>
         <div class="text-[11px] text-brand-400 mt-1">Be specific — better messages get faster replies.</div>
       </div>
-      <button id="nm-apply-btn" onclick="nmSubmitApply()" class="nm-ic gap-2 w-full py-3.5 text-sm font-bold text-white bg-brand-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-brand-800 active:scale-[.98] font-sans">
+      <button id="nm-apply-btn" onclick="nmSubmitApply()" class="nm-ic gap-2 w-full py-3.5 text-sm font-bold text-white bg-brand-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-brand-800 active:scale-[.98] ">
         Send Application
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
       </button>

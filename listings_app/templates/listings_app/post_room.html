@@ -169,7 +169,7 @@
         <h1 class="text-xl font-extrabold text-brand-900 tracking-tight">{% if listing %}Edit Room{% else %}Post a Room{% endif %}</h1>
         <p class="text-[13px] text-gray-500 mt-0.5" id="nm-step-hint">Step 1 of 5 — Basic Information</p>
       </div>
-      <button type="button" onclick="parSubmit('draft')" class="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-[12px] font-semibold text-gray-500 hover:border-brand-300 hover:hover:bg-brand-50 hover:bg-brand-50 transition-all shadow-sm cursor-pointer font-sans">
+      <button type="button" onclick="parSubmit('draft')" class="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-[12px] font-semibold text-gray-500 hover:border-brand-300 hover:hover:bg-brand-50 hover:bg-brand-50 transition-all shadow-sm cursor-pointer ">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M17 3v4H8V3M12 12v5m0 0l-2-2m2 2l2-2"/></svg>
         Save Draft
       </button>
@@ -479,7 +479,7 @@
           <!-- Search bar -->
           <div class="flex gap-2 mb-2">
             <input type="text" id="nm-map-search" placeholder="Search address or place name..." class="nm-input flex-1" onkeydown="if(event.key==='Enter'){event.preventDefault();parMapSearch();}">
-            <button type="button" onclick="parMapSearch()" class="px-4 py-3 text-[13px] font-bold text-white bg-brand-600 border-none rounded-lg cursor-pointer font-sans whitespace-nowrap hover:bg-violet-800 transition-colors">Search</button>
+            <button type="button" onclick="parMapSearch()" class="px-4 py-3 text-[13px] font-bold text-white bg-brand-600 border-none rounded-lg cursor-pointer  whitespace-nowrap hover:bg-violet-800 transition-colors">Search</button>
             <button type="button" onclick="parMapLocate()" title="Use my location" class="px-3.5 py-3 bg-brand-50 border border-brand-200 rounded-lg cursor-pointer hover:bg-brand-100 transition-colors flex items-center justify-center text-brand-700"><svg class="nm-ic" width="17" height="17"><use href="#i-map-pin"></use></svg></button>
           </div>
           <!-- Map container -->
@@ -512,7 +512,7 @@
           <div class="flex justify-center text-brand-300 mb-3"><svg class="nm-ic" width="44" height="44"><use href="#i-folder"></use></svg></div>
           <div class="text-[15px] font-bold text-gray-700 mb-1">Drag &amp; drop photos here</div>
           <div class="text-[13px] text-gray-500 mb-3.5">PNG, JPG, WEBP up to 10MB each</div>
-          <button type="button" class="px-6 py-2.5 text-[13px] font-bold hover:bg-brand-50 bg-white border border-brand-600 rounded-lg cursor-pointer font-sans hover:bg-brand-50 transition-colors">Browse Files</button>
+          <button type="button" class="px-6 py-2.5 text-[13px] font-bold hover:bg-brand-50 bg-white border border-brand-600 rounded-lg cursor-pointer  hover:bg-brand-50 transition-colors">Browse Files</button>
         </div>
         <!-- photo count -->
         <div id="nm-photo-count" class="hidden text-xs text-gray-500 mt-2"></div>
@@ -525,7 +525,7 @@
       <div class="bg-white rounded-2xl p-7 shadow-card">
         <div class="flex items-center justify-between mb-3.5 flex-wrap gap-2.5">
           <h3 class="text-base font-bold text-gray-900 flex items-center gap-2"><span class="shrink-0"></span>Description</h3>
-          <button onclick="parGenerateAI()" id="nm-ai-btn" class="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold hover:bg-brand-50 bg-brand-50 border border-brand-200 rounded-lg cursor-pointer font-sans hover:bg-brand-100 transition-colors">
+          <button onclick="parGenerateAI()" id="nm-ai-btn" class="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold hover:bg-brand-50 bg-brand-50 border border-brand-200 rounded-lg cursor-pointer  hover:bg-brand-100 transition-colors">
             <span class="shrink-0"><svg class="nm-ic" width="14" height="14"><use href="#i-sparkle"></use></svg></span> Generate with AI
           </button>
         </div>
@@ -799,7 +799,7 @@
           <h3 class="text-base font-bold text-gray-900 flex items-center gap-2"><span class="shrink-0"><svg class="nm-ic" width="16" height="16"><use href="#i-edit"></use></svg></span>Custom Requirements</h3>
           <p class="text-xs text-gray-500 mt-0.5">Add your own rules that don't fit the categories above</p>
         </div>
-        <button type="button" onclick="parAddCustom()" class="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold hover:bg-brand-50 bg-brand-50 border border-brand-200 rounded-lg cursor-pointer font-sans hover:bg-brand-100 transition-colors">
+        <button type="button" onclick="parAddCustom()" class="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold hover:bg-brand-50 bg-brand-50 border border-brand-200 rounded-lg cursor-pointer  hover:bg-brand-100 transition-colors">
           + Add Custom Item
         </button>
       </div>
@@ -908,7 +908,7 @@
         <div class="text-base font-extrabold text-white mb-1 flex items-center gap-2"><span class="shrink-0"><svg class="nm-ic" width="17" height="17"><use href="#i-rocket"></use></svg></span>Ready to publish?</div>
         <div class="text-[13px] text-white/75">Your listing will be live instantly and visible to thousands of seekers</div>
       </div>
-      <button type="button" onclick="parSubmit('publish')" class="px-8 py-3.5 text-[15px] font-bold hover:bg-brand-50 bg-white border-none rounded-lg cursor-pointer font-sans whitespace-nowrap hover:scale-105 transition-transform flex items-center gap-2">Publish Listing <span class="shrink-0"><svg class="nm-ic" width="15" height="15"><use href="#i-check"></use></svg></span></button>
+      <button type="button" onclick="parSubmit('publish')" class="px-8 py-3.5 text-[15px] font-bold hover:bg-brand-50 bg-white border-none rounded-lg cursor-pointer  whitespace-nowrap hover:scale-105 transition-transform flex items-center gap-2">Publish Listing <span class="shrink-0"><svg class="nm-ic" width="15" height="15"><use href="#i-check"></use></svg></span></button>
     </div>
   </div>
 

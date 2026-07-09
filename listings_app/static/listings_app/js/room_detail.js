@@ -252,7 +252,7 @@ function nmSubmitApply() {
           var appId = result.data.application_id;
           var cancelBtn = document.createElement('button');
           cancelBtn.id = 'nm-cancel-apply-btn';
-          cancelBtn.className = 'block w-full py-3.5 text-sm font-bold text-white bg-rose-600 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-rose-700 active:scale-[.98] font-sans mb-2.5';
+          cancelBtn.className = 'block w-full py-3.5 text-sm font-bold text-white bg-rose-600 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-rose-700 active:scale-[.98]  mb-2.5';
           cancelBtn.textContent = 'Cancel Application ✕';
           cancelBtn.addEventListener('click', function () { nmCancelApply(appId, cancelBtn); });
           applyNowBtn.replaceWith(cancelBtn);
@@ -315,7 +315,7 @@ function nmCancelApply(appPk, btn) {
         if (btn) {
           var applyNowBtn = document.createElement('button');
           applyNowBtn.id = 'nm-apply-now-btn';
-          applyNowBtn.className = 'block w-full py-3.5 text-sm font-bold text-white bg-violet-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-violet-800 active:scale-[.98] font-sans mb-2.5';
+          applyNowBtn.className = 'block w-full py-3.5 text-sm font-bold text-white bg-violet-700 border-none rounded-xl cursor-pointer text-center transition-all hover:bg-violet-800 active:scale-[.98]  mb-2.5';
           applyNowBtn.textContent = 'Apply Now ';
           applyNowBtn.addEventListener('click', function () { nmOpenModal(); });
           btn.replaceWith(applyNowBtn);
