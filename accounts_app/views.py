@@ -374,7 +374,7 @@ def _send_otp_email(user, otp):
     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e5e7eb;">
 
       <!-- Header -->
-      <div style="background: linear-gradient(135deg, #4c1d95, #6d28d9, #7c3aed); padding: 32px 24px; text-align: center;">
+      <div style="background: linear-gradient(135deg, #A85300, #A85300, #CC6600); padding: 32px 24px; text-align: center;">
         <h1 style="color: #ffffff; font-size: 22px; font-weight: 800; margin: 0;"> NestMatch</h1>
         <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 8px 0 0;">Password Reset Code</p>
       </div>
@@ -384,8 +384,8 @@ def _send_otp_email(user, otp):
         <p style="color: #1e293b; font-size: 15px; margin: 0 0 24px;">Hi there! Here's your verification code:</p>
 
         <!-- OTP Code -->
-        <div style="background: #f5f3ff; border: 2px solid #7c3aed; border-radius: 12px; padding: 24px; text-align: center; margin: 0 0 24px;">
-          <p style="color: #6d28d9; font-size: 42px; font-weight: 800; letter-spacing: 12px; margin: 0;">{otp.code}</p>
+        <div style="background: #FFFAF2; border: 2px solid #CC6600; border-radius: 12px; padding: 24px; text-align: center; margin: 0 0 24px;">
+          <p style="color: #A85300; font-size: 42px; font-weight: 800; letter-spacing: 12px; margin: 0;">{otp.code}</p>
         </div>
 
         <p style="color: #64748b; font-size: 13px; margin: 0 0 8px;"> This code expires in <strong>2 minutes</strong>.</p>
@@ -403,7 +403,6 @@ def _send_otp_email(user, otp):
     msg = EmailMultiAlternatives(subject, text_content, None, [user.email])
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
-
 
 def forgot_password_view(request):
     """

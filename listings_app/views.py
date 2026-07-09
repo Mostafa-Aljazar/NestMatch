@@ -280,7 +280,6 @@ def room_detail(request, pk):
 
     can_review = False
     my_application = None
-    is_own_listing = False
     is_favorited = False
     has_profile = False
     compatibility = None

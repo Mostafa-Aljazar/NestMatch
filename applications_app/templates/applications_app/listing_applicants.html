@@ -1,5 +1,4 @@
 {% load static %}
-{% load icons %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,33 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Applicants — {{ listing.title }} — NestMatch</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { jakarta: ['"Plus Jakarta Sans"', 'sans-serif'] },
-          colors: {
-            violet: { 50:'#F5F3FF', 100:'#EDE9FE', 200:'#DDD6FE', 600:'#7C3AED', 700:'#6D28D9' },
-          },
-          keyframes: {
-            fadeUp:  { from:{ opacity:'0', transform:'translateY(10px)' }, to:{ opacity:'1', transform:'translateY(0)' } },
-            toastIn: { from:{ opacity:'0', transform:'translateX(24px)' }, to:{ opacity:'1', transform:'translateX(0)' } },
-            toastOut:{ to:  { opacity:'0', transform:'translateX(24px)' } },
-          },
-          animation: {
-            fadeUp:   'fadeUp .4s ease both',
-            toastIn:  'toastIn .3s ease both',
-            toastOut: 'toastOut .3s ease forwards',
-          },
-        }
-      }
-    }
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  {% include "core_app/partials/tailwind_config.html" %}
+  <link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
 </head>
-<body class="font-jakarta bg-gray-50 text-gray-900 overflow-x-hidden">
+<body class="bg-brand-50 text-gray-900 overflow-x-hidden">
 
 {% include "core_app/partials/navbar.html" with active_page="my_listings" %}
 
@@ -42,39 +18,41 @@
 
   <!-- ── Back link ── -->
   <a href="{% url 'listings_app:my_listings' %}"
-     class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-violet-600 transition-colors mb-4">
-    {% icon 'chevron-left' size=14 %}
+     class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:hover:bg-brand-50 transition-colors mb-4">
+    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+    </svg>
     Back to My Listings
   </a>
 
   <!-- ── Page Header ── -->
-  <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+  <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 bg-white rounded-2xl border border-brand-100 shadow-sm p-4">
     <div class="w-full sm:w-24 h-32 sm:h-20 rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-violet-200 to-violet-300">
       {% with img=listing.images.first %}
       {% if img %}<img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover"/>{% endif %}
       {% endwith %}
     </div>
     <div class="min-w-0 flex-1">
-      <h1 class="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight leading-tight truncate">{{ listing.title }}</h1>
+      <h1 class="text-xl sm:text-2xl font-extrabold text-brand-900 tracking-tight leading-tight truncate">{{ listing.title }}</h1>
       <p class="text-sm text-gray-500 mt-1">{{ listing.district }}, {{ listing.city }} &middot; ${{ listing.price }}/mo</p>
     </div>
   </div>
 
   <!-- ── Stats ── -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
-      <div id="nm-stat-total" class="text-2xl font-extrabold text-violet-600">{{ stats.total }}</div>
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-brand-100">
+      <div id="nm-stat-total" class="text-2xl font-extrabold hover:bg-brand-50">{{ stats.total }}</div>
       <div class="text-xs text-gray-500 font-medium mt-1">Total</div>
     </div>
-    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-brand-100">
       <div id="nm-stat-pending" class="text-2xl font-extrabold text-amber-500">{{ stats.pending }}</div>
       <div class="text-xs text-gray-500 font-medium mt-1">Pending</div>
     </div>
-    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-brand-100">
       <div id="nm-stat-accepted" class="text-2xl font-extrabold text-emerald-500">{{ stats.accepted }}</div>
       <div class="text-xs text-gray-500 font-medium mt-1">Accepted</div>
     </div>
-    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm border border-brand-100">
       <div id="nm-stat-rejected" class="text-2xl font-extrabold text-red-500">{{ stats.rejected }}</div>
       <div class="text-xs text-gray-500 font-medium mt-1">Rejected</div>
     </div>
@@ -85,15 +63,19 @@
 
     {% if not applications %}
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm px-6 py-20 text-center animate-fadeUp">
-      <div class="flex justify-center text-gray-300 mb-4">{% icon 'people' size=48 %}</div>
-      <div class="text-lg font-extrabold text-gray-900 mb-2">No applicants yet</div>
+      <div class="flex justify-center text-brand-300 mb-4">
+        <svg class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+        </svg>
+      </div>
+      <div class="text-lg font-extrabold text-brand-500 mb-2">No applicants yet</div>
       <p class="text-sm text-gray-500 max-w-xs mx-auto">Once someone applies to this room, they'll show up here.</p>
     </div>
     {% else %}
 
     {% for app in applications %}
     <div data-app-pk="{{ app.pk }}" data-status="{{ app.status }}"
-         class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 animate-fadeUp">
+         class="bg-white rounded-2xl overflow-hidden shadow-sm border border-brand-100 animate-fadeUp">
       <div class="flex flex-col sm:flex-row gap-3 p-4">
 
         <!-- avatar -->
@@ -110,7 +92,7 @@
           <!-- name + status -->
           <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
             <div>
-              <a href="{% url 'accounts_app:public_profile' app.seeker.pk %}" class="text-sm font-bold text-gray-900 leading-snug hover:text-violet-600 transition-colors">{{ app.seeker.full_name }}</a>
+              <a href="{% url 'accounts_app:public_profile' app.seeker.pk %}" class="text-sm font-bold text-gray-900 leading-snug hover:hover:bg-brand-50 transition-colors">{{ app.seeker.full_name }}</a>
               <div class="text-xs text-gray-500 mt-0.5">{{ app.seeker.email }}</div>
             </div>
             <span data-status-badge
@@ -125,24 +107,30 @@
           <!-- compatibility + date -->
           <div class="flex flex-wrap items-center gap-2 mt-2.5">
             {% if app.compatibility %}
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-violet-50 text-violet-600">
-              {% icon 'award' size=12 %} {{ app.compatibility }}% Match
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-brand-50 hover:bg-brand-50">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+              </svg>
+              {{ app.compatibility }}% Match
             </span>
             {% endif %}
-            <span class="inline-flex items-center gap-1 text-xs text-gray-400">
-              {% icon 'calendar' size=12 %} {{ app.applied_at|date:"M j, Y" }}
+            <span class="inline-flex items-center gap-1 text-xs text-brand-400">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+              </svg>
+              {{ app.applied_at|date:"M j, Y" }}
             </span>
           </div>
 
           <!-- message -->
           {% if app.message %}
-          <div class="mt-3 px-3 py-2.5 bg-gray-50 border-l-[3px] border-violet-200 rounded-r-lg text-xs text-gray-600 italic leading-relaxed">
+          <div class="mt-3 px-3 py-2.5 bg-brand-50 border-l-[3px] border-brand-200 rounded-r-lg text-xs text-gray-600 italic leading-relaxed">
             "{{ app.message }}"
           </div>
           {% endif %}
 
           <!-- poster note (shown once decided) -->
-          <div data-poster-note class="mt-3 px-3 py-2.5 bg-violet-50 border-l-[3px] border-violet-300 rounded-r-lg text-xs text-violet-700 leading-relaxed {% if not app.poster_note %}hidden{% endif %}">
+          <div data-poster-note class="mt-3 px-3 py-2.5 bg-brand-50 border-l-[3px] border-brand-300 rounded-r-lg text-xs text-brand-700 leading-relaxed {% if not app.poster_note %}hidden{% endif %}">
             <span data-poster-note-text>{{ app.poster_note }}</span>
           </div>
 
@@ -150,11 +138,17 @@
           <div data-actions class="flex flex-col sm:flex-row gap-2 mt-3 {% if app.status != 'pending' %}hidden{% endif %}">
             <button onclick="nmAccept({{ app.pk }}, this)"
               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer font-jakarta">
-              {% icon 'check' size=13 %} Accept
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+              Accept
             </button>
             <button onclick="nmReject({{ app.pk }}, this)"
               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 transition-colors cursor-pointer font-jakarta">
-              {% icon 'close' size=13 %} Reject
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+              Reject
             </button>
           </div>
 
@@ -162,13 +156,19 @@
           <div data-agreement-actions class="flex flex-col sm:flex-row gap-2 mt-3 {% if app.status != 'accepted' %}hidden{% endif %}">
             {% if app.agreement %}
             <a href="{% url 'agreements_app:view' app.agreement.pk %}"
-               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-violet-700 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors">
-              📄 View Agreement
+               class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-brand-700 bg-brand-50 border border-brand-200 hover:bg-brand-100 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-1.519-2.121L10.5 18.5m0 0-2.121-2.121M10.5 18.5V15m9-9v13.5A2.25 2.25 0 0 1 17.25 21H6.75A2.25 2.25 0 0 1 4.5 18.75V5.25A2.25 2.25 0 0 1 6.75 3h6.879a1.5 1.5 0 0 1 1.06.44l4.243 4.242a1.5 1.5 0 0 1 .44 1.061Z" />
+              </svg>
+              View Agreement
             </a>
             {% else %}
             <button onclick="nmGenerateAgreement({{ app.pk }}, this)"
-              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-violet-700 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-colors cursor-pointer font-jakarta">
-              ✨ Generate Agreement
+              class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-brand-700 bg-brand-50 border border-brand-200 hover:bg-brand-100 transition-colors cursor-pointer font-jakarta">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
+              </svg>
+              Generate Agreement
             </button>
             {% endif %}
           </div>
@@ -191,7 +191,7 @@
 <style>
   .nm-toast-success{background:#059669;color:#fff}
   .nm-toast-error  {background:#E11D48;color:#fff}
-  .nm-toast-info   {background:#7C3AED;color:#fff}
+  .nm-toast-info   {background:var(--brand-600);color:#fff}
   @keyframes nmToastIn {from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
   @keyframes nmToastOut{from{opacity:1}to{opacity:0;transform:translateX(20px)}}
   .nm-toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;font-family:"Plus Jakarta Sans",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:240px;max-width:340px;width:auto;animation:nmToastIn .3s ease}

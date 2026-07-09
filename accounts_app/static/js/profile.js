@@ -436,7 +436,7 @@ if (reviewForm) {
         card.innerHTML = `
           <div class="flex justify-between items-center gap-3">
             <div>
-              <p class="font-semibold text-slate-900">${_escHtml(reviewerName)}</p>
+              <p class="font-semibold text-brand-900">${_escHtml(reviewerName)}</p>
               <p class="text-slate-500 text-xs">${_escHtml(roleLabel)}</p>
             </div>
             <span class="rounded-full px-3 py-1 text-[11px] font-semibold bg-yellow-50 text-yellow-700">Pending approval</span>
