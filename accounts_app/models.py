@@ -249,6 +249,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    # Set by an admin when banning (is_active=False) so other staff can see
+    # why -- cleared again on unban so a future ban starts with a clean note.
+    ban_reason = models.TextField(blank=True, null=True)
+
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

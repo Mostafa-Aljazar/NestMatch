@@ -217,12 +217,20 @@ def public_profile_view(request, user_id):
     listing_count = active_listings.count()
     shown_listings = active_listings[:4]
 
+    # Contact Us submissions are private support inquiries -- only staff
+    # reviewing a user's profile from the admin dashboard should see them,
+    # never a regular seeker/poster looking at someone else's profile.
+    contact_messages = None
+    if request.user.is_staff:
+        contact_messages = profile_user.contact_messages.order_by('-created_at')
+
     context = {
         'profile_user': profile_user,
         'lifestyle_profile': lifestyle_profile,
         'listing_count': listing_count,
         'active_listings': shown_listings,
         'more_listings_count': max(0, listing_count - len(shown_listings)),
+        'contact_messages': contact_messages,
     }
     return render(request, 'public_profile.html', context)
 

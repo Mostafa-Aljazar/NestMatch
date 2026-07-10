@@ -90,8 +90,39 @@ class ContactMessage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_read    = models.BooleanField(default=False)
 
+    # Set when the sender was logged in at the time of submission, so the
+    # admin messages list can show their real name/profile picture instead
+    # of just the raw text they typed into the form. Nullable because
+    # anonymous visitors can still use the Contact Us form.
+    user = models.ForeignKey(
+        'accounts_app.User', null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='contact_messages',
+    )
+
     def __str__(self):
         return f"{self.name} — {self.email}"
 
     class Meta:
         ordering = ['-created_at']
+
+
+class ContactReply(models.Model):
+    """
+    One admin reply email sent for a ContactMessage. A message can have
+    several of these over time (e.g. a follow-up after the visitor
+    responds again), so this is a separate one-to-many model rather than
+    a single reply_text field on ContactMessage.
+    """
+    message    = models.ForeignKey(ContactMessage, on_delete=models.CASCADE, related_name='replies')
+    reply_text = models.TextField()
+    replied_at = models.DateTimeField(auto_now_add=True)
+    replied_by = models.ForeignKey(
+        'accounts_app.User', null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='contact_replies',
+    )
+
+    def __str__(self):
+        return f"Reply to {self.message_id} at {self.replied_at:%Y-%m-%d %H:%M}"
+
+    class Meta:
+        ordering = ['replied_at']

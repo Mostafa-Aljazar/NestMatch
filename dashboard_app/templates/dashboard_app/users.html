@@ -136,7 +136,9 @@
 
       <form id="banForm" method="post" action="">
         {% csrf_token %}
-        <div style="display:flex;gap:10px;margin-top:20px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-top:16px;margin-bottom:6px">Reason (optional)</label>
+        <textarea name="reason" placeholder="Example: Repeated harassment reports, fake listings, etc." style="width:100%;padding:10px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;font-family:inherit;resize:none;min-height:80px;color:#111827"></textarea>
+        <div style="display:flex;gap:10px;margin-top:16px">
           <button type="button" onclick="closeBanModal()" style="flex:1;padding:10px;font-size:13px;font-weight:600;color:#374151;background:#F3F4F6;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Cancel</button>
           <button type="submit" style="flex:1;padding:10px;font-size:13px;font-weight:600;color:#fff;background:#E11D48;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Ban</button>
         </div>
@@ -172,6 +174,7 @@
 function openBanModal(userId, userName) {
   document.getElementById('banModalUserName').textContent = userName;
   document.getElementById('banForm').action = `/dashboard/ban/${userId}/`;
+  document.getElementById('banForm').reset();
   document.getElementById('banModal').style.display = 'flex';
 }
 

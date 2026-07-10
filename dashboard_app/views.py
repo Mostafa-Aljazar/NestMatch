@@ -6,13 +6,15 @@ from django.http import JsonResponse
 from django.db.models import Count, Avg
 from django.db.models.functions import TruncDate
 from django.utils import timezone
+from django.utils.html import escape
+from django.core.mail import EmailMultiAlternatives
 from datetime import timedelta
 import json
 
 from accounts_app.models import User, VerificationDocument, Testimonial
 from listings_app.models import Listing
 from applications_app.models import Application
-from core_app.models import SiteContent, ContactMessage
+from core_app.models import SiteContent, ContactMessage, ContactReply
 
 
 # ─────────────────────────────────────────────
@@ -188,11 +190,43 @@ def banned_users_list(request):
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
 def messages_list(request):
-    all_messages = ContactMessage.objects.all().order_by('-created_at')
+    from django.core.paginator import Paginator
+    from django.db.models import Q
+
+    all_messages = ContactMessage.objects.select_related('user').prefetch_related('replies__replied_by').order_by('-created_at')
+
+    # Counts are taken before the search filter so the summary cards always
+    # reflect the full inbox, not just the current search results.
+    total_count = all_messages.count()
+    unread_count = all_messages.filter(is_read=False).count()
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        all_messages = all_messages.filter(
+            Q(name__icontains=search_query) | Q(email__icontains=search_query)
+        )
+
+    status_filter = request.GET.get('status', 'all')
+    if status_filter == 'unread':
+        all_messages = all_messages.filter(is_read=False)
+    elif status_filter == 'read':
+        all_messages = all_messages.filter(is_read=True)
+    else:
+        status_filter = 'all'
+
+    paginator = Paginator(all_messages, 10)  # 10 messages per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     context = {
         'current_tab': 'messages',
-        'all_messages': all_messages,
+        'page_obj': page_obj,
+        'all_messages': page_obj.object_list,
+        'total_count': total_count,
+        'unread_count': unread_count,
+        'read_count': total_count - unread_count,
+        'search_query': search_query,
+        'status_filter': status_filter,
     }
 
     return render(request, 'dashboard_app/messages.html', context)
@@ -313,6 +347,7 @@ def ban_user(request, user_id):
     if request.method == 'POST':
         user = get_object_or_404(User, id=user_id)
         user.is_active = False
+        user.ban_reason = request.POST.get('reason', '').strip()
         user.save()
     return redirect('dashboard_app:index')
 
@@ -322,6 +357,7 @@ def unban_user(request, user_id):
     if request.method == 'POST':
         user = get_object_or_404(User, id=user_id)
         user.is_active = True
+        user.ban_reason = ''
         user.save()
     return redirect('dashboard_app:index')
 
@@ -428,6 +464,90 @@ def delete_message(request, message_id):
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'ok': True})
+
+    return redirect(f"{reverse('dashboard_app:index')}#messages")
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def reply_message(request, message_id):
+    """
+    Sends an admin's reply as a real email to the address the visitor left
+    on the Contact Us form, and marks the message read (replying to it
+    implies it's been handled).
+    """
+    if request.method != 'POST':
+        return redirect(f"{reverse('dashboard_app:index')}#messages")
+
+    msg = get_object_or_404(ContactMessage, id=message_id)
+    reply_text = request.POST.get('reply', '').strip()
+
+    if not reply_text:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'ok': False, 'error': 'Reply message cannot be empty.'})
+        return redirect(f"{reverse('dashboard_app:index')}#messages")
+
+    subject = 'Re: Your inquiry to NestMatch Support'
+    text_content = (
+        f'Dear {msg.name},\n\n'
+        f'Thank you for contacting NestMatch. Below is our response to your inquiry:\n\n'
+        f'{reply_text}\n\n'
+        f'For your reference, your original message was:\n"{msg.message}"\n\n'
+        f'If you have any further questions, simply reply to this email and our team will be happy to assist.\n\n'
+        f'Kind regards,\n'
+        f'The NestMatch Support Team'
+    )
+
+    safe_name = escape(msg.name)
+    safe_reply = escape(reply_text)
+    safe_original = escape(msg.message)
+    html_content = f'''
+    <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e5e9;">
+      <div style="background: #A85300; padding: 28px 32px;">
+        <h1 style="color: #ffffff; font-size: 19px; font-weight: 700; margin: 0; letter-spacing: .3px;">NestMatch</h1>
+        <p style="color: rgba(255,255,255,0.82); font-size: 12.5px; margin: 4px 0 0; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: .8px;">Customer Support</p>
+      </div>
+      <div style="padding: 36px 32px 28px; font-family: Arial, sans-serif;">
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 0 0 18px;">Dear {safe_name},</p>
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 0 0 18px;">Thank you for contacting NestMatch. Please find our response to your inquiry below.</p>
+
+        <div style="color: #1e293b; font-size: 14.5px; line-height: 1.7; white-space: pre-wrap; margin: 0 0 26px; padding: 18px 20px; background: #FFFAF2; border-radius: 8px; border: 1px solid #FDDCC7;">{safe_reply}</div>
+
+        <p style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; margin: 0 0 8px;">Your Original Message</p>
+        <div style="border-left: 3px solid #D1D5DB; padding: 4px 0 4px 16px; margin: 0 0 28px;">
+          <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin: 0; white-space: pre-wrap; font-style: italic;">&ldquo;{safe_original}&rdquo;</p>
+        </div>
+
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 0 0 4px;">Should you require further assistance, please do not hesitate to reply directly to this email.</p>
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 22px 0 0;">
+          Kind regards,<br>
+          <strong>The NestMatch Support Team</strong>
+        </p>
+      </div>
+      <div style="background: #f8fafc; border-top: 1px solid #e5e7eb; padding: 18px 32px; text-align: center; font-family: Arial, sans-serif;">
+        <p style="color: #94a3b8; font-size: 11.5px; margin: 0;">&copy; 2026 NestMatch. All rights reserved.</p>
+        <p style="color: #b0b7c1; font-size: 11px; margin: 4px 0 0;">This is a reply to a message you submitted via our Contact Us form.</p>
+      </div>
+    </div>
+    '''
+
+    email = EmailMultiAlternatives(subject, text_content, None, [msg.email])
+    email.attach_alternative(html_content, 'text/html')
+    email.send()
+
+    reply = ContactReply.objects.create(message=msg, reply_text=reply_text, replied_by=request.user)
+
+    msg.is_read = True
+    msg.save()
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({
+            'ok': True,
+            'reply': {
+                'text': reply.reply_text,
+                'replied_at': reply.replied_at.strftime('%b %d, %Y') + ' · ' + reply.replied_at.strftime('%H:%M'),
+                'replied_by': (reply.replied_by.full_name.strip() if reply.replied_by else '') or 'Admin',
+            },
+        })
 
     return redirect(f"{reverse('dashboard_app:index')}#messages")
 

@@ -203,23 +203,36 @@
                 <!-- Name -->
                 <div>
                   <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Full Name <span class="text-red-400">*</span></label>
-                  <input type="text" name="name" id="name" placeholder="Your full name" class="input-field"
-                    value="{{ form_data.name|default:'' }}"/>
-                  {% if errors.name %}
-                      <p class="text-xs text-red-500 mt-1">{{ errors.name }}</p>
-                    {% endif %}
+                  {% if request.user.is_authenticated %}
+                    <input type="text" name="name" id="name" class="input-field bg-gray-100 text-gray-500 cursor-not-allowed"
+                      value="{{ request.user.full_name }}" readonly title="Using your account name"/>
+                  {% else %}
+                    <input type="text" name="name" id="name" placeholder="Your full name" class="input-field"
+                      value="{{ form_data.name|default:'' }}"/>
+                    {% if errors.name %}
+                        <p class="text-xs text-red-500 mt-1">{{ errors.name }}</p>
+                      {% endif %}
+                  {% endif %}
                 </div>
 
                 <!-- Email -->
                 <div>
                   <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">Email Address <span class="text-red-400">*</span></label>
-                  <input type="email" name="email" id="email" placeholder="your@email.com" class="input-field"
-                    value="{{ form_data.email|default:'' }}"/>
+                  {% if request.user.is_authenticated %}
+                    <input type="email" name="email" id="email" class="input-field bg-gray-100 text-gray-500 cursor-not-allowed"
+                      value="{{ request.user.email }}" readonly title="Using your account email"/>
+                  {% else %}
+                    <input type="email" name="email" id="email" placeholder="your@email.com" class="input-field"
+                      value="{{ form_data.email|default:'' }}"/>
                     {% if errors.email %}
                       <p class="text-xs text-red-500 mt-1">{{ errors.email }}</p>
                     {% endif %}
+                  {% endif %}
                 </div>
               </div>
+              {% if request.user.is_authenticated %}
+                <p class="text-xs text-gray-400 -mt-3 mb-5">Signed in as {{ request.user.full_name }} ({{ request.user.email }})</p>
+              {% endif %}
 
               <!-- Message -->
               <div class="mb-7">

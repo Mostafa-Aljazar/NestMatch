@@ -39,6 +39,7 @@ urlpatterns = [
     # Contact messages
     path('messages/read/<int:message_id>/', views.mark_message_read, name='mark_message_read'),
     path('messages/delete/<int:message_id>/', views.delete_message, name='delete_message'),
+    path('messages/reply/<int:message_id>/', views.reply_message, name='reply_message'),
 
     # Site content update
     path('site-content/update/', views.update_site_content, name='update_site_content'),

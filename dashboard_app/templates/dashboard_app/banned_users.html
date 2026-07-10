@@ -6,39 +6,137 @@
 
 {% block page_title %}Banned Users{% endblock %}
 
+{% block extra_css %}
+<style>
+.ban-hero{display:flex;align-items:center;gap:16px;padding:20px 22px;border-radius:16px;background:linear-gradient(135deg,#FEF2F2,#FFF5F5);border:1px solid #FECACA;margin-bottom:20px}
+.ban-hero-icon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#EF4444,#F87171);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(239,68,68,.3)}
+.ban-count{font-size:26px;font-weight:800;color:#B91C1C;line-height:1}
+
+.ban-tbl{width:100%;border-collapse:separate;border-spacing:0}
+.ban-tbl thead th{font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.6px;padding:12px 16px;text-align:left;background:#F9FAFB;border-bottom:1px solid #E5E7EB}
+.ban-tbl thead th:first-child{border-top-left-radius:10px}
+.ban-tbl thead th:last-child{border-top-right-radius:10px}
+.ban-tbl tbody tr{transition:background .15s}
+.ban-tbl tbody tr:hover{background:#FAFBFC}
+.ban-tbl tbody td{font-size:13px;color:#374151;padding:14px 16px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
+.ban-tbl tbody tr:last-child td{border-bottom:none}
+
+.ban-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #FFE4E6}
+.ban-avatar-fallback{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#EF4444,#FCA5A5);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 2px 6px rgba(239,68,68,.25)}
+
+.pill-reason{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:11.5px;font-weight:600;color:#B91C1C;background:#FEF2F2;border:1px solid #FECACA;border-radius:20px;cursor:pointer;font-family:inherit;transition:all .15s}
+.pill-reason:hover{background:#FEE2E2;border-color:#FCA5A5}
+.pill-none{font-size:12px;color:#C4C7CE;font-style:italic}
+
+.btn-view-profile{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;font-size:11.5px;font-weight:700;color:var(--brand-600);background:var(--brand-50);border:1px solid #FBC9A3;border-radius:8px;text-decoration:none;white-space:nowrap;transition:all .15s}
+.btn-view-profile:hover{background:var(--brand-100);transform:translateY(-1px)}
+.btn-unban-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;font-size:11.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,#10B981,#059669);border:none;border-radius:8px;cursor:pointer;font-family:inherit;white-space:nowrap;box-shadow:0 2px 6px rgba(16,185,129,.3);transition:transform .15s}
+.btn-unban-pill:hover{transform:translateY(-1px)}
+
+.ban-empty{text-align:center;padding:56px 20px;color:#9CA3AF}
+
+/* ── Modal ── */
+.ban-modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);z-index:2000;align-items:center;justify-content:center;padding:16px}
+.ban-modal-overlay.open{display:flex}
+.ban-modal{background:#fff;border-radius:18px;box-shadow:0 25px 60px rgba(0,0,0,.25);max-width:440px;width:100%;overflow:hidden;animation:banModalIn .22s ease}
+@keyframes banModalIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.ban-modal-header{display:flex;align-items:center;gap:14px;padding:24px 24px 0}
+.ban-modal-icon{width:44px;height:44px;border-radius:12px;background:#FEE2E2;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ban-modal-body{padding:16px 24px 24px}
+.ban-modal-reason{margin-top:14px;padding:14px 16px;background:#F9FAFB;border:1px solid #F0F1F3;border-radius:12px;font-size:13.5px;color:#374151;line-height:1.6;white-space:pre-wrap;max-height:260px;overflow-y:auto}
+.ban-modal-footer{padding:0 24px 24px}
+.btn-modal-close{width:100%;padding:12px;font-size:13.5px;font-weight:700;color:#374151;background:#F3F4F6;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-modal-close:hover{background:#E5E7EB}
+
+/* ── Pagination ── */
+.ban-page-link{padding:7px 12px;font-size:11.5px;font-weight:700;color:var(--brand-600);background:var(--brand-50);border:1px solid #FBC9A3;border-radius:8px;text-decoration:none}
+.ban-page-disabled{padding:7px 12px;font-size:11.5px;font-weight:700;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:8px;cursor:not-allowed}
+.ban-page-current{padding:7px 12px;font-size:11.5px;font-weight:700;color:#111827;background:#E5E7EB;border-radius:8px}
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="margin-bottom:20px">
-  <h2 style="font-size:20px;font-weight:800;color:#111827">Banned Users</h2>
-  <p style="font-size:13px;color:#6B7280;margin-top:2px">{{ page_obj.paginator.count }} user{{ page_obj.paginator.count|pluralize }} currently banned from the platform</p>
+
+<!-- ── Hero summary ── -->
+<div class="ban-hero">
+  <div class="ban-hero-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+  </div>
+  <div>
+    <div class="ban-count">{{ page_obj.paginator.count }}</div>
+    <div style="font-size:13px;color:#9F1239;font-weight:600;margin-top:2px">user{{ page_obj.paginator.count|pluralize }} currently banned from the platform</div>
+  </div>
 </div>
-<div class="adm-card">
+
+<div class="adm-card" style="padding:0;overflow:hidden">
   <div style="overflow-x:auto">
-    <table class="adm-tbl">
-      <thead><tr><th>User</th><th>Email</th><th>Country</th><th>Listings</th><th>Actions</th></tr></thead>
+    <table class="ban-tbl">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th style="text-align:center">Listings</th>
+          <th>Reason</th>
+          <th>Banned At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
       <tbody>
         {% for u in banned_list %}
         <tr>
           <td>
-            <div style="display:flex;align-items:center;gap:8px">
+            <div style="display:flex;align-items:center;gap:10px">
               {% if u.profile_pic %}
-                <img src="{{ u.profile_pic.url }}" alt="{{ u.full_name }}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:center;flex-shrink:0" />
+                <img src="{{ u.profile_pic.url }}" alt="{{ u.full_name }}" class="ban-avatar" />
               {% else %}
-                <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#EF4444,#F87171);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff">
-                  {{ u.first_name|first|upper }}{% if u.last_name %}{{ u.last_name|first|upper }}{% endif %}
+                <div class="ban-avatar-fallback">
+                  {% if u.first_name %}{{ u.first_name|first|upper }}{% if u.last_name %}{{ u.last_name|first|upper }}{% endif %}{% else %}{{ u.email|first|upper }}{% endif %}
                 </div>
               {% endif %}
-              <span style="font-weight:600">{{ u.full_name }}</span>
+              <span style="font-weight:700;color:#111827">{% if u.first_name %}{{ u.full_name }}{% else %}{{ u.email }}{% endif %}</span>
             </div>
           </td>
           <td style="color:#6B7280">{{ u.email }}</td>
-          <td style="color:#6B7280">{{ u.get_country_display }}</td>
-          <td style="text-align:center">{{ u.listings.count }}</td>
+          <td style="text-align:center">
+            <span class="badge badge-gray">{{ u.listings.count }}</span>
+          </td>
           <td>
-            <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="display:inline">{% csrf_token %}<button type="submit" class="btn-unban">Unban</button></form>
+            {% if u.ban_reason %}
+              <button type="button" class="pill-reason" onclick="openReasonModal('{% if u.first_name %}{{ u.full_name|escapejs }}{% else %}{{ u.email|escapejs }}{% endif %}', '{{ u.ban_reason|escapejs }}')">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                View Reason
+              </button>
+            {% else %}
+              <span class="pill-none">No reason given</span>
+            {% endif %}
+          </td>
+          <td style="color:#6B7280;white-space:nowrap;font-size:12.5px">{{ u.updated_at|date:"M d, Y · H:i" }}</td>
+          <td>
+            <div style="display:flex;gap:8px;align-items:center">
+              <a href="{% url 'accounts_app:public_profile' u.id %}" target="_blank" class="btn-view-profile">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Profile
+              </a>
+              <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="margin:0">
+                {% csrf_token %}
+                <button type="submit" class="btn-unban-pill">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                  Unban
+                </button>
+              </form>
+            </div>
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" style="text-align:center;color:#9CA3AF;padding:20px">No banned users.</td></tr>
+        <tr>
+          <td colspan="6">
+            <div class="ban-empty">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 14px"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+              <p style="font-weight:700;color:#6B7280;font-size:14px">No banned users</p>
+              <p style="font-size:12.5px;margin-top:4px;color:#9CA3AF">Everyone currently has access to the platform.</p>
+            </div>
+          </td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
@@ -46,31 +144,68 @@
 
   <!-- PAGINATION -->
   {% if page_obj.has_other_pages %}
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;flex-wrap:wrap;gap:10px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;flex-wrap:wrap;gap:10px;border-top:1px solid #F3F4F6">
     <div style="font-size:12px;color:#6B7280">
       Showing <strong>{{ page_obj.start_index }}</strong> to <strong>{{ page_obj.end_index }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> banned users
     </div>
 
     <div style="display:flex;align-items:center;gap:6px">
       {% if page_obj.has_previous %}
-        <a href="?page=1" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">« First</a>
-        <a href="?page={{ page_obj.previous_page_number }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">‹ Previous</a>
+        <a href="?page=1" class="ban-page-link">« First</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="ban-page-link">‹ Previous</a>
       {% else %}
-        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">« First</span>
-        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">‹ Previous</span>
+        <span class="ban-page-disabled">« First</span>
+        <span class="ban-page-disabled">‹ Previous</span>
       {% endif %}
 
-      <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#111827;background:#E5E7EB;border-radius:4px">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      <span class="ban-page-current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
 
       {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">Next ›</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">Last »</a>
+        <a href="?page={{ page_obj.next_page_number }}" class="ban-page-link">Next ›</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="ban-page-link">Last »</a>
       {% else %}
-        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">Next ›</span>
-        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">Last »</span>
+        <span class="ban-page-disabled">Next ›</span>
+        <span class="ban-page-disabled">Last »</span>
       {% endif %}
     </div>
   </div>
   {% endif %}
 </div>
+
+<!-- BAN REASON MODAL -->
+<div id="reasonModal" class="ban-modal-overlay" onclick="if(event.target.id==='reasonModal') closeReasonModal()">
+  <div class="ban-modal" onclick="event.stopPropagation()">
+    <div class="ban-modal-header">
+      <div class="ban-modal-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+      </div>
+      <div>
+        <h3 style="font-size:16px;font-weight:800;color:#111827">Ban Reason</h3>
+        <p id="reasonModalUser" style="font-size:12.5px;color:#9CA3AF;margin-top:2px;font-weight:600"></p>
+      </div>
+    </div>
+    <div class="ban-modal-body">
+      <div id="reasonModalText" class="ban-modal-reason"></div>
+    </div>
+    <div class="ban-modal-footer">
+      <button type="button" class="btn-modal-close" onclick="closeReasonModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openReasonModal(userName, reason) {
+  document.getElementById('reasonModalUser').textContent = userName;
+  document.getElementById('reasonModalText').textContent = reason;
+  document.getElementById('reasonModal').classList.add('open');
+}
+
+function closeReasonModal() {
+  document.getElementById('reasonModal').classList.remove('open');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeReasonModal();
+});
+</script>
 {% endblock %}
