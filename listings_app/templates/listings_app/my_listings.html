@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Listings — NestMatch</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
   {% include "core_app/partials/tailwind_config.html" %}
+  <link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
 </head>
 <body class="bg-brand-50 text-gray-900 overflow-x-hidden">
 
@@ -96,7 +96,7 @@
               <div class="text-sm font-bold text-gray-900 leading-snug truncate">{{ listing.title }}</div>
               <div class="text-xs text-gray-500 mt-1">{{ listing.district }}, {{ listing.city }} &middot; ${{ listing.price }}/mo</div>
             </div>
-            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold shrink-0 self-start
+            <spanscm-history-item:d%3A%5C15-12-2022%5CAxsos%5CGroupProject%5CNestMatchProject%5CNestMatch?%7B%22repositoryId%22%3A%22scm0%22%2C%22historyItemId%22%3A%22d8e2823f3dca52cbd906dea5c46d6a93f8631055%22%2C%22historyItemParentId%22%3A%22c5a06479ab4ed24be305c65e20769e5d9adc8e6e%22%2C%22historyItemDisplayId%22%3A%22d8e2823%22%7D class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold shrink-0 self-start
               {% if listing.status == 'active' %}bg-emerald-100 text-emerald-700
               {% elif listing.status == 'draft' %}bg-gray-100 text-gray-500
               {% elif listing.status == 'pending' %}bg-amber-100 text-amber-700
