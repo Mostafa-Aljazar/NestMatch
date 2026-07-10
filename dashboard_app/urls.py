@@ -52,4 +52,5 @@ urlpatterns = [
     # Reviews
     path('reviews/<int:review_id>/approve/', views.approve_review, name='approve_review'),
     path('reviews/<int:review_id>/reject/', views.reject_review, name='reject_review'),
+    path('reviews/<int:review_id>/email/', views.email_review_author, name='email_review_author'),
 ]

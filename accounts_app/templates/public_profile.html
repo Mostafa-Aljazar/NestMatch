@@ -330,6 +330,48 @@
   </div>
   {% endif %}
 
+  <!-- ─── Submitted reviews (admin-only) ─── -->
+  {% if submitted_reviews is not None %}
+  <div class="bg-white rounded-2xl p-7 shadow-sm border border-brand-100 mb-4 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-5" style="animation-delay:.14s">
+    <div class="flex items-center justify-between mb-[18px] sm:mb-3.5">
+      <h3 class="text-[17px] font-extrabold text-gray-900 tracking-tight sm:text-[15px] flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-500"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Submitted Reviews
+      </h3>
+      <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Staff only</span>
+    </div>
+
+    {% if submitted_reviews %}
+    <div class="flex flex-col gap-2.5">
+      {% for review in submitted_reviews %}
+      <a href="{% url 'dashboard_app:reviews' %}" class="flex items-start gap-3 rounded-xl border border-brand-100 p-3.5 hover:border-brand-200 hover:bg-brand-50 transition-all">
+        <div class="w-2 h-2 rounded-full mt-1.5 shrink-0 {% if review.approved %}bg-emerald-400{% else %}bg-brand-500{% endif %}"></div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <div class="flex items-center gap-1">
+              {% for i in "12345" %}
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="{% if forloop.counter <= review.rating %}#FBBF24{% else %}none{% endif %}" stroke="{% if forloop.counter <= review.rating %}none{% else %}#D1D5DB{% endif %}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              {% endfor %}
+              <span class="text-xs font-bold text-gray-400 ml-1">{{ review.created_at|date:"M d, Y" }}</span>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full {% if review.approved %}bg-emerald-100 text-emerald-700{% else %}bg-brand-100 text-brand-600{% endif %}">
+              {% if review.approved %}Approved{% else %}Pending{% endif %}
+            </span>
+          </div>
+          <p class="text-sm text-gray-700 mt-1.5 line-clamp-2">{{ review.quote }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-6">
+      <div class="text-brand-500 mb-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <div class="text-sm font-bold text-brand-500">No reviews submitted by this user</div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
   <!-- ─── Contact Us messages (admin-only) ─── -->
   {% if contact_messages is not None %}
   <div class="bg-white rounded-2xl p-7 shadow-sm border border-brand-100 mb-4 animate-[fadeUp_.4s_ease_both] sm:rounded-xl sm:p-5" style="animation-delay:.16s">

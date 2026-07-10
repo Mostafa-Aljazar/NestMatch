@@ -687,7 +687,6 @@ class Testimonial(models.Model):
     )
     reviewer_name = models.CharField(max_length=150)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-    location = models.CharField(max_length=120, blank=True)
     quote = models.TextField()
     rating = models.PositiveSmallIntegerField(default=5)
     approved = models.BooleanField(default=False)

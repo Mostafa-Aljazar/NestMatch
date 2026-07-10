@@ -25,7 +25,12 @@ function activateTab(tabName) {
   });
 
   const activeBtn = document.querySelector(`.tab-nav-btn[data-tab="${target}"]`);
-  if (activeBtn) activeBtn.classList.add('active');
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    // On mobile the nav is a horizontally scrolling pill bar, so keep the
+    // active pill in view instead of leaving it scrolled off-screen.
+    activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
   if (tabPanels[target]) tabPanels[target].classList.remove('hidden');
 }
 
@@ -387,9 +392,44 @@ async function submitAjaxForm(form) {
 
 
 // ===========================================================================
-// 9. REVIEW FORM — AJAX + live card inject
+// 9. REVIEW FORM — star picker + AJAX submit (server re-render on success)
 // ===========================================================================
+document.querySelectorAll('[data-relative-time]').forEach((el) => {
+  const then = new Date(el.dataset.relativeTime);
+  const days = Math.floor((Date.now() - then.getTime()) / 86400000);
+  if (days <= 0) el.textContent = 'Today';
+  else if (days === 1) el.textContent = 'Yesterday';
+  else if (days < 30) el.textContent = `${days} days ago`;
+  // Older than a month: keep the server-rendered absolute date as-is.
+});
+
 const reviewForm = document.getElementById('review-form');
+const ratingInput = document.getElementById('rating');
+const ratingStars = document.querySelectorAll('#rating-picker .rating-star');
+const ratingLabel = document.getElementById('rating-picker-label');
+const RATING_LABELS = { 1: 'Poor', 2: 'Fair', 3: 'Good', 4: 'Very good', 5: 'Excellent!' };
+
+function paintStars(value) {
+  ratingStars.forEach((btn) => {
+    const filled = Number(btn.dataset.star) <= value;
+    btn.classList.toggle('text-amber-400', filled);
+    btn.classList.toggle('text-slate-300', !filled);
+  });
+  if (ratingLabel) ratingLabel.textContent = RATING_LABELS[value] || 'Tap a star to rate';
+}
+
+ratingStars.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    ratingInput.value = btn.dataset.star;
+    paintStars(Number(btn.dataset.star));
+  });
+  btn.addEventListener('mouseenter', () => paintStars(Number(btn.dataset.star)));
+});
+
+const ratingPicker = document.getElementById('rating-picker');
+if (ratingPicker) {
+  ratingPicker.addEventListener('mouseleave', () => paintStars(Number(ratingInput.value) || 0));
+}
 
 if (reviewForm) {
   reviewForm.addEventListener('submit', async (event) => {
@@ -423,43 +463,11 @@ if (reviewForm) {
       }
 
       if (data.success) {
-        const reviewerName = formData.get('reviewer_name') || '';
-        const roleVal      = formData.get('role') || '';
-        const locationVal  = formData.get('location') || '';
-        const reviewText   = formData.get('review_text') || '';
-        const today        = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        const roleLabel    = roleVal === 'seeker' ? 'Room Seeker' : roleVal === 'poster' ? 'Room Poster' : roleVal;
-
-        const card = document.createElement('div');
-        card.className = 'bg-slate-50 p-4 border border-slate-200 rounded-xl';
-        card.style.animation = 'tabFadeIn 0.25s ease';
-        card.innerHTML = `
-          <div class="flex justify-between items-center gap-3">
-            <div>
-              <p class="font-semibold text-brand-900">${_escHtml(reviewerName)}</p>
-              <p class="text-slate-500 text-xs">${_escHtml(roleLabel)}</p>
-            </div>
-            <span class="rounded-full px-3 py-1 text-[11px] font-semibold bg-yellow-50 text-yellow-700">Pending approval</span>
-          </div>
-          <p class="mt-3 text-slate-600 text-sm leading-6">${_escHtml(reviewText.substring(0, 140))}${reviewText.length > 140 ? '…' : ''}</p>
-          <div class="flex flex-wrap items-center gap-2 mt-3 text-slate-500 text-xs">
-            ${locationVal ? `<span>${_escHtml(locationVal)}</span>` : ''}
-            <span>· ${today}</span>
-          </div>`;
-
-        const reviewsPanel = document.getElementById('tab-reviews');
-        let listContainer  = reviewsPanel.querySelector('.space-y-4');
-        if (!listContainer) {
-          const emptyMsg = reviewsPanel.querySelector('.space-y-6 p.text-slate-500');
-          if (emptyMsg) emptyMsg.remove();
-          listContainer = document.createElement('div');
-          listContainer.className = 'space-y-4';
-          const reviewsBox = reviewsPanel.querySelector('.space-y-6 .rounded-2xl');
-          if (reviewsBox) reviewsBox.appendChild(listContainer);
-        }
-        listContainer.prepend(card);
-        reviewForm.reset();
-        _showToast('Review submitted! It will appear publicly once approved.', false);
+        // Reload from the server so the new review card (and its stars)
+        // render from real saved data instead of a hand-built HTML guess.
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', 'reviews');
+        window.location.href = url.toString();
       } else {
         Object.entries(data.errors || {}).forEach(([field, message]) => {
           const errorEl = reviewForm.querySelector(`.field-error[data-field="${field}"]`);
@@ -547,12 +555,6 @@ function _showToast(message, isError = false) {
     <button type="button" class="ml-2 text-sm font-semibold ${iconColor}" onclick="this.closest('#_global-toast').remove()">✕</button>`;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 5000);
-}
-
-function _escHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 

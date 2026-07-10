@@ -294,13 +294,40 @@ def verification_list(request):
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
 def reviews_list(request):
-    pending_reviews = Testimonial.objects.filter(approved=False).select_related('user')
-    approved_reviews = Testimonial.objects.filter(approved=True).select_related('user')
+    from django.core.paginator import Paginator
+
+    all_reviews = Testimonial.objects.select_related('user').order_by('-created_at')
+
+    # Counts are taken before the search filter so the summary cards always
+    # reflect every review, not just the current search results.
+    total_count = all_reviews.count()
+    pending_count = all_reviews.filter(approved=False).count()
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        all_reviews = all_reviews.filter(reviewer_name__icontains=search_query)
+
+    status_filter = request.GET.get('status', 'all')
+    if status_filter == 'pending':
+        all_reviews = all_reviews.filter(approved=False)
+    elif status_filter == 'approved':
+        all_reviews = all_reviews.filter(approved=True)
+    else:
+        status_filter = 'all'
+
+    paginator = Paginator(all_reviews, 10)  # 10 reviews per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     context = {
         'current_tab': 'reviews',
-        'pending_reviews': pending_reviews,
-        'approved_reviews': approved_reviews,
+        'page_obj': page_obj,
+        'all_reviews': page_obj.object_list,
+        'total_count': total_count,
+        'pending_count': pending_count,
+        'approved_count': total_count - pending_count,
+        'search_query': search_query,
+        'status_filter': status_filter,
     }
 
     return render(request, 'dashboard_app/reviews.html', context)
@@ -621,14 +648,78 @@ def approve_review(request, review_id):
         review.approved = True
         review.save()
 
-    return redirect(f"{reverse('dashboard_app:index')}#reviews")
+    return redirect('dashboard_app:reviews')
 
 
 @user_passes_test(is_admin, login_url='/auth/login/')
 def reject_review(request, review_id):
     if request.method == 'POST':
         get_object_or_404(Testimonial, id=review_id).delete()
-    return redirect(f"{reverse('dashboard_app:index')}#reviews")
+    return redirect('dashboard_app:reviews')
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def email_review_author(request, review_id):
+    """
+    Sends a one-off email to the account that submitted a review — e.g. to
+    say thanks for a glowing 5-star review, or to ask what went wrong on a
+    low one. Not a threaded conversation like Contact Messages, so nothing
+    is persisted; it's just a courtesy email sent straight to the user.
+    """
+    review = get_object_or_404(Testimonial, id=review_id)
+
+    if request.method != 'POST':
+        return redirect('dashboard_app:reviews')
+
+    subject = request.POST.get('subject', '').strip()
+    body = request.POST.get('body', '').strip()
+
+    if not subject or not body:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'ok': False, 'error': 'Subject and message are required.'})
+        return redirect('dashboard_app:reviews')
+
+    safe_name = escape(review.user.full_name)
+    safe_body = escape(body)
+    safe_quote = escape(review.quote)
+    text_content = (
+        f'Dear {review.user.full_name},\n\n'
+        f'{body}\n\n'
+        f'For reference, your review was:\n"{review.quote}"\n\n'
+        f'Kind regards,\n'
+        f'The NestMatch Team'
+    )
+    html_content = f'''
+    <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e5e9;">
+      <div style="background: #A85300; padding: 28px 32px;">
+        <h1 style="color: #ffffff; font-size: 19px; font-weight: 700; margin: 0; letter-spacing: .3px;">NestMatch</h1>
+        <p style="color: rgba(255,255,255,0.82); font-size: 12.5px; margin: 4px 0 0; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: .8px;">About your review</p>
+      </div>
+      <div style="padding: 36px 32px 28px; font-family: Arial, sans-serif;">
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 0 0 18px;">Dear {safe_name},</p>
+        <div style="color: #1e293b; font-size: 14.5px; line-height: 1.7; white-space: pre-wrap; margin: 0 0 26px; padding: 18px 20px; background: #FFFAF2; border-radius: 8px; border: 1px solid #FDDCC7;">{safe_body}</div>
+        <p style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; margin: 0 0 8px;">Your Review</p>
+        <div style="border-left: 3px solid #D1D5DB; padding: 4px 0 4px 16px; margin: 0 0 28px;">
+          <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin: 0; white-space: pre-wrap; font-style: italic;">&ldquo;{safe_quote}&rdquo;</p>
+        </div>
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 22px 0 0;">
+          Kind regards,<br>
+          <strong>The NestMatch Team</strong>
+        </p>
+      </div>
+      <div style="background: #f8fafc; border-top: 1px solid #e5e7eb; padding: 18px 32px; text-align: center; font-family: Arial, sans-serif;">
+        <p style="color: #94a3b8; font-size: 11.5px; margin: 0;">&copy; 2026 NestMatch. All rights reserved.</p>
+      </div>
+    </div>
+    '''
+
+    email = EmailMultiAlternatives(subject, text_content, None, [review.user.email])
+    email.attach_alternative(html_content, 'text/html')
+    email.send()
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'ok': True})
+    return redirect('dashboard_app:reviews')
 
 # ── View user listings (admin only) ──────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')

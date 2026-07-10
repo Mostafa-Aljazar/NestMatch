@@ -7,7 +7,7 @@ from .models import ContactMessage
 class TestimonialAdmin(admin.ModelAdmin):
     list_display = ('reviewer_name', 'role', 'rating', 'approved', 'created_at')
     list_filter = ('approved', 'role', 'rating')
-    search_fields = ('reviewer_name', 'quote', 'location')
+    search_fields = ('reviewer_name', 'quote')
     ordering = ('-created_at',)
 
 @admin.register(ContactMessage)

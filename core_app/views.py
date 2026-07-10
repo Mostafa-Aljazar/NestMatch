@@ -44,6 +44,7 @@ def index(request):
     reviews = (
         Testimonial.objects
         .filter(approved=True)
+        .select_related('user')
         .order_by('-created_at')[:6]
     )
 
