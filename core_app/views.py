@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model
 from .models import SiteContent
-from listings_app.models import Listing
+from listings_app.models import Listing ,Favorite
 from accounts_app.models import Testimonial
 from django.contrib import messages
 from .models import ContactMessage
@@ -26,10 +26,14 @@ def index(request):
         profile = getattr(request.user, 'lifestyle_profile', None)
         if profile is not None and latest_listings:
             from compatibility_app.scoring import get_or_compute_scores_bulk
-            scores = get_or_compute_scores_bulk(request.user, profile, latest_listings)
+            others = [l for l in latest_listings if l.poster_id != request.user.id]
+            scores = get_or_compute_scores_bulk(request.user, profile, others) if others else {}
             for listing in latest_listings:
-                score_row = scores.get(listing.pk)
-                listing.compat_score = score_row.overall_score if score_row else None
+                if listing.poster_id == request.user.id:
+                    listing.compat_score = None
+                else:
+                    score_row = scores.get(listing.pk)
+                    listing.compat_score = score_row.overall_score if score_row else None
         else:
             for listing in latest_listings:
                 listing.compat_score = None
@@ -42,6 +46,13 @@ def index(request):
         .filter(approved=True)
         .order_by('-created_at')[:6]
     )
+
+    favorite_ids = set()
+    if request.user.is_authenticated and latest_listings:
+        favorite_ids = set(
+            Favorite.objects.filter(user=request.user, listing__in=latest_listings)
+            .values_list('listing_id', flat=True)
+        )
 
     active_listings_count = Listing.objects.filter(status='active').count()
     registered_users_count = User.objects.count()
@@ -67,6 +78,7 @@ def index(request):
         'latest_listings': latest_listings,
         'reviews':         reviews,
         'stats':           stats,
+        'favorite_ids':    favorite_ids, 
     }
     return render(request, 'core_app/landing.html', context)
 

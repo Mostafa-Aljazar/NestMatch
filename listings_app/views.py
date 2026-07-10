@@ -81,11 +81,15 @@ def listings_page(request):
         from compatibility_app.scoring import get_or_compute_scores_bulk
 
         all_listings = list(qs)
-        scores = get_or_compute_scores_bulk(request.user, profile, all_listings)
+        others = [l for l in all_listings if l.poster_id != request.user.id]
+        scores = get_or_compute_scores_bulk(request.user, profile, others) if others else {}
         for listing in all_listings:
-            score_row = scores.get(listing.pk)
-            listing.compat_score = score_row.overall_score if score_row else None
-
+            if listing.poster_id == request.user.id:
+                listing.compat_score = None
+            else:
+                score_row = scores.get(listing.pk)
+                listing.compat_score = score_row.overall_score if score_row else None
+                
         compat_min = request.GET.get('compat_min')
         if compat_min:
             try:
