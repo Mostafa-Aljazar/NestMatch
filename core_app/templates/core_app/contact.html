@@ -83,7 +83,7 @@
                 </div>
                 <div>
                 <div class="text-xs font-bold text-brand-400 uppercase tracking-wider mb-0.5">WhatsApp</div>
-                <a href="https://wa.me/201000000000" target="_blank" class="text-sm font-semibold text-gray-700 hover:text-green-600 transition">+20 100 000 0000</a>
+                <a href="https://wa.me/201000000000" target="_blank" class="text-sm font-semibold text-gray-700 hover:text-green-600 transition">+970 59 000 0000</a>
                 </div>
             </div>
 
@@ -134,17 +134,67 @@
             <h2 class="text-xl font-extrabold text-gray-900 mb-1">Send us a message</h2>
             <p class="text-sm text-gray-500 mb-8">Fill out the form below and we'll get back to you shortly.</p>
 
-            <!-- Django messages -->
-            {% if messages %}
-              {% for message in messages %}
-                <div class="mb-6 px-5 py-4 rounded-xl text-sm font-semibold flex items-center gap-3
-                  {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-700
-                  {% else %}bg-red-50 border border-red-200 text-red-700{% endif %}">
-                  {% if message.tags == 'success' %}{% else %}{% endif %}
-                  {{ message }}
-                </div>
-              {% endfor %}
-            {% endif %}
+         <!-- Django messages - Toast notification (top-right) -->
+{% if messages %}
+  <div id="toast-container" class="fixed top-24 right-6 z-[100] flex flex-col gap-3 w-full max-w-sm px-4 sm:px-0">
+    {% for message in messages %}
+      <div class="toast-item flex items-start gap-3 px-5 py-4 rounded-2xl shadow-2xl border bg-white
+        {% if message.tags == 'success' %}border-green-200
+        {% else %}border-red-200{% endif %}"
+        style="animation: slideInRight 0.3s ease-out;">
+
+        <!-- Icon -->
+        <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5
+          {% if message.tags == 'success' %}bg-green-100{% else %}bg-red-100{% endif %}">
+          {% if message.tags == 'success' %}
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
+              <path d="M20 6L9 17l-5-5" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          {% else %}
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
+              <path d="M18 6L6 18M6 6l12 12" stroke="#DC2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          {% endif %}
+        </div>
+
+        <!-- Text -->
+        <div class="flex-1">
+          <p class="text-sm font-bold {% if message.tags == 'success' %}text-green-700{% else %}text-red-700{% endif %}">
+            {% if message.tags == 'success' %}Success{% else %}Error{% endif %}
+          </p>
+          <p class="text-sm mt-0.5 text-gray-500">
+            {{ message }}
+          </p>
+        </div>
+
+        <!-- Close button -->
+        <button onclick="this.closest('.toast-item').remove()" class="shrink-0 text-gray-400 hover:text-gray-600 transition">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+
+  <style>
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+
+  <script>
+    setTimeout(function() {
+      document.querySelectorAll('.toast-item').forEach(function(el) {
+        el.style.transition = 'opacity 0.3s, transform 0.3s';
+        el.style.opacity = '0';
+        el.style.transform = 'translateX(100%)';
+        setTimeout(function() { el.remove(); }, 300);
+      });
+    }, 5000);
+  </script>
+{% endif %}
 
             <form method="POST" action="/contact/" id="contact-form">
               {% csrf_token %}
