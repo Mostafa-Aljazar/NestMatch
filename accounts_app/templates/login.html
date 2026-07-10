@@ -34,6 +34,39 @@
       .auth-input.has-icon-left  { padding-left: 2.5rem; }   /* 40px, matches pl-10 */
       .auth-input.has-icon-right { padding-right: 2.5rem; }
 
+      #nm-toast-wrap {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 9999;
+      }
+
+      .nm-toast {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 18px;
+        border-radius: 8px;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-family: sans-serif;
+        animation: nmToastIn .3s ease forwards;
+      }
+
+      .nm-toast-icon { display: flex; align-items: center; }
+      .nm-toast-msg { max-width: 260px; line-height: 1.4; }
+
+      .nm-toast-success { border-left: 5px solid #2ecc71; color: #31d877; }
+      .nm-toast-error { border-left: 5px solid #e74c3c; color: #e74c3c; }
+      .nm-toast-info { border-left: 5px solid #3498db; color: #3498db; }
+      .nm-toast-warning { border-left: 5px solid #f1c40f; color: #f1c40f; }
+
+      @keyframes nmToastIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+      @keyframes nmToastOut { to { opacity: 0; transform: translateX(100%); } }
+
       input, select, textarea {
         background-color: #ffffff !important;
         color: #111827;
@@ -50,6 +83,7 @@
     </style>
   </head>
   <body class="min-h-screen bg-brand-50 text-brand-800">
+    <div id="nm-toast-wrap" class="fixed top-20 right-4 left-4 z-[9999] flex flex-col items-end gap-2.5 pointer-events-none sm:left-auto sm:right-6"></div>
     <div class="min-h-screen lg:grid lg:grid-cols-[1.05fr_0.95fr]">
       <aside class="relative hidden overflow-hidden bg-gradient-to-br from-brand-900 via-brand-700 to-brand-500 px-10 py-16 text-white lg:flex lg:flex-col lg:justify-center">
         <div class="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,255,255,0.14)_1.5px,_transparent_1.5px)] bg-[length:32px_32px]" aria-hidden="true"></div>
@@ -216,6 +250,45 @@
           if (errorEl) errorEl.remove();
         });
       });
+
+      function nmToast(msg, type, duration) {
+        type = type || 'success';
+        duration = duration || 4500;
+
+        var wrap = document.getElementById('nm-toast-wrap');
+        var t = document.createElement('div');
+        t.className = 'nm-toast nm-toast-' + type + ' pointer-events-auto';
+
+        var svgs = {
+          success: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+          error: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
+          info: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
+          warning: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>'
+        };
+
+        t.innerHTML =
+          '<div class="nm-toast-icon">' + (svgs[type] || '') + '</div>' +
+          '<div class="nm-toast-msg">' + msg + '</div>';
+
+        wrap.appendChild(t);
+
+        setTimeout(function () {
+          t.style.animation = 'nmToastOut .3s ease forwards';
+          setTimeout(function () { t.remove(); }, 300);
+        }, duration);
+      }
+
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('banned') === '1') {
+          nmToast('Your account has been suspended.<br>Please contact support if you believe this is a mistake.', 'error');
+
+          // Strip the query flag so refreshing the page doesn't re-fire the toast
+          params.delete('banned');
+          var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+          window.history.replaceState({}, document.title, newUrl);
+        }
+      })();
     </script>
   </body>
 </html>
