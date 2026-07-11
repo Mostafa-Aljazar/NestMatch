@@ -6,81 +6,410 @@
 
 {% block page_title %}Applications{% endblock %}
 
+{% block extra_css %}
+<style>
+.msg-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:1000px){.msg-stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.msg-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:400px){.msg-stats{grid-template-columns:1fr}}
+.msg-stat{display:flex;align-items:center;gap:13px;padding:18px 20px;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s,border-color .15s;text-decoration:none;border:1.5px solid transparent;cursor:pointer}
+.msg-stat:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.msg-stat.active{border-color:var(--brand-400)}
+.msg-stat.static{cursor:default}
+.msg-stat.static:hover{transform:none;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.msg-stat-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.msg-stat-num{font-size:22px;font-weight:800;color:#111827;line-height:1}
+.msg-stat-label{font-size:12px;color:#9CA3AF;font-weight:600;margin-top:3px}
+
+.msg-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 22px;background:#FAFBFC;border-bottom:1px solid #F0F1F3;border-radius:16px 16px 0 0}
+.msg-tabs{display:flex;gap:4px;background:#F0F1F3;padding:4px;border-radius:11px;flex-shrink:0}
+.msg-tab{padding:7px 14px;font-size:12.5px;font-weight:700;color:#6B7280;text-decoration:none;border-radius:8px;transition:all .15s;white-space:nowrap}
+.msg-tab:hover{color:#374151}
+.msg-tab.active{background:#fff;color:var(--brand-600);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.msg-search{display:flex;align-items:center;gap:8px;flex:1;max-width:380px;min-width:220px;background:#fff;border:1.5px solid #E5E7EB;border-radius:24px;padding:0 14px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:border-color .15s,box-shadow .15s}
+.msg-search:focus-within{border-color:var(--brand-600);box-shadow:0 0 0 4px rgba(204,102,0,.1)}
+.msg-search svg.msg-search-icon{color:#9CA3AF;flex-shrink:0}
+.msg-search input{flex:1;min-width:0;border:none!important;outline:none!important;background:transparent!important;padding:11px 0!important;margin:0!important;font-size:13.5px;font-family:inherit;color:#111827;box-shadow:none!important;border-radius:0!important}
+.msg-search input::placeholder{color:#B0B7C1}
+.msg-search-clear{flex-shrink:0;background:#F3F4F6;border-radius:50%;border:none;color:#9CA3AF;cursor:pointer;padding:5px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:background .15s,color .15s;text-decoration:none}
+.msg-search-clear:hover{background:#E5E7EB;color:#374151}
+.msg-search-result{flex-basis:100%;font-size:12px;color:#6B7280;font-weight:600}
+.msg-search-result strong{color:var(--brand-600)}
+
+.msg-row{display:flex;align-items:center;gap:14px;padding:17px 22px;border-bottom:1px solid #F3F4F6;cursor:pointer;transition:background .15s}
+.msg-row:last-child{border-bottom:none}
+.msg-row:hover{background:#FAFBFC}
+.msg-row.unread{background:#FFFAF2}
+.msg-row.unread:hover{background:#FDF3E4}
+.msg-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--brand-600),var(--brand-400));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 2px 6px rgba(204,102,0,.25)}
+.msg-avatar-img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.msg-main{flex:1;min-width:0}
+.msg-top{display:flex;align-items:center;gap:8px}
+.msg-name{font-size:14px;font-weight:700;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg-match-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.msg-preview{font-size:12.5px;color:#9CA3AF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.msg-side{display:flex;align-items:center;gap:18px;flex-shrink:0}
+.msg-meta{min-width:92px}
+.msg-meta-date{display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:12px;font-weight:600;color:#4B5563;white-space:nowrap}
+.msg-meta-time{display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:11px;color:#9CA3AF;white-space:nowrap;margin-top:3px}
+.msg-meta-date svg,.msg-meta-time svg{flex-shrink:0;opacity:.75}
+.msg-empty{padding:64px 20px;text-align:center;color:#9CA3AF}
+
+.msg-badge{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:10.5px;font-weight:700;padding:4px 12px;border-radius:20px;flex-shrink:0;min-width:74px;text-align:center}
+.msg-badge-pending{background:#FEF3C7;color:#D97706}
+.msg-badge-accepted{background:#D1FAE5;color:#059669}
+.msg-badge-rejected{background:#FEE2E2;color:#DC2626}
+
+/* ── Pagination ── */
+.msg-page-link{padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none}
+.msg-page-disabled{padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed}
+.msg-page-current{padding:6px 10px;font-size:11px;font-weight:600;color:#111827;background:#E5E7EB;border-radius:4px}
+
+/* ── Modal ── */
+.msg-modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);z-index:2000;align-items:center;justify-content:center;padding:16px}
+.msg-modal-overlay.open{display:flex}
+.msg-modal{background:#fff;border-radius:20px;box-shadow:0 30px 70px rgba(0,0,0,.3);max-width:540px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;animation:msgModalIn .25s cubic-bezier(.16,1,.3,1)}
+.msg-modal-scroll{overflow-y:auto;flex:1 1 auto;min-height:0;scrollbar-width:thin;scrollbar-color:#D1D5DB transparent}
+.msg-modal-scroll::-webkit-scrollbar{width:6px}
+.msg-modal-scroll::-webkit-scrollbar-track{background:transparent}
+.msg-modal-scroll::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:20px}
+@keyframes msgModalIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.msg-modal-banner{position:relative;background:linear-gradient(135deg,var(--brand-700),var(--brand-600) 55%,var(--brand-500));padding:28px 26px 24px;flex-shrink:0}
+.msg-modal-x{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.16);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.msg-modal-x:hover{background:rgba(255,255,255,.28)}
+.msg-modal-header{display:flex;align-items:center;gap:16px}
+.msg-modal-avatar{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);border:2.5px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0}
+.msg-modal-title{font-size:17px;font-weight:800;color:#fff;margin:0}
+.msg-modal-email{font-size:12.5px;color:rgba(255,255,255,.85);margin-top:3px;word-break:break-all}
+.msg-modal-profile-link{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#fff;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;text-decoration:none;transition:background .15s}
+.msg-modal-profile-link:hover{background:rgba(255,255,255,.32)}
+
+.msg-modal-body{padding:24px 26px 22px;background:linear-gradient(180deg,#FFFAF2 0%,#fff 90px)}
+.msg-modal-status{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;margin-bottom:22px;padding:5px 12px;border-radius:20px}
+.msg-modal-section-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px}
+.msg-modal-section-label svg{color:var(--brand-500)}
+.msg-modal-text{padding:16px 18px;background:#fff;border:1px solid #F0F1F3;border-left:3px solid var(--brand-500);border-radius:4px 14px 14px 4px;font-size:13.5px;color:#374151;line-height:1.7;white-space:pre-wrap;box-shadow:0 1px 4px rgba(0,0,0,.03)}
+.msg-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.msg-info-tile{background:#fff;border:1px solid #F0F1F3;border-radius:12px;padding:13px 15px}
+.msg-info-tile-label{font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px}
+.msg-info-tile-value{font-size:14px;font-weight:700;color:#111827;margin-top:3px}
+.msg-modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:16px 26px;background:#FAFBFC;border-top:1px solid #F0F1F3}
+.msg-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;font-size:12.5px;font-weight:700;border:none;border-radius:9px;cursor:pointer;font-family:inherit;transition:filter .15s,transform .15s,box-shadow .15s;text-decoration:none}
+.msg-btn:hover{transform:translateY(-1px)}
+.msg-btn-close{color:#4B5563;background:#fff;border:1.5px solid #E5E7EB!important}
+.msg-btn-close:hover{background:#F9FAFB;border-color:#D1D5DB!important}
+.msg-btn-view{color:#fff;background:linear-gradient(135deg,var(--brand-600),var(--brand-500));box-shadow:0 4px 12px rgba(204,102,0,.35)}
+.msg-btn-view:hover{box-shadow:0 6px 16px rgba(204,102,0,.4)}
+</style>
+{% endblock %}
+
 {% block content %}
 <div style="margin-bottom:20px">
   <h2 style="font-size:20px;font-weight:800;color:#111827">All Applications</h2>
-  <p style="font-size:13px;color:#6B7280;margin-top:2px">Every application submitted across the platform</p>
+  <p style="font-size:13px;color:#6B7280;margin-top:2px">Every application submitted across the platform &middot; click one to view it in full</p>
 </div>
-<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px">
-  <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);text-align:center">
-    <div style="font-size:24px;font-weight:800;color:#111827">{{ app_stats.total }}</div>
-    <div style="font-size:11px;color:#6B7280;margin-top:3px">Total</div>
-  </div>
-  <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);text-align:center">
-    <div style="font-size:24px;font-weight:800;color:#D97706">{{ app_stats.pending }}</div>
-    <div style="font-size:11px;color:#6B7280;margin-top:3px">Pending</div>
-  </div>
-  <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);text-align:center">
-    <div style="font-size:24px;font-weight:800;color:#059669">{{ app_stats.accepted }}</div>
-    <div style="font-size:11px;color:#6B7280;margin-top:3px">Accepted</div>
-  </div>
-  <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);text-align:center">
-    <div style="font-size:24px;font-weight:800;color:#E11D48">{{ app_stats.rejected }}</div>
-    <div style="font-size:11px;color:#6B7280;margin-top:3px">Rejected</div>
-  </div>
-  <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);text-align:center">
-    <div style="font-size:24px;font-weight:800;color:var(--brand-600)">{% if app_stats.avg_compatibility %}{{ app_stats.avg_compatibility|floatformat:0 }}%{% else %}&mdash;{% endif %}</div>
-    <div style="font-size:11px;color:#6B7280;margin-top:3px">Avg Match</div>
-  </div>
-</div>
-<div style="background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06)">
-  <div style="overflow-x:auto">
-    <table style="width:100%;border-collapse:collapse">
-      <thead>
-        <tr>
-          <th style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.7px;padding:11px 14px;border-bottom:1px solid #E5E7EB;text-align:left;background:#F9FAFB">Applicant</th>
-          <th style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.7px;padding:11px 14px;border-bottom:1px solid #E5E7EB;text-align:left;background:#F9FAFB">Listing</th>
-          <th style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.7px;padding:11px 14px;border-bottom:1px solid #E5E7EB;text-align:left;background:#F9FAFB">Applied</th>
-          <th style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.7px;padding:11px 14px;border-bottom:1px solid #E5E7EB;text-align:left;background:#F9FAFB">Match</th>
-          <th style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.7px;padding:11px 14px;border-bottom:1px solid #E5E7EB;text-align:left;background:#F9FAFB">Status</th>
-          <th style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.7px;padding:11px 14px;border-bottom:1px solid #E5E7EB;text-align:left;background:#F9FAFB">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for app in all_applications %}
-        <tr style="border-bottom:1px solid #F3F4F6">
-          <td style="padding:13px 14px;vertical-align:middle">
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:30px;height:30px;border-radius:50%;background:inear-gradient(135deg,var(--brand-600),var(--brand-400));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">{{ app.seeker.first_name|first|upper }}</div>
-              <div>
-                <div style="font-size:13px;font-weight:600;color:#111827;white-space:nowrap">{{ app.seeker.full_name }}</div>
-                <div style="font-size:11px;color:#9CA3AF">{{ app.seeker.email }}</div>
-              </div>
-            </div>
-          </td>
-          <td style="padding:13px 14px;vertical-align:middle">
-            <div style="font-size:12px;font-weight:600;color:#374151;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ app.listing.title }}</div>
-            <div style="font-size:11px;color:#9CA3AF">{{ app.listing.city }}</div>
-          </td>
-          <td style="padding:13px 14px;vertical-align:middle;font-size:12px;color:#6B7280;white-space:nowrap">{{ app.applied_at|date:"M d, Y" }}</td>
-          <td style="padding:13px 14px;vertical-align:middle">
-            {% if app.compatibility %}<span style="font-size:12px;font-weight:700;color:{% if app.compatibility >= 80 %}var(--brand-600){% elif app.compatibility >= 60 %}#D97706{% else %}#E11D48{% endif %}">{{ app.compatibility }}%</span>
-            {% else %}<span style="font-size:12px;color:#9CA3AF">&mdash;</span>{% endif %}
-          </td>
-          <td style="padding:13px 14px;vertical-align:middle">
-            {% if app.status == "pending" %}<span style="display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#FEF3C7;color:#D97706">Pending</span>
-            {% elif app.status == "accepted" %}<span style="display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#D1FAE5;color:#059669">Accepted</span>
-            {% else %}<span style="display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#FFE4E6;color:#E11D48">Rejected</span>{% endif %}
-          </td>
-          <td style="padding:13px 14px;vertical-align:middle">
-            <a href="{% url 'dashboard_app:listing_detail' app.listing.id %}" style="font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:6px;padding:4px 9px">View Room</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="6" style="padding:40px;text-align:center;color:#9CA3AF">No applications yet.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+<!-- ── Summary stats (also act as quick filters) ── -->
+<div class="msg-stats">
+  <a href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'all' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:var(--brand-100)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ total_count }}</div>
+      <div class="msg-stat-label">Total</div>
+    </div>
+  </a>
+  <a href="?status=pending{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'pending' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:#FEF3C7">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ pending_count }}</div>
+      <div class="msg-stat-label">Pending</div>
+    </div>
+  </a>
+  <a href="?status=accepted{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'accepted' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:#D1FAE5">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ accepted_count }}</div>
+      <div class="msg-stat-label">Accepted</div>
+    </div>
+  </a>
+  <a href="?status=rejected{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'rejected' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:#FEE2E2">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ rejected_count }}</div>
+      <div class="msg-stat-label">Rejected</div>
+    </div>
+  </a>
+  <div class="msg-stat static">
+    <div class="msg-stat-icon" style="background:var(--brand-100)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{% if avg_compatibility %}{{ avg_compatibility|floatformat:0 }}%{% else %}&mdash;{% endif %}</div>
+      <div class="msg-stat-label">Avg Match</div>
+    </div>
   </div>
 </div>
+
+<div class="adm-card" style="padding:0">
+  <!-- ── Toolbar: filter tabs + search ── -->
+  <form method="get" class="msg-toolbar">
+    <div class="msg-tabs">
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=all" class="msg-tab{% if status_filter == 'all' %} active{% endif %}">All</a>
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=pending" class="msg-tab{% if status_filter == 'pending' %} active{% endif %}">Pending</a>
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=accepted" class="msg-tab{% if status_filter == 'accepted' %} active{% endif %}">Accepted</a>
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=rejected" class="msg-tab{% if status_filter == 'rejected' %} active{% endif %}">Rejected</a>
+    </div>
+    <input type="hidden" name="status" value="{{ status_filter }}">
+    <div class="msg-search">
+      <svg class="msg-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" name="q" value="{{ search_query }}" placeholder="Search by applicant or listing...">
+      {% if search_query %}
+        <a href="?status={{ status_filter }}" class="msg-search-clear" title="Clear search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </a>
+      {% endif %}
+    </div>
+    {% if search_query %}
+      <div class="msg-search-result">
+        <strong>{{ page_obj.paginator.count }}</strong> result{{ page_obj.paginator.count|pluralize }} for &ldquo;{{ search_query }}&rdquo;
+      </div>
+    {% endif %}
+  </form>
+
+  {% for app in all_applications %}
+  <div id="app-row-{{ app.id }}"
+       class="msg-row{% if app.status == 'pending' %} unread{% endif %}"
+       onclick="openAppModal({{ app.id }})"
+       data-name="{{ app.seeker.full_name }}"
+       data-email="{{ app.seeker.email }}"
+       data-listing="{{ app.listing.title }}"
+       data-listing-city="{{ app.listing.city }}"
+       data-status="{{ app.status }}"
+       data-status-display="{{ app.get_status_display }}"
+       data-applied="{{ app.applied_at|date:'M d, Y \a\t H:i' }}"
+       data-compatibility="{{ app.compatibility|default:'' }}"
+       data-message="{{ app.message }}"
+       data-poster-note="{{ app.poster_note }}"
+       data-avatar-url="{% if app.seeker.profile_pic %}{{ app.seeker.profile_pic.url }}{% endif %}"
+       data-profile-url="{% url 'accounts_app:public_profile' app.seeker.id %}"
+       data-room-url="{% url 'dashboard_app:listing_detail' app.listing.id %}">
+    {% if app.seeker.profile_pic %}
+      <img src="{{ app.seeker.profile_pic.url }}" alt="{{ app.seeker.full_name }}" class="msg-avatar-img">
+    {% else %}
+      <div class="msg-avatar">{{ app.seeker.full_name|first|upper }}</div>
+    {% endif %}
+    <div class="msg-main">
+      <div class="msg-top">
+        <span class="msg-name">{{ app.seeker.full_name }}</span>
+        {% if app.compatibility %}
+        <span class="msg-match-badge" style="background:{% if app.compatibility >= 80 %}#D1FAE5;color:#059669{% elif app.compatibility >= 60 %}#FEF3C7;color:#D97706{% else %}#FEE2E2;color:#DC2626{% endif %}">{{ app.compatibility }}% Match</span>
+        {% endif %}
+      </div>
+      <div class="msg-preview">{{ app.seeker.email }} &middot; {{ app.listing.title }}</div>
+    </div>
+    <div class="msg-side">
+      {% if app.status == 'accepted' %}
+        <span class="msg-badge msg-badge-accepted">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          Accepted
+        </span>
+      {% elif app.status == 'rejected' %}
+        <span class="msg-badge msg-badge-rejected">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Rejected
+        </span>
+      {% else %}
+        <span class="msg-badge msg-badge-pending">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Pending
+        </span>
+      {% endif %}
+      <div class="msg-meta">
+        <div class="msg-meta-date">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          {{ app.applied_at|date:"M d, Y" }}
+        </div>
+        <div class="msg-meta-time">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          {{ app.applied_at|date:"H:i" }}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="msg-empty">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <p style="font-weight:600">
+      {% if search_query %}No applications match &ldquo;{{ search_query }}&rdquo;.
+      {% elif status_filter == 'pending' %}No pending applications.
+      {% elif status_filter == 'accepted' %}No accepted applications.
+      {% elif status_filter == 'rejected' %}No rejected applications.
+      {% else %}No applications yet.{% endif %}
+    </p>
+  </div>
+  {% endfor %}
+
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;flex-wrap:wrap;gap:10px;border-top:1px solid #F3F4F6">
+    <div style="font-size:12px;color:#6B7280">
+      Showing <strong>{{ page_obj.start_index }}</strong> to <strong>{{ page_obj.end_index }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> applications
+    </div>
+
+    <div style="display:flex;align-items:center;gap:6px">
+      {% if page_obj.has_previous %}
+        <a href="?page=1&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">« First</a>
+        <a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">‹ Previous</a>
+      {% else %}
+        <span class="msg-page-disabled">« First</span>
+        <span class="msg-page-disabled">‹ Previous</span>
+      {% endif %}
+
+      <span class="msg-page-current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">Next ›</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">Last »</a>
+      {% else %}
+        <span class="msg-page-disabled">Next ›</span>
+        <span class="msg-page-disabled">Last »</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- APPLICATION DETAIL MODAL -->
+<div id="appModal" class="msg-modal-overlay" onclick="if(event.target.id==='appModal') closeAppModal()">
+  <div class="msg-modal" onclick="event.stopPropagation()">
+    <div class="msg-modal-banner">
+      <button type="button" class="msg-modal-x" onclick="closeAppModal()" title="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="msg-modal-header">
+        <div id="appModalAvatar" class="msg-modal-avatar"></div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <h3 id="appModalName" class="msg-modal-title"></h3>
+            <a id="appModalProfileLink" href="#" target="_blank" class="msg-modal-profile-link">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              View Profile
+            </a>
+          </div>
+          <div id="appModalEmail" class="msg-modal-email"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg-modal-scroll">
+      <div class="msg-modal-body">
+        <span id="appModalStatus" class="msg-modal-status"></span>
+
+        <div class="msg-info-grid">
+          <div class="msg-info-tile">
+            <div class="msg-info-tile-label">Listing</div>
+            <div id="appModalListing" class="msg-info-tile-value" style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+          </div>
+          <div class="msg-info-tile">
+            <div class="msg-info-tile-label">Compatibility</div>
+            <div id="appModalMatch" class="msg-info-tile-value"></div>
+          </div>
+          <div class="msg-info-tile">
+            <div class="msg-info-tile-label">Applied</div>
+            <div id="appModalApplied" class="msg-info-tile-value" style="font-size:12.5px"></div>
+          </div>
+          <div class="msg-info-tile">
+            <div class="msg-info-tile-label">Location</div>
+            <div id="appModalCity" class="msg-info-tile-value" style="font-size:13px"></div>
+          </div>
+        </div>
+
+        <div class="msg-modal-section-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Applicant's Message
+        </div>
+        <div id="appModalText" class="msg-modal-text"></div>
+
+        <div id="appModalNoteWrap" style="display:none;margin-top:20px">
+          <div class="msg-modal-section-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+            Poster's Note
+          </div>
+          <div id="appModalNote" class="msg-modal-text" style="border-left-color:#059669"></div>
+        </div>
+      </div>
+      <div class="msg-modal-footer">
+        <button type="button" class="msg-btn msg-btn-close" onclick="closeAppModal()">Close</button>
+        <a id="appModalRoomLink" href="#" class="msg-btn msg-btn-view">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V20a1 1 0 0 1-1 1H15V15H9v6H4a1 1 0 0 1-1-1Z"/></svg>
+          View Room
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openAppModal(appId) {
+  const row = document.getElementById('app-row-' + appId);
+  const data = row.dataset;
+
+  const avatarEl = document.getElementById('appModalAvatar');
+  if (data.avatarUrl) {
+    avatarEl.innerHTML = '<img src="' + data.avatarUrl + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
+  } else {
+    avatarEl.textContent = data.name.charAt(0).toUpperCase();
+  }
+  document.getElementById('appModalName').textContent = data.name;
+  document.getElementById('appModalEmail').textContent = data.email;
+  document.getElementById('appModalListing').textContent = data.listing;
+  document.getElementById('appModalCity').textContent = data.listingCity || '—';
+  document.getElementById('appModalApplied').textContent = data.applied;
+  document.getElementById('appModalMatch').textContent = data.compatibility ? data.compatibility + '%' : '—';
+  document.getElementById('appModalText').textContent = data.message || 'No message provided.';
+  document.getElementById('appModalProfileLink').href = data.profileUrl;
+  document.getElementById('appModalRoomLink').href = data.roomUrl;
+
+  renderAppStatus(data.status, data.statusDisplay);
+
+  const noteWrap = document.getElementById('appModalNoteWrap');
+  if (data.posterNote) {
+    document.getElementById('appModalNote').textContent = data.posterNote;
+    noteWrap.style.display = '';
+  } else {
+    noteWrap.style.display = 'none';
+  }
+
+  document.getElementById('appModal').classList.add('open');
+}
+
+function renderAppStatus(statusValue, label) {
+  const el = document.getElementById('appModalStatus');
+  el.textContent = label || statusValue;
+  if (statusValue === 'accepted') {
+    el.style.background = '#D1FAE5'; el.style.color = '#059669';
+  } else if (statusValue === 'rejected') {
+    el.style.background = '#FEE2E2'; el.style.color = '#DC2626';
+  } else {
+    el.style.background = '#FEF3C7'; el.style.color = '#D97706';
+  }
+}
+
+function closeAppModal() {
+  document.getElementById('appModal').classList.remove('open');
+}
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeAppModal();
+});
+</script>
 {% endblock %}

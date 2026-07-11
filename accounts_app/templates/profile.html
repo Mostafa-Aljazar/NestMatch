@@ -276,50 +276,56 @@
         <!-- Aside -->
         <!-- ============================================================ -->
         <aside class="w-full flex-shrink-0">
-            <div class="rounded-2xl border border-slate-200 bg-white p-2 lg:p-3">
-              <nav class="grid grid-cols-3 gap-1.5 sm:grid-cols-3 lg:flex lg:grid-cols-none lg:gap-1">
+            <p class="mb-2 flex items-center gap-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+                <path d="M12 2 3 6.5v11L12 22l9-4.5v-11z" /><path d="M12 2v20M3 6.5l9 4.5 9-4.5" />
+              </svg>
+              Jump to a section
+            </p>
+            <div class="rounded-2xl border border-slate-200 bg-white p-2">
+              <nav class="flex flex-wrap gap-1.5">
 
-                <button class="tab-nav-btn active group flex w-full flex-col items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50/50 px-2 py-3 text-center text-xs font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 lg:flex-row lg:justify-start lg:gap-2.5 lg:px-3 lg:py-2.5 lg:text-sm lg:whitespace-nowrap" data-tab="info">
-                  <svg class="hidden flex-shrink-0 lg:block" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <button class="tab-nav-btn active group flex flex-1 basis-[47%] items-center justify-center gap-2 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5 text-sm font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 sm:basis-auto sm:justify-start" data-tab="info">
+                  <svg class="flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="8" r="3.2" /><path d="M5.5 19c1-3.2 3.6-5 6.5-5s5.5 1.8 6.5 5" />
                   </svg>
-                  <span class="leading-tight">Personal info</span>
+                  <span class="truncate leading-tight">Personal info</span>
                 </button>
 
-                <button class="tab-nav-btn group flex w-full flex-col items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50/50 px-2 py-3 text-center text-xs font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 lg:flex-row lg:justify-start lg:gap-2.5 lg:px-3 lg:py-2.5 lg:text-sm lg:whitespace-nowrap" data-tab="lifestyle">
-                  <svg class="hidden flex-shrink-0 lg:block" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <button class="tab-nav-btn group flex flex-1 basis-[47%] items-center justify-center gap-2 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5 text-sm font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 sm:basis-auto sm:justify-start" data-tab="lifestyle">
+                  <svg class="flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="6" x2="5" y2="18" /><line x1="12" y1="4" x2="12" y2="18" /><line x1="19" y1="9" x2="19" y2="18" />
                     <circle cx="5" cy="9" r="1.5" fill="currentColor" stroke="none" />
                     <circle cx="12" cy="13" r="1.5" fill="currentColor" stroke="none" />
                     <circle cx="19" cy="6" r="1.5" fill="currentColor" stroke="none" />
                   </svg>
-                  <span class="leading-tight">Lifestyle profile</span>
+                  <span class="truncate leading-tight">Lifestyle profile</span>
                 </button>
 
-                <button class="tab-nav-btn group flex w-full flex-col items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50/50 px-2 py-3 text-center text-xs font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 lg:flex-row lg:justify-start lg:gap-2.5 lg:px-3 lg:py-2.5 lg:text-sm lg:whitespace-nowrap" data-tab="security">
-                  <svg class="hidden flex-shrink-0 lg:block" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <button class="tab-nav-btn group flex flex-1 basis-[47%] items-center justify-center gap-2 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5 text-sm font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 sm:basis-auto sm:justify-start" data-tab="security">
+                  <svg class="flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" />
                   </svg>
-                  <span class="leading-tight">Security</span>
+                  <span class="truncate leading-tight">Security</span>
                 </button>
 
-                <button class="tab-nav-btn group flex w-full flex-col items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50/50 px-2 py-3 text-center text-xs font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 lg:flex-row lg:justify-start lg:gap-2.5 lg:px-3 lg:py-2.5 lg:text-sm lg:whitespace-nowrap" data-tab="reviews">
-                  <svg class="hidden flex-shrink-0 lg:block" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <button class="tab-nav-btn group flex flex-1 basis-[47%] items-center justify-center gap-2 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5 text-sm font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 sm:basis-auto sm:justify-start" data-tab="reviews">
+                  <svg class="flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                   </svg>
-                  <span class="leading-tight">Reviews</span>
+                  <span class="truncate leading-tight">Reviews</span>
                 </button>
 
-                <button class="tab-nav-btn group flex w-full flex-col items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50/50 px-2 py-3 text-center text-xs font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 lg:flex-row lg:justify-start lg:gap-2.5 lg:px-3 lg:py-2.5 lg:text-sm lg:whitespace-nowrap" data-tab="verification">
-                  <svg class="hidden flex-shrink-0 lg:block" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <button class="tab-nav-btn group flex flex-1 basis-[47%] items-center justify-center gap-2 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5 text-sm font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 sm:basis-auto sm:justify-start" data-tab="verification">
+                  <svg class="flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z" /><path d="M9 12l2 2 4-4" />
                   </svg>
-                  <span class="leading-tight">Verification</span>
+                  <span class="truncate leading-tight">Verification</span>
                 </button>
 
               </nav>
             </div>
-          </aside>           
+          </aside>
         <!-- ============================================================ -->
         <!-- Content                                                       -->
         <!-- ============================================================ -->
@@ -483,15 +489,21 @@
           <!-- TAB 2: Lifestyle profile                                      -->
           <!-- ============================================================ -->
           <div id="tab-lifestyle" class="tab-panel hidden space-y-6">
-            <div class="flex items-start gap-3 bg-brand-50 p-4 border border-brand-200 rounded-xl">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-700)" stroke-width="1.8" class="flex-shrink-0 mt-0.5">
-                <circle cx="12" cy="12" r="8" />
-                <circle cx="12" cy="12" r="4" />
-                <circle cx="12" cy="12" r="0.7" fill="var(--brand-700)" stroke="none" />
-              </svg>
-              <div>
-                <p class="font-semibold text-brand-900 text-sm">Compatibility profile</p>
-                <p class="text-slate-600 text-sm">Keep this updated — it directly affects who gets recommended to you.</p>
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-700 via-brand-600 to-brand-500 p-5 sm:p-6">
+              <div class="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10"></div>
+              <div class="pointer-events-none absolute -bottom-10 left-10 h-24 w-24 rounded-full bg-white/10"></div>
+              <div class="relative flex items-start gap-3.5">
+                <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/15">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="8" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="12" cy="12" r="0.7" fill="#fff" stroke="none" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-display font-bold text-white text-base">Compatibility profile</p>
+                  <p class="mt-0.5 text-sm text-white/80">Keep this updated — it directly affects who gets recommended to you.</p>
+                </div>
               </div>
             </div>
 
@@ -886,46 +898,89 @@
           <!-- TAB 4: Reviews                                                -->
           <!-- ============================================================ -->
             <div id="tab-reviews" class="tab-panel hidden">
+              <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-700 via-brand-600 to-brand-500 mb-6 p-5 sm:p-6">
+                <div class="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10"></div>
+                <div class="pointer-events-none absolute -bottom-10 left-10 h-24 w-24 rounded-full bg-white/10"></div>
+                <div class="relative flex items-start gap-3.5">
+                  <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/15">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-display font-bold text-white text-base">Share your experience</p>
+                    <p class="mt-0.5 text-sm text-white/80">Your review helps other seekers and posters trust NestMatch. It goes live once our team approves it.</p>
+                  </div>
+                </div>
+              </div>
+
               <div class="gap-6 grid lg:grid-cols-[1.2fr_0.8fr]">
 
                 <!-- Form -->
-                <div class="bg-white shadow-sm p-8 border border-slate-100 rounded-2xl">
-                  <h3 class="mb-5 font-display font-bold text-gray-900 text-xl">{{ review_section_heading }}</h3>
-                  <form id="review-form" action="{% url 'accounts_app:submit_review' %}" method="POST" class="space-y-5">
+                <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+                  <h3 class="font-display text-lg font-bold text-gray-900">{{ review_section_heading }}</h3>
+                  <p class="mt-1 text-sm text-slate-500">Tell the community what NestMatch has been like for you.</p>
+
+                  <form id="review-form" action="{% url 'accounts_app:submit_review' %}" method="POST" class="mt-6 space-y-6">
                     {% csrf_token %}
                     <div>
-                      <label for="reviewer_name" class="block mb-2 font-semibold text-slate-600 text-sm">Your name</label>
-                      <input id="reviewer_name" name="reviewer_name" type="text" required placeholder="e.g. Sara Ahmed"
-                        class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-gray-600 text-sm" />
-                      <p class="mt-2 text-rose-600 text-xs field-error" data-field="reviewer_name"></p>
-                    </div>
-
-                    <div class="gap-5 grid sm:grid-cols-2">
-                      <div>
-                        <label for="role" class="block mb-2 font-semibold text-slate-600 text-sm">I am a</label>
-                        <select id="role" name="role" required
-                          class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-gray-600 text-sm">
-                          <option value="">Select role</option>
-                          <option value="seeker">Room Seeker</option>
-                          <option value="poster">Room Poster</option>
-                        </select>
-                        <p class="mt-2 text-rose-600 text-xs field-error" data-field="role"></p>
+                      <label for="reviewer_name" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Your name</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7.5" r="4.5"/></svg>
+                        <input id="reviewer_name" name="reviewer_name" type="text" required placeholder="e.g. Sara Ahmed"
+                          class="field-icon-input w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 focus:border-brand-500 focus:ring-2 focus:ring-brand-100" />
                       </div>
-                      <div>
-                        <label for="location" class="block mb-2 font-semibold text-slate-600 text-sm">Location</label>
-                        <input id="location" name="location" type="text" placeholder="e.g. Cairo, Heliopolis"
-                          class="bg-slate-50 focus:bg-white px-4 py-3 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-gray-600 text-sm" />
-                      </div>
+                      <p class="mt-1.5 text-xs text-rose-600 field-error" data-field="reviewer_name"></p>
                     </div>
 
                     <div>
-                      <label for="review_text" class="block mb-2 font-semibold text-slate-600 text-sm">Your review</label>
-                      <textarea id="review_text" name="review_text" rows="6" required placeholder="Tell us about your experience with NestMatch"
-                        class="bg-slate-50 focus:bg-white px-4 py-4 border border-slate-200 focus:border-brand-500 rounded-lg focus:ring-2 focus:ring-brand-100 w-full text-gray-600 text-sm leading-6"></textarea>
-                      <p class="mt-2 text-rose-600 text-xs field-error" data-field="review_text"></p>
+                      <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">I am a</label>
+                      <input type="hidden" id="input-role" name="role" value="" />
+                      <div class="grid grid-cols-2 gap-3" data-target="role">
+                        <button type="button" data-value="seeker"
+                          class="role-option option-card flex flex-col items-center gap-2 rounded-xl border border-slate-200 px-4 py-4 text-center transition-all hover:border-slate-300">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4a8 8 0 1 0 5.3 14L21 22l-3.9-3.9A8 8 0 0 0 11 4z"/><path d="M8 11h6M8 14h4"/></svg>
+                          <span class="text-sm font-semibold text-slate-600">Room Seeker</span>
+                        </button>
+                        <button type="button" data-value="poster"
+                          class="role-option option-card flex flex-col items-center gap-2 rounded-xl border border-slate-200 px-4 py-4 text-center transition-all hover:border-slate-300">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg>
+                          <span class="text-sm font-semibold text-slate-600">Room Poster</span>
+                        </button>
+                      </div>
+                      <p class="mt-1.5 text-xs text-rose-600 field-error" data-field="role"></p>
                     </div>
 
-                    <button type="submit" class="bg-brand-600 hover:bg-brand-700 shadow-lg shadow-brand-200/30 px-4 py-3 rounded-lg w-full font-semibold text-white text-sm transition">
+                    <div>
+                      <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Your rating</label>
+                      <input type="hidden" id="rating" name="rating" value="" />
+                      <div class="flex items-center gap-4 rounded-xl border border-amber-100 bg-gradient-to-br from-amber-50 to-white px-5 py-4">
+                        <div id="rating-picker" class="flex items-center gap-1.5">
+                          {% for i in "12345" %}
+                            <button type="button" data-star="{{ forloop.counter }}" aria-label="{{ forloop.counter }} star{{ forloop.counter|pluralize }}"
+                              class="rating-star rounded-md p-0.5 text-slate-300 transition-transform hover:scale-110 hover:text-amber-400">
+                              <svg width="27" height="27" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                              </svg>
+                            </button>
+                          {% endfor %}
+                        </div>
+                        <span id="rating-picker-label" class="text-xs font-semibold text-amber-700/70">Tap a star to rate</span>
+                      </div>
+                      <p class="mt-1.5 text-xs text-rose-600 field-error" data-field="rating"></p>
+                    </div>
+
+                    <div>
+                      <label for="review_text" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Your review</label>
+                      <div class="field-icon-wrap">
+                        <svg class="field-icon" style="top: 0.95rem; transform: none;" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <textarea id="review_text" name="review_text" rows="6" required placeholder="Tell us about your experience with NestMatch"
+                          class="field-icon-input min-h-28 w-full rounded-lg border border-slate-200 bg-white pl-10 py-2.5 text-sm text-gray-600 leading-6 focus:border-brand-500 focus:ring-2 focus:ring-brand-100"></textarea>
+                      </div>
+                      <p class="mt-1.5 text-xs text-rose-600 field-error" data-field="review_text"></p>
+                    </div>
+
+                    <button type="submit" class="w-full rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-200/30 transition hover:bg-brand-700">
                       Submit review
                     </button>
                   </form>
@@ -933,39 +988,54 @@
 
                 <!-- My submitted reviews -->
                 <div class="space-y-6">
-                  <div class="bg-white shadow-sm p-8 border border-slate-100 rounded-2xl">
-                    <h3 class="mb-4 font-display font-bold text-gray-900 text-lg">My submitted reviews</h3>
+                  <div class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+                    <h3 class="font-display text-base font-bold text-gray-900">My submitted reviews</h3>
                     {% if user_reviews %}
-                      <div class="space-y-4">
+                      <div class="mt-5 space-y-4">
                         {% for review in user_reviews %}
-                          <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl">
-                            <div class="flex justify-between items-center gap-3">
-                              <div>
-                                <p class="font-semibold text-brand-900">{{ review.reviewer_name }}</p>
-                                <p class="text-slate-500 text-xs">{{ review.get_role_display }}</p>
+                          <div class="group relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-4 transition-shadow hover:shadow-md">
+                            <svg class="pointer-events-none absolute -right-1 -top-1 h-12 w-12 text-brand-600 opacity-[0.06]" viewBox="0 0 24 24" fill="currentColor"><path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z"/></svg>
+                            <div class="relative flex items-start justify-between gap-3">
+                              <div class="flex items-center gap-2.5 min-w-0">
+                                {% if user_obj.profile_pic %}
+                                  <img src="{{ user_obj.profile_pic.url }}" alt="" class="h-9 w-9 flex-shrink-0 rounded-full object-cover border-2 border-white shadow-sm" />
+                                {% else %}
+                                  <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-black text-white shadow-sm">{{ review.reviewer_name|first|upper }}</div>
+                                {% endif %}
+                                <div class="min-w-0">
+                                  <p class="truncate font-semibold text-brand-900">{{ review.reviewer_name }}</p>
+                                  <p class="text-xs text-slate-500">{{ review.get_role_display }}</p>
+                                </div>
                               </div>
-                              <div class="flex items-center gap-2">
-                                <span class="rounded-full px-3 py-1 text-[11px] font-semibold {{ review.approved|yesno:'bg-emerald-100 text-emerald-700,bg-yellow-50 text-yellow-700' }}">
-                                  {{ review.approved|yesno:'Approved,Pending approval' }}
-                                </span>
-                                <form action="{% url 'accounts_app:delete_review' review.id %}" method="POST" data-ajax-review-delete>
-                                  {% csrf_token %}
-                                  <button type="submit" class="inline-flex items-center gap-1 bg-white hover:bg-rose-50 px-3 py-1 border border-rose-200 rounded-full font-semibold text-[11px] text-rose-700">
-                                    <span aria-hidden="true"></span> Delete
-                                  </button>
-                                </form>
-                              </div>
+                              <span class="flex-shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold {{ review.approved|yesno:'bg-emerald-100 text-emerald-700,bg-yellow-50 text-yellow-700' }}">
+                                {{ review.approved|yesno:'Approved,Pending approval' }}
+                              </span>
                             </div>
-                            <p class="mt-3 text-slate-600 text-sm leading-6">{{ review.quote|truncatechars:140 }}</p>
-                            <div class="flex flex-wrap items-center gap-2 mt-3 text-slate-500 text-xs">
-                              {% if review.location %}<span>{{ review.location }}</span>{% endif %}
-                              <span>· {{ review.created_at|date:'M j, Y' }}</span>
+                            <div class="relative mt-3 flex gap-0.5">
+                              {% for i in "12345" %}
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="{% if forloop.counter <= review.rating %}#FBBF24{% else %}none{% endif %}" stroke="{% if forloop.counter <= review.rating %}none{% else %}#CBD5E1{% endif %}">
+                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                              {% endfor %}
+                            </div>
+                            <p class="relative mt-3 border-l-2 border-brand-200 pl-3 text-sm italic leading-6 text-slate-600">"{{ review.quote|truncatechars:140 }}"</p>
+                            <div class="relative mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                              <span data-relative-time="{{ review.created_at|date:'c' }}">{{ review.created_at|date:'M j, Y' }}</span>
+                              <form action="{% url 'accounts_app:delete_review' review.id %}" method="POST" data-ajax-review-delete>
+                                {% csrf_token %}
+                                <button type="submit" class="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-white px-3 py-1 text-[11px] font-semibold text-rose-700 hover:bg-rose-50">
+                                  Delete
+                                </button>
+                              </form>
                             </div>
                           </div>
                         {% endfor %}
                       </div>
                     {% else %}
-                      <p class="text-slate-500 text-sm">You haven't submitted any reviews yet. Use the form to send your feedback.</p>
+                      <div class="mt-5 flex flex-col items-center rounded-xl border border-dashed border-slate-200 bg-slate-50 py-10 text-center">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <p class="text-sm text-slate-500">You haven't submitted any reviews yet.<br>Use the form to send your feedback.</p>
+                      </div>
                     {% endif %}
                   </div>
                 </div>
@@ -979,14 +1049,20 @@
           <div id="tab-verification" class="tab-panel hidden space-y-6">
 
             <!-- INFO BANNER -->
-            <div class="flex items-start gap-3 rounded-xl border border-brand-200 bg-brand-50 p-4">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand-700)" stroke-width="1.8" class="mt-0.5 flex-shrink-0">
-                <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z" />
-                <path d="M9 12l2 2 4-4" />
-              </svg>
-              <div>
-                <p class="text-sm font-semibold text-brand-900">Identity verification</p>
-                <p class="text-sm text-slate-600">Verified accounts get a trust badge and appear higher in matches. PDF, JPG, or PNG — max 8MB.</p>
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-700 via-brand-600 to-brand-500 p-5 sm:p-6">
+              <div class="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10"></div>
+              <div class="pointer-events-none absolute -bottom-10 left-10 h-24 w-24 rounded-full bg-white/10"></div>
+              <div class="relative flex items-start gap-3.5">
+                <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/15">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z" />
+                    <path d="M9 12l2 2 4-4" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-display font-bold text-white text-base">Identity verification</p>
+                  <p class="mt-0.5 text-sm text-white/80">Verified accounts get a trust badge and appear higher in matches. PDF, JPG, or PNG — max 8MB.</p>
+                </div>
               </div>
             </div>
 

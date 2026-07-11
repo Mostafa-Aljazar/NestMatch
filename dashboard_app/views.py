@@ -6,13 +6,15 @@ from django.http import JsonResponse
 from django.db.models import Count, Avg
 from django.db.models.functions import TruncDate
 from django.utils import timezone
+from django.utils.html import escape
+from django.core.mail import EmailMultiAlternatives
 from datetime import timedelta
 import json
 
 from accounts_app.models import User, VerificationDocument, Testimonial
 from listings_app.models import Listing
 from applications_app.models import Application
-from core_app.models import SiteContent, ContactMessage
+from core_app.models import SiteContent, ContactMessage, ContactReply, PlatformSettings
 
 
 # ─────────────────────────────────────────────
@@ -88,7 +90,13 @@ def overview(request):
         .order_by('-app_count')[:5]
     )
 
-    recent_users = User.objects.order_by('-created_at')[:10]
+    recent_users = (
+        User.objects.annotate(
+            listing_count=Count('listings', distinct=True),
+            application_count=Count('applications', distinct=True),
+        )
+        .order_by('-created_at')[:10]
+    )
 
     context = {
         'current_tab': 'overview',
@@ -113,6 +121,7 @@ def overview(request):
 @user_passes_test(is_admin, login_url='/auth/login/')
 def users_list(request):
     from django.core.paginator import Paginator
+    from django.db.models import Q
 
     all_users = (
         User.objects.annotate(
@@ -122,6 +131,31 @@ def users_list(request):
         .order_by('-created_at')
     )
 
+    # Counts taken before the search/status filters so the summary cards
+    # always reflect every user, not just the current results.
+    total_count = all_users.count()
+    active_count = all_users.filter(is_active=True).count()
+    banned_count = all_users.filter(is_active=False).count()
+    admin_count = all_users.filter(is_staff=True).count()
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        all_users = all_users.filter(
+            Q(first_name__icontains=search_query)
+            | Q(last_name__icontains=search_query)
+            | Q(email__icontains=search_query)
+        )
+
+    status_filter = request.GET.get('status', 'all')
+    if status_filter == 'active':
+        all_users = all_users.filter(is_active=True)
+    elif status_filter == 'banned':
+        all_users = all_users.filter(is_active=False)
+    elif status_filter == 'admins':
+        all_users = all_users.filter(is_staff=True)
+    else:
+        status_filter = 'all'
+
     paginator = Paginator(all_users, 10)  # 10 users per page
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
@@ -130,6 +164,12 @@ def users_list(request):
         'current_tab': 'users',
         'page_obj': page_obj,
         'all_users': page_obj.object_list,
+        'total_count': total_count,
+        'active_count': active_count,
+        'banned_count': banned_count,
+        'admin_count': admin_count,
+        'search_query': search_query,
+        'status_filter': status_filter,
     }
 
     return render(request, 'dashboard_app/users.html', context)
@@ -141,12 +181,37 @@ def users_list(request):
 @user_passes_test(is_admin, login_url='/auth/login/')
 def listings_list(request):
     from django.core.paginator import Paginator
+    from django.db.models import Q
 
     all_listings = (
         Listing.objects.select_related('poster')
         .annotate(app_count=Count('applications'))
+        .prefetch_related('images')
         .order_by('-created_at')
     )
+
+    # Counts taken before the search/status filters so the summary cards
+    # always reflect every listing, not just the current results.
+    total_count = all_listings.count()
+    active_count = all_listings.filter(status='active').count()
+    pending_count = all_listings.filter(status__in=['pending', 'draft']).count()
+    inactive_count = all_listings.filter(status__in=['inactive', 'closed']).count()
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        all_listings = all_listings.filter(
+            Q(title__icontains=search_query)
+            | Q(city__icontains=search_query)
+            | Q(district__icontains=search_query)
+            | Q(poster__first_name__icontains=search_query)
+            | Q(poster__last_name__icontains=search_query)
+        )
+
+    status_filter = request.GET.get('status', 'all')
+    if status_filter in ('active', 'pending', 'draft', 'inactive', 'closed'):
+        all_listings = all_listings.filter(status=status_filter)
+    else:
+        status_filter = 'all'
 
     paginator = Paginator(all_listings, 10)  # 10 listings per page
     page_number = request.GET.get('page', 1)
@@ -156,6 +221,12 @@ def listings_list(request):
         'current_tab': 'listings',
         'page_obj': page_obj,
         'all_listings': page_obj.object_list,
+        'total_count': total_count,
+        'active_count': active_count,
+        'pending_count': pending_count,
+        'inactive_count': inactive_count,
+        'search_query': search_query,
+        'status_filter': status_filter,
     }
 
     return render(request, 'dashboard_app/listings.html', context)
@@ -167,8 +238,28 @@ def listings_list(request):
 @user_passes_test(is_admin, login_url='/auth/login/')
 def banned_users_list(request):
     from django.core.paginator import Paginator
+    from django.db.models import Q
 
-    all_banned = User.objects.filter(is_active=False).order_by('-updated_at')
+    all_banned = (
+        User.objects.filter(is_active=False)
+        .annotate(listing_count=Count('listings', distinct=True))
+        .order_by('-updated_at')
+    )
+
+    # Counts taken before the search filter so the summary cards always
+    # reflect every banned user, not just the current results.
+    total_count = all_banned.count()
+    with_reason_count = all_banned.exclude(ban_reason='').exclude(ban_reason__isnull=True).count()
+    no_reason_count = total_count - with_reason_count
+    with_listings_count = all_banned.filter(listing_count__gt=0).count()
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        all_banned = all_banned.filter(
+            Q(first_name__icontains=search_query)
+            | Q(last_name__icontains=search_query)
+            | Q(email__icontains=search_query)
+        )
 
     paginator = Paginator(all_banned, 10)  # 10 banned users per page
     page_number = request.GET.get('page', 1)
@@ -178,6 +269,11 @@ def banned_users_list(request):
         'current_tab': 'banned',
         'page_obj': page_obj,
         'banned_list': page_obj.object_list,
+        'total_count': total_count,
+        'with_reason_count': with_reason_count,
+        'no_reason_count': no_reason_count,
+        'with_listings_count': with_listings_count,
+        'search_query': search_query,
     }
 
     return render(request, 'dashboard_app/banned_users.html', context)
@@ -188,11 +284,43 @@ def banned_users_list(request):
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
 def messages_list(request):
-    all_messages = ContactMessage.objects.all().order_by('-created_at')
+    from django.core.paginator import Paginator
+    from django.db.models import Q
+
+    all_messages = ContactMessage.objects.select_related('user').prefetch_related('replies__replied_by').order_by('-created_at')
+
+    # Counts are taken before the search filter so the summary cards always
+    # reflect the full inbox, not just the current search results.
+    total_count = all_messages.count()
+    unread_count = all_messages.filter(is_read=False).count()
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        all_messages = all_messages.filter(
+            Q(name__icontains=search_query) | Q(email__icontains=search_query)
+        )
+
+    status_filter = request.GET.get('status', 'all')
+    if status_filter == 'unread':
+        all_messages = all_messages.filter(is_read=False)
+    elif status_filter == 'read':
+        all_messages = all_messages.filter(is_read=True)
+    else:
+        status_filter = 'all'
+
+    paginator = Paginator(all_messages, 10)  # 10 messages per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     context = {
         'current_tab': 'messages',
-        'all_messages': all_messages,
+        'page_obj': page_obj,
+        'all_messages': page_obj.object_list,
+        'total_count': total_count,
+        'unread_count': unread_count,
+        'read_count': total_count - unread_count,
+        'search_query': search_query,
+        'status_filter': status_filter,
     }
 
     return render(request, 'dashboard_app/messages.html', context)
@@ -203,17 +331,8 @@ def messages_list(request):
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
 def applications_list(request):
-    total_applications = Application.objects.count()
-
-    app_stats = {
-        'total': total_applications,
-        'pending': Application.objects.filter(status=Application.STATUS_PENDING).count(),
-        'accepted': Application.objects.filter(status=Application.STATUS_ACCEPTED).count(),
-        'rejected': Application.objects.filter(status=Application.STATUS_REJECTED).count(),
-        'avg_compatibility': Application.objects.exclude(
-            compatibility__isnull=True
-        ).aggregate(avg=Avg('compatibility'))['avg'],
-    }
+    from django.core.paginator import Paginator
+    from django.db.models import Q
 
     all_applications = (
         Application.objects.select_related('seeker', 'listing', 'listing__poster')
@@ -221,10 +340,46 @@ def applications_list(request):
         .order_by('-applied_at')
     )
 
+    # Counts/avg taken before the search/status filters so the summary cards
+    # always reflect every application, not just the current results.
+    total_count = all_applications.count()
+    pending_count = all_applications.filter(status=Application.STATUS_PENDING).count()
+    accepted_count = all_applications.filter(status=Application.STATUS_ACCEPTED).count()
+    rejected_count = all_applications.filter(status=Application.STATUS_REJECTED).count()
+    avg_compatibility = all_applications.exclude(
+        compatibility__isnull=True
+    ).aggregate(avg=Avg('compatibility'))['avg']
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        all_applications = all_applications.filter(
+            Q(seeker__first_name__icontains=search_query)
+            | Q(seeker__last_name__icontains=search_query)
+            | Q(seeker__email__icontains=search_query)
+            | Q(listing__title__icontains=search_query)
+        )
+
+    status_filter = request.GET.get('status', 'all')
+    if status_filter in ('pending', 'accepted', 'rejected'):
+        all_applications = all_applications.filter(status=status_filter)
+    else:
+        status_filter = 'all'
+
+    paginator = Paginator(all_applications, 10)  # 10 applications per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
     context = {
         'current_tab': 'applications',
-        'all_applications': all_applications,
-        'app_stats': app_stats,
+        'page_obj': page_obj,
+        'all_applications': page_obj.object_list,
+        'total_count': total_count,
+        'pending_count': pending_count,
+        'accepted_count': accepted_count,
+        'rejected_count': rejected_count,
+        'avg_compatibility': avg_compatibility,
+        'search_query': search_query,
+        'status_filter': status_filter,
     }
 
     return render(request, 'dashboard_app/applications.html', context)
@@ -235,21 +390,56 @@ def applications_list(request):
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
 def verification_list(request):
-    pending_documents = (
-        VerificationDocument.objects.filter(status='pending')
-        .select_related('user', 'listing')
-        .order_by('created_at')
-    )
+    from django.core.paginator import Paginator
+    from django.db.models import Q
 
     all_documents = (
         VerificationDocument.objects.select_related('user', 'listing')
-        .order_by('-updated_at')
+        .order_by('-created_at')
     )
+
+    # Counts are taken before the search/status filters so the summary cards
+    # always reflect the full document set, not just the current results.
+    total_count = all_documents.count()
+    pending_count = all_documents.filter(status=VerificationDocument.PENDING).count()
+    approved_count = all_documents.filter(status=VerificationDocument.APPROVED).count()
+    rejected_count = all_documents.filter(status=VerificationDocument.REJECTED).count()
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        all_documents = all_documents.filter(
+            Q(user__first_name__icontains=search_query)
+            | Q(user__last_name__icontains=search_query)
+            | Q(user__email__icontains=search_query)
+        )
+
+    status_filter = request.GET.get('status', 'all')
+    if status_filter in ('pending', 'approved', 'rejected'):
+        all_documents = all_documents.filter(status=status_filter)
+    else:
+        status_filter = 'all'
+
+    type_filter = request.GET.get('type', 'all')
+    if type_filter in (VerificationDocument.ID_DOCUMENT, VerificationDocument.RENTAL_CONTRACT):
+        all_documents = all_documents.filter(document_type=type_filter)
+    else:
+        type_filter = 'all'
+
+    paginator = Paginator(all_documents, 10)  # 10 documents per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     context = {
         'current_tab': 'verification',
-        'pending_documents': pending_documents,
-        'all_documents': all_documents,
+        'page_obj': page_obj,
+        'all_documents': page_obj.object_list,
+        'total_count': total_count,
+        'pending_count': pending_count,
+        'approved_count': approved_count,
+        'rejected_count': rejected_count,
+        'search_query': search_query,
+        'status_filter': status_filter,
+        'type_filter': type_filter,
     }
 
     return render(request, 'dashboard_app/verification.html', context)
@@ -260,13 +450,40 @@ def verification_list(request):
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
 def reviews_list(request):
-    pending_reviews = Testimonial.objects.filter(approved=False).select_related('user')
-    approved_reviews = Testimonial.objects.filter(approved=True).select_related('user')
+    from django.core.paginator import Paginator
+
+    all_reviews = Testimonial.objects.select_related('user').order_by('-created_at')
+
+    # Counts are taken before the search filter so the summary cards always
+    # reflect every review, not just the current search results.
+    total_count = all_reviews.count()
+    pending_count = all_reviews.filter(approved=False).count()
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        all_reviews = all_reviews.filter(reviewer_name__icontains=search_query)
+
+    status_filter = request.GET.get('status', 'all')
+    if status_filter == 'pending':
+        all_reviews = all_reviews.filter(approved=False)
+    elif status_filter == 'approved':
+        all_reviews = all_reviews.filter(approved=True)
+    else:
+        status_filter = 'all'
+
+    paginator = Paginator(all_reviews, 10)  # 10 reviews per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     context = {
         'current_tab': 'reviews',
-        'pending_reviews': pending_reviews,
-        'approved_reviews': approved_reviews,
+        'page_obj': page_obj,
+        'all_reviews': page_obj.object_list,
+        'total_count': total_count,
+        'pending_count': pending_count,
+        'approved_count': total_count - pending_count,
+        'search_query': search_query,
+        'status_filter': status_filter,
     }
 
     return render(request, 'dashboard_app/reviews.html', context)
@@ -292,11 +509,46 @@ def site_content_page(request):
 # ─────────────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')
 def settings_page(request):
+    from django.conf import settings as django_settings
+
+    platform_settings = PlatformSettings.load()
+    email_backend = django_settings.EMAIL_BACKEND
+    email_backend_short = email_backend.rsplit('.', 1)[-1] if email_backend else 'Unknown'
+
     context = {
         'current_tab': 'settings',
+        'platform_settings': platform_settings,
+        'default_from_email': django_settings.DEFAULT_FROM_EMAIL,
+        'email_host': django_settings.EMAIL_HOST,
+        'email_port': django_settings.EMAIL_PORT,
+        'email_backend_short': email_backend_short,
+        'debug_mode': django_settings.DEBUG,
     }
 
     return render(request, 'dashboard_app/settings.html', context)
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def update_settings(request):
+    if request.method == 'POST':
+        settings_obj = PlatformSettings.load()
+
+        settings_obj.platform_name = request.POST.get('platform_name', '').strip() or 'NestMatch'
+        settings_obj.support_email = request.POST.get('support_email', '').strip() or 'hello@nestmatch.io'
+        settings_obj.site_url = request.POST.get('site_url', '').strip() or 'nestmatch.io'
+
+        try:
+            max_photos = int(request.POST.get('max_listing_photos', 10))
+            settings_obj.max_listing_photos = max(1, min(max_photos, 20))
+        except (TypeError, ValueError):
+            settings_obj.max_listing_photos = 10
+
+        settings_obj.auto_approve_listings = request.POST.get('auto_approve_listings') == 'on'
+        settings_obj.save()
+
+        messages.success(request, 'Platform settings saved successfully.')
+
+    return redirect('dashboard_app:settings')
 
 
 # Redirect old index to overview
@@ -313,6 +565,7 @@ def ban_user(request, user_id):
     if request.method == 'POST':
         user = get_object_or_404(User, id=user_id)
         user.is_active = False
+        user.ban_reason = request.POST.get('reason', '').strip()
         user.save()
     return redirect('dashboard_app:index')
 
@@ -322,6 +575,7 @@ def unban_user(request, user_id):
     if request.method == 'POST':
         user = get_object_or_404(User, id=user_id)
         user.is_active = True
+        user.ban_reason = ''
         user.save()
     return redirect('dashboard_app:index')
 
@@ -432,6 +686,90 @@ def delete_message(request, message_id):
     return redirect(f"{reverse('dashboard_app:index')}#messages")
 
 
+@user_passes_test(is_admin, login_url='/auth/login/')
+def reply_message(request, message_id):
+    """
+    Sends an admin's reply as a real email to the address the visitor left
+    on the Contact Us form, and marks the message read (replying to it
+    implies it's been handled).
+    """
+    if request.method != 'POST':
+        return redirect(f"{reverse('dashboard_app:index')}#messages")
+
+    msg = get_object_or_404(ContactMessage, id=message_id)
+    reply_text = request.POST.get('reply', '').strip()
+
+    if not reply_text:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'ok': False, 'error': 'Reply message cannot be empty.'})
+        return redirect(f"{reverse('dashboard_app:index')}#messages")
+
+    subject = 'Re: Your inquiry to NestMatch Support'
+    text_content = (
+        f'Dear {msg.name},\n\n'
+        f'Thank you for contacting NestMatch. Below is our response to your inquiry:\n\n'
+        f'{reply_text}\n\n'
+        f'For your reference, your original message was:\n"{msg.message}"\n\n'
+        f'If you have any further questions, simply reply to this email and our team will be happy to assist.\n\n'
+        f'Kind regards,\n'
+        f'The NestMatch Support Team'
+    )
+
+    safe_name = escape(msg.name)
+    safe_reply = escape(reply_text)
+    safe_original = escape(msg.message)
+    html_content = f'''
+    <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e5e9;">
+      <div style="background: #A85300; padding: 28px 32px;">
+        <h1 style="color: #ffffff; font-size: 19px; font-weight: 700; margin: 0; letter-spacing: .3px;">NestMatch</h1>
+        <p style="color: rgba(255,255,255,0.82); font-size: 12.5px; margin: 4px 0 0; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: .8px;">Customer Support</p>
+      </div>
+      <div style="padding: 36px 32px 28px; font-family: Arial, sans-serif;">
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 0 0 18px;">Dear {safe_name},</p>
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 0 0 18px;">Thank you for contacting NestMatch. Please find our response to your inquiry below.</p>
+
+        <div style="color: #1e293b; font-size: 14.5px; line-height: 1.7; white-space: pre-wrap; margin: 0 0 26px; padding: 18px 20px; background: #FFFAF2; border-radius: 8px; border: 1px solid #FDDCC7;">{safe_reply}</div>
+
+        <p style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; margin: 0 0 8px;">Your Original Message</p>
+        <div style="border-left: 3px solid #D1D5DB; padding: 4px 0 4px 16px; margin: 0 0 28px;">
+          <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin: 0; white-space: pre-wrap; font-style: italic;">&ldquo;{safe_original}&rdquo;</p>
+        </div>
+
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 0 0 4px;">Should you require further assistance, please do not hesitate to reply directly to this email.</p>
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 22px 0 0;">
+          Kind regards,<br>
+          <strong>The NestMatch Support Team</strong>
+        </p>
+      </div>
+      <div style="background: #f8fafc; border-top: 1px solid #e5e7eb; padding: 18px 32px; text-align: center; font-family: Arial, sans-serif;">
+        <p style="color: #94a3b8; font-size: 11.5px; margin: 0;">&copy; 2026 NestMatch. All rights reserved.</p>
+        <p style="color: #b0b7c1; font-size: 11px; margin: 4px 0 0;">This is a reply to a message you submitted via our Contact Us form.</p>
+      </div>
+    </div>
+    '''
+
+    email = EmailMultiAlternatives(subject, text_content, None, [msg.email])
+    email.attach_alternative(html_content, 'text/html')
+    email.send()
+
+    reply = ContactReply.objects.create(message=msg, reply_text=reply_text, replied_by=request.user)
+
+    msg.is_read = True
+    msg.save()
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({
+            'ok': True,
+            'reply': {
+                'text': reply.reply_text,
+                'replied_at': reply.replied_at.strftime('%b %d, %Y') + ' · ' + reply.replied_at.strftime('%H:%M'),
+                'replied_by': (reply.replied_by.full_name.strip() if reply.replied_by else '') or 'Admin',
+            },
+        })
+
+    return redirect(f"{reverse('dashboard_app:index')}#messages")
+
+
 # ─────────────────────────────────────────────
 # SITE CONTENT
 # ─────────────────────────────────────────────
@@ -450,8 +788,9 @@ def update_site_content(request):
                 setattr(content, field, request.POST.get(field, '').strip())
 
         content.save()
+        messages.success(request, 'Landing page content saved successfully.')
 
-    return redirect(f"{reverse('dashboard_app:index')}#site-content")
+    return redirect('dashboard_app:site_content')
 
 
 # ─────────────────────────────────────────────
@@ -471,6 +810,13 @@ def approve_document(request, doc_id):
             doc.listing.status = 'active'
             doc.listing.save()
 
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'ok': True,
+                'status': doc.status,
+                'reviewed_at': doc.reviewed_at.strftime('%b %d, %Y') + ' · ' + doc.reviewed_at.strftime('%H:%M'),
+            })
+
     return redirect(f"{reverse('dashboard_app:index')}#verification")
 
 
@@ -478,8 +824,15 @@ def approve_document(request, doc_id):
 def reject_document(request, doc_id):
     if request.method == 'POST':
         doc = get_object_or_404(VerificationDocument, id=doc_id)
+        reason = request.POST.get('reason', '').strip()
+
+        if not reason:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'ok': False, 'error': 'Please provide a rejection reason.'})
+            return redirect(f"{reverse('dashboard_app:index')}#verification")
+
         doc.status = VerificationDocument.REJECTED
-        doc.rejection_reason = request.POST.get('reason', '').strip()
+        doc.rejection_reason = reason
         doc.reviewed_by = request.user
         doc.reviewed_at = timezone.now()
         doc.save()
@@ -487,6 +840,14 @@ def reject_document(request, doc_id):
         if doc.listing and doc.document_type == 'rental_contract' and doc.listing.status not in ['pending', 'closed', 'draft']:
             doc.listing.status = 'pending'
             doc.listing.save()
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'ok': True,
+                'status': doc.status,
+                'rejection_reason': doc.rejection_reason,
+                'reviewed_at': doc.reviewed_at.strftime('%b %d, %Y') + ' · ' + doc.reviewed_at.strftime('%H:%M'),
+            })
 
     return redirect(f"{reverse('dashboard_app:index')}#verification")
 
@@ -501,14 +862,78 @@ def approve_review(request, review_id):
         review.approved = True
         review.save()
 
-    return redirect(f"{reverse('dashboard_app:index')}#reviews")
+    return redirect('dashboard_app:reviews')
 
 
 @user_passes_test(is_admin, login_url='/auth/login/')
 def reject_review(request, review_id):
     if request.method == 'POST':
         get_object_or_404(Testimonial, id=review_id).delete()
-    return redirect(f"{reverse('dashboard_app:index')}#reviews")
+    return redirect('dashboard_app:reviews')
+
+
+@user_passes_test(is_admin, login_url='/auth/login/')
+def email_review_author(request, review_id):
+    """
+    Sends a one-off email to the account that submitted a review — e.g. to
+    say thanks for a glowing 5-star review, or to ask what went wrong on a
+    low one. Not a threaded conversation like Contact Messages, so nothing
+    is persisted; it's just a courtesy email sent straight to the user.
+    """
+    review = get_object_or_404(Testimonial, id=review_id)
+
+    if request.method != 'POST':
+        return redirect('dashboard_app:reviews')
+
+    subject = request.POST.get('subject', '').strip()
+    body = request.POST.get('body', '').strip()
+
+    if not subject or not body:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'ok': False, 'error': 'Subject and message are required.'})
+        return redirect('dashboard_app:reviews')
+
+    safe_name = escape(review.user.full_name)
+    safe_body = escape(body)
+    safe_quote = escape(review.quote)
+    text_content = (
+        f'Dear {review.user.full_name},\n\n'
+        f'{body}\n\n'
+        f'For reference, your review was:\n"{review.quote}"\n\n'
+        f'Kind regards,\n'
+        f'The NestMatch Team'
+    )
+    html_content = f'''
+    <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e5e9;">
+      <div style="background: #A85300; padding: 28px 32px;">
+        <h1 style="color: #ffffff; font-size: 19px; font-weight: 700; margin: 0; letter-spacing: .3px;">NestMatch</h1>
+        <p style="color: rgba(255,255,255,0.82); font-size: 12.5px; margin: 4px 0 0; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: .8px;">About your review</p>
+      </div>
+      <div style="padding: 36px 32px 28px; font-family: Arial, sans-serif;">
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 0 0 18px;">Dear {safe_name},</p>
+        <div style="color: #1e293b; font-size: 14.5px; line-height: 1.7; white-space: pre-wrap; margin: 0 0 26px; padding: 18px 20px; background: #FFFAF2; border-radius: 8px; border: 1px solid #FDDCC7;">{safe_body}</div>
+        <p style="color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; margin: 0 0 8px;">Your Review</p>
+        <div style="border-left: 3px solid #D1D5DB; padding: 4px 0 4px 16px; margin: 0 0 28px;">
+          <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin: 0; white-space: pre-wrap; font-style: italic;">&ldquo;{safe_quote}&rdquo;</p>
+        </div>
+        <p style="color: #1e293b; font-size: 14.5px; line-height: 1.6; margin: 22px 0 0;">
+          Kind regards,<br>
+          <strong>The NestMatch Team</strong>
+        </p>
+      </div>
+      <div style="background: #f8fafc; border-top: 1px solid #e5e7eb; padding: 18px 32px; text-align: center; font-family: Arial, sans-serif;">
+        <p style="color: #94a3b8; font-size: 11.5px; margin: 0;">&copy; 2026 NestMatch. All rights reserved.</p>
+      </div>
+    </div>
+    '''
+
+    email = EmailMultiAlternatives(subject, text_content, None, [review.user.email])
+    email.attach_alternative(html_content, 'text/html')
+    email.send()
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'ok': True})
+    return redirect('dashboard_app:reviews')
 
 # ── View user listings (admin only) ──────────────────────────────────────
 @user_passes_test(is_admin, login_url='/auth/login/')

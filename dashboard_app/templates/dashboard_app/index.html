@@ -699,13 +699,12 @@ a{text-decoration:none;cursor:pointer}
           <div class="adm-section-title">Pending Review</div>
           <div style="overflow-x:auto">
             <table class="adm-tbl">
-              <thead><tr><th>Reviewer</th><th>Role</th><th>Location</th><th>Review</th><th>Submitted</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Reviewer</th><th>Role</th><th>Review</th><th>Submitted</th><th>Actions</th></tr></thead>
               <tbody>
                 {% for review in pending_reviews %}
                 <tr>
                   <td style="font-weight:600">{{ review.reviewer_name }}</td>
                   <td>{{ review.get_role_display }}</td>
-                  <td style="color:#6B7280">{{ review.location|default:"—" }}</td>
                   <td style="color:#374151;max-width:280px">{{ review.quote|truncatechars:100 }}</td>
                   <td style="color:#6B7280;white-space:nowrap">{{ review.created_at|date:"M d, Y" }}</td>
                   <td>
@@ -734,18 +733,17 @@ a{text-decoration:none;cursor:pointer}
           <div class="adm-section-title">Approved Reviews</div>
           <div style="overflow-x:auto">
             <table class="adm-tbl">
-              <thead><tr><th>Reviewer</th><th>Role</th><th>Location</th><th>Review</th><th>Date</th></tr></thead>
+              <thead><tr><th>Reviewer</th><th>Role</th><th>Review</th><th>Date</th></tr></thead>
               <tbody>
                 {% for review in approved_reviews %}
                 <tr>
                   <td style="font-weight:600">{{ review.reviewer_name }}</td>
                   <td>{{ review.get_role_display }}</td>
-                  <td style="color:#6B7280">{{ review.location|default:"—" }}</td>
                   <td style="color:#374151;max-width:280px">{{ review.quote|truncatechars:100 }}</td>
                   <td style="color:#6B7280;white-space:nowrap">{{ review.created_at|date:"M d, Y" }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" style="text-align:center;color:#9CA3AF;padding:20px">No approved reviews yet.</td></tr>
+                <tr><td colspan="4" style="text-align:center;color:#9CA3AF;padding:20px">No approved reviews yet.</td></tr>
                 {% endfor %}
               </tbody>
             </table>

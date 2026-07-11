@@ -217,12 +217,23 @@ def public_profile_view(request, user_id):
     listing_count = active_listings.count()
     shown_listings = active_listings[:4]
 
+    # Contact Us submissions are private support inquiries -- only staff
+    # reviewing a user's profile from the admin dashboard should see them,
+    # never a regular seeker/poster looking at someone else's profile.
+    contact_messages = None
+    submitted_reviews = None
+    if request.user.is_staff:
+        contact_messages = profile_user.contact_messages.order_by('-created_at')
+        submitted_reviews = profile_user.testimonials.order_by('-created_at')
+
     context = {
         'profile_user': profile_user,
         'lifestyle_profile': lifestyle_profile,
         'listing_count': listing_count,
         'active_listings': shown_listings,
         'more_listings_count': max(0, listing_count - len(shown_listings)),
+        'contact_messages': contact_messages,
+        'submitted_reviews': submitted_reviews,
     }
     return render(request, 'public_profile.html', context)
 
@@ -276,7 +287,7 @@ def submit_review(request):
     review_text   = request.POST.get('review_text', '').strip()
     reviewer_name = request.POST.get('reviewer_name', '').strip()
     role          = request.POST.get('role', '').strip()
-    location      = request.POST.get('location', '').strip()
+    rating_raw    = request.POST.get('rating', '').strip()
 
     errors = {}
     if not reviewer_name:
@@ -286,6 +297,15 @@ def submit_review(request):
     if role not in dict(Testimonial.ROLE_CHOICES):
         errors['role'] = 'Please select your role.'
 
+    rating = 5
+    if rating_raw:
+        if rating_raw.isdigit() and 1 <= int(rating_raw) <= 5:
+            rating = int(rating_raw)
+        else:
+            errors['rating'] = 'Please select a rating between 1 and 5 stars.'
+    else:
+        errors['rating'] = 'Please select a star rating.'
+
     if errors:
         return JsonResponse({'success': False, 'errors': errors})
 
@@ -293,8 +313,8 @@ def submit_review(request):
         user=request.user,
         reviewer_name=reviewer_name,
         role=role,
-        location=location,
         quote=review_text,
+        rating=rating,
         approved=False,
     )
 

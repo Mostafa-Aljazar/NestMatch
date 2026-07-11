@@ -6,49 +6,555 @@
 
 {% block page_title %}Messages{% endblock %}
 
+{% block extra_css %}
+<style>
+.msg-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:640px){.msg-stats{grid-template-columns:1fr}}
+.msg-stat{display:flex;align-items:center;gap:13px;padding:18px 20px;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s,border-color .15s;text-decoration:none;border:1.5px solid transparent;cursor:pointer}
+.msg-stat:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.msg-stat.active{border-color:var(--brand-400)}
+.msg-stat-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.msg-stat-num{font-size:22px;font-weight:800;color:#111827;line-height:1}
+.msg-stat-label{font-size:12px;color:#9CA3AF;font-weight:600;margin-top:3px}
+
+.msg-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 22px;background:#FAFBFC;border-bottom:1px solid #F0F1F3;border-radius:16px 16px 0 0}
+.msg-tabs{display:flex;gap:4px;background:#F0F1F3;padding:4px;border-radius:11px;flex-shrink:0}
+.msg-tab{padding:7px 14px;font-size:12.5px;font-weight:700;color:#6B7280;text-decoration:none;border-radius:8px;transition:all .15s;white-space:nowrap}
+.msg-tab:hover{color:#374151}
+.msg-tab.active{background:#fff;color:var(--brand-600);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.msg-search{display:flex;align-items:center;gap:8px;flex:1;max-width:380px;min-width:220px;background:#fff;border:1.5px solid #E5E7EB;border-radius:24px;padding:0 14px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:border-color .15s,box-shadow .15s}
+.msg-search:focus-within{border-color:var(--brand-600);box-shadow:0 0 0 4px rgba(204,102,0,.1)}
+.msg-search svg.msg-search-icon{color:#9CA3AF;flex-shrink:0}
+.msg-search input{flex:1;min-width:0;border:none!important;outline:none!important;background:transparent!important;padding:11px 0!important;margin:0!important;font-size:13.5px;font-family:inherit;color:#111827;box-shadow:none!important;border-radius:0!important}
+.msg-search input::placeholder{color:#B0B7C1}
+.msg-search-clear{flex-shrink:0;background:#F3F4F6;border-radius:50%;border:none;color:#9CA3AF;cursor:pointer;padding:5px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:background .15s,color .15s;text-decoration:none}
+.msg-search-clear:hover{background:#E5E7EB;color:#374151}
+.msg-search-result{flex-basis:100%;font-size:12px;color:#6B7280;font-weight:600}
+.msg-search-result strong{color:var(--brand-600)}
+
+.msg-row{display:flex;align-items:center;gap:14px;padding:17px 22px;border-bottom:1px solid #F3F4F6;cursor:pointer;transition:background .15s}
+.msg-row:last-child{border-bottom:none}
+.msg-row:hover{background:#FAFBFC}
+.msg-row.unread{background:#FFFAF2}
+.msg-row.unread:hover{background:#FDF3E4}
+.msg-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--brand-600),var(--brand-400));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 2px 6px rgba(204,102,0,.25)}
+.msg-avatar-img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.msg-main{flex:1;min-width:0}
+.msg-top{display:flex;align-items:center;gap:8px}
+.msg-name{font-size:14px;font-weight:700;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg-user-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:var(--brand-600);background:var(--brand-100);padding:2px 8px;border-radius:20px;flex-shrink:0}
+.msg-dot{width:7px;height:7px;border-radius:50%;background:var(--brand-600);flex-shrink:0}
+.msg-preview{font-size:12.5px;color:#9CA3AF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.msg-side{display:flex;align-items:center;gap:18px;flex-shrink:0}
+.msg-meta{min-width:92px}
+.msg-meta-date{display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:12px;font-weight:600;color:#4B5563;white-space:nowrap}
+.msg-meta-time{display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:11px;color:#9CA3AF;white-space:nowrap;margin-top:3px}
+.msg-meta-date svg,.msg-meta-time svg{flex-shrink:0;opacity:.75}
+.msg-empty{padding:64px 20px;text-align:center;color:#9CA3AF}
+
+.msg-badge{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:10.5px;font-weight:700;padding:4px 12px;border-radius:20px;flex-shrink:0;min-width:64px;text-align:center}
+.msg-badge-unread{background:#FDDCC7;color:#A85300}
+.msg-badge-read{background:#F3F4F6;color:#6B7280}
+
+/* ── Pagination (matches Users page) ── */
+.msg-page-link{padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none}
+.msg-page-disabled{padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed}
+.msg-page-current{padding:6px 10px;font-size:11px;font-weight:600;color:#111827;background:#E5E7EB;border-radius:4px}
+
+/* ── Modal ── */
+.msg-modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);z-index:2000;align-items:center;justify-content:center;padding:16px}
+.msg-modal-overlay.open{display:flex}
+.msg-modal{background:#fff;border-radius:20px;box-shadow:0 30px 70px rgba(0,0,0,.3);max-width:540px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;animation:msgModalIn .25s cubic-bezier(.16,1,.3,1)}
+.msg-modal-scroll{overflow-y:auto;flex:1 1 auto;min-height:0;scrollbar-width:thin;scrollbar-color:#D1D5DB transparent}
+.msg-modal-scroll::-webkit-scrollbar{width:6px}
+.msg-modal-scroll::-webkit-scrollbar-track{background:transparent}
+.msg-modal-scroll::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:20px}
+.msg-modal-scroll::-webkit-scrollbar-thumb:hover{background:#9CA3AF}
+@keyframes msgModalIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.msg-modal-banner{position:relative;background:linear-gradient(135deg,var(--brand-700),var(--brand-600) 55%,var(--brand-500));padding:28px 26px 24px;flex-shrink:0}
+.msg-modal-x{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.16);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.msg-modal-x:hover{background:rgba(255,255,255,.28)}
+.msg-modal-header{display:flex;align-items:center;gap:16px}
+.msg-modal-avatar{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);border:2.5px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0}
+.msg-modal-title{font-size:17px;font-weight:800;color:#fff;margin:0}
+.msg-modal-email{font-size:12.5px;color:rgba(255,255,255,.85);margin-top:3px;word-break:break-all}
+.msg-modal-profile-link{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#fff;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;text-decoration:none;transition:background .15s}
+.msg-modal-profile-link:hover{background:rgba(255,255,255,.32)}
+
+.msg-modal-body{padding:24px 26px 22px;background:linear-gradient(180deg,#FFFAF2 0%,#fff 90px)}
+.msg-modal-date{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#A85300;font-weight:700;margin-bottom:22px;background:var(--brand-100);padding:5px 12px;border-radius:20px}
+.msg-modal-date::before{content:'';display:inline-block;width:12px;height:12px;background-color:#A85300;flex-shrink:0;-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");-webkit-mask-size:contain;mask-size:contain}
+.msg-modal-section-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px}
+.msg-modal-section-label svg{color:var(--brand-500)}
+.msg-modal-text{padding:16px 18px;background:#fff;border:1px solid #F0F1F3;border-left:3px solid var(--brand-500);border-radius:4px 14px 14px 4px;font-size:13.5px;color:#374151;line-height:1.7;white-space:pre-wrap;max-height:180px;overflow-y:auto;box-shadow:0 1px 4px rgba(0,0,0,.03)}
+.msg-reply-card{padding:14px 16px;background:#F0FDF4;border:1px solid #BBF7D0;border-left:3px solid #059669;border-radius:4px 14px 14px 4px;font-size:13px;color:#065F46;line-height:1.6;white-space:pre-wrap}
+.msg-reply-card-meta{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#059669;margin-bottom:6px}
+.msg-modal-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 26px;background:#FAFBFC;border-top:1px solid #F0F1F3}
+.msg-modal-footer-left{display:flex;gap:8px}
+.msg-modal-footer-right{display:flex;gap:8px}
+.msg-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;font-size:12.5px;font-weight:700;border:none;border-radius:9px;cursor:pointer;font-family:inherit;transition:filter .15s,transform .15s,box-shadow .15s}
+.msg-btn:hover{transform:translateY(-1px)}
+.msg-btn-close{color:#4B5563;background:#fff;border:1.5px solid #E5E7EB!important}
+.msg-btn-close:hover{background:#F9FAFB;border-color:#D1D5DB!important}
+.msg-btn-read{color:#059669;background:#fff;border:1.5px solid #BBF7D0!important}
+.msg-btn-read:hover{background:#F0FDF4}
+.msg-btn-delete{color:#E11D48;background:#fff;border:1.5px solid #FECDD3!important}
+.msg-btn-delete:hover{background:#FFF1F2}
+
+.msg-reply-section{margin-top:24px;padding:18px 18px 16px;background:linear-gradient(160deg,var(--brand-50),#fff 60%);border:1px solid #FBC9A3;border-radius:14px}
+.msg-reply-section .msg-modal-section-label{color:#A85300}
+.msg-reply-section .msg-modal-section-label svg{color:var(--brand-600)}
+.msg-reply-textarea{width:100%;min-height:90px;padding:12px 14px;font-size:13px;font-family:inherit;color:#111827;background:#fff;border:1.5px solid #F0D9BE;border-radius:10px;resize:vertical;outline:none;transition:border-color .15s,box-shadow .15s;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.msg-reply-textarea:focus{border-color:var(--brand-600);box-shadow:0 0 0 3px rgba(204,102,0,.12)}
+.msg-reply-status{font-size:11.5px;font-weight:600;color:#9CA3AF}
+.msg-reply-status.success{color:#059669}
+.msg-reply-status.error{color:#E11D48}
+.msg-btn-send{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;font-size:12.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--brand-600),var(--brand-500));border:none;border-radius:9px;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(204,102,0,.35);transition:transform .15s,filter .15s,box-shadow .15s}
+.msg-btn-send:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(204,102,0,.4)}
+.msg-btn-send:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+</style>
+{% endblock %}
+
 {% block content %}
 <div style="margin-bottom:20px">
   <h2 style="font-size:20px;font-weight:800;color:#111827">Contact Messages</h2>
-  <p style="font-size:13px;color:#6B7280;margin-top:2px">Messages submitted through the Contact Us form</p>
+  <p style="font-size:13px;color:#6B7280;margin-top:2px">Messages submitted through the Contact Us form &middot; click a message to view it in full</p>
 </div>
-<div style="background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06)">
-  {% for msg in all_messages %}
-  <div id="msg-{{ msg.id }}" style="padding:20px 22px;border-bottom:1px solid #F3F4F6;{% if not msg.is_read %}border-left:3px solid var(--brand-600);{% endif %}">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:38px;height:38px;border-radius:50%;background:inear-gradient(135deg,var(--brand-600),var(--brand-400));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0">
-          {{ msg.name|first|upper }}
-        </div>
-        <div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:14px;font-weight:700;color:#111827">{{ msg.name }}</span>
-            {% if not msg.is_read %}<span style="width:7px;height:7px;border-radius:50%;background:var(--brand-600);display:inline-block"></span>{% endif %}
-          </div>
-          <div style="font-size:12px;color:#9CA3AF">{{ msg.email }} &middot; {{ msg.created_at|date:"M d, Y H:i" }}</div>
-        </div>
+
+<!-- ── Summary stats (also act as quick filters) ── -->
+<div class="msg-stats">
+  <a href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'all' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:var(--brand-100)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ total_count }}</div>
+      <div class="msg-stat-label">Total messages</div>
+    </div>
+  </a>
+  <a href="?status=unread{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'unread' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:#FDDCC7">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A85300" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ unread_count }}</div>
+      <div class="msg-stat-label">Unread</div>
+    </div>
+  </a>
+  <a href="?status=read{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'read' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:#D1FAE5">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ read_count }}</div>
+      <div class="msg-stat-label">Read</div>
+    </div>
+  </a>
+</div>
+
+<div class="adm-card" style="padding:0">
+  <!-- ── Toolbar: filter tabs + search ── -->
+  <form method="get" class="msg-toolbar">
+    <div class="msg-tabs">
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=all" class="msg-tab{% if status_filter == 'all' %} active{% endif %}">All</a>
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=unread" class="msg-tab{% if status_filter == 'unread' %} active{% endif %}">Unread</a>
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=read" class="msg-tab{% if status_filter == 'read' %} active{% endif %}">Read</a>
+    </div>
+    <input type="hidden" name="status" value="{{ status_filter }}">
+    <div class="msg-search">
+      <svg class="msg-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" name="q" value="{{ search_query }}" placeholder="Search by name or email...">
+      {% if search_query %}
+        <a href="?status={{ status_filter }}" class="msg-search-clear" title="Clear search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </a>
+      {% endif %}
+    </div>
+    {% if search_query %}
+      <div class="msg-search-result">
+        <strong>{{ page_obj.paginator.count }}</strong> result{{ page_obj.paginator.count|pluralize }} for &ldquo;{{ search_query }}&rdquo;
       </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
-        {% if not msg.is_read %}
-        <form method="post" action="{% url 'dashboard_app:mark_message_read' msg.id %}" style="display:inline">
-          {% csrf_token %}
-          <button type="submit" style="font-size:11px;font-weight:600;color:#059669;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit">Mark Read</button>
-        </form>
-        {% endif %}
-        <form method="post" action="{% url 'dashboard_app:delete_message' msg.id %}" style="display:inline" onsubmit="return confirm('Delete this message?')">
-          {% csrf_token %}
-          <button type="submit" style="font-size:11px;font-weight:600;color:#E11D48;background:#FFF1F2;border:1px solid #FECDD3;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit">Delete</button>
-        </form>
+    {% endif %}
+  </form>
+
+  {% for msg in all_messages %}
+  <div id="msg-row-{{ msg.id }}"
+       class="msg-row{% if not msg.is_read %} unread{% endif %}"
+       onclick="openMsgModal({{ msg.id }})"
+       data-name="{% if msg.user %}{{ msg.user.full_name }}{% else %}{{ msg.name }}{% endif %}"
+       data-email="{% if msg.user %}{{ msg.user.email }}{% else %}{{ msg.email }}{% endif %}"
+       data-date="{{ msg.created_at|date:'M d, Y \a\t H:i' }}"
+       data-message="{{ msg.message }}"
+       data-unread="{{ msg.is_read|yesno:',1' }}"
+       data-avatar-url="{% if msg.user and msg.user.profile_pic %}{{ msg.user.profile_pic.url }}{% endif %}"
+       data-profile-url="{% if msg.user %}{% url 'accounts_app:public_profile' msg.user.id %}{% endif %}"
+       data-read-url="{% url 'dashboard_app:mark_message_read' msg.id %}"
+       data-delete-url="{% url 'dashboard_app:delete_message' msg.id %}"
+       data-reply-url="{% url 'dashboard_app:reply_message' msg.id %}">
+    {% if msg.user and msg.user.profile_pic %}
+      <img src="{{ msg.user.profile_pic.url }}" alt="{{ msg.user.full_name }}" class="msg-avatar-img">
+    {% elif msg.user %}
+      <div class="msg-avatar">{{ msg.user.full_name|first|upper }}</div>
+    {% else %}
+      <div class="msg-avatar">{{ msg.name|first|upper }}</div>
+    {% endif %}
+    <div class="msg-main">
+      <div class="msg-top">
+        <span class="msg-name">{% if msg.user %}{{ msg.user.full_name }}{% else %}{{ msg.name }}{% endif %}</span>
+        {% if msg.user %}<span class="msg-user-badge" title="Registered NestMatch user">User</span>{% endif %}
+        {% if not msg.is_read %}<span class="msg-dot"></span>{% endif %}
+      </div>
+      <div class="msg-preview">{% if msg.user %}{{ msg.user.email }}{% else %}{{ msg.email }}{% endif %} &middot; {{ msg.message|truncatechars:70 }}</div>
+    </div>
+    <div class="msg-side">
+      {% if msg.is_read %}
+        <span class="msg-badge msg-badge-read">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          Read
+        </span>
+      {% else %}
+        <span class="msg-badge msg-badge-unread">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+          Unread
+        </span>
+      {% endif %}
+      <div class="msg-meta">
+        <div class="msg-meta-date">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          {{ msg.created_at|date:"M d, Y" }}
+        </div>
+        <div class="msg-meta-time">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          {{ msg.created_at|date:"H:i" }}
+        </div>
       </div>
     </div>
-    <div style="margin-top:12px;font-size:13px;color:#374151;line-height:1.6;background:#F9FAFB;border-radius:8px;padding:12px 14px;border-left:3px solid var(--brand-100)">
-      {{ msg.message }}
+    <div class="msg-replies-data" style="display:none">
+      {% for reply in msg.replies.all %}
+        <span data-reply-text="{{ reply.reply_text }}" data-reply-date="{{ reply.replied_at|date:'M d, Y \a\t H:i' }}" data-reply-by="{{ reply.replied_by.full_name|default:'Admin' }}"></span>
+      {% endfor %}
     </div>
   </div>
   {% empty %}
-  <div style="padding:48px;text-align:center;color:#9CA3AF">
+  <div class="msg-empty">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-    <p style="font-weight:600">No messages yet.</p>
+    <p style="font-weight:600">
+      {% if search_query %}No messages match &ldquo;{{ search_query }}&rdquo;.
+      {% elif status_filter == 'unread' %}No unread messages.
+      {% elif status_filter == 'read' %}No read messages yet.
+      {% else %}No messages yet.{% endif %}
+    </p>
   </div>
   {% endfor %}
+
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;flex-wrap:wrap;gap:10px;border-top:1px solid #F3F4F6">
+    <div style="font-size:12px;color:#6B7280">
+      Showing <strong>{{ page_obj.start_index }}</strong> to <strong>{{ page_obj.end_index }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> messages
+    </div>
+
+    <div style="display:flex;align-items:center;gap:6px">
+      {% if page_obj.has_previous %}
+        <a href="?page=1&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">« First</a>
+        <a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">‹ Previous</a>
+      {% else %}
+        <span class="msg-page-disabled">« First</span>
+        <span class="msg-page-disabled">‹ Previous</span>
+      {% endif %}
+
+      <span class="msg-page-current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">Next ›</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">Last »</a>
+      {% else %}
+        <span class="msg-page-disabled">Next ›</span>
+        <span class="msg-page-disabled">Last »</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
 </div>
+
+<!-- MESSAGE DETAIL MODAL -->
+<div id="msgModal" class="msg-modal-overlay" onclick="if(event.target.id==='msgModal') closeMsgModal()">
+  <div class="msg-modal" onclick="event.stopPropagation()">
+    <div class="msg-modal-banner">
+      <button type="button" class="msg-modal-x" onclick="closeMsgModal()" title="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="msg-modal-header">
+        <div id="msgModalAvatar" class="msg-modal-avatar"></div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <h3 id="msgModalName" class="msg-modal-title"></h3>
+            <a id="msgModalProfileLink" href="#" target="_blank" class="msg-modal-profile-link" style="display:none">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              View Profile
+            </a>
+          </div>
+          <div id="msgModalEmail" class="msg-modal-email"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="msg-modal-scroll">
+      <div class="msg-modal-body">
+        <div id="msgModalDate" class="msg-modal-date"></div>
+
+        <div class="msg-modal-section-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Message
+        </div>
+        <div id="msgModalText" class="msg-modal-text"></div>
+
+        <div id="msgModalReplies" style="display:none;margin-top:20px">
+          <div class="msg-modal-section-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+            Previous Replies
+          </div>
+          <div id="msgModalRepliesList" style="display:flex;flex-direction:column;gap:10px"></div>
+        </div>
+
+        <div class="msg-reply-section">
+          <div class="msg-modal-section-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            Reply by Email
+          </div>
+          <textarea id="msgReplyText" class="msg-reply-textarea" placeholder="Write your reply here..."></textarea>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+            <span id="msgReplyStatus" class="msg-reply-status"></span>
+            <button type="button" id="msgReplySendBtn" class="msg-btn-send" onclick="sendReply()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Send Reply
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="msg-modal-footer">
+        <div class="msg-modal-footer-left">
+          <button type="button" class="msg-btn msg-btn-delete" onclick="deleteCurrentMsg()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Delete
+          </button>
+        </div>
+        <div class="msg-modal-footer-right">
+          <button type="button" id="msgModalReadBtn" class="msg-btn msg-btn-read" onclick="markCurrentMsgRead()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+            Mark Read
+          </button>
+          <button type="button" class="msg-btn msg-btn-close" onclick="closeMsgModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentMsgId = null;
+
+function getCsrfToken() {
+  return document.cookie.split('; ').find(r => r.startsWith('csrftoken='))?.split('=')[1];
+}
+
+function openMsgModal(msgId) {
+  const row = document.getElementById('msg-row-' + msgId);
+  const data = row.dataset;
+
+  currentMsgId = msgId;
+  const avatarEl = document.getElementById('msgModalAvatar');
+  if (data.avatarUrl) {
+    avatarEl.innerHTML = '<img src="' + data.avatarUrl + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
+  } else {
+    avatarEl.textContent = data.name.charAt(0).toUpperCase();
+  }
+  document.getElementById('msgModalName').textContent = data.name;
+  document.getElementById('msgModalEmail').textContent = data.email;
+  document.getElementById('msgModalDate').textContent = data.date;
+  document.getElementById('msgModalText').textContent = data.message;
+
+  const profileLink = document.getElementById('msgModalProfileLink');
+  if (data.profileUrl) {
+    profileLink.href = data.profileUrl;
+    profileLink.style.display = '';
+  } else {
+    profileLink.style.display = 'none';
+  }
+
+  renderReplies(row);
+
+  const isUnread = data.unread === '1';
+  document.getElementById('msgModalReadBtn').style.display = isUnread ? '' : 'none';
+
+  document.getElementById('msgReplyText').value = '';
+  const status = document.getElementById('msgReplyStatus');
+  status.textContent = '';
+  status.className = 'msg-reply-status';
+
+  document.getElementById('msgModal').classList.add('open');
+
+  // Opening a message counts as reading it, same as the old inline page did implicitly by showing full content.
+  if (isUnread) markCurrentMsgRead(true);
+}
+
+function renderReplies(row) {
+  const wrap = document.getElementById('msgModalReplies');
+  const list = document.getElementById('msgModalRepliesList');
+  list.innerHTML = '';
+
+  const repliesData = row.querySelector('.msg-replies-data');
+  const spans = repliesData ? repliesData.querySelectorAll('span') : [];
+
+  if (spans.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+
+  spans.forEach(function (span) {
+    list.appendChild(buildReplyCard(span.dataset.replyText, span.dataset.replyDate, span.dataset.replyBy));
+  });
+  wrap.style.display = '';
+}
+
+function buildReplyCard(text, date, by) {
+  const card = document.createElement('div');
+  card.className = 'msg-reply-card';
+
+  const meta = document.createElement('div');
+  meta.className = 'msg-reply-card-meta';
+  meta.textContent = by + ' · ' + date;
+
+  const body = document.createElement('div');
+  body.textContent = text;
+
+  card.appendChild(meta);
+  card.appendChild(body);
+  return card;
+}
+
+function closeMsgModal() {
+  document.getElementById('msgModal').classList.remove('open');
+  currentMsgId = null;
+}
+
+function updateRowBadge(row, isUnread) {
+  row.classList.toggle('unread', isUnread);
+  const badge = row.querySelector('.msg-badge');
+  if (badge) {
+    badge.textContent = isUnread ? 'Unread' : 'Read';
+    badge.className = 'msg-badge ' + (isUnread ? 'msg-badge-unread' : 'msg-badge-read');
+  }
+  row.querySelector('.msg-dot')?.remove();
+  row.dataset.unread = isUnread ? '1' : '';
+}
+
+function markCurrentMsgRead(silent) {
+  if (currentMsgId === null) return;
+  const row = document.getElementById('msg-row-' + currentMsgId);
+  const url = row.dataset.readUrl;
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCsrfToken() },
+  }).then(function (resp) {
+    if (!resp.ok) return;
+    updateRowBadge(row, false);
+    document.getElementById('msgModalReadBtn').style.display = 'none';
+    if (!silent) admToast('Marked as read.', 'success');
+  });
+}
+
+function deleteCurrentMsg() {
+  if (currentMsgId === null) return;
+  if (!confirm('Delete this message?')) return;
+
+  const row = document.getElementById('msg-row-' + currentMsgId);
+  const url = row.dataset.deleteUrl;
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCsrfToken() },
+  }).then(function (resp) {
+    if (!resp.ok) return;
+    row.remove();
+    closeMsgModal();
+    admToast('Message deleted.', 'success');
+  });
+}
+
+function sendReply() {
+  if (currentMsgId === null) return;
+
+  const textarea = document.getElementById('msgReplyText');
+  const status = document.getElementById('msgReplyStatus');
+  const sendBtn = document.getElementById('msgReplySendBtn');
+  const replyText = textarea.value.trim();
+
+  if (!replyText) {
+    status.textContent = 'Write a reply before sending.';
+    status.className = 'msg-reply-status error';
+    return;
+  }
+
+  const row = document.getElementById('msg-row-' + currentMsgId);
+  const url = row.dataset.replyUrl;
+
+  sendBtn.disabled = true;
+  status.textContent = 'Sending...';
+  status.className = 'msg-reply-status';
+
+  const body = new URLSearchParams();
+  body.set('reply', replyText);
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRFToken': getCsrfToken(),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: body.toString(),
+  })
+    .then(function (resp) { return resp.json().then(function (data) { return { ok: resp.ok, data: data }; }); })
+    .then(function (result) {
+      sendBtn.disabled = false;
+      if (result.ok && result.data.ok) {
+        status.textContent = 'Reply sent!';
+        status.className = 'msg-reply-status success';
+        textarea.value = '';
+        updateRowBadge(row, false);
+        document.getElementById('msgModalReadBtn').style.display = 'none';
+        admToast('Reply sent to ' + row.dataset.email + '.', 'success');
+
+        // Persist this reply in the row's hidden data so it still shows up
+        // if the modal is reopened later, and reflect it live right now.
+        const r = result.data.reply;
+        const repliesData = row.querySelector('.msg-replies-data');
+        const span = document.createElement('span');
+        span.dataset.replyText = r.text;
+        span.dataset.replyDate = r.replied_at;
+        span.dataset.replyBy = r.replied_by;
+        repliesData.appendChild(span);
+
+        const wrap = document.getElementById('msgModalReplies');
+        document.getElementById('msgModalRepliesList').appendChild(buildReplyCard(r.text, r.replied_at, r.replied_by));
+        wrap.style.display = '';
+      } else {
+        status.textContent = (result.data && result.data.error) || 'Failed to send reply.';
+        status.className = 'msg-reply-status error';
+      }
+    })
+    .catch(function () {
+      sendBtn.disabled = false;
+      status.textContent = 'Failed to send reply. Check your connection.';
+      status.className = 'msg-reply-status error';
+    });
+}
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeMsgModal();
+});
+</script>
 {% endblock %}

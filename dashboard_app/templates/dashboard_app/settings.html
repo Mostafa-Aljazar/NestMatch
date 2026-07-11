@@ -2,19 +2,286 @@
 
 {% block title %}Settings - NestMatch Admin{% endblock %}
 
-{% block page_icon %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>{% endblock %}
+{% block page_icon %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>{% endblock %}
 
 {% block page_title %}Settings{% endblock %}
 
+{% block extra_css %}
+<style>
+.st-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:768px){.st-stats{grid-template-columns:1fr}}
+.st-stat{display:flex;align-items:center;gap:13px;padding:18px 20px;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s,border-color .15s;text-decoration:none;border:1.5px solid transparent;cursor:pointer}
+.st-stat:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.st-stat.active{border-color:var(--brand-400)}
+.st-stat-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.st-stat-label{font-size:13px;font-weight:800;color:#111827;line-height:1.2}
+.st-stat-desc{font-size:11px;color:#9CA3AF;font-weight:600;margin-top:3px}
+
+.st-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 22px;background:#FAFBFC;border-bottom:1px solid #F0F1F3;border-radius:16px 16px 0 0}
+.st-tabs{display:flex;gap:4px;background:#F0F1F3;padding:4px;border-radius:11px;flex-shrink:0;flex-wrap:wrap}
+.st-tab{padding:7px 14px;font-size:12.5px;font-weight:700;color:#6B7280;text-decoration:none;border-radius:8px;transition:all .15s;white-space:nowrap}
+.st-tab:hover{color:#374151}
+.st-tab.active{background:#fff;color:var(--brand-600);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.st-toolbar-meta{font-size:12px;color:#6B7280;font-weight:600}
+.st-toolbar-meta strong{color:var(--brand-600)}
+
+.st-section{padding:22px 24px;border-bottom:1px solid #F3F4F6}
+.st-section:last-of-type{border-bottom:none}
+.st-section-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
+.st-section-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.st-section-title{font-size:15px;font-weight:800;color:#111827;margin:0}
+.st-section-desc{font-size:12.5px;color:#9CA3AF;margin-top:3px;line-height:1.4}
+
+.st-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.st-span-2{grid-column:1 / -1}
+@media(max-width:640px){.st-grid-2{grid-template-columns:1fr}}
+
+.st-field{display:flex;flex-direction:column;gap:6px}
+.st-label{font-size:12px;font-weight:700;color:#374151}
+.st-hint{font-size:11px;color:#9CA3AF;line-height:1.4}
+.st-input{width:100%;padding:10px 14px;font-size:13px;border:1.5px solid #E5E7EB;border-radius:10px;font-family:inherit;color:#111827;outline:none;background:#fff;transition:border-color .15s,box-shadow .15s}
+.st-input:focus{border-color:var(--brand-600);box-shadow:0 0 0 3px rgba(204,102,0,.1)}
+.st-input::placeholder{color:#B0B7C1}
+.st-input-narrow{max-width:160px}
+
+.st-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:640px){.st-info-grid{grid-template-columns:1fr}}
+.st-info-card{background:#FAFBFC;border:1.5px solid #F0F1F3;border-radius:12px;padding:16px 18px;transition:border-color .15s,box-shadow .15s}
+.st-info-card:hover{border-color:#E5E7EB;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.st-info-label{font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.st-info-value{font-size:13.5px;font-weight:700;color:#111827;word-break:break-all}
+.st-info-badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:20px;margin-top:8px}
+.st-info-badge-ok{background:#D1FAE5;color:#059669}
+.st-info-badge-warn{background:#FEF3C7;color:#D97706}
+
+.st-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;background:#FAFBFC;border:1.5px solid #F0F1F3;border-radius:12px}
+.st-toggle-text{flex:1;min-width:0}
+.st-toggle-title{font-size:13px;font-weight:700;color:#111827}
+.st-toggle-desc{font-size:11.5px;color:#9CA3AF;margin-top:3px;line-height:1.4}
+.st-toggle{width:44px;height:24px;border-radius:99px;background:#E5E7EB;border:none;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s}
+.st-toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);transition:transform .2s}
+.st-toggle.on{background:var(--brand-600)}
+.st-toggle.on::after{transform:translateX(20px)}
+
+.st-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 24px;background:#FAFBFC;border-top:1px solid #F0F1F3;border-radius:0 0 16px 16px}
+.st-footer-left{font-size:12px;color:#6B7280;font-weight:600}
+.st-footer-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.st-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 22px;font-size:13px;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:transform .15s,box-shadow .15s;text-decoration:none}
+.st-btn:hover{transform:translateY(-1px)}
+.st-btn-save{color:#fff;background:linear-gradient(135deg,var(--brand-700),var(--brand-600));box-shadow:0 4px 14px rgba(168,83,0,.28)}
+.st-btn-save:hover{box-shadow:0 6px 18px rgba(168,83,0,.36)}
+.st-btn-secondary{color:#374151;background:#fff;border:1.5px solid #E5E7EB!important}
+.st-btn-secondary:hover{background:#F9FAFB}
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="margin-bottom:20px"><h2 style="font-size:20px;font-weight:800;color:#111827">Platform Settings</h2></div>
-<div class="adm-card">
-  <div class="adm-section-title">General</div>
-  <div style="display:flex;flex-direction:column;gap:16px">
-    <div><label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px">Platform Name</label><input type="text" value="NestMatch" class="adm-input" style="width:100%;max-width:360px"></div>
-    <div><label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px">Support Email</label><input type="email" value="hello@nestmatch.io" class="adm-input" style="width:100%;max-width:360px"></div>
-    <div><label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:6px">Max Listing Photos</label><input type="number" value="10" class="adm-input" style="width:120px"></div>
-  </div>
-  <button style="margin-top:20px;padding:11px 28px;font-size:13px;font-weight:700;color:#fff;background:var(--brand-600);border:none;border-radius:8px;cursor:pointer;font-family:inherit">Save Settings</button>
+<div style="margin-bottom:20px">
+  <h2 style="font-size:20px;font-weight:800;color:#111827">Platform Settings</h2>
+  <p style="font-size:13px;color:#6B7280;margin-top:2px">Configure general platform options, listing limits, and review system status</p>
 </div>
+
+<!-- Section quick-nav -->
+<div class="st-stats">
+  <a href="#section-general" class="st-stat active" data-section="general">
+    <div class="st-stat-icon" style="background:var(--brand-100)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+    <div>
+      <div class="st-stat-label">General</div>
+      <div class="st-stat-desc">Name &amp; support contact</div>
+    </div>
+  </a>
+  <a href="#section-listings" class="st-stat" data-section="listings">
+    <div class="st-stat-icon" style="background:#D1FAE5">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3L21 12V20a1 1 0 0 1-1 1H15V15H9v6H4a1 1 0 0 1-1-1Z"/></svg>
+    </div>
+    <div>
+      <div class="st-stat-label">Listings</div>
+      <div class="st-stat-desc">Upload &amp; posting limits</div>
+    </div>
+  </a>
+  <a href="#section-system" class="st-stat" data-section="system">
+    <div class="st-stat-icon" style="background:#EDE9FE">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    </div>
+    <div>
+      <div class="st-stat-label">System</div>
+      <div class="st-stat-desc">Email &amp; environment info</div>
+    </div>
+  </a>
+</div>
+
+<form method="post" action="{% url 'dashboard_app:update_settings' %}" id="settingsForm">
+  {% csrf_token %}
+  <div class="adm-card" style="padding:0;margin-bottom:0">
+
+    <div class="st-toolbar">
+      <div class="st-tabs">
+        <a href="#section-general" class="st-tab active" data-section="general">General</a>
+        <a href="#section-listings" class="st-tab" data-section="listings">Listings</a>
+        <a href="#section-system" class="st-tab" data-section="system">System</a>
+      </div>
+      <div class="st-toolbar-meta">Environment <strong>{% if debug_mode %}Development{% else %}Production{% endif %}</strong></div>
+    </div>
+
+    <!-- General -->
+    <section id="section-general" class="st-section">
+      <div class="st-section-head">
+        <div class="st-section-icon" style="background:var(--brand-100)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <h3 class="st-section-title">General</h3>
+          <p class="st-section-desc">Platform identity and the support contact shown to users across the site.</p>
+        </div>
+      </div>
+      <div class="st-grid-2">
+        <div class="st-field">
+          <label class="st-label" for="platform_name">Platform Name</label>
+          <input type="text" id="platform_name" name="platform_name" value="{{ platform_settings.platform_name }}" class="st-input" placeholder="NestMatch">
+          <span class="st-hint">Displayed in emails, footers, and admin branding.</span>
+        </div>
+        <div class="st-field">
+          <label class="st-label" for="support_email">Support Email</label>
+          <input type="email" id="support_email" name="support_email" value="{{ platform_settings.support_email }}" class="st-input" placeholder="hello@nestmatch.io">
+          <span class="st-hint">Shown in the footer and contact page.</span>
+        </div>
+        <div class="st-field">
+          <label class="st-label" for="site_url">Site URL</label>
+          <input type="text" id="site_url" name="site_url" value="{{ platform_settings.site_url }}" class="st-input" placeholder="nestmatch.io">
+          <span class="st-hint">Displayed in the footer contact section (e.g. nestmatch.io or https://nestmatch.io).</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Listings -->
+    <section id="section-listings" class="st-section">
+      <div class="st-section-head">
+        <div class="st-section-icon" style="background:#D1FAE5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <div>
+          <h3 class="st-section-title">Listings</h3>
+          <p class="st-section-desc">Controls for room posting and photo uploads on the platform.</p>
+        </div>
+      </div>
+      <div class="st-grid-2">
+        <div class="st-field">
+          <label class="st-label" for="max_listing_photos">Max Listing Photos</label>
+          <input type="number" id="max_listing_photos" name="max_listing_photos" value="{{ platform_settings.max_listing_photos }}" min="1" max="20" class="st-input st-input-narrow">
+          <span class="st-hint">Maximum photos allowed per listing (currently enforced at 10 in the upload form).</span>
+        </div>
+        <div class="st-field">
+          <label class="st-label">Auto-approve Listings</label>
+          <div class="st-toggle-row">
+            <div class="st-toggle-text">
+              <div class="st-toggle-title">Publish without admin review</div>
+              <div class="st-toggle-desc">When off, new listings require admin approval before going live.</div>
+            </div>
+            <button type="button" class="st-toggle{% if platform_settings.auto_approve_listings %} on{% endif %}" aria-label="Toggle auto-approve" onclick="this.classList.toggle('on');document.getElementById('auto_approve_listings').checked=this.classList.contains('on')"></button>
+            <input type="checkbox" id="auto_approve_listings" name="auto_approve_listings" {% if platform_settings.auto_approve_listings %}checked{% endif %} style="display:none">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- System (read-only) -->
+    <section id="section-system" class="st-section">
+      <div class="st-section-head">
+        <div class="st-section-icon" style="background:#EDE9FE">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div>
+          <h3 class="st-section-title">System &amp; Email</h3>
+          <p class="st-section-desc">Read-only environment details — configured via server environment variables.</p>
+        </div>
+      </div>
+      <div class="st-info-grid">
+        <div class="st-info-card">
+          <div class="st-info-label">Default From Email</div>
+          <div class="st-info-value">{{ default_from_email|default:"Not configured" }}</div>
+          {% if default_from_email %}
+          <span class="st-info-badge st-info-badge-ok">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+            Configured
+          </span>
+          {% else %}
+          <span class="st-info-badge st-info-badge-warn">Not set</span>
+          {% endif %}
+        </div>
+        <div class="st-info-card">
+          <div class="st-info-label">SMTP Host</div>
+          <div class="st-info-value">{{ email_host }}</div>
+          <span class="st-info-badge st-info-badge-ok">Port {{ email_port }}</span>
+        </div>
+        <div class="st-info-card">
+          <div class="st-info-label">Debug Mode</div>
+          <div class="st-info-value">{% if debug_mode %}Enabled{% else %}Disabled{% endif %}</div>
+          {% if debug_mode %}
+          <span class="st-info-badge st-info-badge-warn">Development only</span>
+          {% else %}
+          <span class="st-info-badge st-info-badge-ok">Production</span>
+          {% endif %}
+        </div>
+        <div class="st-info-card">
+          <div class="st-info-label">Email Backend</div>
+          <div class="st-info-value" style="font-size:12px;font-weight:600;color:#6B7280">{{ email_backend_short }}</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="st-footer">
+      <div class="st-footer-left">Last saved {{ platform_settings.updated_at|date:"M d, Y · g:i A" }} · footer contact uses Support Email and Site URL above</div>
+      <div class="st-footer-actions">
+        <button type="reset" class="st-btn st-btn-secondary">Reset</button>
+        <button type="submit" class="st-btn st-btn-save">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Settings
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const sectionLinks = document.querySelectorAll('[data-section]');
+  const sections = ['general', 'listings', 'system'];
+
+  function setActive(section) {
+    sectionLinks.forEach(function(link) {
+      link.classList.toggle('active', link.dataset.section === section);
+    });
+  }
+
+  sectionLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      const target = document.getElementById('section-' + link.dataset.section);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActive(link.dataset.section);
+      }
+    });
+  });
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          setActive(entry.target.id.replace('section-', ''));
+        }
+      });
+    }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(function(name) {
+      const el = document.getElementById('section-' + name);
+      if (el) observer.observe(el);
+    });
+  }
+});
+</script>
 {% endblock %}
