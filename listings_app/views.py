@@ -287,7 +287,9 @@ def room_detail(request, pk):
     is_favorited = False
     has_profile = False
     compatibility = None
+    seeker_id_status = None
     if request.user.is_authenticated:
+        seeker_id_status = request.user.verification_status['id_document']
         my_application = Application.objects.filter(listing=listing, seeker=request.user).first()
         can_review = (
             my_application is not None
@@ -313,6 +315,7 @@ def room_detail(request, pk):
         'is_favorited':   is_favorited,
         'has_profile':    has_profile,
         'compatibility':  compatibility,
+        'seeker_id_status': seeker_id_status,
     })
 
 

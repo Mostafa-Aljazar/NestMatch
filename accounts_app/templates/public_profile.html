@@ -46,10 +46,17 @@
       </div>
 
       <div class="flex gap-[7px] mt-4 flex-wrap">
+        {% if profile_user.is_id_verified %}
         <span class="inline-flex  gap-1 bg-emerald-100 text-emerald-700 text-[11px] font-bold px-[10px] py-[4px] rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg> 
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
           Verified
         </span>
+        {% else %}
+        <span class="inline-flex  gap-1 bg-gray-100 text-gray-500 text-[11px] font-bold px-[10px] py-[4px] rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Not Verified
+        </span>
+        {% endif %}
         <span class="inline-flex  gap-1 bg-brand-100 text-brand-700 text-[11px] font-bold px-[10px] py-[4px] rounded-full">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg>
           {{ listing_count }} active listing{{ listing_count|pluralize }}

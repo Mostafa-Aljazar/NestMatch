@@ -16,6 +16,7 @@ urlpatterns = [
     path('reviews/', views.reviews_list, name='reviews'),
     path('site-content/', views.site_content_page, name='site_content'),
     path('settings/', views.settings_page, name='settings'),
+    path('settings/update/', views.update_settings, name='update_settings'),
 
     # User moderation
     path('ban/<int:user_id>/', views.ban_user, name='ban_user'),

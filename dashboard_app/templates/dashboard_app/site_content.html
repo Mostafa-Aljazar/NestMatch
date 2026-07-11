@@ -2,94 +2,370 @@
 
 {% block title %}Site Content - NestMatch Admin{% endblock %}
 
-{% block page_icon %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>{% endblock %}
+{% block page_icon %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>{% endblock %}
 
 {% block page_title %}Site Content{% endblock %}
+
+{% block extra_css %}
+<style>
+.sc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:900px){.sc-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.sc-stats{grid-template-columns:1fr}}
+.sc-stat{display:flex;align-items:center;gap:13px;padding:18px 20px;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s,border-color .15s;text-decoration:none;border:1.5px solid transparent;cursor:pointer}
+.sc-stat:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.sc-stat.active{border-color:var(--brand-400)}
+.sc-stat-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc-stat-label{font-size:13px;font-weight:800;color:#111827;line-height:1.2}
+.sc-stat-desc{font-size:11px;color:#9CA3AF;font-weight:600;margin-top:3px}
+
+.sc-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 22px;background:#FAFBFC;border-bottom:1px solid #F0F1F3;border-radius:16px 16px 0 0}
+.sc-tabs{display:flex;gap:4px;background:#F0F1F3;padding:4px;border-radius:11px;flex-shrink:0;flex-wrap:wrap}
+.sc-tab{padding:7px 14px;font-size:12.5px;font-weight:700;color:#6B7280;text-decoration:none;border-radius:8px;transition:all .15s;white-space:nowrap}
+.sc-tab:hover{color:#374151}
+.sc-tab.active{background:#fff;color:var(--brand-600);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.sc-toolbar-meta{font-size:12px;color:#6B7280;font-weight:600}
+.sc-toolbar-meta strong{color:var(--brand-600)}
+
+.sc-section{padding:22px 24px;border-bottom:1px solid #F3F4F6}
+.sc-section:last-of-type{border-bottom:none}
+.sc-section-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
+.sc-section-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc-section-title{font-size:15px;font-weight:800;color:#111827;margin:0}
+.sc-section-desc{font-size:12.5px;color:#9CA3AF;margin-top:3px;line-height:1.4}
+
+.sc-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sc-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.sc-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.sc-span-2{grid-column:1 / -1}
+@media(max-width:900px){.sc-grid-3,.sc-grid-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.sc-grid-2,.sc-grid-3,.sc-grid-4{grid-template-columns:1fr}}
+
+.sc-field{display:flex;flex-direction:column;gap:6px}
+.sc-label{font-size:12px;font-weight:700;color:#374151}
+.sc-hint{font-size:11px;color:#9CA3AF;line-height:1.4}
+.sc-input{width:100%;padding:10px 14px;font-size:13px;border:1.5px solid #E5E7EB;border-radius:10px;font-family:inherit;color:#111827;outline:none;background:#fff;transition:border-color .15s,box-shadow .15s}
+.sc-input:focus{border-color:var(--brand-600);box-shadow:0 0 0 3px rgba(204,102,0,.1)}
+.sc-input::placeholder{color:#B0B7C1}
+textarea.sc-input{resize:vertical;min-height:72px;line-height:1.5}
+
+.sc-stat-edit{background:#FAFBFC;border:1.5px solid #F0F1F3;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s,box-shadow .15s}
+.sc-stat-edit:hover{border-color:#E5E7EB;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.sc-stat-edit-label{font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px}
+
+.sc-step-card{background:linear-gradient(160deg,var(--brand-50),#fff 55%);border:1.5px solid #FBC9A3;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s,transform .15s}
+.sc-step-card:hover{box-shadow:0 4px 14px rgba(204,102,0,.08);transform:translateY(-1px)}
+.sc-step-head{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.sc-step-num{width:26px;height:26px;border-radius:50%;background:var(--brand-600);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc-step-title{font-size:12px;font-weight:700;color:#A85300;text-transform:uppercase;letter-spacing:.4px}
+
+.sc-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 24px;background:#FAFBFC;border-top:1px solid #F0F1F3;border-radius:0 0 16px 16px}
+.sc-footer-left{font-size:12px;color:#6B7280;font-weight:600}
+.sc-footer-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sc-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 22px;font-size:13px;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:transform .15s,box-shadow .15s,filter .15s;text-decoration:none}
+.sc-btn:hover{transform:translateY(-1px)}
+.sc-btn-save{color:#fff;background:linear-gradient(135deg,var(--brand-700),var(--brand-600));box-shadow:0 4px 14px rgba(168,83,0,.28)}
+.sc-btn-save:hover{box-shadow:0 6px 18px rgba(168,83,0,.36)}
+.sc-btn-preview{color:var(--brand-600);background:#fff;border:1.5px solid var(--brand-200)!important}
+.sc-btn-preview:hover{background:var(--brand-50)}
+</style>
+{% endblock %}
 
 {% block content %}
 <div style="margin-bottom:20px">
   <h2 style="font-size:20px;font-weight:800;color:#111827">Landing Page Content</h2>
-  <p style="font-size:13px;color:#6B7280;margin-top:2px">Edit the text shown on the public homepage. Changes go live immediately.</p>
+  <p style="font-size:13px;color:#6B7280;margin-top:2px">Edit the text shown on the public homepage &middot; changes go live immediately after saving</p>
 </div>
-<form method="post" action="{% url 'dashboard_app:update_site_content' %}">
+
+<!-- Section quick-nav -->
+<div class="sc-stats">
+  <a href="#section-hero" class="sc-stat active" data-section="hero">
+    <div class="sc-stat-icon" style="background:var(--brand-100)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div>
+      <div class="sc-stat-label">Hero Section</div>
+      <div class="sc-stat-desc">Headline &amp; CTAs</div>
+    </div>
+  </a>
+  <a href="#section-stats" class="sc-stat" data-section="stats">
+    <div class="sc-stat-icon" style="background:#D1FAE5">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+    </div>
+    <div>
+      <div class="sc-stat-label">Stats Bar</div>
+      <div class="sc-stat-desc">4 homepage metrics</div>
+    </div>
+  </a>
+  <a href="#section-how" class="sc-stat" data-section="how">
+    <div class="sc-stat-icon" style="background:#FEF3C7">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    </div>
+    <div>
+      <div class="sc-stat-label">How It Works</div>
+      <div class="sc-stat-desc">3-step guide</div>
+    </div>
+  </a>
+  <a href="#section-cta" class="sc-stat" data-section="cta">
+    <div class="sc-stat-icon" style="background:#EDE9FE">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+    <div>
+      <div class="sc-stat-label">Bottom CTA</div>
+      <div class="sc-stat-desc">Final call to action</div>
+    </div>
+  </a>
+</div>
+
+<form method="post" action="{% url 'dashboard_app:update_site_content' %}" id="siteContentForm">
   {% csrf_token %}
-  <!-- Hero -->
-  <div class="adm-card">
-    <div class="adm-section-title">Hero Section</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Badge Text</label><input type="text" name="hero_badge_text" value="{{ site_content.hero_badge_text }}" class="adm-input" style="width:100%"></div>
-      <div></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title — Line 1</label><input type="text" name="hero_title_line1" value="{{ site_content.hero_title_line1 }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title — Line 2</label><input type="text" name="hero_title_line2" value="{{ site_content.hero_title_line2 }}" class="adm-input" style="width:100%"></div>
-      <div style="grid-column:1 / -1"><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label><textarea name="hero_subtitle" rows="2" class="adm-input" style="width:100%;resize:vertical">{{ site_content.hero_subtitle }}</textarea></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button Text</label><input type="text" name="hero_cta_primary_text" value="{{ site_content.hero_cta_primary_text }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button URL</label><input type="text" name="hero_cta_primary_url" value="{{ site_content.hero_cta_primary_url }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button Text</label><input type="text" name="hero_cta_secondary_text" value="{{ site_content.hero_cta_secondary_text }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button URL</label><input type="text" name="hero_cta_secondary_url" value="{{ site_content.hero_cta_secondary_url }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 1</label><input type="text" name="hero_feature_tag_1" value="{{ site_content.hero_feature_tag_1 }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 2</label><input type="text" name="hero_feature_tag_2" value="{{ site_content.hero_feature_tag_2 }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Feature Tag 3</label><input type="text" name="hero_feature_tag_3" value="{{ site_content.hero_feature_tag_3 }}" class="adm-input" style="width:100%"></div>
-    </div>
-  </div>
-  <!-- Stats -->
-  <div class="adm-card">
-    <div class="adm-section-title">Stats Bar</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
-      {% for n in "1234" %}
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <label style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase">Stat {{ n }}</label>
-        <input type="text" name="stat_{{ n }}_value" value="{% if n == '1' %}{{ site_content.stat_1_value }}{% elif n == '2' %}{{ site_content.stat_2_value }}{% elif n == '3' %}{{ site_content.stat_3_value }}{% else %}{{ site_content.stat_4_value }}{% endif %}" class="adm-input" placeholder="Value (e.g. 2,400+)">
-        <input type="text" name="stat_{{ n }}_label" value="{% if n == '1' %}{{ site_content.stat_1_label }}{% elif n == '2' %}{{ site_content.stat_2_label }}{% elif n == '3' %}{{ site_content.stat_3_label }}{% else %}{{ site_content.stat_4_label }}{% endif %}" class="adm-input" placeholder="Label">
+  <div class="adm-card" style="padding:0;margin-bottom:0">
+
+    <div class="sc-toolbar">
+      <div class="sc-tabs">
+        <a href="#section-hero" class="sc-tab active" data-section="hero">Hero</a>
+        <a href="#section-stats" class="sc-tab" data-section="stats">Stats</a>
+        <a href="#section-how" class="sc-tab" data-section="how">How It Works</a>
+        <a href="#section-cta" class="sc-tab" data-section="cta">Bottom CTA</a>
       </div>
-      {% endfor %}
+      <div class="sc-toolbar-meta">Last updated <strong>{{ site_content.updated_at|date:"M d, Y · g:i A" }}</strong></div>
     </div>
-  </div>
-  <!-- How it works -->
-  <div class="adm-card">
-    <div class="adm-section-title">How It Works Section</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Eyebrow</label><input type="text" name="how_it_works_eyebrow" value="{{ site_content.how_it_works_eyebrow }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title</label><input type="text" name="how_it_works_title" value="{{ site_content.how_it_works_title }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label><input type="text" name="how_it_works_subtitle" value="{{ site_content.how_it_works_subtitle }}" class="adm-input" style="width:100%"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
-      <div style="background:#F9FAFB;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase">Step 1</div>
-        <input type="text" name="step_1_icon" value="{{ site_content.step_1_icon }}" class="adm-input" placeholder="Icon (emoji)">
-        <input type="text" name="step_1_title" value="{{ site_content.step_1_title }}" class="adm-input" placeholder="Title">
-        <textarea name="step_1_text" rows="3" class="adm-input" style="resize:vertical">{{ site_content.step_1_text }}</textarea>
+
+    <!-- Hero -->
+    <section id="section-hero" class="sc-section">
+      <div class="sc-section-head">
+        <div class="sc-section-icon" style="background:var(--brand-100)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div>
+          <h3 class="sc-section-title">Hero Section</h3>
+          <p class="sc-section-desc">The first thing visitors see — badge, headline, subtitle, buttons, and feature tags.</p>
+        </div>
       </div>
-      <div style="background:#F9FAFB;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase">Step 2</div>
-        <input type="text" name="step_2_icon" value="{{ site_content.step_2_icon }}" class="adm-input" placeholder="Icon (emoji)">
-        <input type="text" name="step_2_title" value="{{ site_content.step_2_title }}" class="adm-input" placeholder="Title">
-        <textarea name="step_2_text" rows="3" class="adm-input" style="resize:vertical">{{ site_content.step_2_text }}</textarea>
+      <div class="sc-grid-2">
+        <div class="sc-field sc-span-2">
+          <label class="sc-label" for="hero_badge_text">Badge Text</label>
+          <input type="text" id="hero_badge_text" name="hero_badge_text" value="{{ site_content.hero_badge_text }}" class="sc-input" placeholder="e.g. AI-Powered Matching">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="hero_title_line1">Title — Line 1</label>
+          <input type="text" id="hero_title_line1" name="hero_title_line1" value="{{ site_content.hero_title_line1 }}" class="sc-input">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="hero_title_line2">Title — Line 2</label>
+          <input type="text" id="hero_title_line2" name="hero_title_line2" value="{{ site_content.hero_title_line2 }}" class="sc-input">
+        </div>
+        <div class="sc-field sc-span-2">
+          <label class="sc-label" for="hero_subtitle">Subtitle</label>
+          <textarea id="hero_subtitle" name="hero_subtitle" rows="3" class="sc-input">{{ site_content.hero_subtitle }}</textarea>
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="hero_cta_primary_text">Primary Button Text</label>
+          <input type="text" id="hero_cta_primary_text" name="hero_cta_primary_text" value="{{ site_content.hero_cta_primary_text }}" class="sc-input">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="hero_cta_primary_url">Primary Button URL</label>
+          <input type="text" id="hero_cta_primary_url" name="hero_cta_primary_url" value="{{ site_content.hero_cta_primary_url }}" class="sc-input" placeholder="/auth/">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="hero_cta_secondary_text">Secondary Button Text</label>
+          <input type="text" id="hero_cta_secondary_text" name="hero_cta_secondary_text" value="{{ site_content.hero_cta_secondary_text }}" class="sc-input">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="hero_cta_secondary_url">Secondary Button URL</label>
+          <input type="text" id="hero_cta_secondary_url" name="hero_cta_secondary_url" value="{{ site_content.hero_cta_secondary_url }}" class="sc-input" placeholder="/rooms/">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="hero_feature_tag_1">Feature Tag 1</label>
+          <input type="text" id="hero_feature_tag_1" name="hero_feature_tag_1" value="{{ site_content.hero_feature_tag_1 }}" class="sc-input">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="hero_feature_tag_2">Feature Tag 2</label>
+          <input type="text" id="hero_feature_tag_2" name="hero_feature_tag_2" value="{{ site_content.hero_feature_tag_2 }}" class="sc-input">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="hero_feature_tag_3">Feature Tag 3</label>
+          <input type="text" id="hero_feature_tag_3" name="hero_feature_tag_3" value="{{ site_content.hero_feature_tag_3 }}" class="sc-input">
+        </div>
       </div>
-      <div style="background:#F9FAFB;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase">Step 3</div>
-        <input type="text" name="step_3_icon" value="{{ site_content.step_3_icon }}" class="adm-input" placeholder="Icon (emoji)">
-        <input type="text" name="step_3_title" value="{{ site_content.step_3_title }}" class="adm-input" placeholder="Title">
-        <textarea name="step_3_text" rows="3" class="adm-input" style="resize:vertical">{{ site_content.step_3_text }}</textarea>
+    </section>
+
+    <!-- Stats -->
+    <section id="section-stats" class="sc-section">
+      <div class="sc-section-head">
+        <div class="sc-section-icon" style="background:#D1FAE5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+        </div>
+        <div>
+          <h3 class="sc-section-title">Stats Bar</h3>
+          <p class="sc-section-desc">Four metrics displayed below the hero — value and label for each.</p>
+        </div>
+      </div>
+      <div class="sc-grid-4">
+        {% for n in "1234" %}
+        <div class="sc-stat-edit">
+          <div class="sc-stat-edit-label">Stat {{ n }}</div>
+          <input type="text" name="stat_{{ n }}_value" value="{% if n == '1' %}{{ site_content.stat_1_value }}{% elif n == '2' %}{{ site_content.stat_2_value }}{% elif n == '3' %}{{ site_content.stat_3_value }}{% else %}{{ site_content.stat_4_value }}{% endif %}" class="sc-input" placeholder="Value (e.g. 2,400+)">
+          <input type="text" name="stat_{{ n }}_label" value="{% if n == '1' %}{{ site_content.stat_1_label }}{% elif n == '2' %}{{ site_content.stat_2_label }}{% elif n == '3' %}{{ site_content.stat_3_label }}{% else %}{{ site_content.stat_4_label }}{% endif %}" class="sc-input" placeholder="Label">
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="section-how" class="sc-section">
+      <div class="sc-section-head">
+        <div class="sc-section-icon" style="background:#FEF3C7">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </div>
+        <div>
+          <h3 class="sc-section-title">How It Works</h3>
+          <p class="sc-section-desc">Section header and three steps explaining the platform flow.</p>
+        </div>
+      </div>
+      <div class="sc-grid-3" style="margin-bottom:20px">
+        <div class="sc-field">
+          <label class="sc-label" for="how_it_works_eyebrow">Eyebrow</label>
+          <input type="text" id="how_it_works_eyebrow" name="how_it_works_eyebrow" value="{{ site_content.how_it_works_eyebrow }}" class="sc-input">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="how_it_works_title">Title</label>
+          <input type="text" id="how_it_works_title" name="how_it_works_title" value="{{ site_content.how_it_works_title }}" class="sc-input">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="how_it_works_subtitle">Subtitle</label>
+          <input type="text" id="how_it_works_subtitle" name="how_it_works_subtitle" value="{{ site_content.how_it_works_subtitle }}" class="sc-input">
+        </div>
+      </div>
+      <div class="sc-grid-3">
+        <div class="sc-step-card">
+          <div class="sc-step-head">
+            <span class="sc-step-num">1</span>
+            <span class="sc-step-title">Step 1</span>
+          </div>
+          <input type="text" name="step_1_icon" value="{{ site_content.step_1_icon }}" class="sc-input" placeholder="Icon (emoji)">
+          <input type="text" name="step_1_title" value="{{ site_content.step_1_title }}" class="sc-input" placeholder="Title">
+          <textarea name="step_1_text" rows="4" class="sc-input">{{ site_content.step_1_text }}</textarea>
+        </div>
+        <div class="sc-step-card">
+          <div class="sc-step-head">
+            <span class="sc-step-num">2</span>
+            <span class="sc-step-title">Step 2</span>
+          </div>
+          <input type="text" name="step_2_icon" value="{{ site_content.step_2_icon }}" class="sc-input" placeholder="Icon (emoji)">
+          <input type="text" name="step_2_title" value="{{ site_content.step_2_title }}" class="sc-input" placeholder="Title">
+          <textarea name="step_2_text" rows="4" class="sc-input">{{ site_content.step_2_text }}</textarea>
+        </div>
+        <div class="sc-step-card">
+          <div class="sc-step-head">
+            <span class="sc-step-num">3</span>
+            <span class="sc-step-title">Step 3</span>
+          </div>
+          <input type="text" name="step_3_icon" value="{{ site_content.step_3_icon }}" class="sc-input" placeholder="Icon (emoji)">
+          <input type="text" name="step_3_title" value="{{ site_content.step_3_title }}" class="sc-input" placeholder="Title">
+          <textarea name="step_3_text" rows="4" class="sc-input">{{ site_content.step_3_text }}</textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <section id="section-cta" class="sc-section">
+      <div class="sc-section-head">
+        <div class="sc-section-icon" style="background:#EDE9FE">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div>
+          <h3 class="sc-section-title">Bottom CTA Section</h3>
+          <p class="sc-section-desc">The final call-to-action block at the bottom of the landing page.</p>
+        </div>
+      </div>
+      <div class="sc-grid-2">
+        <div class="sc-field">
+          <label class="sc-label" for="cta_eyebrow">Eyebrow</label>
+          <input type="text" id="cta_eyebrow" name="cta_eyebrow" value="{{ site_content.cta_eyebrow }}" class="sc-input">
+        </div>
+        <div class="sc-field"></div>
+        <div class="sc-field sc-span-2">
+          <label class="sc-label" for="cta_title">Title</label>
+          <input type="text" id="cta_title" name="cta_title" value="{{ site_content.cta_title }}" class="sc-input">
+        </div>
+        <div class="sc-field sc-span-2">
+          <label class="sc-label" for="cta_subtitle">Subtitle</label>
+          <input type="text" id="cta_subtitle" name="cta_subtitle" value="{{ site_content.cta_subtitle }}" class="sc-input">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="cta_primary_text">Primary Button Text</label>
+          <input type="text" id="cta_primary_text" name="cta_primary_text" value="{{ site_content.cta_primary_text }}" class="sc-input">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="cta_primary_url">Primary Button URL</label>
+          <input type="text" id="cta_primary_url" name="cta_primary_url" value="{{ site_content.cta_primary_url }}" class="sc-input" placeholder="/rooms/new/">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="cta_secondary_text">Secondary Button Text</label>
+          <input type="text" id="cta_secondary_text" name="cta_secondary_text" value="{{ site_content.cta_secondary_text }}" class="sc-input">
+        </div>
+        <div class="sc-field">
+          <label class="sc-label" for="cta_secondary_url">Secondary Button URL</label>
+          <input type="text" id="cta_secondary_url" name="cta_secondary_url" value="{{ site_content.cta_secondary_url }}" class="sc-input" placeholder="/rooms/">
+        </div>
+      </div>
+    </section>
+
+    <div class="sc-footer">
+      <div class="sc-footer-left">All changes are saved to the live homepage immediately.</div>
+      <div class="sc-footer-actions">
+        <a href="/" target="_blank" class="sc-btn sc-btn-preview">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Preview Live Site
+        </a>
+        <button type="submit" class="sc-btn sc-btn-save">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Changes
+        </button>
       </div>
     </div>
-  </div>
-  <!-- Bottom CTA -->
-  <div class="adm-card">
-    <div class="adm-section-title">Bottom CTA Section</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Eyebrow</label><input type="text" name="cta_eyebrow" value="{{ site_content.cta_eyebrow }}" class="adm-input" style="width:100%"></div>
-      <div></div>
-      <div style="grid-column:1 / -1"><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Title</label><input type="text" name="cta_title" value="{{ site_content.cta_title }}" class="adm-input" style="width:100%"></div>
-      <div style="grid-column:1 / -1"><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Subtitle</label><input type="text" name="cta_subtitle" value="{{ site_content.cta_subtitle }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button Text</label><input type="text" name="cta_primary_text" value="{{ site_content.cta_primary_text }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Primary Button URL</label><input type="text" name="cta_primary_url" value="{{ site_content.cta_primary_url }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button Text</label><input type="text" name="cta_secondary_text" value="{{ site_content.cta_secondary_text }}" class="adm-input" style="width:100%"></div>
-      <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px">Secondary Button URL</label><input type="text" name="cta_secondary_url" value="{{ site_content.cta_secondary_url }}" class="adm-input" style="width:100%"></div>
-    </div>
-  </div>
-  <div style="display:flex;align-items:center;gap:12px">
-    <button type="submit" style="padding:11px 28px;font-size:13px;font-weight:700;color:#fff;background:var(--brand-600);border:none;border-radius:8px;cursor:pointer;font-family:inherit">Save Changes</button>
-    <a href="/" target="_blank" style="font-size:12px;font-weight:600;color:var(--brand-600)">Preview Live Site →</a>
   </div>
 </form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const sectionLinks = document.querySelectorAll('[data-section]');
+  const sections = ['hero', 'stats', 'how', 'cta'];
+
+  function setActive(section) {
+    sectionLinks.forEach(function(link) {
+      link.classList.toggle('active', link.dataset.section === section);
+    });
+  }
+
+  sectionLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      const target = document.getElementById('section-' + link.dataset.section);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActive(link.dataset.section);
+      }
+    });
+  });
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          const id = entry.target.id.replace('section-', '');
+          setActive(id);
+        }
+      });
+    }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+
+    sections.forEach(function(name) {
+      const el = document.getElementById('section-' + name);
+      if (el) observer.observe(el);
+    });
+  }
+});
+</script>
 {% endblock %}
