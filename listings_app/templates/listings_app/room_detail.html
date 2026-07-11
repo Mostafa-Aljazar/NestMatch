@@ -5,6 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ listing.title }} — NestMatch</title>
+<meta name="description" content="{{ listing.title }} in {{ listing.city }}{% if listing.district %}, {{ listing.district }}{% endif %}. ${{ listing.price|floatformat:0 }}/month, {{ listing.get_listing_type_display }}, max {{ listing.max_occupants }} occupants. Available from {{ listing.available_from|date:'M j, Y' }}.">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
