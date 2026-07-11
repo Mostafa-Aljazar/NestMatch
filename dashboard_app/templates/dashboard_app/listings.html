@@ -224,9 +224,21 @@ function toggleMenu(btn) {
 
   if (menu.style.display === 'none' || menu.style.display === '') {
     const rect = btn.getBoundingClientRect();
+    // Measure the menu off-screen first so we know its real height before deciding
+    // whether it fits below the button or needs to open upward instead.
     menu.style.display = 'block';
-    menu.style.top = (rect.bottom + 4) + 'px';
+    menu.style.visibility = 'hidden';
+    menu.style.top = '0px';
+    const menuHeight = menu.offsetHeight;
+    const spaceBelow = window.innerHeight - rect.bottom;
+
+    if (spaceBelow < menuHeight + 8 && rect.top > menuHeight) {
+      menu.style.top = (rect.top - menuHeight - 4) + 'px';
+    } else {
+      menu.style.top = (rect.bottom + 4) + 'px';
+    }
     menu.style.left = (rect.left - 140 + rect.width) + 'px';
+    menu.style.visibility = 'visible';
   } else {
     menu.style.display = 'none';
   }
