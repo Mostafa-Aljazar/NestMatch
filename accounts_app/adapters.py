@@ -13,7 +13,23 @@ it always succeeds automatically and the manual form never appears.
 import re
 import uuid
 
+from django.shortcuts import redirect
+from django.urls import reverse
+
+from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+
+
+class NestMatchAccountAdapter(DefaultAccountAdapter):
+    """
+    Overrides allauth's default behaviour of sending banned (is_active=False)
+    users to its own unstyled /auth/inactive/ page. Instead we send them back
+    to our login page with a query flag so it can show the same toast
+    notification used for a banned user logging in with email/password.
+    """
+
+    def respond_user_inactive(self, request, user):
+        return redirect(f"{reverse('accounts_app:login')}?banned=1")
 
 
 class NestMatchSocialAccountAdapter(DefaultSocialAccountAdapter):

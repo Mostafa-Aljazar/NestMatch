@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -90,6 +91,14 @@ def login_view(request):
                    User.objects.filter(username__iexact=identifier).first()
 
         if user_obj:
+            # A banned account (is_active=False) makes Django's authenticate()
+            # return None even with the correct password, same as a wrong
+            # password would -- so check the password against it directly
+            # first to tell the two cases apart and redirect banned users to
+            # a clear notice instead of a generic "invalid credentials" error.
+            if not user_obj.is_active and user_obj.check_password(password):
+                return redirect(f"{reverse('accounts_app:login')}?banned=1")
+
             # Authenticate against Django backend architecture
             user = authenticate(request, username=user_obj.username, password=password)
             if user is not None:

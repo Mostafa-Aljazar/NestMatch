@@ -101,6 +101,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_ADAPTER = 'accounts_app.adapters.NestMatchAccountAdapter'
 
 
 LOGIN_REDIRECT_URL = '/'
