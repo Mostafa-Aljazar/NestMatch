@@ -6,121 +6,266 @@
 
 {% block page_title %}Users{% endblock %}
 
+{% block extra_css %}
+<style>
+.msg-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:900px){.msg-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.msg-stats{grid-template-columns:1fr}}
+.msg-stat{display:flex;align-items:center;gap:13px;padding:18px 20px;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s,border-color .15s;text-decoration:none;border:1.5px solid transparent;cursor:pointer}
+.msg-stat:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.msg-stat.active{border-color:var(--brand-400)}
+.msg-stat-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.msg-stat-num{font-size:22px;font-weight:800;color:#111827;line-height:1}
+.msg-stat-label{font-size:12px;color:#9CA3AF;font-weight:600;margin-top:3px}
+
+.msg-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 22px;background:#FAFBFC;border-bottom:1px solid #F0F1F3;border-radius:16px 16px 0 0}
+.msg-tabs{display:flex;gap:4px;background:#F0F1F3;padding:4px;border-radius:11px;flex-shrink:0;flex-wrap:wrap}
+.msg-tab{padding:7px 14px;font-size:12.5px;font-weight:700;color:#6B7280;text-decoration:none;border-radius:8px;transition:all .15s;white-space:nowrap}
+.msg-tab:hover{color:#374151}
+.msg-tab.active{background:#fff;color:var(--brand-600);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.msg-search{display:flex;align-items:center;gap:8px;flex:1;max-width:360px;min-width:200px;background:#fff;border:1.5px solid #E5E7EB;border-radius:24px;padding:0 14px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:border-color .15s,box-shadow .15s}
+.msg-search:focus-within{border-color:var(--brand-600);box-shadow:0 0 0 4px rgba(204,102,0,.1)}
+.msg-search svg.msg-search-icon{color:#9CA3AF;flex-shrink:0}
+.msg-search input{flex:1;min-width:0;border:none!important;outline:none!important;background:transparent!important;padding:11px 0!important;margin:0!important;font-size:13.5px;font-family:inherit;color:#111827;box-shadow:none!important;border-radius:0!important}
+.msg-search input::placeholder{color:#B0B7C1}
+.msg-search-clear{flex-shrink:0;background:#F3F4F6;border-radius:50%;border:none;color:#9CA3AF;cursor:pointer;padding:5px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:background .15s,color .15s;text-decoration:none}
+.msg-search-clear:hover{background:#E5E7EB;color:#374151}
+.msg-search-result{flex-basis:100%;font-size:12px;color:#6B7280;font-weight:600}
+.msg-search-result strong{color:var(--brand-600)}
+
+.msg-row{display:flex;align-items:center;gap:14px;padding:15px 22px;border-bottom:1px solid #F3F4F6;transition:background .15s}
+.msg-row:last-child{border-bottom:none}
+.msg-row:hover{background:#FAFBFC}
+.msg-row.banned{background:#FEF2F2}
+.msg-row.banned:hover{background:#FDE8E8}
+.msg-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--brand-600),var(--brand-400));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 2px 6px rgba(204,102,0,.25)}
+.msg-avatar-img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.msg-main{flex:1;min-width:0}
+.msg-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.msg-name{font-size:14px;font-weight:700;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg-preview{font-size:12.5px;color:#9CA3AF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.msg-side{display:flex;align-items:center;gap:16px;flex-shrink:0}
+.msg-stat-pair{display:flex;gap:14px}
+.msg-mini{min-width:40px;text-align:center}
+.msg-mini-num{font-size:14px;font-weight:800;color:#374151;line-height:1}
+.msg-mini-label{font-size:10px;color:#9CA3AF;font-weight:600;margin-top:2px}
+.msg-empty{padding:64px 20px;text-align:center;color:#9CA3AF}
+
+.msg-tag{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.msg-tag-admin{background:#EDE9FE;color:#7C3AED}
+.msg-tag-verified{background:#D1FAE5;color:#059669}
+.msg-tag-unverified{background:#F3F4F6;color:#9CA3AF}
+.msg-badge{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:10.5px;font-weight:700;padding:4px 12px;border-radius:20px;flex-shrink:0;min-width:66px;text-align:center}
+.msg-badge-active{background:#D1FAE5;color:#059669}
+.msg-badge-banned{background:#FEE2E2;color:#DC2626}
+
+.msg-kebab{background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:8px;color:#9CA3AF;line-height:1;transition:background .15s,color .15s}
+.msg-kebab:hover{background:#F3F4F6;color:#374151}
+.action-menu a:hover,.action-menu button:hover{background:#F9FAFB}
+
+/* ── Pagination ── */
+.msg-page-link{padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none}
+.msg-page-disabled{padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed}
+.msg-page-current{padding:6px 10px;font-size:11px;font-weight:600;color:#111827;background:#E5E7EB;border-radius:4px}
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-  <div>
-    <h2 style="font-size:20px;font-weight:800;color:#111827">All Users</h2>
-    <p style="font-size:13px;color:#6B7280;margin-top:2px">Manage and moderate platform users</p>
-  </div>
+<div style="margin-bottom:20px">
+  <h2 style="font-size:20px;font-weight:800;color:#111827">All Users</h2>
+  <p style="font-size:13px;color:#6B7280;margin-top:2px">Manage and moderate platform users</p>
 </div>
-<div class="adm-card">
-  <div style="overflow-x:auto">
-    <table class="adm-tbl">
-      <thead><tr><th>User</th><th>Email</th><th>Joined</th><th>Country</th><th>Listings</th><th>Applications</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody>
-        {% for u in all_users %}
-        <tr>
-          <td>
-            <div style="display:flex;align-items:center;gap:8px">
-              {% if u.profile_pic %}
-                <img src="{{ u.profile_pic.url }}" alt="{% if u.first_name %}{{ u.full_name }}{% else %}{{ u.email }}{% endif %}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:center;flex-shrink:0" />
-              {% else %}
-                <div style="width:30px;height:30px;border-radius:50%;background:inear-gradient(135deg,var(--brand-600),var(--brand-400));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">
-                  {% if u.first_name %}{{ u.first_name|first|upper }}{% if u.last_name %}{{ u.last_name|first|upper }}{% endif %}{% else %}{{ u.email|first|upper }}{% endif %}
-                </div>
-              {% endif %}
-              <span style="font-weight:600;white-space:nowrap">{% if u.first_name %}{{ u.full_name }}{% else %}{{ u.email }}{% endif %}</span>
-              {% if u.is_staff %}<span class="badge badge-purple">Admin</span>{% endif %}
-            </div>
-          </td>
-          <td style="color:#6B7280;white-space:nowrap">{{ u.email }}</td>
-          <td style="color:#6B7280;white-space:nowrap">{{ u.created_at|date:"M d" }}</td>
-          <td style="color:#6B7280">{{ u.get_country_display }}</td>
-          <td style="text-align:center">{{ u.listing_count }}</td>
-          <td style="text-align:center">{{ u.application_count }}</td>
-          <td>
-            {% if u.is_active %}<span class="badge badge-green">Active</span>
-            {% else %}<span class="badge badge-red">Banned</span>{% endif %}
-          </td>
-          <td>
-            <div style="position:relative;display:inline-block">
-              <button onclick="toggleMenu(this)" style="background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;color:#6B7280;font-size:18px;font-weight:bold;line-height:1" title="Actions">⋮</button>
-              <div class="action-menu" style="display:none;position:fixed;background:#fff;border:1px solid #E5E7EB;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:1000;min-width:140px">
-                <a href="{% url 'accounts_app:public_profile' u.id %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6" target="_blank">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  View Profile
-                </a>
-                <a href="{% url 'dashboard_app:view_user_listings' u.id %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12L12 3L21 12V20a1 1 0 0 1-1 1H15V15H9v6H4a1 1 0 0 1-1-1Z"/></svg>
-                  Listings
-                </a>
-                <a href="{% url 'dashboard_app:view_user_applications' u.id %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                  Applications
-                </a>
-                <a href="mailto:{{ u.email }}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                  Email
-                </a>
-                <a href="{% url 'dashboard_app:user_documents' u.id %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                  Verify Documents
-                </a>
-                {% if u.is_active %}
-                  <button type="button" onclick="openBanModal({{ u.id }}, '{{ u.full_name|escapejs }}')" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#E11D48;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit;text-align:left">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                    Ban
-                  </button>
-                {% else %}
-                  <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="margin:0">
-                    {% csrf_token %}
-                    <button type="submit" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#059669;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-                      Unban
-                    </button>
-                  </form>
-                {% endif %}
-                {% if not u.is_staff %}
-                  <button onclick="openDeleteModal({{ u.id }}, '{{ u.full_name }}', {{ u.listings.count }}, {{ u.applications.count }})" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#E11D48;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                    Delete
-                  </button>
-                {% endif %}
-              </div>
-            </div>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="8" style="text-align:center;color:#9CA3AF;padding:20px">No users found.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+<!-- ── Summary stats (also act as quick filters) ── -->
+<div class="msg-stats">
+  <a href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'all' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:var(--brand-100)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ total_count }}</div>
+      <div class="msg-stat-label">Total users</div>
+    </div>
+  </a>
+  <a href="?status=active{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'active' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:#D1FAE5">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ active_count }}</div>
+      <div class="msg-stat-label">Active</div>
+    </div>
+  </a>
+  <a href="?status=banned{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'banned' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:#FEE2E2">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ banned_count }}</div>
+      <div class="msg-stat-label">Banned</div>
+    </div>
+  </a>
+  <a href="?status=admins{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-stat{% if status_filter == 'admins' %} active{% endif %}">
+    <div class="msg-stat-icon" style="background:#EDE9FE">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3.5 8-7 9c-3.5-1-7-4-7-9V6l7-3z"/></svg>
+    </div>
+    <div>
+      <div class="msg-stat-num">{{ admin_count }}</div>
+      <div class="msg-stat-label">Admins</div>
+    </div>
+  </a>
+</div>
+
+<div class="adm-card" style="padding:0">
+  <!-- ── Toolbar: filter tabs + search ── -->
+  <form method="get" class="msg-toolbar">
+    <div class="msg-tabs">
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=all" class="msg-tab{% if status_filter == 'all' %} active{% endif %}">All</a>
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=active" class="msg-tab{% if status_filter == 'active' %} active{% endif %}">Active</a>
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=banned" class="msg-tab{% if status_filter == 'banned' %} active{% endif %}">Banned</a>
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=admins" class="msg-tab{% if status_filter == 'admins' %} active{% endif %}">Admins</a>
+    </div>
+    <input type="hidden" name="status" value="{{ status_filter }}">
+    <div class="msg-search">
+      <svg class="msg-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" name="q" value="{{ search_query }}" placeholder="Search by name or email...">
+      {% if search_query %}
+        <a href="?status={{ status_filter }}" class="msg-search-clear" title="Clear search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </a>
+      {% endif %}
+    </div>
+    {% if search_query %}
+      <div class="msg-search-result">
+        <strong>{{ page_obj.paginator.count }}</strong> result{{ page_obj.paginator.count|pluralize }} for &ldquo;{{ search_query }}&rdquo;
+      </div>
+    {% endif %}
+  </form>
+
+  {% for u in all_users %}
+  <div class="msg-row{% if not u.is_active %} banned{% endif %}">
+    {% if u.profile_pic %}
+      <img src="{{ u.profile_pic.url }}" alt="{% if u.first_name %}{{ u.full_name }}{% else %}{{ u.email }}{% endif %}" class="msg-avatar-img">
+    {% else %}
+      <div class="msg-avatar">{% if u.first_name %}{{ u.first_name|first|upper }}{% if u.last_name %}{{ u.last_name|first|upper }}{% endif %}{% else %}{{ u.email|first|upper }}{% endif %}</div>
+    {% endif %}
+    <div class="msg-main">
+      <div class="msg-top">
+        <span class="msg-name">{% if u.first_name %}{{ u.full_name }}{% else %}{{ u.email }}{% endif %}</span>
+        {% if u.is_staff %}<span class="msg-tag msg-tag-admin">Admin</span>{% endif %}
+        {% if u.is_id_verified %}
+          <span class="msg-tag msg-tag-verified" title="ID document approved">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+            Verified
+          </span>
+        {% else %}
+          <span class="msg-tag msg-tag-unverified" title="No approved ID document">Not Verified</span>
+        {% endif %}
+      </div>
+      <div class="msg-preview">{{ u.email }} &middot; {% if u.country %}{{ u.get_country_display }} &middot; {% endif %}joined {{ u.created_at|date:"M d, Y" }}</div>
+    </div>
+    <div class="msg-side">
+      <div class="msg-stat-pair">
+        <div class="msg-mini">
+          <div class="msg-mini-num">{{ u.listing_count }}</div>
+          <div class="msg-mini-label">listings</div>
+        </div>
+        <div class="msg-mini">
+          <div class="msg-mini-num">{{ u.application_count }}</div>
+          <div class="msg-mini-label">apps</div>
+        </div>
+      </div>
+      {% if u.is_active %}
+        <span class="msg-badge msg-badge-active">Active</span>
+      {% else %}
+        <span class="msg-badge msg-badge-banned">Banned</span>
+      {% endif %}
+
+      <!-- Actions kebab -->
+      <div style="position:relative;display:inline-block">
+        <button onclick="toggleMenu(this)" class="msg-kebab" title="Actions" style="font-size:18px;font-weight:bold">⋮</button>
+        <div class="action-menu" style="display:none;position:fixed;background:#fff;border:1px solid #E5E7EB;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:1000;min-width:160px;overflow:hidden">
+          <a href="{% url 'accounts_app:public_profile' u.id %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6" target="_blank">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            View Profile
+          </a>
+          <a href="{% url 'dashboard_app:view_user_listings' u.id %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12L12 3L21 12V20a1 1 0 0 1-1 1H15V15H9v6H4a1 1 0 0 1-1-1Z"/></svg>
+            Listings
+          </a>
+          <a href="{% url 'dashboard_app:view_user_applications' u.id %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Applications
+          </a>
+          <a href="mailto:{{ u.email }}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Email
+          </a>
+          <a href="{% url 'dashboard_app:user_documents' u.id %}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#374151;text-decoration:none;border-bottom:1px solid #F3F4F6">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Verify Documents
+          </a>
+          {% if u.is_active %}
+            <button type="button" onclick="openBanModal({{ u.id }}, '{{ u.full_name|escapejs }}')" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#E11D48;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit;text-align:left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              Ban
+            </button>
+          {% else %}
+            <form method="post" action="{% url 'dashboard_app:unban_user' u.id %}" style="margin:0">
+              {% csrf_token %}
+              <button type="submit" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#059669;background:none;border:none;border-bottom:1px solid #F3F4F6;cursor:pointer;font-family:inherit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                Unban
+              </button>
+            </form>
+          {% endif %}
+          {% if not u.is_staff %}
+            <button onclick="openDeleteModal({{ u.id }}, '{{ u.full_name }}', {{ u.listings.count }}, {{ u.applications.count }})" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:12px;color:#E11D48;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              Delete
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
   </div>
+  {% empty %}
+  <div class="msg-empty">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    <p style="font-weight:600">
+      {% if search_query %}No users match &ldquo;{{ search_query }}&rdquo;.
+      {% elif status_filter == 'active' %}No active users.
+      {% elif status_filter == 'banned' %}No banned users.
+      {% elif status_filter == 'admins' %}No admin users.
+      {% else %}No users found.{% endif %}
+    </p>
+  </div>
+  {% endfor %}
 
   <!-- PAGINATION -->
   {% if page_obj.has_other_pages %}
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;flex-wrap:wrap;gap:10px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;flex-wrap:wrap;gap:10px;border-top:1px solid #F3F4F6">
     <div style="font-size:12px;color:#6B7280">
       Showing <strong>{{ page_obj.start_index }}</strong> to <strong>{{ page_obj.end_index }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> users
     </div>
 
     <div style="display:flex;align-items:center;gap:6px">
       {% if page_obj.has_previous %}
-        <a href="?page=1" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">« First</a>
-        <a href="?page={{ page_obj.previous_page_number }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">‹ Previous</a>
+        <a href="?page=1&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">« First</a>
+        <a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">‹ Previous</a>
       {% else %}
-        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">« First</span>
-        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">‹ Previous</span>
+        <span class="msg-page-disabled">« First</span>
+        <span class="msg-page-disabled">‹ Previous</span>
       {% endif %}
 
-      <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#111827;background:#E5E7EB;border-radius:4px">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      <span class="msg-page-current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
 
       {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">Next ›</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}" style="padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none">Last »</a>
+        <a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">Next ›</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="msg-page-link">Last »</a>
       {% else %}
-        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">Next ›</span>
-        <span style="padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed">Last »</span>
+        <span class="msg-page-disabled">Next ›</span>
+        <span class="msg-page-disabled">Last »</span>
       {% endif %}
     </div>
   </div>
@@ -136,7 +281,9 @@
 
       <form id="banForm" method="post" action="">
         {% csrf_token %}
-        <div style="display:flex;gap:10px;margin-top:20px">
+        <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-top:16px;margin-bottom:6px">Reason (optional)</label>
+        <textarea name="reason" placeholder="Example: Repeated harassment reports, fake listings, etc." style="width:100%;padding:10px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;font-family:inherit;resize:none;min-height:80px;color:#111827"></textarea>
+        <div style="display:flex;gap:10px;margin-top:16px">
           <button type="button" onclick="closeBanModal()" style="flex:1;padding:10px;font-size:13px;font-weight:600;color:#374151;background:#F3F4F6;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Cancel</button>
           <button type="submit" style="flex:1;padding:10px;font-size:13px;font-weight:600;color:#fff;background:#E11D48;border:none;border-radius:6px;cursor:pointer;font-family:inherit">Ban</button>
         </div>
@@ -172,6 +319,7 @@
 function openBanModal(userId, userName) {
   document.getElementById('banModalUserName').textContent = userName;
   document.getElementById('banForm').action = `/dashboard/ban/${userId}/`;
+  document.getElementById('banForm').reset();
   document.getElementById('banModal').style.display = 'flex';
 }
 
@@ -201,7 +349,7 @@ function toggleMenu(btn) {
     } else {
       menu.style.top = (rect.bottom + 4) + 'px';
     }
-    menu.style.left = (rect.left - 140 + rect.width) + 'px';
+    menu.style.left = (rect.left - 160 + rect.width) + 'px';
     menu.style.visibility = 'visible';
   } else {
     menu.style.display = 'none';

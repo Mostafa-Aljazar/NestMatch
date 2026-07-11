@@ -114,21 +114,21 @@
       <div class="footer-contact">
         <p style="font-size:10px;font-weight:800;color:#f9fafb;letter-spacing:1.4px;text-transform:uppercase;margin:0 0 18px">Contact</p>
         <div style="display:flex;flex-direction:column;gap:14px">
-          <a href="mailto:hello@nestmatch.io" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+          <a href="mailto:{{ platform_settings.support_email }}" style="display:flex;align-items:center;gap:10px;text-decoration:none">
             <span style="width:30px;height:30px;border-radius:7px;background:#3a2c1f;border:1px solid #4d3a28;display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
               </svg>
             </span>
-            <span style="font-size:13px;color:#a8998a">hello@nestmatch.io</span>
+            <span style="font-size:13px;color:#a8998a">{{ platform_settings.support_email }}</span>
           </a>
-          <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+          <a href="{{ platform_settings.support_website_url }}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:10px;text-decoration:none">
             <span style="width:30px;height:30px;border-radius:7px;background:#3a2c1f;border:1px solid #4d3a28;display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
               </svg>
             </span>
-            <span style="font-size:13px;color:#a8998a">nestmatch.io</span>
+            <span style="font-size:13px;color:#a8998a">{{ platform_settings.support_domain }}</span>
           </a>
         </div>
 

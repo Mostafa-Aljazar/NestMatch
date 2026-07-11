@@ -6,67 +6,545 @@
 
 {% block page_title %}Reviews{% endblock %}
 
+{% block extra_css %}
+<style>
+.rev-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:640px){.rev-stats{grid-template-columns:1fr}}
+.rev-stat{display:flex;align-items:center;gap:13px;padding:18px 20px;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s,border-color .15s;text-decoration:none;border:1.5px solid transparent;cursor:pointer}
+.rev-stat:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.rev-stat.active{border-color:var(--brand-400)}
+.rev-stat-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rev-stat-num{font-size:22px;font-weight:800;color:#111827;line-height:1}
+.rev-stat-label{font-size:12px;color:#9CA3AF;font-weight:600;margin-top:3px}
+
+.rev-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 22px;background:#FAFBFC;border-bottom:1px solid #F0F1F3;border-radius:16px 16px 0 0}
+.rev-tabs{display:flex;gap:4px;background:#F0F1F3;padding:4px;border-radius:11px;flex-shrink:0}
+.rev-tab{padding:7px 14px;font-size:12.5px;font-weight:700;color:#6B7280;text-decoration:none;border-radius:8px;transition:all .15s;white-space:nowrap}
+.rev-tab:hover{color:#374151}
+.rev-tab.active{background:#fff;color:var(--brand-600);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.rev-search{display:flex;align-items:center;gap:8px;flex:1;max-width:380px;min-width:220px;background:#fff;border:1.5px solid #E5E7EB;border-radius:24px;padding:0 14px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:border-color .15s,box-shadow .15s}
+.rev-search:focus-within{border-color:var(--brand-600);box-shadow:0 0 0 4px rgba(204,102,0,.1)}
+.rev-search svg.rev-search-icon{color:#9CA3AF;flex-shrink:0}
+.rev-search input{flex:1;min-width:0;border:none!important;outline:none!important;background:transparent!important;padding:11px 0!important;margin:0!important;font-size:13.5px;font-family:inherit;color:#111827;box-shadow:none!important;border-radius:0!important}
+.rev-search input::placeholder{color:#B0B7C1}
+.rev-search-clear{flex-shrink:0;background:#F3F4F6;border-radius:50%;border:none;color:#9CA3AF;cursor:pointer;padding:5px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:background .15s,color .15s;text-decoration:none}
+.rev-search-clear:hover{background:#E5E7EB;color:#374151}
+.rev-search-result{flex-basis:100%;font-size:12px;color:#6B7280;font-weight:600}
+.rev-search-result strong{color:var(--brand-600)}
+
+.rev-row{display:flex;align-items:center;gap:14px;padding:17px 22px;border-bottom:1px solid #F3F4F6;cursor:pointer;transition:background .15s}
+.rev-row:last-child{border-bottom:none}
+.rev-row:hover{background:#FAFBFC}
+.rev-row.is-pending{background:#FFFAF2}
+.rev-row.is-pending:hover{background:#FDF3E4}
+.rev-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--brand-600),var(--brand-400));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 2px 6px rgba(204,102,0,.25)}
+.rev-main{flex:1;min-width:0}
+.rev-top{display:flex;align-items:center;gap:8px}
+.rev-name{font-size:14px;font-weight:700;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rev-role-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:var(--brand-600);background:var(--brand-100);padding:2px 8px;border-radius:20px;flex-shrink:0}
+.rev-stars{display:flex;gap:1px;flex-shrink:0}
+.rev-preview{font-size:12.5px;color:#9CA3AF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.rev-side{display:flex;align-items:center;gap:18px;flex-shrink:0}
+.rev-meta{min-width:92px}
+.rev-meta-date{display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:12px;font-weight:600;color:#4B5563;white-space:nowrap}
+.rev-meta-date svg{flex-shrink:0;opacity:.75}
+.rev-empty{padding:64px 20px;text-align:center;color:#9CA3AF}
+
+.rev-badge{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:10.5px;font-weight:700;padding:4px 12px;border-radius:20px;flex-shrink:0;min-width:88px;text-align:center}
+.rev-badge-pending{background:#FDDCC7;color:#A85300}
+.rev-badge-approved{background:#D1FAE5;color:#059669}
+
+/* ── Pagination ── */
+.rev-page-link{padding:6px 10px;font-size:11px;font-weight:600;color:var(--brand-600);background:var(--brand-50);border:1px solid #DDD6FE;border-radius:4px;text-decoration:none}
+.rev-page-disabled{padding:6px 10px;font-size:11px;font-weight:600;color:#D1D5DB;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:4px;cursor:not-allowed}
+.rev-page-current{padding:6px 10px;font-size:11px;font-weight:600;color:#111827;background:#E5E7EB;border-radius:4px}
+
+/* ── Modal ── */
+.rev-modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);z-index:2000;align-items:center;justify-content:center;padding:16px}
+.rev-modal-overlay.open{display:flex}
+.rev-modal{background:#fff;border-radius:20px;box-shadow:0 30px 70px rgba(0,0,0,.3);max-width:540px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;animation:revModalIn .25s cubic-bezier(.16,1,.3,1)}
+.rev-modal-scroll{overflow-y:auto;flex:1 1 auto;min-height:0;scrollbar-width:thin;scrollbar-color:#D1D5DB transparent}
+.rev-modal-scroll::-webkit-scrollbar{width:6px}
+.rev-modal-scroll::-webkit-scrollbar-track{background:transparent}
+.rev-modal-scroll::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:20px}
+.rev-modal-scroll::-webkit-scrollbar-thumb:hover{background:#9CA3AF}
+@keyframes revModalIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.rev-modal-banner{position:relative;background:linear-gradient(135deg,var(--brand-700),var(--brand-600) 55%,var(--brand-500));padding:28px 26px 24px;flex-shrink:0}
+.rev-modal-x{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.16);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.rev-modal-x:hover{background:rgba(255,255,255,.28)}
+.rev-modal-header{display:flex;align-items:center;gap:16px}
+.rev-modal-avatar{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);border:2.5px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0}
+.rev-modal-title{font-size:17px;font-weight:800;color:#fff;margin:0}
+.rev-modal-sub{font-size:12.5px;color:rgba(255,255,255,.85);margin-top:3px}
+.rev-modal-stars{display:flex;gap:2px;margin-top:6px}
+
+.rev-modal-body{padding:24px 26px 22px;background:linear-gradient(180deg,#FFFAF2 0%,#fff 90px)}
+.rev-modal-date{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#A85300;font-weight:700;margin-bottom:22px;background:var(--brand-100);padding:5px 12px;border-radius:20px}
+.rev-modal-date::before{content:'';display:inline-block;width:12px;height:12px;background-color:#A85300;flex-shrink:0;-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");-webkit-mask-size:contain;mask-size:contain}
+.rev-modal-section-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px}
+.rev-modal-section-label svg{color:var(--brand-500)}
+.rev-modal-text{padding:16px 18px;background:#fff;border:1px solid #F0F1F3;border-left:3px solid var(--brand-500);border-radius:4px 14px 14px 4px;font-size:13.5px;color:#374151;line-height:1.7;white-space:pre-wrap;max-height:260px;overflow-y:auto;box-shadow:0 1px 4px rgba(0,0,0,.03)}
+.rev-modal-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 26px;background:#FAFBFC;border-top:1px solid #F0F1F3}
+.rev-modal-footer-left{display:flex;gap:8px}
+.rev-modal-footer-right{display:flex;gap:8px}
+.rev-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;font-size:12.5px;font-weight:700;border:none;border-radius:9px;cursor:pointer;font-family:inherit;transition:filter .15s,transform .15s,box-shadow .15s}
+.rev-btn:hover{transform:translateY(-1px)}
+.rev-btn-close{color:#4B5563;background:#fff;border:1.5px solid #E5E7EB!important}
+.rev-btn-close:hover{background:#F9FAFB;border-color:#D1D5DB!important}
+.rev-btn-approve{color:#059669;background:#fff;border:1.5px solid #BBF7D0!important}
+.rev-btn-approve:hover{background:#F0FDF4}
+.rev-btn-reject{color:#E11D48;background:#fff;border:1.5px solid #FECDD3!important}
+.rev-btn-reject:hover{background:#FFF1F2}
+
+/* ── Reject confirmation dialog ── */
+.rev-confirm-dialog{background:#fff;border-radius:18px;box-shadow:0 30px 70px rgba(0,0,0,.3);max-width:380px;width:100%;padding:28px 26px 24px;text-align:center;animation:revModalIn .22s cubic-bezier(.16,1,.3,1)}
+.rev-confirm-icon{width:52px;height:52px;border-radius:50%;background:#FEF2F2;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.rev-confirm-title{font-size:16px;font-weight:800;color:#111827;margin:0 0 8px}
+.rev-confirm-body{font-size:13px;color:#6B7280;line-height:1.5;margin:0 0 22px}
+.rev-confirm-actions{display:flex;gap:10px;justify-content:center}
+.rev-confirm-actions .rev-btn{flex:1}
+.rev-btn-reject-confirm{color:#fff;background:linear-gradient(135deg,#E11D48,#BE123C);box-shadow:0 4px 12px rgba(225,29,72,.3)}
+.rev-btn-reject-confirm:hover{box-shadow:0 6px 16px rgba(225,29,72,.4)}
+
+/* ── Reused from Messages page: profile link + email-compose section ── */
+.msg-modal-profile-link{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#fff;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px;text-decoration:none;transition:background .15s}
+.msg-modal-profile-link:hover{background:rgba(255,255,255,.32)}
+.msg-modal-section-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px}
+.msg-modal-section-label svg{color:var(--brand-500)}
+.msg-reply-section{margin-top:24px;padding:18px 18px 16px;background:linear-gradient(160deg,var(--brand-50),#fff 60%);border:1px solid #FBC9A3;border-radius:14px}
+.msg-reply-section .msg-modal-section-label{color:#A85300}
+.msg-reply-section .msg-modal-section-label svg{color:var(--brand-600)}
+.msg-reply-textarea{width:100%;min-height:90px;padding:12px 14px;font-size:13px;font-family:inherit;color:#111827;background:#fff;border:1.5px solid #F0D9BE;border-radius:10px;resize:vertical;outline:none;transition:border-color .15s,box-shadow .15s;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.msg-reply-textarea:focus{border-color:var(--brand-600);box-shadow:0 0 0 3px rgba(204,102,0,.12)}
+.msg-reply-status{font-size:11.5px;font-weight:600;color:#9CA3AF}
+.msg-reply-status.success{color:#059669}
+.msg-reply-status.error{color:#E11D48}
+.msg-btn-send{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;font-size:12.5px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--brand-600),var(--brand-500));border:none;border-radius:9px;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(204,102,0,.35);transition:transform .15s,filter .15s,box-shadow .15s}
+.msg-btn-send:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(204,102,0,.4)}
+.msg-btn-send:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+</style>
+{% endblock %}
+
 {% block content %}
 <div style="margin-bottom:20px">
   <h2 style="font-size:20px;font-weight:800;color:#111827">Reviews</h2>
-  <p style="font-size:13px;color:#6B7280;margin-top:2px">{{ pending_reviews|length }} review{{ pending_reviews|pluralize }} awaiting approval</p>
+  <p style="font-size:13px;color:#6B7280;margin-top:2px">Testimonials submitted by users &middot; click a review to read it in full</p>
 </div>
 
-<!-- Pending first -->
-<div class="adm-card">
-  <div class="adm-section-title">Pending Review</div>
-  <div style="overflow-x:auto">
-    <table class="adm-tbl">
-      <thead><tr><th>Reviewer</th><th>Role</th><th>Location</th><th>Review</th><th>Submitted</th><th>Actions</th></tr></thead>
-      <tbody>
-        {% for review in pending_reviews %}
-        <tr>
-          <td style="font-weight:600">{{ review.reviewer_name }}</td>
-          <td>{{ review.get_role_display }}</td>
-          <td style="color:#6B7280">{{ review.location|default:"—" }}</td>
-          <td style="color:#374151;max-width:280px">{{ review.quote|truncatechars:100 }}</td>
-          <td style="color:#6B7280;white-space:nowrap">{{ review.created_at|date:"M d, Y" }}</td>
-          <td>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-              <form method="post" action="{% url 'dashboard_app:approve_review' review.id %}" style="display:inline">
-                {% csrf_token %}
-                <button type="submit" class="btn-unban">Approve</button>
-              </form>
-              <form method="post" action="{% url 'dashboard_app:reject_review' review.id %}" style="display:inline" onsubmit="return confirm('Delete this review permanently?')">
-                {% csrf_token %}
-                <button type="submit" class="btn-ban">Reject</button>
-              </form>
-            </div>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="6" style="text-align:center;color:#9CA3AF;padding:20px">No pending reviews.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<!-- ── Summary stats (also act as quick filters) ── -->
+<div class="rev-stats">
+  <a href="?status=all{% if search_query %}&q={{ search_query }}{% endif %}" class="rev-stat{% if status_filter == 'all' %} active{% endif %}">
+    <div class="rev-stat-icon" style="background:var(--brand-100)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    </div>
+    <div>
+      <div class="rev-stat-num">{{ total_count }}</div>
+      <div class="rev-stat-label">Total reviews</div>
+    </div>
+  </a>
+  <a href="?status=pending{% if search_query %}&q={{ search_query }}{% endif %}" class="rev-stat{% if status_filter == 'pending' %} active{% endif %}">
+    <div class="rev-stat-icon" style="background:#FDDCC7">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A85300" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 3"/></svg>
+    </div>
+    <div>
+      <div class="rev-stat-num">{{ pending_count }}</div>
+      <div class="rev-stat-label">Awaiting approval</div>
+    </div>
+  </a>
+  <a href="?status=approved{% if search_query %}&q={{ search_query }}{% endif %}" class="rev-stat{% if status_filter == 'approved' %} active{% endif %}">
+    <div class="rev-stat-icon" style="background:#D1FAE5">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div>
+      <div class="rev-stat-num">{{ approved_count }}</div>
+      <div class="rev-stat-label">Approved</div>
+    </div>
+  </a>
+</div>
+
+<div class="adm-card" style="padding:0">
+  <!-- ── Toolbar: filter tabs + search ── -->
+  <form method="get" class="rev-toolbar">
+    <div class="rev-tabs">
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=all" class="rev-tab{% if status_filter == 'all' %} active{% endif %}">All</a>
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=pending" class="rev-tab{% if status_filter == 'pending' %} active{% endif %}">Pending</a>
+      <a href="?{% if search_query %}q={{ search_query }}&{% endif %}status=approved" class="rev-tab{% if status_filter == 'approved' %} active{% endif %}">Approved</a>
+    </div>
+    <input type="hidden" name="status" value="{{ status_filter }}">
+    <div class="rev-search">
+      <svg class="rev-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" name="q" value="{{ search_query }}" placeholder="Search by name...">
+      {% if search_query %}
+        <a href="?status={{ status_filter }}" class="rev-search-clear" title="Clear search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </a>
+      {% endif %}
+    </div>
+    {% if search_query %}
+      <div class="rev-search-result">
+        <strong>{{ page_obj.paginator.count }}</strong> result{{ page_obj.paginator.count|pluralize }} for &ldquo;{{ search_query }}&rdquo;
+      </div>
+    {% endif %}
+  </form>
+
+  {% for review in all_reviews %}
+  <div id="rev-row-{{ review.id }}"
+       class="rev-row{% if not review.approved %} is-pending{% endif %}"
+       onclick="openRevModal({{ review.id }})"
+       data-name="{{ review.reviewer_name }}"
+       data-role="{{ review.get_role_display }}"
+       data-date="{{ review.created_at|date:'M d, Y \a\t H:i' }}"
+       data-quote="{{ review.quote }}"
+       data-rating="{{ review.rating }}"
+       data-approved="{{ review.approved|yesno:'1,' }}"
+       data-approve-url="{% url 'dashboard_app:approve_review' review.id %}"
+       data-reject-url="{% url 'dashboard_app:reject_review' review.id %}"
+       data-email-url="{% url 'dashboard_app:email_review_author' review.id %}"
+       data-profile-url="{% url 'accounts_app:public_profile' review.user_id %}"
+       data-user-email="{{ review.user.email }}"
+       data-avatar-url="{% if review.user.profile_pic %}{{ review.user.profile_pic.url }}{% endif %}">
+    {% if review.user.profile_pic %}
+      <img src="{{ review.user.profile_pic.url }}" alt="{{ review.reviewer_name }}" class="rev-avatar" style="object-fit:cover">
+    {% else %}
+    <div class="rev-avatar">{{ review.reviewer_name|first|upper }}</div>
+    {% endif %}
+    <div class="rev-main">
+      <div class="rev-top">
+        <span class="rev-name">{{ review.reviewer_name }}</span>
+        <span class="rev-role-badge">{{ review.get_role_display }}</span>
+        <span class="rev-stars">
+          {% for i in "12345" %}
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="{% if forloop.counter <= review.rating %}#F59E0B{% else %}none{% endif %}" stroke="{% if forloop.counter <= review.rating %}none{% else %}#D1D5DB{% endif %}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          {% endfor %}
+        </span>
+      </div>
+      <div class="rev-preview">{{ review.quote|truncatechars:90 }}</div>
+    </div>
+    <div class="rev-side">
+      {% if review.approved %}
+        <span class="rev-badge rev-badge-approved">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          Approved
+        </span>
+      {% else %}
+        <span class="rev-badge rev-badge-pending">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+          Pending
+        </span>
+      {% endif %}
+      <div class="rev-meta">
+        <div class="rev-meta-date">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          {{ review.created_at|date:"M d, Y" }}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="rev-empty">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <p style="font-weight:600">
+      {% if search_query %}No reviews match &ldquo;{{ search_query }}&rdquo;.
+      {% elif status_filter == 'pending' %}No reviews awaiting approval.
+      {% elif status_filter == 'approved' %}No approved reviews yet.
+      {% else %}No reviews yet.{% endif %}
+    </p>
+  </div>
+  {% endfor %}
+
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;flex-wrap:wrap;gap:10px;border-top:1px solid #F3F4F6">
+    <div style="font-size:12px;color:#6B7280">
+      Showing <strong>{{ page_obj.start_index }}</strong> to <strong>{{ page_obj.end_index }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> reviews
+    </div>
+
+    <div style="display:flex;align-items:center;gap:6px">
+      {% if page_obj.has_previous %}
+        <a href="?page=1&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="rev-page-link">« First</a>
+        <a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="rev-page-link">‹ Previous</a>
+      {% else %}
+        <span class="rev-page-disabled">« First</span>
+        <span class="rev-page-disabled">‹ Previous</span>
+      {% endif %}
+
+      <span class="rev-page-current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="rev-page-link">Next ›</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&status={{ status_filter }}{% if search_query %}&q={{ search_query }}{% endif %}" class="rev-page-link">Last »</a>
+      {% else %}
+        <span class="rev-page-disabled">Next ›</span>
+        <span class="rev-page-disabled">Last »</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- REVIEW DETAIL MODAL -->
+<div id="revModal" class="rev-modal-overlay" onclick="if(event.target.id==='revModal') closeRevModal()">
+  <div class="rev-modal" onclick="event.stopPropagation()">
+    <div class="rev-modal-banner">
+      <button type="button" class="rev-modal-x" onclick="closeRevModal()" title="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="rev-modal-header">
+        <div id="revModalAvatar" class="rev-modal-avatar"></div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <h3 id="revModalName" class="rev-modal-title"></h3>
+            <a id="revModalProfileLink" href="#" target="_blank" class="msg-modal-profile-link">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              View Profile
+            </a>
+          </div>
+          <div id="revModalSub" class="rev-modal-sub"></div>
+          <div id="revModalStars" class="rev-modal-stars"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rev-modal-scroll">
+      <div class="rev-modal-body">
+        <div id="revModalDate" class="rev-modal-date"></div>
+
+        <div class="rev-modal-section-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Review
+        </div>
+        <div id="revModalText" class="rev-modal-text"></div>
+
+        <div class="msg-reply-section" style="margin-top:24px">
+          <div class="msg-modal-section-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 6.5l8 6 8-6"/></svg>
+            Email the reviewer
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <button type="button" class="rev-quick-tpl" data-tpl="thanks" style="flex:1;padding:8px 10px;font-size:11.5px;font-weight:700;color:#059669;background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:8px;cursor:pointer;font-family:inherit">Say thanks</button>
+            <button type="button" class="rev-quick-tpl" data-tpl="ask" style="flex:1;padding:8px 10px;font-size:11.5px;font-weight:700;color:#A85300;background:var(--brand-50);border:1.5px solid #FBC9A3;border-radius:8px;cursor:pointer;font-family:inherit">Ask what went wrong</button>
+          </div>
+          <input id="revEmailSubject" type="text" placeholder="Subject"
+            style="width:100%;padding:10px 14px;font-size:13px;font-family:inherit;color:#111827;background:#fff;border:1.5px solid #F0D9BE;border-radius:10px;outline:none;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.03)">
+          <textarea id="revEmailBody" class="msg-reply-textarea" placeholder="Write your message here..."></textarea>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+            <span id="revEmailStatus" class="msg-reply-status"></span>
+            <button type="button" id="revEmailSendBtn" class="msg-btn-send" onclick="sendReviewEmail()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Send Email
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="rev-modal-footer">
+        <div class="rev-modal-footer-left">
+          <button type="button" class="rev-btn rev-btn-reject" onclick="rejectCurrentReview()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+            Reject
+          </button>
+        </div>
+        <div class="rev-modal-footer-right">
+          <button type="button" id="revModalApproveBtn" class="rev-btn rev-btn-approve" onclick="approveCurrentReview()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+            Approve
+          </button>
+          <button type="button" class="rev-btn rev-btn-close" onclick="closeRevModal()">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Approved history -->
-<div class="adm-card">
-  <div class="adm-section-title">Approved Reviews</div>
-  <div style="overflow-x:auto">
-    <table class="adm-tbl">
-      <thead><tr><th>Reviewer</th><th>Role</th><th>Location</th><th>Review</th><th>Date</th></tr></thead>
-      <tbody>
-        {% for review in approved_reviews %}
-        <tr>
-          <td style="font-weight:600">{{ review.reviewer_name }}</td>
-          <td>{{ review.get_role_display }}</td>
-          <td style="color:#6B7280">{{ review.location|default:"—" }}</td>
-          <td style="color:#374151;max-width:280px">{{ review.quote|truncatechars:100 }}</td>
-          <td style="color:#6B7280;white-space:nowrap">{{ review.created_at|date:"M d, Y" }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5" style="text-align:center;color:#9CA3AF;padding:20px">No approved reviews yet.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+<!-- REJECT CONFIRMATION DIALOG -->
+<div id="revRejectOverlay" class="rev-modal-overlay" style="z-index:2100" onclick="if(event.target.id==='revRejectOverlay') closeRejectConfirm()">
+  <div class="rev-confirm-dialog" onclick="event.stopPropagation()">
+    <div class="rev-confirm-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+    </div>
+    <h3 class="rev-confirm-title">Reject this review?</h3>
+    <p class="rev-confirm-body">This will permanently delete the review. This action can't be undone.</p>
+    <div class="rev-confirm-actions">
+      <button type="button" class="rev-btn rev-btn-close" onclick="closeRejectConfirm()">Cancel</button>
+      <button type="button" class="rev-btn rev-btn-reject-confirm" onclick="confirmRejectReview()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Yes, reject it
+      </button>
+    </div>
   </div>
 </div>
+
+<!-- Hidden forms POST to the same approve/reject endpoints used elsewhere; the modal just triggers them. -->
+<form id="revApproveForm" method="post" style="display:none">{% csrf_token %}</form>
+<form id="revRejectForm" method="post" style="display:none">{% csrf_token %}</form>
+
+<script>
+let currentRevId = null;
+
+function getCsrfToken() {
+  return document.cookie.split('; ').find(r => r.startsWith('csrftoken='))?.split('=')[1];
+}
+
+function openRevModal(revId) {
+  const row = document.getElementById('rev-row-' + revId);
+  const data = row.dataset;
+
+  currentRevId = revId;
+
+  const avatarEl = document.getElementById('revModalAvatar');
+  if (data.avatarUrl) {
+    avatarEl.innerHTML = '<img src="' + data.avatarUrl + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
+  } else {
+    avatarEl.textContent = data.name.charAt(0).toUpperCase();
+  }
+
+  document.getElementById('revModalName').textContent = data.name;
+  document.getElementById('revModalSub').textContent = data.role;
+  document.getElementById('revModalDate').textContent = data.date;
+  document.getElementById('revModalText').textContent = data.quote;
+  document.getElementById('revModalProfileLink').href = data.profileUrl;
+
+  const starsWrap = document.getElementById('revModalStars');
+  starsWrap.innerHTML = '';
+  const rating = Number(data.rating) || 0;
+  for (let i = 1; i <= 5; i++) {
+    const filled = i <= rating;
+    starsWrap.insertAdjacentHTML('beforeend',
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="' + (filled ? '#FBBF24' : 'rgba(255,255,255,.3)') + '" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
+    );
+  }
+
+  const isApproved = data.approved === '1';
+  document.getElementById('revModalApproveBtn').style.display = isApproved ? 'none' : '';
+
+  document.getElementById('revEmailSubject').value = '';
+  document.getElementById('revEmailBody').value = '';
+  const status = document.getElementById('revEmailStatus');
+  status.textContent = '';
+  status.className = 'msg-reply-status';
+
+  document.getElementById('revModal').classList.add('open');
+}
+
+function closeRevModal() {
+  document.getElementById('revModal').classList.remove('open');
+  currentRevId = null;
+}
+
+document.querySelectorAll('.rev-quick-tpl').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    if (currentRevId === null) return;
+    const row = document.getElementById('rev-row-' + currentRevId);
+    const name = row.dataset.name;
+    const subjectEl = document.getElementById('revEmailSubject');
+    const bodyEl = document.getElementById('revEmailBody');
+
+    if (btn.dataset.tpl === 'thanks') {
+      subjectEl.value = 'Thank you for your review!';
+      bodyEl.value = 'Hi ' + name + ',\n\nThank you so much for taking the time to share your experience with NestMatch — we really appreciate it!';
+    } else {
+      subjectEl.value = 'About your recent review';
+      bodyEl.value = 'Hi ' + name + ',\n\nThanks for your feedback. We noticed your rating and would love to know more about what went wrong so we can make things right.';
+    }
+  });
+});
+
+function sendReviewEmail() {
+  if (currentRevId === null) return;
+
+  const subjectEl = document.getElementById('revEmailSubject');
+  const bodyEl = document.getElementById('revEmailBody');
+  const status = document.getElementById('revEmailStatus');
+  const sendBtn = document.getElementById('revEmailSendBtn');
+  const subject = subjectEl.value.trim();
+  const body = bodyEl.value.trim();
+
+  if (!subject || !body) {
+    status.textContent = 'Subject and message are both required.';
+    status.className = 'msg-reply-status error';
+    return;
+  }
+
+  const row = document.getElementById('rev-row-' + currentRevId);
+  const url = row.dataset.emailUrl;
+
+  sendBtn.disabled = true;
+  status.textContent = 'Sending...';
+  status.className = 'msg-reply-status';
+
+  const formBody = new URLSearchParams();
+  formBody.set('subject', subject);
+  formBody.set('body', body);
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRFToken': getCsrfToken(),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: formBody.toString(),
+  })
+    .then(function (resp) { return resp.json().then(function (data) { return { ok: resp.ok, data: data }; }); })
+    .then(function (result) {
+      sendBtn.disabled = false;
+      if (result.ok && result.data.ok) {
+        status.textContent = 'Email sent!';
+        status.className = 'msg-reply-status success';
+        admToast('Email sent to ' + row.dataset.userEmail + '.', 'success');
+      } else {
+        status.textContent = (result.data && result.data.error) || 'Failed to send email.';
+        status.className = 'msg-reply-status error';
+      }
+    })
+    .catch(function () {
+      sendBtn.disabled = false;
+      status.textContent = 'Failed to send email. Check your connection.';
+      status.className = 'msg-reply-status error';
+    });
+}
+
+function approveCurrentReview() {
+  if (currentRevId === null) return;
+  const row = document.getElementById('rev-row-' + currentRevId);
+  const form = document.getElementById('revApproveForm');
+  form.action = row.dataset.approveUrl;
+  form.submit();
+}
+
+let pendingRejectId = null;
+
+function rejectCurrentReview() {
+  if (currentRevId === null) return;
+  pendingRejectId = currentRevId;
+  closeRevModal();
+  document.getElementById('revRejectOverlay').classList.add('open');
+}
+
+function closeRejectConfirm() {
+  document.getElementById('revRejectOverlay').classList.remove('open');
+  pendingRejectId = null;
+}
+
+function confirmRejectReview() {
+  if (pendingRejectId === null) return;
+  const row = document.getElementById('rev-row-' + pendingRejectId);
+  const form = document.getElementById('revRejectForm');
+  form.action = row.dataset.rejectUrl;
+  document.getElementById('revRejectOverlay').classList.remove('open');
+  pendingRejectId = null;
+  form.submit();
+}
+
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  const rejectOpen = document.getElementById('revRejectOverlay').classList.contains('open');
+  if (rejectOpen) {
+    closeRejectConfirm();
+  } else {
+    closeRevModal();
+  }
+});
+</script>
 {% endblock %}

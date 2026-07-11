@@ -1191,7 +1191,8 @@ window.NM = {
   title:      '{{ listing.title|escapejs }}',
   imageCount: '{{ images|length }}',
   listingPk:  '{{ listing.pk }}',
-  applyUrl:   '{% url "applications_app:apply" listing.pk %}'
+  applyUrl:   '{% url "applications_app:apply" listing.pk %}',
+  seekerIdStatus: '{{ seeker_id_status|default:"" }}'
 };
 
 function nmToggleFavDetail(event, btn) {

@@ -83,6 +83,53 @@ class SiteContent(models.Model):
         return obj
 
 
+class PlatformSettings(models.Model):
+    """
+    Singleton model for admin-configurable platform settings.
+    Use PlatformSettings.load() to fetch-or-create it.
+    """
+
+    platform_name = models.CharField(max_length=80, default='NestMatch')
+    support_email = models.EmailField(default='hello@nestmatch.io')
+    site_url = models.CharField(max_length=200, default='nestmatch.io')
+    max_listing_photos = models.PositiveSmallIntegerField(default=10)
+    auto_approve_listings = models.BooleanField(default=False)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Platform Settings'
+        verbose_name_plural = 'Platform Settings'
+
+    def __str__(self):
+        return 'Platform Settings'
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def load(cls):
+        obj, _created = cls.objects.get_or_create(pk=1)
+        return obj
+
+    @property
+    def support_domain(self):
+        return self.site_url_display
+
+    @property
+    def site_url_display(self):
+        url = (self.site_url or 'nestmatch.io').strip()
+        for prefix in ('https://', 'http://'):
+            if url.lower().startswith(prefix):
+                url = url[len(prefix):]
+        return url.rstrip('/').split('/')[0] or 'nestmatch.io'
+
+    @property
+    def support_website_url(self):
+        return f'https://{self.site_url_display}'
+
+
 class ContactMessage(models.Model):
     name       = models.CharField(max_length=100)
     email      = models.EmailField()
@@ -90,8 +137,39 @@ class ContactMessage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_read    = models.BooleanField(default=False)
 
+    # Set when the sender was logged in at the time of submission, so the
+    # admin messages list can show their real name/profile picture instead
+    # of just the raw text they typed into the form. Nullable because
+    # anonymous visitors can still use the Contact Us form.
+    user = models.ForeignKey(
+        'accounts_app.User', null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='contact_messages',
+    )
+
     def __str__(self):
         return f"{self.name} — {self.email}"
 
     class Meta:
         ordering = ['-created_at']
+
+
+class ContactReply(models.Model):
+    """
+    One admin reply email sent for a ContactMessage. A message can have
+    several of these over time (e.g. a follow-up after the visitor
+    responds again), so this is a separate one-to-many model rather than
+    a single reply_text field on ContactMessage.
+    """
+    message    = models.ForeignKey(ContactMessage, on_delete=models.CASCADE, related_name='replies')
+    reply_text = models.TextField()
+    replied_at = models.DateTimeField(auto_now_add=True)
+    replied_by = models.ForeignKey(
+        'accounts_app.User', null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='contact_replies',
+    )
+
+    def __str__(self):
+        return f"Reply to {self.message_id} at {self.replied_at:%Y-%m-%d %H:%M}"
+
+    class Meta:
+        ordering = ['replied_at']

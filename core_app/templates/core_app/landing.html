@@ -262,24 +262,29 @@
       <div class="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {% if reviews %}
           {% for review in reviews %}
-            <div class="bg-white shadow-sm p-6 border border-brand-100 rounded-2xl">
-              <div class="flex gap-0.5 mb-4">
+            <div class="group relative flex flex-col bg-white shadow-sm hover:shadow-lg p-7 border border-brand-100 hover:border-brand-200 rounded-2xl transition-all hover:-translate-y-0.5 duration-200">
+              <svg class="top-5 right-6 absolute opacity-[0.08] w-10 h-10 text-brand-600" viewBox="0 0 24 24" fill="currentColor"><path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z"/></svg>
+
+              <div class="flex items-center gap-0.5 mb-4">
                 {% for i in "12345" %}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="{% if forloop.counter <= review.rating %}#FBBF24{% else %}none{% endif %}" stroke="{% if forloop.counter <= review.rating %}none{% else %}currentColor{% endif %}">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="{% if forloop.counter <= review.rating %}#FBBF24{% else %}none{% endif %}" stroke="{% if forloop.counter <= review.rating %}none{% else %}#D1D5DB{% endif %}" stroke-width="1.5">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                   </svg>
                 {% endfor %}
               </div>
-              <p class="mb-5 text-gray-600 text-sm leading-relaxed">"{{ review.quote }}"</p>
-              <div class="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-4">
-                <div class="flex items-center gap-2.5">
-                  <div class="flex justify-center items-center bg-brand-100 rounded-full w-8 h-8 font-black text-brand-700 text-xs">{{ review.reviewer_initials }}</div>
-                  <div>
-                    <div class="font-bold text-gray-800 text-sm">{{ review.reviewer_name }}</div>
-                    <div class="text-brand-400 text-xs">{% if review.location %}{{ review.location }}{% else %}Unknown location{% endif %}</div>
-                  </div>
+
+              <p class="flex-1 mb-6 text-gray-600 text-sm leading-relaxed">"{{ review.quote }}"</p>
+
+              <div class="flex items-center gap-3 pt-5 border-t border-brand-50">
+                {% if review.user.profile_pic %}
+                  <img src="{{ review.user.profile_pic.url }}" alt="{{ review.reviewer_name }}" class="border-2 border-brand-100 rounded-full w-11 h-11 object-cover">
+                {% else %}
+                  <div class="flex justify-center items-center bg-gradient-to-br from-brand-500 to-brand-700 rounded-full w-11 h-11 font-black text-white text-sm">{{ review.reviewer_initials }}</div>
+                {% endif %}
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-gray-900 text-sm truncate">{{ review.reviewer_name }}</div>
+                  <div class="font-semibold text-brand-500 text-xs">{{ review.get_role_display }}</div>
                 </div>
-                <span class="bg-brand-50 text-brand-500 px-2 py-1 rounded-full font-medium text-[11px] hover:bg-brand-50">{{ review.get_role_display }}</span>
               </div>
             </div>
           {% endfor %}

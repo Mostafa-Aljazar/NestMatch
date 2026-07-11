@@ -1,11 +1,16 @@
 # Application app views.py
+import logging
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from listings_app.models import Listing
 from .models import Application
+
+logger = logging.getLogger(__name__)
 
 
 def _build_demo_apps():
@@ -227,7 +232,30 @@ def accept_application(request, pk):
     app.status = Application.STATUS_ACCEPTED
     app.poster_note = request.POST.get('poster_note', '').strip()
     app.save(update_fields=['status', 'poster_note', 'updated_at'])
-    return JsonResponse({'ok': True, 'stats': _listing_application_stats(app.listing)})
+
+    # Accepting a seeker immediately spins up their (unsigned) rental
+    # agreement, so both parties can go straight to signing — no separate
+    # "Generate Agreement" step. Wrapped so a generation hiccup (e.g. the
+    # AI service being down) never blocks the acceptance itself; the
+    # agreement can still be generated later from the detail page.
+    agreement = None
+    view_url = None
+    try:
+        from agreements_app.service import get_or_create_agreement
+        agreement = get_or_create_agreement(app)
+        if agreement:
+            app.agreement = agreement
+            app.save(update_fields=['updated_at'])
+            view_url = reverse('agreements_app:view', args=[agreement.pk])
+    except Exception:
+        logger.exception("Auto-generating agreement failed for application %s", app.pk)
+
+    return JsonResponse({
+        'ok': True,
+        'stats': _listing_application_stats(app.listing),
+        'agreement_id': agreement.pk if agreement else None,
+        'view_url': view_url,
+    })
 
 
 @login_required

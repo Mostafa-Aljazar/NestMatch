@@ -16,6 +16,7 @@ urlpatterns = [
     path('reviews/', views.reviews_list, name='reviews'),
     path('site-content/', views.site_content_page, name='site_content'),
     path('settings/', views.settings_page, name='settings'),
+    path('settings/update/', views.update_settings, name='update_settings'),
 
     # User moderation
     path('ban/<int:user_id>/', views.ban_user, name='ban_user'),
@@ -39,6 +40,7 @@ urlpatterns = [
     # Contact messages
     path('messages/read/<int:message_id>/', views.mark_message_read, name='mark_message_read'),
     path('messages/delete/<int:message_id>/', views.delete_message, name='delete_message'),
+    path('messages/reply/<int:message_id>/', views.reply_message, name='reply_message'),
 
     # Site content update
     path('site-content/update/', views.update_site_content, name='update_site_content'),
@@ -51,4 +53,5 @@ urlpatterns = [
     # Reviews
     path('reviews/<int:review_id>/approve/', views.approve_review, name='approve_review'),
     path('reviews/<int:review_id>/reject/', views.reject_review, name='reject_review'),
+    path('reviews/<int:review_id>/email/', views.email_review_author, name='email_review_author'),
 ]

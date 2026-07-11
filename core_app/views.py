@@ -44,6 +44,7 @@ def index(request):
     reviews = (
         Testimonial.objects
         .filter(approved=True)
+        .select_related('user')
         .order_by('-created_at')[:6]
     )
 
@@ -90,8 +91,15 @@ def faq(request):
 def contact(request):
     if request.method == 'POST':
         name    = request.POST.get('name', '').strip()
-        email   = request.POST.get('email', '').strip()
         message = request.POST.get('message', '').strip()
+
+        # A logged-in visitor's email is always their account email --
+        # ignore whatever the (disabled) field posted and use the real one,
+        # so they can't be impersonated by tampering with the form.
+        if request.user.is_authenticated:
+            email = request.user.email
+        else:
+            email = request.POST.get('email', '').strip()
 
         errors = {}
 
@@ -112,14 +120,23 @@ def contact(request):
             errors['message'] = 'Message must be under 2000 characters!'
 
         if not errors:
-            ContactMessage.objects.create(name=name, email=email, message=message)
+            ContactMessage.objects.create(
+                name=name,
+                email=email,
+                message=message,
+                user=request.user if request.user.is_authenticated else None,
+            )
             messages.success(request, "Your message has been sent! We'll get back to you within 24 hours.")
             return redirect('core_app:contact')
         else:
             messages.error(request, 'Please fix the errors below.')
             return render(request, 'core_app/contact.html', {'errors': errors, 'form_data': {'name': name, 'email': email, 'message': message}})
 
-    return render(request, 'core_app/contact.html')
+    form_data = {}
+    if request.user.is_authenticated:
+        form_data = {'name': request.user.full_name.strip(), 'email': request.user.email}
+
+    return render(request, 'core_app/contact.html', {'form_data': form_data})
 
 
 

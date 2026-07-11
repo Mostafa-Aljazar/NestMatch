@@ -4,6 +4,7 @@ import re
 
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
+from django.utils import timezone
 
 from .models import Agreement
 from .utils import generate_agreement_content
@@ -62,6 +63,10 @@ def _create_agreement(application, version):
         generated_text=_flatten_sections(data, list_lines),
         is_fallback=data['is_fallback'],
         version=version,
+        poster_signed_name=poster.full_name,
+        poster_signed_at=timezone.now(),
+        tenant_signed_name=tenant.full_name,
+        tenant_signed_at=timezone.now(),
     )
 
     try:
