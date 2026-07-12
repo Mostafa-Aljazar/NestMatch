@@ -4,7 +4,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ profile_user.full_name }} — NestMatch</title>
+<title>{{ profile_user.full_name }} | NestMatch</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%23EA580C%22/><path d=%22M17 30L32 16L47 30V50C47 51.5 45.8 52.7 44.3 52.7H37V40H27V52.7H19.7C18.2 52.7 17 51.5 17 50V30Z%22 fill=%22white%22/></svg>">
+<meta property="og:title" content="{{ profile_user.get_full_name|default:profile_user.username }} | NestMatch">
+<meta property="og:description" content="View {{ profile_user.get_full_name|default:profile_user.username }}'s profile and listings on NestMatch.">
+<meta property="og:type" content="profile">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% if profile_user.profile_pic %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ profile_user.profile_pic.url }}">
+{% endif %}
 <script src="https://cdn.tailwindcss.com"></script>
 {% include "core_app/partials/tailwind_config.html" %}
 <link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">

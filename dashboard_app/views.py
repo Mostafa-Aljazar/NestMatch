@@ -564,9 +564,47 @@ def index(request):
 def ban_user(request, user_id):
     if request.method == 'POST':
         user = get_object_or_404(User, id=user_id)
+        was_active = user.is_active
         user.is_active = False
         user.ban_reason = request.POST.get('reason', '').strip()
         user.save()
+
+        if was_active and user.email:
+            reason = user.ban_reason or 'No reason provided.'
+            subject = 'Your NestMatch account has been banned'
+            text_content = (
+                f'Dear {user.full_name or user.username},\n\n'
+                f'Your NestMatch account has been temporarily banned by the platform administrators.\n\n'
+                f'Ban reason: {reason}\n\n'
+                'If you believe this action was taken in error, please contact the NestMatch support team for assistance.\n\n'
+                'Kind regards,\n'
+                'The NestMatch Support Team'
+            )
+            safe_name = escape(user.full_name or user.username)
+            safe_reason = escape(reason)
+            html_content = f'''
+            <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb;">
+              <div style="background: linear-gradient(135deg, #A85300, #964c10); padding: 24px 28px;">
+                <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 700;">NestMatch</h1>
+                <p style="margin: 4px 0 0; color: rgba(255,255,255,0.85); font-size: 12px; text-transform: uppercase; letter-spacing: 0.7px;">Account Notice</p>
+              </div>
+              <div style="padding: 28px; color: #1f2937; line-height: 1.7;">
+                <p style="margin: 0 0 14px;">Dear <strong>{safe_name}</strong>,</p>
+                <p style="margin: 0 0 14px;">Your NestMatch account has been temporarily banned by the platform administrators.</p>
+                <div style="background: #FFFAF2; border: 1px solid #FDDCC7; border-left: 4px solid #A85300; border-radius: 8px; padding: 14px 16px; margin: 0 0 18px;">
+                  <strong>Ban reason:</strong> {safe_reason}
+                </div>
+                <p style="margin: 0 0 6px;">If you believe this action was taken in error, please contact the NestMatch support team for assistance.</p>
+                <p style="margin: 16px 0 0;">Kind regards,<br><strong>The NestMatch Support Team</strong></p>
+              </div>
+            </div>
+            '''
+            email = EmailMultiAlternatives(subject, text_content, None, [user.email])
+            email.attach_alternative(html_content, 'text/html')
+            try:
+                email.send()
+            except Exception:
+                pass
     return redirect('dashboard_app:index')
 
 

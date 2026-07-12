@@ -5,6 +5,7 @@ from .models import SiteContent
 from listings_app.models import Listing ,Favorite
 from accounts_app.models import Testimonial
 from django.contrib import messages
+from django.http import JsonResponse
 from .models import ContactMessage
 import re
 
@@ -87,15 +88,13 @@ def index(request):
 def faq(request):
     return render(request, 'core_app/faq.html')
 
-# contact view
+
+
 def contact(request):
     if request.method == 'POST':
         name    = request.POST.get('name', '').strip()
         message = request.POST.get('message', '').strip()
 
-        # A logged-in visitor's email is always their account email --
-        # ignore whatever the (disabled) field posted and use the real one,
-        # so they can't be impersonated by tampering with the form.
         if request.user.is_authenticated:
             email = request.user.email
         else:
@@ -103,41 +102,35 @@ def contact(request):
 
         errors = {}
 
-        # Name
         if len(name) < 2:
             errors['name'] = 'Name must be at least 2 characters!'
         elif len(name) > 100:
             errors['name'] = 'Name must be under 100 characters!'
 
-        # Email
         if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
             errors['email'] = 'Please enter a valid email address!'
 
-        # Message
         if len(message) < 10:
             errors['message'] = 'Message must be at least 10 characters!'
         elif len(message) > 2000:
             errors['message'] = 'Message must be under 2000 characters!'
 
-        if not errors:
-            ContactMessage.objects.create(
-                name=name,
-                email=email,
-                message=message,
-                user=request.user if request.user.is_authenticated else None,
-            )
-            messages.success(request, "Your message has been sent! We'll get back to you within 24 hours.")
-            return redirect('core_app:contact')
-        else:
-            messages.error(request, 'Please fix the errors below.')
-            return render(request, 'core_app/contact.html', {'errors': errors, 'form_data': {'name': name, 'email': email, 'message': message}})
+        if errors:
+            return JsonResponse({'success': False, 'errors': errors}, status=400)
+
+        ContactMessage.objects.create(
+            name=name,
+            email=email,
+            message=message,
+            user=request.user if request.user.is_authenticated else None,
+        )
+        return JsonResponse({'success': True, 'message': "Your message has been sent! We'll get back to you within 24 hours."})
 
     form_data = {}
     if request.user.is_authenticated:
         form_data = {'name': request.user.full_name.strip(), 'email': request.user.email}
 
     return render(request, 'core_app/contact.html', {'form_data': form_data})
-
 
 
 def privacy_policy(request):

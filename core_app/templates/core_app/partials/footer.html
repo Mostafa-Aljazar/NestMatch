@@ -19,15 +19,42 @@
     .footer-support  { grid-column: 3; grid-row: 1; }
     .footer-contact  { grid-column: 4; grid-row: 1; }
   }
+
+  .footer-leaf-deco {
+    position: absolute;
+    bottom: -30px;
+    right: -20px;
+    width: 170px;
+    height: auto;
+    opacity: .16;
+    pointer-events: none;
+    z-index: 0;
+    transform: rotate(-25deg);
+    transform-origin: bottom center;
+  }
+  @media (max-width: 1024px) { .footer-leaf-deco { right: -15px; width: 130px } }
+  @media (max-width: 640px)  { .footer-leaf-deco { width: 95px; opacity: .12; right: -10px } }
 </style>
 
-<footer style="background:#241a12;font-family:'Outfit',sans-serif">
+<footer style="background:#241a12;font-family:'Outfit',sans-serif;position:relative;overflow:hidden">
 
   <!-- Top gradient line -->
   <div style="height:2px;background:linear-gradient(90deg,var(--brand-600),var(--brand-400),var(--brand-600))"></div>
 
+  <!-- Decorative leaf accent -->
+  <svg class="footer-leaf-deco" viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 250 L100 40" stroke="var(--brand-400)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M100 60 C70 55 45 40 35 15 C65 20 90 35 100 60Z" fill="var(--brand-400)"/>
+    <path d="M100 90 C130 85 155 70 165 45 C135 50 110 65 100 90Z" fill="var(--brand-400)"/>
+    <path d="M100 120 C70 115 45 100 35 75 C65 80 90 95 100 120Z" fill="var(--brand-400)"/>
+    <path d="M100 150 C130 145 155 130 165 105 C135 110 110 125 100 150Z" fill="var(--brand-400)"/>
+    <path d="M100 180 C70 175 45 160 35 135 C65 140 90 155 100 180Z" fill="var(--brand-400)"/>
+    <path d="M100 210 C130 205 155 190 165 165 C135 170 110 185 100 210Z" fill="var(--brand-400)"/>
+    <path d="M100 40 C93 32 88 22 88 10 C97 16 102 28 100 40Z" fill="var(--brand-400)"/>
+  </svg>
+
   <!-- Main footer body -->
-  <div style="max-width:1200px;margin:0 auto;padding:40px 20px 0" class="lg:pt-16 sm:px-8 lg:px-10">
+  <div style="max-width:1200px;margin:0 auto;padding:40px 20px 0;position:relative;z-index:1" class="lg:pt-16 sm:px-8 lg:px-10">
 
     <!-- 4-column grid -->
     <div class="footer-grid pb-8 md:pb-10" style="border-bottom:1px solid #3a2c1f">

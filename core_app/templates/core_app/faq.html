@@ -4,7 +4,13 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FAQ — NestMatch</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%23EA580C%22/><path d=%22M17 30L32 16L47 30V50C47 51.5 45.8 52.7 44.3 52.7H37V40H27V52.7H19.7C18.2 52.7 17 51.5 17 50V30Z%22 fill=%22white%22/></svg>">
+  <title>FAQ | NestMatch</title>
+  <meta property="og:title" content="FAQ — Frequently Asked Questions | NestMatch">
+  <meta property="og:description" content="Common questions about posting rooms, applying for listings, and using NestMatch.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta name="description" content="Common questions about posting rooms, applying for listings, AI compatibility matching, and using NestMatch.">
   <script src="https://cdn.tailwindcss.com"></script>
   {% include "core_app/partials/tailwind_config.html" %}
   <link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
@@ -23,7 +29,7 @@
   {% include "core_app/partials/navbar.html" with active_page="faq" %}
 
   <!-- Hero -->
-  <section class="relative pt-24 pb-20 overflow-hidden" style="background: linear-gradient(135deg, var(--brand-800) 0%, var(--brand-600) 100%, #FFFAF2 100%);">
+  <section class="relative pt-24 pb-20 overflow-hidden" style="background: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 100%, #FFFAF2 100%);">
     <!-- Dots -->
     <div class="absolute inset-0 pointer-events-none" style="background-image:radial-gradient(circle,rgba(255,255,255,.1) 1.5px,transparent 1.5px);background-size:32px 32px"></div>
     <!-- Blobs -->

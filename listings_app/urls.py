@@ -16,4 +16,5 @@ urlpatterns = [
     path('<int:pk>/photos/', views.photo_tour,  name='photo_tour'),
     path('<int:pk>/review/', views.post_review, name='post_review'),
     path('<int:pk>/favorite/', views.toggle_favorite, name='toggle_favorite'),
+    path('generate-description/', views.generate_description_ajax, name='generate_description'),
 ]
