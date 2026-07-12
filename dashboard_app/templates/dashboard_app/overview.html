@@ -184,13 +184,15 @@
       <div class="msg-top">
         <span class="msg-name">{% if u.first_name %}{{ u.full_name }}{% else %}{{ u.email }}{% endif %}</span>
         {% if u.is_staff %}<span class="msg-tag msg-tag-admin">Admin</span>{% endif %}
-        {% if u.is_id_verified %}
-          <span class="msg-tag msg-tag-verified" title="ID document approved">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
-            Verified
-          </span>
-        {% else %}
-          <span class="msg-tag msg-tag-unverified" title="No approved ID document">Not Verified</span>
+        {% if not u.is_staff %}
+          {% if u.is_id_verified %}
+            <span class="msg-tag msg-tag-verified" title="ID document approved">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+              Verified
+            </span>
+          {% else %}
+            <span class="msg-tag msg-tag-unverified" title="No approved ID document">Not Verified</span>
+          {% endif %}
         {% endif %}
       </div>
       <div class="msg-preview">{{ u.email }} &middot; {% if u.country %}{{ u.get_country_display }} &middot; {% endif %}joined {{ u.created_at|date:"M d, Y" }}</div>
