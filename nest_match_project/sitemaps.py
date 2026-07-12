@@ -1,6 +1,7 @@
 # Import the base Sitemap class from Django.
 # This class is responsible for auto-generating the sitemap.xml file
 from django.contrib.sitemaps import Sitemap
+from django.urls import reverse
 
 # Import the Listing model from the listings_app app
 # so we can pull all the rooms from the database
@@ -48,4 +49,4 @@ class ListingSitemap(Sitemap):
         # pattern in listings_app/urls.py
         # (i.e. confirm it's really /rooms/<pk>/ and not something like
         # /rooms/detail/<pk>/)
-        return f"/rooms/{obj.pk}/"
+        return reverse('listings_app:room_detail', args=[obj.pk])
