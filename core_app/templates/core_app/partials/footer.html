@@ -119,7 +119,15 @@
         <div style="display:flex;flex-direction:column;gap:12px">
           <a href="/"           style="font-size:13px;color:#a8998a;text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color='#a8998a'">Home</a>
           <a href="/rooms/"     style="font-size:13px;color:#a8998a;text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color='#a8998a'">Browse Rooms</a>
-          <a href="/rooms/new/" style="font-size:13px;color:#a8998a;text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color='#a8998a'">Post a Room</a>
+           {% if user.is_authenticated %}
+          {% if user.is_id_verified %}
+            <a href="/rooms/new/"  style="font-size:13px;color:#a8998a;text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color='#a8998a'"> Post a Room</a>
+          {% else %}
+            <button onclick="nmShowVerificationAlert()"  style="font-size:13px;color:#a8998a;text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color='#a8998a'">Post a Room</button>
+          {% endif %}
+      {% else %}
+          <a href="/auth/login/"   style="font-size:13px;color:#a8998a;text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color='#a8998a'">Post a Room</a>
+      {% endif %}
           {% if user.is_authenticated and user.is_staff %}
              <a href="/dashboard/" style="font-size:13px;color:#a8998a;text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--brand-400)'" onmouseout="this.style.color='#a8998a'">Dashboard</a>
           {% endif %}
