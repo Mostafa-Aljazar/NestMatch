@@ -4,7 +4,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Favorites — NestMatch</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%23EA580C%22/><path d=%22M17 30L32 16L47 30V50C47 51.5 45.8 52.7 44.3 52.7H37V40H27V52.7H19.7C18.2 52.7 17 51.5 17 50V30Z%22 fill=%22white%22/></svg>">
+<title>My Favorites | NestMatch</title>
+<meta name="description" content="View and manage your saved room listings on NestMatch.">
 <script src="https://cdn.tailwindcss.com"></script>
 {% include "core_app/partials/tailwind_config.html" %}
 <link rel="stylesheet" href="{% static 'core_app/css/theme.css' %}">
@@ -13,29 +15,43 @@
 * { box-sizing: border-box }
 a { text-decoration: none }
 
-.nm-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px }
-@media (max-width: 1280px) { .nm-cards-grid { grid-template-columns: repeat(2, 1fr) } }
-@media (max-width: 640px)  { .nm-cards-grid { grid-template-columns: 1fr } }
+.nm-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+@media (min-width: 640px)  { .nm-container { padding-left: 32px; padding-right: 32px } }
+@media (min-width: 1024px) { .nm-container { padding-left: 40px; padding-right: 40px } }
+
+.nm-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+@media (max-width: 900px)  { .nm-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+@media (max-width: 560px)  { .nm-cards-grid { grid-template-columns: 1fr } }
 </style>
 </head>
 <body class="bg-brand-50">
 
 {% include "core_app/partials/navbar.html" with active_page="favorites" %}
 
-<div class="max-w-[1440px] mx-auto px-7 pt-24 pb-16">
+<div class="nm-container pt-24 pb-16">
 
-  <div class="flex items-center justify-between gap-3 mb-7 flex-wrap">
+  <div class="flex items-end justify-between gap-4 flex-wrap mb-8" style="border-bottom:1px solid #f0dfd0;padding-bottom:22px">
     <div>
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-brand-900 tracking-tight leading-tight flex items-center gap-2.5">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="#f43f5e">
-        <path d="M12 20.25c-.3 0-.6-.1-.85-.28C7.14 17.24 3 13.94 3 9.83 3 7.16 5.16 5 7.83 5c1.53 0 2.98.72 3.89 1.9L12 7.24l.28-.34C13.19 5.72 14.64 5 16.17 5 18.84 5 21 7.16 21 9.83c0 4.11-4.14 7.41-8.15 10.14-.25.18-.55.28-.85.28z"/>
-      </svg>
-      Your Favorites
-      </h1>
-      <p class="text-sm text-gray-500 mt-1">{{ listings|length }} room{{ listings|length|pluralize }} saved for later</p>
+      <div class="flex items-center gap-2.5 mb-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#f43f5e">
+          <path d="M12 20.25c-.3 0-.6-.1-.85-.28C7.14 17.24 3 13.94 3 9.83 3 7.16 5.16 5 7.83 5c1.53 0 2.98.72 3.89 1.9L12 7.24l.28-.34C13.19 5.72 14.64 5 16.17 5 18.84 5 21 7.16 21 9.83c0 4.11-4.14 7.41-8.15 10.14-.25.18-.55.28-.85.28z"/>
+        </svg>
+        <h1 class="text-2xl sm:text-[28px] font-extrabold text-brand-900 tracking-tight leading-none">Your Favorites</h1>
+      </div>
+      <p class="text-sm text-gray-500">{{ listings|length }} room{{ listings|length|pluralize }} saved for later</p>
     </div>
     <a href="{% url 'listings_app:listings' %}"
-       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-brand-500 text-sm font-bold hover:bg-brand-600 bg-brand-50 border border-brand-200 hover:text-brand-50 transition-colors">
+       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-white text-sm font-bold"
+       style="background:var(--brand-600)">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"/></svg> Browse Rooms
     </a>
   </div>
@@ -44,15 +60,13 @@ a { text-decoration: none }
     {% for listing in listings %}
       {% include "listings_app/partials/listing_card.html" with listing=listing %}
     {% empty %}
-      <div style="grid-column:1/-1;text-align:center;padding:90px 20px">
-        <div style="margin-bottom:16px;display:flex;justify-content:center;color:#FCA5A5">
-          <svg width="52" height="52" viewBox="0 0 24 24" fill="currentColor">
+      <div style="grid-column:1/-1;text-align:center;padding:80px 20px 60px">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#e3c4a5" stroke-width="1.5" style="margin:0 auto 20px">
           <path d="M12 20.25c-.3 0-.6-.1-.85-.28C7.14 17.24 3 13.94 3 9.83 3 7.16 5.16 5 7.83 5c1.53 0 2.98.72 3.89 1.9L12 7.24l.28-.34C13.19 5.72 14.64 5 16.17 5 18.84 5 21 7.16 21 9.83c0 4.11-4.14 7.41-8.15 10.14-.25.18-.55.28-.85.28z"/>
         </svg>
-        </div>
-        <div style="font-size:18px;font-weight:700;color:#DD7826;margin-bottom:8px">No favorites yet</div>
-        <div style="font-size:14px;color:#6B7280;margin-bottom:24px">Tap the heart on any listing to save it here.</div>
-        <a href="{% url 'listings_app:listings' %}" style="padding:10px 24px;background:var(--brand-600);color:#fff;border-radius:8px;font-size:14px;font-weight:600">Browse Listings</a>
+        <div style="font-size:17px;font-weight:700;color:#241a12;margin-bottom:6px">No favorites yet</div>
+        <div style="font-size:14px;color:#8a7863;margin-bottom:26px">Tap the heart on any listing to save it here.</div>
+        <a href="{% url 'listings_app:listings' %}" style="padding:10px 26px;background:var(--brand-600);color:#fff;border-radius:8px;font-size:14px;font-weight:600">Browse Listings</a>
       </div>
     {% endfor %}
   </div>

@@ -14,7 +14,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 a{text-decoration:none;cursor:pointer}
 .adm-shell{display:flex;min-height:100vh}
 .adm-sidebar{width:260px;flex-shrink:0;background:linear-gradient(180deg,#1E1B4B 0%,#2D2A6E 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto;transition:transform .3s}
-@media(max-width:900px){.adm-sidebar{transform:translateX(-260px)}.adm-sidebar.open{transform:translateX(0)}}
+@media(max-width:900px){.adm-shell{display:block}.adm-sidebar{transform:translateX(-260px)}.adm-sidebar.open{transform:translateX(0)}}
 .adm-sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:199}
 .adm-sidebar-overlay.open{display:block}
 .adm-body{flex:1;min-width:0;margin-left:260px;display:flex;flex-direction:column;min-height:100vh}

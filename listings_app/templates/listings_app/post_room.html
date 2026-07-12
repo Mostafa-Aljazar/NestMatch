@@ -5,7 +5,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% if listing %}Edit Room{% else %}Post a Room{% endif %} — NestMatch</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%23EA580C%22/><path d=%22M17 30L32 16L47 30V50C47 51.5 45.8 52.7 44.3 52.7H37V40H27V52.7H19.7C18.2 52.7 17 51.5 17 50V30Z%22 fill=%22white%22/></svg>">
+<title>{% if listing %}Edit Room{% else %}Post a Room{% endif %} | NestMatch</title>
+<meta name="description" content="List your room or apartment on NestMatch and find compatible tenants using AI matching.">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -59,8 +61,11 @@
   flex-shrink:0;
 }
 </style>
-</head>
+</head>parShowToast
 <body class="bg-brand-50 text-gray-900 overflow-x-hidden">
+
+<div id="par-toast-container" class="fixed top-20 right-5 z-[99999] flex flex-col gap-3 w-[calc(100%-2.5rem)] sm:w-[360px]"></div>
+
 <svg style="display:none" aria-hidden="true">
 <defs>
 <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 12.9L12 21.5 2.5 12 2.5 2.5 12 2.5 20.6 11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></symbol>
@@ -525,7 +530,7 @@
       <div class="bg-white rounded-2xl p-7 shadow-card">
         <div class="flex items-center justify-between mb-3.5 flex-wrap gap-2.5">
           <h3 class="text-base font-bold text-gray-900 flex items-center gap-2"><span class="shrink-0"></span>Description</h3>
-          <button onclick="parGenerateAI()" id="nm-ai-btn" class="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold hover:bg-brand-50 bg-brand-50 border border-brand-200 rounded-lg cursor-pointer  hover:bg-brand-100 transition-colors">
+          <button onclick="parGenerateAI()" id="nm-ai-btn" class="text-brand-500 flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold hover:bg-brand-50 bg-brand-50 border border-brand-200 rounded-lg cursor-pointer  hover:bg-brand-100 transition-colors">
             <span class="shrink-0"><svg class="nm-ic" width="14" height="14"><use href="#i-sparkle"></use></svg></span> Generate with AI
           </button>
         </div>
@@ -897,8 +902,10 @@
           </div>
         {% endif %}
         <input type="file" id="nm-contract-file" accept=".pdf,.jpg,.jpeg,.png"
-          class="text-xs text-gray-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-brand-700 hover:file:bg-brand-100" />
-        <p id="nm-contract-error" class="mt-2 text-xs text-rose-600"></p>
+        class="text-xs text-gray-500 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-brand-700 hover:file:bg-brand-100"
+        onchange="parPreviewContract(this)" />
+      <div id="nm-contract-preview" class="hidden mt-3 flex items-center gap-3 bg-brand-50 border border-brand-200 rounded-lg p-3 cursor-pointer hover:bg-brand-100 transition-colors"></div>
+      <p id="nm-contract-error" class="mt-2 text-xs text-rose-600"></p>
       {% endif %}
     </div>
 
@@ -918,6 +925,16 @@
     <button type="button" id="par-next" onclick="parStep(window._parStep+1)" class="flex-1 py-3.5 text-[15px] font-bold text-white bg-brand-600 border-none rounded-lg cursor-pointer hover:bg-brand-800 transition-colors flex items-center justify-center gap-1.5">Continue <span class="shrink-0"><svg class="nm-ic" width="15" height="15"><use href="#i-chevron-right"></use></svg></span></button>
   </div>
 </form>
+
+<!-- Contract Preview Modal -->
+<div id="nm-contract-modal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4" style="background:rgba(0,0,0,.7)" onclick="if(event.target===this)parCloseContractModal()">
+  <div style="max-width:90vw;max-height:90vh;position:relative">
+    <button onclick="parCloseContractModal()" style="position:absolute;top:-40px;right:0;background:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <img id="nm-contract-modal-img" src="" style="max-width:90vw;max-height:90vh;border-radius:8px;display:block" alt="Contract preview">
+  </div>
+</div>
 
 <script>
 /* post_room.js — Post a Room wizard logic */
@@ -987,45 +1004,43 @@ function parIsStepValid(s) {
 
 function parShowToast(message, isError) {
   if (!message) return;
-  var existing = document.getElementById('par-toast');
-  if (existing) existing.remove();
+  var container = document.getElementById('par-toast-container');
+  if (!container) return;
+
   var toast = document.createElement('div');
-  toast.id = 'par-toast';
-  toast.className = 'fixed right-4 top-24 z-[999] pointer-events-auto animate-[parToastIn_0.25s_ease]';
-  toast.style.width = '360px';
-  toast.style.maxWidth = '360px';
-  toast.style.background   = isError ? '#fff1f2' : '#f0fdf4';
-  toast.style.border       = '1px solid ' + (isError ? '#fecdd3' : '#bbf7d0');
-  toast.style.borderRadius = '14px';
-  toast.style.padding      = '14px 16px';
-  toast.style.boxShadow    = isError
-    ? '0 4px 24px rgba(239,68,68,.10)'
-    : '0 4px 24px rgba(16,185,129,.10)';
-  toast.style.fontFamily   = "'Plus Jakarta Sans', sans-serif";
+  toast.className = 'flex items-start gap-3 bg-white rounded-2xl border ' +
+    (isError ? 'border-red-100' : 'border-emerald-100') + ' shadow-lg p-4';
+  toast.style.boxShadow = '0 10px 40px rgba(0,0,0,0.12)';
+  toast.style.animation = 'parToastIn 0.25s ease';
 
-  var textColor   = isError ? '#b91c1c' : '#15803d';
-  var accentColor = isError ? '#dc2626' : '#16a34a';
-
+  var iconBg = isError ? 'bg-red-100' : 'bg-emerald-100';
   var icon = isError
-    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="' + accentColor + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M12 3l10 18H2z"/><line x1="12" y1="9" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>'
-    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="' + accentColor + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>';
+    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
 
   toast.innerHTML =
-    '<div style="display:flex;align-items:flex-start;gap:12px">' +
-      icon +
-      '<div style="flex:1;min-width:0">' +
-        '<div style="font-size:13px;font-weight:700;color:' + textColor + ';margin-bottom:3px">' + (isError ? 'Error' : 'Success') + '</div>' +
-        '<div style="font-size:13px;font-weight:500;color:' + textColor + ';line-height:1.5">' + message + '</div>' +
-      '</div>' +
-      '<button type="button" onclick="document.getElementById(\'par-toast\')?.remove()" ' +
-        'style="background:transparent;border:none;color:' + textColor + ';cursor:pointer;font-size:16px;line-height:1;padding:0;flex-shrink:0;margin-top:1px;opacity:.6">✕</button>' +
-    '</div>';
+    '<div class="w-9 h-9 rounded-xl ' + iconBg + ' flex items-center justify-center shrink-0">' + icon + '</div>' +
+    '<div class="flex-1 min-w-0">' +
+      '<p class="text-sm font-bold text-gray-900">' + (isError ? 'Error' : 'Success') + '</p>' +
+      '<p class="text-xs text-gray-500 mt-0.5 leading-relaxed">' + message + '</p>' +
+    '</div>' +
+    '<button class="shrink-0 text-gray-400 hover:text-gray-600 transition-colors">' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+    '</button>';
 
-  document.body.appendChild(toast);
-  setTimeout(function(){ toast.remove(); }, 5000);
+  toast.querySelector('button').addEventListener('click', function() {
+    toast.remove();
+  });
+
+  container.appendChild(toast);
+
+  setTimeout(function() {
+    toast.style.transition = 'opacity 0.3s, transform 0.3s';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(function() { toast.remove(); }, 300);
+  }, 5000);
 }
-
-
 
 function parSetFieldError(fieldId, message) {
   var errorEl = document.getElementById(fieldId + '-error');
@@ -1351,22 +1366,65 @@ function parFeatureLeave(label) {
 var PAR_SPINNER_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:inline-block;animation:spin 1s linear infinite"><path d="M12 3a9 9 0 019 9"/></svg>';
 var PAR_SPARKLE_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/><path d="M19 15l.7 2.1L22 18l-2.3.9L19 21l-.7-2.1L16 18l2.3-.9z"/></svg>';
 
+var GENERATE_DESC_URL = "{% url 'listings_app:generate_description' %}";
+
 function parGenerateAI() {
   var btn = document.getElementById('nm-ai-btn');
   if (btn) { btn.innerHTML = PAR_SPINNER_SVG + ' Generating...'; btn.disabled = true; }
-  setTimeout(function() {
-    var ta = document.getElementById('nm-desc-ta');
-    if (ta) {
-      ta.value = 'A bright, fully-furnished private room in a well-maintained 3-bedroom apartment. The room features a comfortable single bed, built-in wardrobe, study desk, and individual A/C unit. Shared spaces include a modern kitchen, spacious living room, and two clean bathrooms.\n\nLocated on the 4th floor with elevator access in a quiet residential building in Nasr City, just 5 minutes walk from Ain Shams University metro station. Ideal for university students or working professionals seeking a clean, peaceful environment.\n\nUtilities (water, electricity, internet) are included in the monthly rent.';
-      ta.style.borderColor = 'var(--brand-600)';
-      ta.style.boxShadow   = '0 0 0 3px rgba(124,58,237,.12)';
+
+  var typeCard = document.querySelector('.nm-type-card.sel[data-type]');
+  var checkedReqs = Array.from(document.querySelectorAll('#par-s4 input[type="checkbox"]:checked'))
+    .map(function(cb) {
+      var row = cb.closest('.nm-toggle-row');
+      var labelEl = row ? row.querySelector('.text-sm.font-semibold') : null;
+      return labelEl ? labelEl.textContent : null;
+    })
+    .filter(Boolean)
+    .join(', ');
+
+  var form = document.getElementById('par-form');
+  var csrfToken = form.querySelector('[name="csrfmiddlewaretoken"]').value;
+
+  var fd = new FormData();
+  fd.append('title', (document.getElementById('par-title') || {}).value || '');
+  fd.append('listing_type', typeCard ? typeCard.dataset.type : '');
+  fd.append('city', (document.getElementById('nm-field-city') || {}).value || '');
+  fd.append('district', (document.getElementById('nm-field-district') || {}).value || '');
+  fd.append('country', (document.getElementById('nm-field-country') || {}).value || '');
+  fd.append('price', (document.getElementById('par-rent') || {}).value || '');
+  fd.append('tenant_types', (document.getElementById('par-tenant-value') || {}).value || 'anyone');
+  fd.append('requirements', checkedReqs);
+  fd.append('custom_requirements', JSON.stringify(parCollectCustomRequirements()));
+
+  fetch(GENERATE_DESC_URL, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
+    body: fd,
+    credentials: 'same-origin'
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if (data.success) {
+      var ta = document.getElementById('nm-desc-ta');
+      if (ta) {
+        ta.value = data.description;
+        ta.style.borderColor = 'var(--brand-600)';
+        ta.style.boxShadow   = '0 0 0 3px rgba(124,58,237,.12)';
+      }
+      var badge = document.getElementById('nm-ai-badge');
+      if (badge) badge.classList.remove('hidden');
+      var aiFlag = document.getElementById('nm-ai-generated');
+      if (aiFlag) aiFlag.value = '1';
+    } else {
+      parShowToast(data.message || 'AI generation failed.', true);
     }
-    var badge = document.getElementById('nm-ai-badge');
-    if (badge) badge.classList.remove('hidden');
-    var aiFlag = document.getElementById('nm-ai-generated');
-    if (aiFlag) aiFlag.value = '1';
+  })
+  .catch(function(){
+    parShowToast('Something went wrong generating the description.', true);
+  })
+  .finally(function(){
     if (btn) { btn.innerHTML = PAR_SPARKLE_SVG + ' Generate with AI'; btn.disabled = false; }
-  }, 2000);
+  });
 }
 
 // ── Landmark Autocomplete ─────────────────────────────────
@@ -1975,6 +2033,62 @@ function parUploadContract(listingId, csrfToken, onDone) {
     if (errorEl) errorEl.textContent = 'Contract upload failed — you can retry from your profile.';
     onDone();
   });
+}
+
+
+var _contractFileURL = null;
+var _contractFileType = null;
+
+function parPreviewContract(input) {
+  var box = document.getElementById('nm-contract-preview');
+  var errorEl = document.getElementById('nm-contract-error');
+  if (errorEl) errorEl.textContent = '';
+  if (!box) return;
+
+  var file = input.files && input.files[0];
+  if (!file) { box.classList.add('hidden'); box.innerHTML = ''; box.onclick = null; return; }
+
+  var sizeKB = (file.size / 1024).toFixed(0);
+  var sizeLabel = file.size > 1024*1024 ? (file.size/1024/1024).toFixed(1) + ' MB' : sizeKB + ' KB';
+
+  // Revoke any previous object URL to avoid memory leaks
+  if (_contractFileURL) URL.revokeObjectURL(_contractFileURL);
+  _contractFileURL = URL.createObjectURL(file);
+  _contractFileType = file.type;
+
+  var eyeIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+
+  if (file.type.startsWith('image/')) {
+    box.innerHTML =
+      '<img src="' + _contractFileURL + '" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0" alt="">' +
+      '<div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:700;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + file.name + '</div>' +
+      '<div style="font-size:11px;color:#6B7280">' + sizeLabel + '</div></div>' +
+      '<span style="flex-shrink:0;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--brand-600)">' + eyeIcon + ' View</span>';
+    box.onclick = function() { parOpenContractModal(_contractFileURL); };
+  } else {
+    // PDF — open in a new tab (browsers render PDFs natively)
+    box.innerHTML =
+      '<div style="width:56px;height:56px;background:#fff;border:1.5px solid #E5E7EB;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand-600)" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/></svg></div>' +
+      '<div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:700;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + file.name + '</div>' +
+      '<div style="font-size:11px;color:#6B7280">' + sizeLabel + '</div></div>' +
+      '<span style="flex-shrink:0;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--brand-600)">' + eyeIcon + ' View</span>';
+    box.onclick = function() { window.open(_contractFileURL, '_blank'); };
+  }
+
+  box.classList.remove('hidden');
+}
+
+function parOpenContractModal(url) {
+  var modal = document.getElementById('nm-contract-modal');
+  var img   = document.getElementById('nm-contract-modal-img');
+  if (img) img.src = url;
+  if (modal) modal.classList.remove('hidden');
+}
+
+function parCloseContractModal() {
+  var modal = document.getElementById('nm-contract-modal');
+  if (modal) modal.classList.add('hidden');
 }
 
 function parSubmit(action) {

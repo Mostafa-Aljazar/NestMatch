@@ -4,7 +4,6 @@
 
   active_page values: "home" | "listings" | "post_room" | "profile" | "dashboard" | "my_listings" | "favorites" | "faq" | "contact"
 {% endcomment %}
-
 <nav id="nm-nav" class="top-0 right-0 left-0 fixed flex items-center bg-white px-5 border-brand-100 border-b h-16 transition-all duration-300" style="z-index:9998">
   <!-- Logo -->
   <a href="/" class="group flex items-center gap-2 mr-8 no-underline shrink-0">
@@ -74,6 +73,7 @@
           {% else %}
             <span id="nav-avatar-placeholder">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
           {% endif %}
+          {% if not user.is_staff %}
           {% if user.is_id_verified %}
           <span class="absolute -right-0.5 -bottom-0.5 flex justify-center items-center bg-emerald-500 rounded-full ring-2 ring-white w-3.5 h-3.5" title="ID Verified">
             <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
@@ -82,6 +82,7 @@
           <span class="absolute -right-0.5 -bottom-0.5 flex justify-center items-center bg-red-500 rounded-full ring-2 ring-white w-3.5 h-3.5" title="Not Verified">
             <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </span>
+          {% endif %}
           {% endif %}
         </span>
           <span class="max-w-[90px] truncate">{{ user.first_name }}</span>
@@ -100,6 +101,7 @@
             <p class="font-semibold text-[13px] text-gray-900 truncate">{{ user.full_name }}</p>
             <p class="mt-0.5 text-[11px] text-brand-400 truncate">{{ user.email }}</p>
 
+            {% if not user.is_staff %}
             {% if user.is_id_verified %}
             <div class="flex items-center gap-2 bg-emerald-50 mt-2.5 px-2.5 py-1.5 border border-emerald-100 rounded-lg">
               <span class="flex justify-center items-center bg-emerald-500 rounded-full w-4 h-4 shrink-0">
@@ -112,12 +114,13 @@
               <span class="flex justify-center items-center bg-red-500 rounded-full w-4 h-4 shrink-0">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </span>
-              <span class="flex-1 font-semibold text-[11px] text-red-600">Not Verified</span>
+              <span class="flex-1 font-semibold text-[11px] text-red-600">ID Not Verified</span>
               <span class="flex items-center gap-0.5 font-bold text-[10px] text-red-500 group-hover:translate-x-0.5 transition-transform">
                 Verify
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </span>
             </a>
+            {% endif %}
             {% endif %}
           </div>
 
@@ -171,7 +174,7 @@
       </div>
 
     {% else %}
-      <a href="/auth/login/" class="hover:bg-brand-50 hover:shadow-sm px-4 py-2 border border-brand-200 hover:border-brand-300 rounded-lg font-semibold hover:bg-brand-50 text-sm active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">
+      <a href="/auth/login/" class="hover:bg-brand-50 text-brand-500 hover:shadow-sm px-4 py-2 border border-brand-200 hover:border-brand-300 rounded-lg font-semibold hover:bg-brand-50 text-sm active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">
         Login
       </a>
       <a href="/auth/register/" class="bg-brand-600 hover:bg-brand-700 shadow-sm hover:shadow-lg hover:shadow-brand-200 px-4 py-2 rounded-lg font-semibold text-white text-sm active:scale-95 transition-all hover:-translate-y-0.5 active:translate-y-0 duration-200 ease-out">
@@ -189,7 +192,7 @@
   </button>
 
 </nav>
-
+NOT Verified
 <!-- Mobile backdrop -->
 <div id="nm-backdrop" onclick="nmCloseMenu()"
      class="md:hidden fixed inset-0 bg-black/40 opacity-0 backdrop-blur-[3px] transition-opacity duration-300 ease-out pointer-events-none"
@@ -229,6 +232,7 @@
         {% else %}
           <span id="nav-avatar-placeholder-mobile">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
         {% endif %}
+        {% if not user.is_staff %}
         {% if user.is_id_verified %}
         <span class="absolute -right-0.5 -bottom-0.5 flex justify-center items-center bg-emerald-500 rounded-full ring-2 ring-white w-4 h-4" title="ID Verified">
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
@@ -238,15 +242,24 @@
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </span>
         {% endif %}
+        {% endif %}
       </div>
       <div class="min-w-0">
         <div class="flex items-center gap-1.5">
           <p class="font-bold text-[14px] text-gray-900 truncate">{{ user.full_name }}</p>
+          <!-- {% if not user.is_staff %}
           {% if user.is_id_verified %}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#10b981" class="shrink-0" title="ID Verified"><path d="M12 2l2.4 1.8 3-.3 1 2.8 2.6 1.5-.6 2.9L23 12l-2 2.3.6 2.9-2.6 1.5-1 2.8-3-.3L12 22l-2.4-1.8-3 .3-1-2.8L2 16.2l.6-2.9L1 12l2-2.3-.6-2.9 2.6-1.5 1-2.8 3 .3L12 2z"/><path d="M9.5 12.5l1.8 1.8 3.5-3.8" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="shrink-0" title="ID Verified">
+            <circle cx="12" cy="12" r="10" fill="#10b981"/>
+            <path d="M7.5 12.5l2.7 2.7L16.5 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           {% else %}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#ef4444" class="shrink-0" title="Not Verified"><path d="M12 2l2.4 1.8 3-.3 1 2.8 2.6 1.5-.6 2.9L23 12l-2 2.3.6 2.9-2.6 1.5-1 2.8-3-.3L12 22l-2.4-1.8-3 .3-1-2.8L2 16.2l.6-2.9L1 12l2-2.3-.6-2.9 2.6-1.5 1-2.8 3 .3L12 2z"/><path d="M14.5 9.5l-5 5M9.5 9.5l5 5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="shrink-0" title="Not Verified">
+            <circle cx="12" cy="12" r="10" fill="#ef4444"/>
+            <path d="M9 9l6 6M15 9l-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
           {% endif %}
+          {% endif %} -->
         </div>
         <p class="font-medium text-[11px] text-brand-500 truncate">{{ user.email }}</p>
       </div>

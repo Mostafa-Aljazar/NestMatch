@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.urls import reverse 
 from .models import Favorite, Listing, ListingImage
+from .ai_description import generate_listing_description
 
 def listings_page(request):
     qs = Listing.objects.filter(
@@ -386,3 +387,30 @@ def photo_tour(request, pk):
         'groups':  groups,
         'total':   len(images),
     })
+
+
+@login_required
+@require_POST
+def generate_description_ajax(request):
+    if request.headers.get('X-Requested-With') != 'XMLHttpRequest':
+        return JsonResponse({'success': False, 'message': 'Invalid request'}, status=400)
+
+    data = {
+        'title': request.POST.get('title', '').strip(),
+        'listing_type': request.POST.get('listing_type', ''),
+        'city': request.POST.get('city', ''),
+        'district': request.POST.get('district', ''),
+        'country': request.POST.get('country', ''),
+        'price': request.POST.get('price', ''),
+        'tenant_types': request.POST.get('tenant_types', 'anyone'),
+        'requirements': request.POST.get('requirements', ''),
+        'custom_requirements': request.POST.get('custom_requirements', ''),
+    }
+
+    description = generate_listing_description(data)
+    if description is None:
+        return JsonResponse(
+            {'success': False, 'message': 'AI generation failed. Please write your own description or try again.'},
+            status=500,
+        )
+    return JsonResponse({'success': True, 'description': description})

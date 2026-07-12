@@ -5,7 +5,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ listing.title }} — NestMatch</title>
+
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%23EA580C%22/><path d=%22M17 30L32 16L47 30V50C47 51.5 45.8 52.7 44.3 52.7H37V40H27V52.7H19.7C18.2 52.7 17 51.5 17 50V30Z%22 fill=%22white%22/></svg>">
+
+<!-- Meta Description -->
 <meta name="description" content="{{ listing.title }} in {{ listing.city }}{% if listing.district %}, {{ listing.district }}{% endif %}. ${{ listing.price|floatformat:0 }}/month, {{ listing.get_listing_type_display }}, max {{ listing.max_occupants }} occupants. Available from {{ listing.available_from|date:'M j, Y' }}.">
+
+<!-- Open Graph tags (for WhatsApp / Facebook / Twitter sharing) -->
+<meta property="og:title" content="{{ listing.title }} — NestMatch">
+<meta property="og:description" content="${{ listing.price|floatformat:0 }}/month in {{ listing.city }}{% if listing.district %}, {{ listing.district }}{% endif %}. {{ listing.get_listing_type_display }}, max {{ listing.max_occupants }} occupants.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% with first_image=listing.images.first %}
+{% if first_image %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ first_image.image.url }}">
+{% endif %}
+{% endwith %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -673,7 +689,7 @@
         <h3 class="text-[17px] font-extrabold text-gray-900 tracking-tight sm:text-[15px]">AI Compatibility Score</h3>
       </div>
       {% if is_own_listing %}
-        <p class="text-sm text-brand-400 italic">This is your own listing — compatibility scoring doesn't apply.</p>
+        <p class="text-sm text-gray-400 italic">This is your own listing — compatibility scoring doesn't apply.</p>
       {% elif user.is_authenticated %}
         {% if has_profile and compatibility %}
           {% with score=compatibility.overall_score %}
