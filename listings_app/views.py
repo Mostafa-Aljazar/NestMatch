@@ -231,7 +231,7 @@ def my_listings(request):
         )
         .order_by('-created_at')
     )
-    
+
     # Calculate stats using database queries instead of Python iteration
     user_listings = Listing.objects.filter(poster=request.user)
     stats = {

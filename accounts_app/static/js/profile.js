@@ -124,7 +124,7 @@ function recalcLifestyleFraction() {
 }
 
 function recalcStrength() {
-  const boolItems = [strengthState.hasPhone, strengthState.hasBio, strengthState.hasPhoto].filter(Boolean).length;
+  const boolItems = [strengthState.hasPhone, strengthState.hasVerification, strengthState.hasPhoto].filter(Boolean).length;
   const pct = Math.round(((boolItems + strengthState.lifestyleFraction) / 4) * 100);
   if (profileStrengthValueHeader) profileStrengthValueHeader.textContent = `${pct}%`;
   if (profileStrengthBarHeader)   profileStrengthBarHeader.style.width   = `${pct}%`;

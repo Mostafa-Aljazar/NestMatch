@@ -146,7 +146,7 @@ def profile_view(request):
     lifestyle_fields_filled = lifestyle_profile.fields_filled_count if lifestyle_profile else 0
     lifestyle_fields_total = len(LifestyleProfile.ALL_PREFERENCE_FIELDS)
     profile_strength = round(100 * (
-        (bool(user.profile_pic) + bool(user.bio) + bool(user.phone_number) + lifestyle_completeness) / 4
+      (bool(user.profile_pic) + bool(user.is_id_verified) + bool(user.phone_number) + lifestyle_completeness) / 4
     ))
 
     documents = {d.document_type: d for d in user.verification_documents.all()}
