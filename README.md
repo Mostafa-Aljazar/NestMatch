@@ -139,6 +139,69 @@ python manage.py runserver
 
 Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
 
+
+## Output
+### Register Page
+![Register Page](docs/screenshots/Register.png)
+
+<br>
+
+### Login Page
+![Login Page](docs/screenshots/Login.png)
+
+<br>
+
+### Landing Page
+![Landing Page](docs/screenshots/Landing.png)
+
+<br>
+
+### Frequently Asked Questions Page
+![Frequently Asked Questions Page](docs/screenshots/Faq.png)
+
+<br>
+
+### Contact Us Page
+![Contact Us Page](docs/screenshots/Contact.png)
+
+<br>
+
+### Rooms Page
+![Rooms Page](docs/screenshots/Rooms.png)
+
+<br>
+
+### Post Room Steps
+![Basic Information](docs/screenshots/post-step1.png)
+![Location](docs/screenshots/post-step2.png)
+![Photos](docs/screenshots/post-step3.png)
+![Requirements](docs/screenshots/post-step4.png)
+![Review](docs/screenshots/post-step5.png)
+
+<br>
+
+### Profile Page
+![Profile Page](docs/screenshots/profile.png)
+
+<br>
+
+### My Room Page
+![My Room Page](<docs/screenshots/My%20Room.jpeg>)
+
+<br>
+
+### Favorite Page
+![Favorite Page](docs/screenshots/Favorite.jpeg)
+
+<br>
+
+### Applications Page
+![Applications Page](docs/screenshots/Applications.jpeg)
+
+<br>
+
+### Admin dashboard Page
+![Admin dashboard Page](docs/screenshots/Admin.png)
 ---
 
 ## Team
