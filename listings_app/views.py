@@ -225,13 +225,13 @@ def my_listings(request):
         .exclude(price__isnull=True)
         .prefetch_related('images', 'contract_documents')
         .annotate(
-            app_count=Count('applications'),
-            pending_count=Count('applications', filter=Q(applications__status='pending')),
+            app_count=Count('applications', distinct=True),
+            pending_count=Count('applications', filter=Q(applications__status='pending'), distinct=True),
             favorite_count=Count('favorited_by', distinct=True),
         )
         .order_by('-created_at')
     )
-
+    
     # Calculate stats using database queries instead of Python iteration
     user_listings = Listing.objects.filter(poster=request.user)
     stats = {
